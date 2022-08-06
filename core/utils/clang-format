@@ -1,0 +1,39 @@
+
+#!/bin/bash
+
+# Absolute path to this script, e.g. /ws/src/package/utils/clang-format.sh
+SCRIPTPATH=$(readlink -f "$0")
+# Absolute path the directory of this script is in, thus /ws/src/package/utils/
+DIRPATH=$(dirname "$SCRIPTPATH")
+# Package absolute path, thus /ws/src/package
+PACKAGE_ROOT_PATH=$(dirname "$DIRPATH")
+printf "Applying clang-foramt for c++ files in: $PACKAGE_ROOT_PATH\n"
+
+# define foramt function
+format () {
+  FILE=$1
+  # echo "$FILE"
+  clang-format -i -style=file --sort-includes --verbose "$FILE"
+}
+export -f format
+
+if [ $#  -eq  0 ]
+then
+  # Declare directories to search through as a string array
+  declare -a directories=("include" "test" "src")
+  # Search for c++ files through passed directories and call foramt function
+  for dir in "${directories[@]}"; do
+    printf "\n- searching through: $PACKAGE_ROOT_PATH/$dir\n"
+    find "$PACKAGE_ROOT_PATH/$dir" -regextype posix-extended -regex '.*\.(cpp|c|hpp|h)' -exec bash -c 'format "$0"' {} \;
+  done
+else
+  printf "\n- foramting passed file(s):\n"
+  for file in "$@"; do
+    ext="${file##*.}" # get file extension
+    if [[ $ext == cpp || $ext == c || $ext == h || $ext == hpp ]]; then
+        format "$file"
+    else
+        printf "Execlude this file: $file\n"
+    fi
+  done
+fi

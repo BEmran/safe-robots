@@ -1,0 +1,41 @@
+
+#!/bin/bash
+
+# Absolute path to this script, e.g. /ws/src/package/utils/clang-format.sh
+SCRIPTPATH=$(readlink -f "$0")
+# Absolute path the directory of this script is in, thus /ws/src/package/utils/
+DIRPATH=$(dirname "$SCRIPTPATH")
+# Package absolute path, thus /ws/src/package
+PACKAGE_ROOT_PATH=$(dirname "$DIRPATH")
+printf "Applying cmake-foramt for CmakeLists.txt files in: $PACKAGE_ROOT_PATH\n"
+export PACKAGE_ROOT_PATH
+
+# define foramt function
+cformat () {
+  FILE=$1
+  echo "Format: $FILE"
+  cmake-format $1 -i -c $PACKAGE_ROOT_PATH/.cmake-format
+}
+export -f cformat
+
+if [ $#  -eq  0 ]
+then
+  cformat "$PACKAGE_ROOT_PATH/CMakeLists.txt"
+  # Declare directories to search through as a string array
+  declare -a directories=("app" "include" "src" "test")
+  # Search for CMakeLists.txt files through passed directories and call foramt function
+  for dir in "${directories[@]}"; do
+    printf "\n- searching through: $PACKAGE_ROOT_PATH/$dir\n"
+    find "$PACKAGE_ROOT_PATH/$dir" -regextype posix-extended -regex '.*CMakeLists.txt' -exec bash -c 'cformat "$0"' {} \;
+  done
+else
+  printf "\n- foramting passed file(s):\n"
+  for file in "$@"; do
+    file_name="$(basename "$file")"
+    if [[ $file_name == CMakeLists.txt ]]; then
+        cformat "$file"
+    else
+        printf "Execlude this file: $file\n"
+    fi
+  done
+fi
