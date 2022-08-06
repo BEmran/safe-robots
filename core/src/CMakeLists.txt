@@ -5,13 +5,35 @@
 # Create header file list for core library
 # ##############################################################################
 set(CORE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
-set(CORE_HEADER_LIST ${CORE_INCLUDE_DIR}/core/add.hpp)
+set(CORE_HEADER_LIST
+  ${CORE_INCLUDE_DIR}/core/utils/date_time.hpp
+  ${CORE_INCLUDE_DIR}/core/utils/event_level.hpp
+  ${CORE_INCLUDE_DIR}/core/utils/exception.hpp
+  ${CORE_INCLUDE_DIR}/core/utils/formatter.hpp
+  ${CORE_INCLUDE_DIR}/core/utils/system.hpp
+  ${CORE_INCLUDE_DIR}/core/utils/terminal.hpp
+  ${CORE_INCLUDE_DIR}/core/utils/logger.hpp
+  ${CORE_INCLUDE_DIR}/core/utils/node.hpp
+  ${CORE_INCLUDE_DIR}/core/utils/writter_console.hpp
+  ${CORE_INCLUDE_DIR}/core/utils/writter_file.hpp
+  ${CORE_INCLUDE_DIR}/core/utils/writter.hpp
+)
 
 # ##############################################################################
 # Create source file list for core library
 # ##############################################################################
 set(CORE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
-set(CORE_SOURCE_LIST ${CORE_SOURCE_DIR}/core/add.cpp)
+set(CORE_SOURCE_LIST
+  ${CORE_SOURCE_DIR}/core/utils/date_time.cpp
+  ${CORE_SOURCE_DIR}/core/utils/event_level.cpp
+  ${CORE_SOURCE_DIR}/core/utils/formatter.cpp
+  ${CORE_SOURCE_DIR}/core/utils/system.cpp
+  ${CORE_SOURCE_DIR}/core/utils/terminal.cpp
+  ${CORE_SOURCE_DIR}/core/utils/logger.cpp
+  ${CORE_SOURCE_DIR}/core/utils/node.cpp
+  ${CORE_SOURCE_DIR}/core/utils/writter_console.cpp
+  ${CORE_SOURCE_DIR}/core/utils/writter_file.cpp
+)
 
 # ##############################################################################
 # Build core library
@@ -34,7 +56,7 @@ target_include_directories(
 )
 
 # Link required library
-target_link_libraries(${CORE_LIBRARY} PRIVATE)
+target_link_libraries(${CORE_LIBRARY} PRIVATE stdc++fs)
 
 # All users of this library will need at least C++17
 target_compile_features(${CORE_LIBRARY} PUBLIC cxx_std_17)

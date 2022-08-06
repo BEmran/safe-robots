@@ -27,8 +27,9 @@ help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
 build: ## build target
-	@rm -rf build
-	@mkdir build
+	@if [ ! -d "./build" ]; then	\
+		mkdir build;				\
+	fi
 	@cmake -S . -B build
 	@cd build; \
 	make
