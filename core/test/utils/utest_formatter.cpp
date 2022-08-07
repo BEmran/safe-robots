@@ -1,28 +1,28 @@
 #include <gtest/gtest.h>
 
 #include "core/utils/formatter.hpp"
-#include "utest/utils.hpp"
+#include "utils.hpp"
 
 using namespace core::utils;
 using event_level_t = EventLevel::event_level_t;
 
 // format a message with disabled Modifier
-std::string format_func_with_modifier_disabled(const LabeledModifier& lm,
-                                               const std::string& msg)
+std::string FormatFuncWithModifierDisabled(const LabeledModifier& lm,
+                                           const std::string& msg)
 {
   std::stringstream ss;
-  ss << "[" << DateTime().time_to_string() << "]";
-  ss << "[" << event_level_to_string(lm.get_event_level()) << "]";
+  ss << "[" << DateTime().TimeToString() << "]";
+  ss << "[" << EventLevelToString(lm.GetEventLevel()) << "]";
   ss << ": " << msg;
   return ss.str();
 }
 
 // format a message with enabled Modifier
-std::string format_func_with_modifier_enabled(const LabeledModifier& lm,
-                                              const std::string& msg)
+std::string FormatFuncWithModifierEnabled(const LabeledModifier& lm,
+                                          const std::string& msg)
 {
   std::stringstream ss;
-  ss << "[" << DateTime().time_to_string() << "]";
+  ss << "[" << DateTime().TimeToString() << "]";
   ss << lm;
   ss << ": " << msg;
   return ss.str();
@@ -48,7 +48,7 @@ TEST(DefaultFormater, FormatWithothModifier)
   for (size_t i = 0; i < EVENTS.size(); i++)
   {
     LabeledModifier lm(EVENTS[i], LABELS[i]);
-    std::string expect = format_func_with_modifier_disabled(lm, msg);
+    std::string expect = FormatFuncWithModifierDisabled(lm, msg);
     EXPECT_EQ(expect, formatter.format(lm, msg));
   }
 }
@@ -62,7 +62,7 @@ TEST(DefaultFormater, FormatWithModifier)
   for (size_t i = 0; i < EVENTS.size(); i++)
   {
     LabeledModifier lm(EVENTS[i], LABELS[i]);
-    std::string expect = format_func_with_modifier_enabled(lm, msg);
+    std::string expect = FormatFuncWithModifierEnabled(lm, msg);
     EXPECT_EQ(expect, formatter.format(lm, msg));
   }
 }

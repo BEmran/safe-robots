@@ -4,9 +4,7 @@
 
 #include <string>
 
-namespace core
-{
-namespace utils
+namespace core::utils
 {
 /**
  * @brief Create a Directories by calling boost::filesystem::create_directory
@@ -15,7 +13,7 @@ namespace utils
  * @param full_path full path of the directory
  * @throw CoreExcept if can not create directories
  */
-void create_directories(const std::string& full_path);
+void CreateDirectories(const std::string& full_path);
 
 /**
  * @brief Checks if the given path exists
@@ -24,9 +22,8 @@ void create_directories(const std::string& full_path);
  * @return true if exists
  * @return false otherwise
  */
-bool is_path_exists(const std::string& path);
+bool IsPathExists(const std::string& path);
 
-}  // namespace utils
-}  // namespace core
+}  // namespace core::utils
 
 #endif  // CORE_UTILS_SYSTEM_HPP

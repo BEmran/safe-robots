@@ -3,9 +3,7 @@
 
 #include <string>
 
-namespace core
-{
-namespace utils
+namespace core::utils
 {
 class Writter
 {
@@ -20,7 +18,7 @@ class Writter
 
   virtual void dump(const std::string& str) = 0;
 };
-}  // namespace utils
-}  // namespace core
+
+}  // namespace core::utils
 
 #endif  // CORE_UTILS_WRITTER_HPP

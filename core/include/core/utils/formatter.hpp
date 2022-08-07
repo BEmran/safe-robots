@@ -8,9 +8,7 @@
 #include "core/utils/event_level.hpp"
 #include "core/utils/terminal.hpp"
 
-namespace core
-{
-namespace utils
+namespace core::utils
 {
 /**
  * @brief Interface class used to present message in certain format (style)
@@ -47,12 +45,12 @@ class DefaultFormater : public FormatterInterface
   std::string format(const LabeledModifier& lm,
                      const std::string& msg) const override;
 
-  std::string add_labeled_modifier(const LabeledModifier& lm) const;
+  std::string AddLabeledModifier(const LabeledModifier& lm) const;
 
  protected:
   bool use_modifier_;
 };
-}  // namespace utils
-}  // namespace core
+
+}  // namespace core::utils
 
 #endif  // CORE_UTILS_FORMATTER_HPP

@@ -6,23 +6,21 @@
 
 #include "core/utils/exception.hpp"
 
-namespace core
-{
-namespace utils
+namespace core::utils
 {
 namespace
 {
-static const std::map<EventLevel::event_level_t, std::string>
-    EVENT_LEVEL_NAME_MAP = {{EventLevel::event_level_t::EL_INFO, "INFO"},
-                            {EventLevel::event_level_t::EL_DEBUG, "DEBUG"},
-                            {EventLevel::event_level_t::EL_WARN, "WARN"},
-                            {EventLevel::event_level_t::EL_ERROR, "ERROR"}};
+const std::map<EventLevel::event_level_t, std::string> kEventLevelNameMap = {
+    {EventLevel::EL_INFO, "INFO"},
+    {EventLevel::EL_DEBUG, "DEBUG"},
+    {EventLevel::EL_WARN, "WARN"},
+    {EventLevel::EL_ERROR, "ERROR"}};
 }  // namespace
 
-std::string event_level_to_string(const EventLevel::event_level_t event)
+std::string EventLevelToString(const EventLevel::event_level_t event)
 {
-  auto it = EVENT_LEVEL_NAME_MAP.find(event);
-  if (it == EVENT_LEVEL_NAME_MAP.end())
+  auto it = kEventLevelNameMap.find(event);
+  if (it == kEventLevelNameMap.end())
   {
     throw Exception("Undefined event level.");
   }
@@ -30,19 +28,19 @@ std::string event_level_to_string(const EventLevel::event_level_t event)
 }
 
 LabeledModifier::LabeledModifier(const EventLevel::event_level_t event)
-  : LabeledModifier(event, event_level_to_string(event))
+  : LabeledModifier(event, EventLevelToString(event))
 {
 }
 
 LabeledModifier::LabeledModifier(const EventLevel::event_level_t event,
                                  const std::string& label)
-  : LabeledModifier(event, label, default_modifier())
+  : LabeledModifier(event, label, DefaultModifier())
 {
 }
 
 LabeledModifier::LabeledModifier(const EventLevel::event_level_t event,
                                  const Modifier& modifier)
-  : LabeledModifier(event, event_level_to_string(event), modifier)
+  : LabeledModifier(event, EventLevelToString(event), modifier)
 {
 }
 
@@ -53,54 +51,53 @@ LabeledModifier::LabeledModifier(const EventLevel::event_level_t event,
 {
 }
 
-EventLevel::event_level_t LabeledModifier::get_event_level() const
+EventLevel::event_level_t LabeledModifier::GetEventLevel() const
 {
   return event_;
 }
 
-std::string LabeledModifier::get_label() const
+std::string LabeledModifier::GetLabel() const
 {
   return label_;
 }
 
-Modifier LabeledModifier::get_modifier() const
+Modifier LabeledModifier::GetModifier() const
 {
   return modifier_;
 }
 
 std::ostream& operator<<(std::ostream& os, const LabeledModifier& lm)
 {
-  return os << lm.get_modifier() << "[" << lm.get_label() << "]"
-            << default_modifier();
+  return os << lm.GetModifier() << "[" << lm.GetLabel() << "]"
+            << DefaultModifier();
 }
 
-LabeledModifier debug_labeled_modifier()
+LabeledModifier DebugLabeledModifier()
 {
-  const Modifier modifier = debug_modifier();
-  const auto event = EventLevel::event_level_t::EL_DEBUG;
+  const Modifier modifier = DebugModifier();
+  const auto event = EventLevel::EL_DEBUG;
   return LabeledModifier(event, modifier);
 }
 
-LabeledModifier error_labeled_modifier()
+LabeledModifier ErrorLabeledModifier()
 {
-  const Modifier modifier = error_modifier();
-  const auto event = EventLevel::event_level_t::EL_ERROR;
+  const Modifier modifier = ErrorModifier();
+  const auto event = EventLevel::EL_ERROR;
   return LabeledModifier(event, modifier);
 }
 
-LabeledModifier info_labeled_modifier()
+LabeledModifier InfoLabeledModifier()
 {
-  const Modifier modifier = info_modifier();
-  const auto event = EventLevel::event_level_t::EL_INFO;
+  const Modifier modifier = InfoModifier();
+  const auto event = EventLevel::EL_INFO;
   return LabeledModifier(event, modifier);
 }
 
-LabeledModifier warn_labeled_modifier()
+LabeledModifier WarnLabeledModifier()
 {
-  const Modifier modifier = warn_modifier();
-  const auto event = EventLevel::event_level_t::EL_WARN;
+  const Modifier modifier = WarnModifier();
+  const auto event = EventLevel::EL_WARN;
   return LabeledModifier(event, modifier);
 }
 
-}  // namespace utils
-}  // namespace core
+}  // namespace core::utils

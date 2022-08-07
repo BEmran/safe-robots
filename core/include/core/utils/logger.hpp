@@ -20,9 +20,7 @@
 #define __FILENAME__                                                           \
   (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
-namespace core
-{
-namespace utils
+namespace core::utils
 {
 /**
  * @brief location information about where the log came from
@@ -44,14 +42,15 @@ struct LogLocation
    *
    * @return std::string a string contains the object information
    */
-  inline std::string to_string() const
+  inline std::string ToString() const
   {
     return "[" + file + "][" + func + "][" + std::to_string(line) + "]";
   }
 };
 
-#define LOG_INFORMATION core::utils::LogLocation(__FILENAME__, __func__, __LINE__)
-#define LOG_INFORMATION_STRING LOG_INFORMATION.to_string()
+#define LOG_INFORMATION                                                        \
+  core::utils::LogLocation(__FILENAME__, __func__, __LINE__)
+#define LOG_INFORMATION_STRING LOG_INFORMATION.ToString()
 
 /**
  * @brief A simple class used to mimic a stream to record all sort of
@@ -114,11 +113,11 @@ class Logger
    * @param lm label modifier to use with the formatter
    * @param msg msg to log
    */
-  virtual void log(const LabeledModifier& lm, const std::string& msg);
+  virtual void Log(const LabeledModifier& lm, const std::string& msg);
 
  protected:
-  void throw_exception_for_error_event(const EventLevel::event_level_t event,
-                                       const std::string& msg);
+  void ThrowExceptionForErrorEvent(const EventLevel::event_level_t event,
+                                   const std::string& msg);
 
  private:
   std::shared_ptr<FileWritter> file_writter_;
@@ -128,9 +127,9 @@ class Logger
   std::shared_ptr<ExceptionFactory> expectation_factory_;
 };
 
-std::shared_ptr<Logger> create_default_logger(const std::string& name,
-                                              const std::string& filename);
-}  // namespace utils
-}  // namespace core
+std::shared_ptr<Logger> CreateDefaultLogger(const std::string& name,
+                                            const std::string& filename);
+
+}  // namespace core::utils
 
 #endif  // CORE_UTILS_TRACER_HPP

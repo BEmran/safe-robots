@@ -5,9 +5,7 @@
 #include <ctime>
 #include <string>
 
-namespace core
-{
-namespace utils
+namespace core::utils
 {
 /**
  * @brief Gets local machine date and time
@@ -45,21 +43,21 @@ class DateTime
    * @details the string is in format of [year](spe)[month](sep)[day]
    * @return std::string generated date
    */
-  std::string date_to_string();
+  std::string DateToString();
 
   /**
    * @brief returns a string with time information
    * @details the string is in format of [hour](spe)[minutes](sep)[seconds]
    * @return std::string generated time
    */
-  std::string time_to_string();
+  std::string TimeToString();
 
   /**
    * @brief returns a string with date and time information in a pretty way
    * @details the returned string in the format of [day name] [day]/[month name]
    * @return std::string date and time
    */
-  std::string pretty();
+  std::string Pretty();
 
   /**
    * @brief Get time structure contains a date and time broken down into its
@@ -67,21 +65,21 @@ class DateTime
    *
    * @return tm time structure
    */
-  tm get_time_struct() const;
+  tm GetTimeStruct() const;
 
   /**
    * @brief returns the abbreviated month name
    *
    * @return std::string 3 chars represent the abbreviated month name
    */
-  std::string abbreviated_month_name() const;
+  std::string AbbreviatedMonthName() const;
 
   /**
    * @brief returns the abbreviated weekday name
    *
    * @return std::string 3 chars represent the weekday month name
    */
-  std::string abbreviated_weekday_name() const;
+  std::string AbbreviatedWeekdayName() const;
 
  private:
   tm time_info_;  // Structure containing a calendar date and time broken down
@@ -94,7 +92,7 @@ class DateTime
  *
  * @return long time in seconds
  */
-long time_in_seconds();
+long TimeInSeconds();
 
 /**
  * @brief returns the current time since the start of its clock in seconds as
@@ -102,7 +100,7 @@ long time_in_seconds();
  *
  * @return std::string time in seconds
  */
-std::string time_in_seconds_string();
+std::string TimeInSecondsString();
 
 /**
  * @brief A standard way to generate a filename using DateTime information
@@ -110,8 +108,7 @@ std::string time_in_seconds_string();
  * @param dt use the passed DateTime object or using current DateTime
  * @return std::string a standard filename
  */
-std::string generate_file_name(const DateTime dt = DateTime());
+std::string GenerateFileName(const DateTime dt = DateTime());
 
-}  // namespace utils
-}  // namespace core
+}  // namespace core::utils
 #endif  // CORE_UTILS_DATE_TIME_HPP

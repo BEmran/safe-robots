@@ -7,11 +7,8 @@
 
 #include <stdexcept>
 
-namespace core
+namespace core::utils
 {
-namespace utils
-{
-  
 class Exception : public std::runtime_error
 {
  public:
@@ -31,7 +28,8 @@ class ExceptionFactory
   }
   virtual void Throw(const std::string& msg) const
   {
-    if (header_.empty()) {
+    if (header_.empty())
+    {
       throw Exception(msg);
     }
     throw Exception(header_ + ": " + msg);
@@ -55,7 +53,7 @@ class NullExceptionFactory : public ExceptionFactory
     (void)msg;
   }
 };
-}  // namespace utils
-}  // namespace core
+
+}  // namespace core::utils
 
 #endif  // CORE_UTILS_EXCEPT_HPP

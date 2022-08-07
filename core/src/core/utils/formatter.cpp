@@ -3,9 +3,7 @@
 
 #include <sstream>
 
-namespace core
-{
-namespace utils
+namespace core::utils
 {
 std::string NullFormatter::format(const LabeledModifier& lm,
                                   const std::string& msg) const
@@ -23,14 +21,13 @@ std::string DefaultFormater::format(const LabeledModifier& lm,
                                     const std::string& msg) const
 {
   std::stringstream ss;
-  ss << "[" << DateTime().time_to_string() << "]";
-  ss << add_labeled_modifier(lm);
+  ss << "[" << DateTime().TimeToString() << "]";
+  ss << AddLabeledModifier(lm);
   ss << ": " << msg;
   return ss.str();
 }
 
-std::string
-DefaultFormater::add_labeled_modifier(const LabeledModifier& lm) const
+std::string DefaultFormater::AddLabeledModifier(const LabeledModifier& lm) const
 {
   std::stringstream ss;
   if (use_modifier_)
@@ -39,9 +36,9 @@ DefaultFormater::add_labeled_modifier(const LabeledModifier& lm) const
   }
   else
   {
-    ss << "[" << lm.get_label() << "]";
+    ss << "[" << lm.GetLabel() << "]";
   }
   return ss.str();
 }
-}  // namespace utils
-}  // namespace core
+
+}  // namespace core::utils

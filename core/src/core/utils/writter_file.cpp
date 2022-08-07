@@ -4,9 +4,7 @@
 
 #include "core/utils/exception.hpp"
 
-namespace core
-{
-namespace utils
+namespace core::utils
 {
 FileWritter::FileWritter(const std::string& filename)
   : filename_(filename), file_(std::make_shared<std::ofstream>())
@@ -26,10 +24,10 @@ FileWritter::~FileWritter()
 
 void FileWritter::dump(const std::string& str)
 {
-  dump_to_file(str);
+  DumpToFile(str);
 }
 
-void FileWritter::dump_to_file(const std::string& str)
+void FileWritter::DumpToFile(const std::string& str)
 {
   dump_mutex_.lock();
   if (!file_->is_open())
@@ -40,5 +38,4 @@ void FileWritter::dump_to_file(const std::string& str)
   dump_mutex_.unlock();
 }
 
-}  // namespace utils
-}  // namespace core
+}  // namespace core::utils

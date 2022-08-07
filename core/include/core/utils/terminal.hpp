@@ -7,12 +7,9 @@
 
 // Bash colors and formatting (ANSI/VT100 Control sequences)
 // https://misc.flogisoft.com/bash/tip_colors_and_formatting
-
-namespace core
+namespace core::utils
 {
-namespace utils
-{
-  namespace terminal
+namespace terminal
 {
 // foreground color
 enum FG
@@ -68,7 +65,7 @@ enum FMT
   FMT_REVERSE = 7,    // reverse coloring
   FMT_HIDDEN = 8,     // hidden
 };
-}  // terminal namespace
+}  // namespace terminal
 
 /**
  * @brief Used to format the data printed at a terminal
@@ -84,8 +81,9 @@ class Modifier
    * @param bg  background color
    * @param fmt font format
    */
-  Modifier(const terminal::FG fg, const terminal::BG bg, const terminal::FMT fmt);
-  std::string to_string() const;
+  Modifier(const terminal::FG fg, const terminal::BG bg,
+           const terminal::FMT fmt);
+  std::string ToString() const;
 
  private:
   terminal::FG fg_;    // foreground color
@@ -104,13 +102,12 @@ class Modifier
 std::ostream& operator<<(std::ostream& os, const Modifier& mod);
 
 /* Create Default modifiers*/
-Modifier default_modifier();
-Modifier debug_modifier();
-Modifier error_modifier();
-Modifier info_modifier();
-Modifier warn_modifier();
+Modifier DefaultModifier();
+Modifier DebugModifier();
+Modifier ErrorModifier();
+Modifier InfoModifier();
+Modifier WarnModifier();
 
-}  // namespace utils
-}  // namespace core
+}  // namespace core::utils
 
 #endif  // CORE_UTILS_TERMINAL_HPP

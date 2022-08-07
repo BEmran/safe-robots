@@ -3,9 +3,7 @@
 
 #include "core/utils/writter.hpp"
 
-namespace core
-{
-namespace utils
+namespace core::utils
 {
 /**
  * @brief A concreate class of Writter used to log data to the console
@@ -19,18 +17,18 @@ class ConsoleWritter : public Writter
    * @brief Construct a new Console Writter object with a specific name
    *
    */
-  explicit ConsoleWritter();
+  ConsoleWritter() = default;
 
   /**
    * @brief Destroy the Console Writter object
    *
    */
-  ~ConsoleWritter();
+  ~ConsoleWritter() = default;
 
   /* Writter Interface */
   void dump(const std::string& str) override;
 };
-}  // namespace utils
-}  // namespace core
+
+}  // namespace core::utils
 
 #endif  // CORE_UTILS_WRITTER_CONSOLE_HPP

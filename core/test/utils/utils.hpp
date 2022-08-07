@@ -14,16 +14,16 @@
 
 typedef core::utils::Modifier Modifier;
 typedef core::utils::LabeledModifier LabeledModifier;
-typedef core::utils::EventLevel::event_level_t event_level_t;
+typedef core::utils::EventLevel EventLevel;
 typedef core::utils::terminal::FG FG;
 typedef core::utils::terminal::BG BG;
 typedef core::utils::terminal::FMT FMT;
 
 // careate list of available variables
 const char* LABELS[] = {"INFO", "DEBUG", "WARN", "ERROR"};
-const std::vector<event_level_t> EVENTS = {
-    event_level_t::EL_INFO, event_level_t::EL_DEBUG, event_level_t::EL_WARN,
-    event_level_t::EL_ERROR};
+const std::vector<EventLevel::event_level_t> EVENTS = {
+    EventLevel::EL_INFO, EventLevel::EL_DEBUG, EventLevel::EL_WARN,
+    EventLevel::EL_ERROR};
 
 /**
  * @brief applu and operation of two AssertionResult
@@ -65,7 +65,7 @@ std::string format_labeled_modifier(const Modifier& modifier,
                                     const std::string& label)
 {
   std::stringstream ss;
-  ss << modifier << "[" << label << "]" << core::utils::default_modifier();
+  ss << modifier << "[" << label << "]" << core::utils::DefaultModifier();
   return ss.str();
 }
 
@@ -82,24 +82,24 @@ void expect_eq_modifier(const FG expect_fg, const BG expect_bg,
                         const FMT expect_fmt, const Modifier& actual)
 {
   EXPECT_EQ(modifier_to_string(expect_fg, expect_bg, expect_fmt),
-            actual.to_string());
+            actual.ToString());
 }
 
 // check if the passed modifiers have the same configuration
 void expect_eq_modifier(const Modifier& expect, const Modifier& actual)
 {
-  EXPECT_EQ(expect.to_string(), actual.to_string());
+  EXPECT_EQ(expect.ToString(), actual.ToString());
 }
 
 // check if the passed labled-modifier has the same expected configuration
-void expect_eq_labeled_modifier(const event_level_t expect_event,
+void expect_eq_labeled_modifier(const EventLevel::event_level_t expect_event,
                                 const std::string& expect_label,
                                 const Modifier& expect_modifier,
                                 const LabeledModifier& actual)
 {
-  EXPECT_EQ(expect_event, actual.get_event_level());
-  EXPECT_EQ(expect_label, actual.get_label());
-  expect_eq_modifier(expect_modifier, actual.get_modifier());
+  EXPECT_EQ(expect_event, actual.GetEventLevel());
+  EXPECT_EQ(expect_label, actual.GetLabel());
+  expect_eq_modifier(expect_modifier, actual.GetModifier());
   std::stringstream ss;
   ss << actual;
   EXPECT_EQ(format_labeled_modifier(expect_modifier, expect_label), ss.str());
@@ -109,8 +109,8 @@ void expect_eq_labeled_modifier(const event_level_t expect_event,
 void expect_eq_labeled_modifier(const LabeledModifier& expect,
                                 const LabeledModifier& actual)
 {
-  expect_eq_labeled_modifier(expect.get_event_level(), expect.get_label(),
-                             expect.get_modifier(), actual);
+  expect_eq_labeled_modifier(expect.GetEventLevel(), expect.GetLabel(),
+                             expect.GetModifier(), actual);
 }
 
 /**

@@ -2,9 +2,7 @@
 
 #include "core/utils/exception.hpp"
 
-namespace core
-{
-namespace utils
+namespace core::utils
 {
 Logger::Logger(const std::string& filename)
   : Logger(filename, std::make_shared<NullExceptionFactory>())
@@ -38,7 +36,7 @@ Logger::Logger(const std::string& filename,
 {
 }
 
-void Logger::log(const LabeledModifier& lm, const std::string& msg)
+void Logger::Log(const LabeledModifier& lm, const std::string& msg)
 {
   const auto file_str = file_formater_->format(lm, msg);
   file_writter_->dump(file_str);
@@ -47,19 +45,21 @@ void Logger::log(const LabeledModifier& lm, const std::string& msg)
   /* TODO: Instead of the logger Associate exception to LabeledModifier, so user
    * can select what kind of excpetion they want to throw when it is used/called
    */
-  throw_exception_for_error_event(lm.get_event_level(), msg);
+  ThrowExceptionForErrorEvent(lm.GetEventLevel(), msg);
 }
 
-void Logger::throw_exception_for_error_event(
-    const EventLevel::event_level_t event, const std::string& msg)
+void Logger::ThrowExceptionForErrorEvent(const EventLevel::event_level_t event,
+                                         const std::string& msg)
 {
   if (event != EventLevel::EL_ERROR)
+  {
     return;
+  }
   expectation_factory_->Throw(msg);
 }
 
-std::shared_ptr<Logger> create_default_logger(const std::string& name,
-                                              const std::string& filename)
+std::shared_ptr<Logger> CreateDefaultLogger(const std::string& name,
+                                            const std::string& filename)
 {
   const auto file_fmt = std::make_shared<DefaultFormater>(false);
   const auto console_fmt = std::make_shared<DefaultFormater>(true);
@@ -67,5 +67,4 @@ std::shared_ptr<Logger> create_default_logger(const std::string& name,
   return std::make_shared<Logger>(filename, file_fmt, console_fmt, except_fact);
 }
 
-}  // namespace utils
-}  // namespace core
+}  // namespace core::utils

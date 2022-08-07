@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "core/utils/terminal.hpp"
-#include "utest/utils.hpp"
+#include "utils.hpp"
 
 using namespace core::utils;
 
@@ -21,7 +21,7 @@ TEST(Modifier, DefaultModifier)
   auto fg = FG::FG_DEFAULT;
   auto bg = BG::BG_DEFAULT;
   auto fmt = FMT::FMT_DEFAULT;
-  const Modifier modifier = default_modifier();
+  const Modifier modifier = DefaultModifier();
   expect_eq_modifier(fg, bg, fmt, modifier);
 }
 
@@ -31,7 +31,7 @@ TEST(Modifier, DebugModifier)
   auto fg = FG::FG_LIGHT_BLUE;
   auto bg = BG::BG_DEFAULT;
   auto fmt = FMT::FMT_BOLD;
-  const Modifier modifier = debug_modifier();
+  const Modifier modifier = DebugModifier();
   expect_eq_modifier(fg, bg, fmt, modifier);
 }
 
@@ -41,7 +41,7 @@ TEST(Modifier, ErrorModifier)
   auto fg = FG::FG_LIGHT_RED;
   auto bg = BG::BG_DEFAULT;
   auto fmt = FMT::FMT_BOLD;
-  const Modifier modifier = error_modifier();
+  const Modifier modifier = ErrorModifier();
   expect_eq_modifier(fg, bg, fmt, modifier);
 }
 
@@ -51,7 +51,7 @@ TEST(Modifier, InfoModifier)
   auto fg = FG::FG_LIGHT_CYAN;
   auto bg = BG::BG_DEFAULT;
   auto fmt = FMT::FMT_BOLD;
-  const Modifier modifier = info_modifier();
+  const Modifier modifier = InfoModifier();
   expect_eq_modifier(fg, bg, fmt, modifier);
 }
 
@@ -61,7 +61,7 @@ TEST(Modifier, WarnModifier)
   auto fg = FG::FG_LIGHT_YELLOW;
   auto bg = BG::BG_DEFAULT;
   auto fmt = FMT::FMT_BOLD;
-  Modifier modifier = warn_modifier();
+  Modifier modifier = WarnModifier();
   expect_eq_modifier(fg, bg, fmt, modifier);
 }
 

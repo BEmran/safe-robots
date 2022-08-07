@@ -1,17 +1,14 @@
 #include "core/utils/terminal.hpp"
 
-namespace core
+namespace core::utils
 {
-namespace utils
-{
-
 using FG = terminal::FG;
 using BG = terminal::BG;
 using FMT = terminal::FMT;
 
 namespace
 {
-std::string single_option_to_string(int option)
+std::string SingleOptionToString(int option)
 {
   return "\x1B[" + std::to_string(option) + "m";
 }
@@ -22,43 +19,42 @@ Modifier::Modifier(const FG fg, const BG bg, const FMT fmt)
 {
 }
 
-std::string Modifier::to_string() const
+std::string Modifier::ToString() const
 {
-  return single_option_to_string(fmt_)    // change baground
-         + single_option_to_string(fg_)   // change font format
-         + single_option_to_string(bg_);  // change foreground
+  return SingleOptionToString(fmt_)    // change baground
+         + SingleOptionToString(fg_)   // change font format
+         + SingleOptionToString(bg_);  // change foreground
 }
 
 std::ostream& operator<<(std::ostream& os, const Modifier& mod)
 {
-  os << mod.to_string();
+  os << mod.ToString();
   return os;
 }
 
-Modifier default_modifier()
+Modifier DefaultModifier()
 {
   return Modifier(FG::FG_DEFAULT, BG::BG_DEFAULT, FMT::FMT_DEFAULT);
 }
 
-Modifier debug_modifier()
+Modifier DebugModifier()
 {
   return Modifier(FG::FG_LIGHT_BLUE, BG::BG_DEFAULT, FMT::FMT_BOLD);
 }
 
-Modifier error_modifier()
+Modifier ErrorModifier()
 {
   return Modifier(FG::FG_LIGHT_RED, BG::BG_DEFAULT, FMT::FMT_BOLD);
 }
 
-Modifier info_modifier()
+Modifier InfoModifier()
 {
   return Modifier(FG::FG_LIGHT_CYAN, BG::BG_DEFAULT, FMT::FMT_BOLD);
 }
 
-Modifier warn_modifier()
+Modifier WarnModifier()
 {
   return Modifier(FG::FG_LIGHT_YELLOW, BG::BG_DEFAULT, FMT::FMT_BOLD);
 }
 
-}  // namespace utils
-}  // namespace core
+}  // namespace core::utils

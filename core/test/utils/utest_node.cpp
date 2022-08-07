@@ -2,81 +2,93 @@
 
 #include "core/utils/logger.hpp"
 #include "core/utils/node.hpp"
-#include "utest/utils.hpp"
+#include "utils.hpp"
 
 using namespace core::utils;
 
 class MockLogger : public Logger
 {
  public:
-  MockLogger()
-    : Logger("filename")
-    , m_lm(LabeledModifier(EventLevel::event_level_t::EL_DEBUG))
-    , m_msg{}
+  MockLogger() : Logger("filename"), lm_(LabeledModifier(EventLevel::EL_DEBUG))
   {
   }
-  void log(const LabeledModifier& lm, const std::string& msg) override
+  void Log(const LabeledModifier& lm, const std::string& msg) override
   {
-    m_lm = lm;
-    m_msg = msg;
+    lm_ = lm;
+    msg_ = msg;
   }
-  LabeledModifier m_lm;
-  std::string m_msg;
+
+  [[nodiscard]] std::string Msg() const
+  {
+    return msg_;
+  }
+
+  [[nodiscard]] LabeledModifier LM() const
+  {
+    return lm_;
+  }
+
+ private:
+  LabeledModifier lm_;
+  std::string msg_;
 };
 
 // check creating NodeLabel Modifier
 TEST(NodeLabeledModifiers, Construct)
 {
-  LabeledModifier lm(EventLevel::event_level_t::EL_DEBUG, debug_modifier());
-  NodeLabeledModifiers node_lm(lm, lm, lm, lm);
+  const LabeledModifier lm_debug(EventLevel::EL_DEBUG, DebugModifier());
+  const LabeledModifier lm_error(EventLevel::EL_ERROR, ErrorModifier());
+  const LabeledModifier lm_info(EventLevel::EL_INFO, InfoModifier());
+  const LabeledModifier lm_warn(EventLevel::EL_WARN, WarnModifier());
+  const NodeLabeledModifiers node_lm(lm_debug, lm_error, lm_info, lm_warn);
 
-  expect_eq_labeled_modifier(node_lm.debug, lm);
-  expect_eq_labeled_modifier(node_lm.error, lm);
-  expect_eq_labeled_modifier(node_lm.info, lm);
-  expect_eq_labeled_modifier(node_lm.warn, lm);
+  expect_eq_labeled_modifier(node_lm.debug, lm_debug);
+  expect_eq_labeled_modifier(node_lm.error, lm_error);
+  expect_eq_labeled_modifier(node_lm.info, lm_info);
+  expect_eq_labeled_modifier(node_lm.warn, lm_warn);
 }
 
 // check creating Default NodeLabel Modifier using
 // CreateDefaultNodeLabelModifier function
 TEST(NodeLabeledModifiers, DefaultConstruct)
 {
-  NodeLabeledModifiers node_lm;
-  expect_eq_labeled_modifier(node_lm.debug, debug_labeled_modifier());
-  expect_eq_labeled_modifier(node_lm.error, error_labeled_modifier());
-  expect_eq_labeled_modifier(node_lm.info, info_labeled_modifier());
-  expect_eq_labeled_modifier(node_lm.warn, warn_labeled_modifier());
+  const NodeLabeledModifiers node_lm;
+  expect_eq_labeled_modifier(node_lm.debug, DebugLabeledModifier());
+  expect_eq_labeled_modifier(node_lm.error, ErrorLabeledModifier());
+  expect_eq_labeled_modifier(node_lm.info, InfoLabeledModifier());
+  expect_eq_labeled_modifier(node_lm.warn, WarnLabeledModifier());
 }
 
 // check construct Node with Name and Logger
 TEST(Node, ConstructWithNameAndLogger)
 {
   auto mock_logger = std::make_shared<MockLogger>();
-  NodeLabeledModifiers node_lm;
-  Node node("node name", mock_logger);
+  const Node node("node name", mock_logger);
 
-  EXPECT_EQ(node.get_name(), "node name");
-  EXPECT_EQ(node.get_logger(), mock_logger);
+  EXPECT_EQ(node.GetName(), "node name");
+  EXPECT_EQ(node.GetLogger(), mock_logger);
 }
 
 // check construct Node with Name and Logger
 TEST(Node, ConstructWithNameAndLoggerAndModiffier)
 {
   auto mock_logger = std::make_shared<MockLogger>();
-  NodeLabeledModifiers node_lm;
-  Node node("node name", mock_logger, node_lm);
+  const NodeLabeledModifiers node_lm;
+  const Node node("node name", mock_logger, node_lm);
 
-  EXPECT_EQ(node.get_name(), "node name");
-  EXPECT_EQ(node.get_logger(), mock_logger);
+  EXPECT_EQ(node.GetName(), "node name");
+  EXPECT_EQ(node.GetLogger(), mock_logger);
 }
 
 // check Node Log function using MockLogger
 TEST(Node, LogWithArbitraryLabledModiffier)
 {
   auto mock_logger = std::make_shared<MockLogger>();
-  Node node("node name", mock_logger);
-  core::utils::LabeledModifier lm(event_level_t::EL_INFO, "tmp", default_modifier());
-  node.log(lm, "message");
-  expect_eq_labeled_modifier(mock_logger->m_lm, lm);
+  const Node node("node name", mock_logger);
+  const core::utils::LabeledModifier lm(EventLevel::EL_INFO, "tmp",
+                                        DefaultModifier());
+  node.Log(lm, "message");
+  expect_eq_labeled_modifier(mock_logger->LM(), lm);
 }
 
 // check Node log_debug function to see if it calls Logger.Log function with the
@@ -84,11 +96,11 @@ TEST(Node, LogWithArbitraryLabledModiffier)
 TEST(Node, log_debug)
 {
   auto mock_logger = std::make_shared<MockLogger>();
-  NodeLabeledModifiers node_lm;
-  Node node("name", mock_logger, node_lm);
-  node.log_debug("message");
-  expect_eq_labeled_modifier(mock_logger->m_lm, node_lm.debug);
-  EXPECT_EQ(mock_logger->m_msg, "[name]: message");
+  const NodeLabeledModifiers node_lm;
+  const Node node("name", mock_logger, node_lm);
+  node.LogDebug("message");
+  expect_eq_labeled_modifier(mock_logger->LM(), node_lm.debug);
+  EXPECT_EQ(mock_logger->Msg(), "[name]: message");
 }
 
 // check Node log_error function to see if it calls Logger.Log function with the
@@ -96,11 +108,11 @@ TEST(Node, log_debug)
 TEST(Node, log_error)
 {
   auto mock_logger = std::make_shared<MockLogger>();
-  NodeLabeledModifiers node_lm;
-  Node node("name", mock_logger, node_lm);
-  node.log_error("message");
-  expect_eq_labeled_modifier(mock_logger->m_lm, node_lm.error);
-  EXPECT_EQ(mock_logger->m_msg, "[name]: message");
+  const NodeLabeledModifiers node_lm;
+  const Node node("name", mock_logger, node_lm);
+  node.LogError("message");
+  expect_eq_labeled_modifier(mock_logger->LM(), node_lm.error);
+  EXPECT_EQ(mock_logger->Msg(), "[name]: message");
 }
 
 // check Node log_info function to see if it calls Logger.Log function with the
@@ -108,11 +120,11 @@ TEST(Node, log_error)
 TEST(Node, log_info)
 {
   auto mock_logger = std::make_shared<MockLogger>();
-  NodeLabeledModifiers node_lm;
-  Node node("name", mock_logger, node_lm);
-  node.log_info("message");
-  expect_eq_labeled_modifier(mock_logger->m_lm, node_lm.info);
-  EXPECT_EQ(mock_logger->m_msg, "[name]: message");
+  const NodeLabeledModifiers node_lm;
+  const Node node("name", mock_logger, node_lm);
+  node.LogInfo("message");
+  expect_eq_labeled_modifier(mock_logger->LM(), node_lm.info);
+  EXPECT_EQ(mock_logger->Msg(), "[name]: message");
 }
 
 // check Node log_warn function to see if it calls Logger.Log function with the
@@ -120,9 +132,9 @@ TEST(Node, log_info)
 TEST(Node, log_warn)
 {
   auto mock_logger = std::make_shared<MockLogger>();
-  NodeLabeledModifiers node_lm;
+  const NodeLabeledModifiers node_lm;
   Node node("name", mock_logger, node_lm);
-  node.log_warn("message");
-  expect_eq_labeled_modifier(mock_logger->m_lm, node_lm.warn);
-  EXPECT_EQ(mock_logger->m_msg, "[name]: message");
+  node.LogWarn("message");
+  expect_eq_labeled_modifier(mock_logger->LM(), node_lm.warn);
+  EXPECT_EQ(mock_logger->Msg(), "[name]: message");
 }

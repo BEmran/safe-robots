@@ -5,67 +5,69 @@
 #include "core/utils/terminal.hpp"
 #include "core/utils/writter_console.hpp"
 #include "core/utils/writter_file.hpp"
-#include "utest/utils.hpp"
+#include "utils.hpp"
 
 using namespace core::utils;
 const char* g_message = "message";
 const char* g_filename = "log.txt";
 
-struct TestLogger
+class TestLogger
 {
-  Logger* m_logger;
-  ConsoleBuffer* m_buf;
-  std::list<std::string> m_logs_console;
-  std::list<std::string> m_logs_file;
-  explicit TestLogger(Logger* logger) : m_logger(logger), m_buf(nullptr)
+ public:
+  explicit TestLogger(Logger* logger) : logger_(logger), buf_(nullptr)
   {
   }
 
   ~TestLogger()
   {
-    delete m_buf;
+    delete buf_;
   }
 
-  void expect_eq_log_no_exception(const LabeledModifier& lm,
-                                  const std::string& msg)
+  void ExpectEqLogNoException(const LabeledModifier& lm, const std::string& msg)
   {
-    clear();
-    m_logger->log(lm, msg);
-    get_logged_data();
-    expect_eq_log(msg);
+    Clear();
+    logger_->Log(lm, msg);
+    GetLoggedData();
+    ExpectEqLog(msg);
   }
 
-  void expect_eq_log_with_exception(const LabeledModifier& lm,
-                                    const std::string& msg)
+  void ExpectEqLogWithException(const LabeledModifier& lm,
+                                const std::string& msg)
   {
     try
     {
-      clear();
-      m_logger->log(lm, msg);
+      Clear();
+      logger_->Log(lm, msg);
     }
     catch (Exception& e)
     {
-      get_logged_data();
+      GetLoggedData();
     }
-    expect_eq_log(msg);
+    ExpectEqLog(msg);
   }
 
-  void clear()
+ private:
+  void Clear()
   {
-    m_buf = new ConsoleBuffer;
+    buf_ = new ConsoleBuffer;
   }
 
-  void expect_eq_log(const std::string& msg)
+  void ExpectEqLog(const std::string& msg)
   {
-    EXPECT_EQ(msg, m_logs_console.front());
-    EXPECT_EQ(msg, m_logs_file.back());
+    EXPECT_EQ(msg, logs_console_.front());
+    EXPECT_EQ(msg, logs_file_.back());
   }
 
-  void get_logged_data()
+  void GetLoggedData()
   {
-    m_logs_console = m_buf->restore_cout_buffer();
-    m_logs_file = read_all_lines_from_file(g_filename);
+    logs_console_ = buf_->restore_cout_buffer();
+    logs_file_ = read_all_lines_from_file(g_filename);
   }
+
+  Logger* logger_;
+  ConsoleBuffer* buf_;
+  std::list<std::string> logs_console_;
+  std::list<std::string> logs_file_;
 };
 
 TEST(LoggerInformation, Construction)
@@ -79,17 +81,17 @@ TEST(LoggerInformation, Construction)
 TEST(LoggerInformation, ToString)
 {
   LogLocation info("filename", "funcname", 1);
-  EXPECT_EQ("[filename][funcname][1]", info.to_string());
+  EXPECT_EQ("[filename][funcname][1]", info.ToString());
 }
 
 TEST(Logger, ConstructingUsingFilename)
 {
-  auto logger = new Logger(g_filename);
+  auto* logger = new Logger(g_filename);
   TestLogger test_logger(logger);
   for (const auto& event : EVENTS)
   {
     LabeledModifier lm(event);
-    test_logger.expect_eq_log_no_exception(lm, g_message);
+    test_logger.ExpectEqLogNoException(lm, g_message);
   }
 }
 
@@ -101,25 +103,25 @@ TEST(Logger, ConstructingUsingFormatter)
   for (const auto& event : EVENTS)
   {
     LabeledModifier lm(event);
-    test_logger.expect_eq_log_no_exception(lm, g_message);
+    test_logger.ExpectEqLogNoException(lm, g_message);
   }
 }
 
 TEST(Logger, ConstructingUsingException)
 {
   auto exception = std::make_shared<ExceptionFactory>("");
-  auto logger = new Logger(g_filename, exception);
+  auto* logger = new Logger(g_filename, exception);
   TestLogger test_logger(logger);
   for (const auto& event : EVENTS)
   {
     LabeledModifier lm(event);
-    if (event == event_level_t::EL_ERROR)
+    if (event == EventLevel::EL_ERROR)
     {
-      test_logger.expect_eq_log_with_exception(lm, g_message);
+      test_logger.ExpectEqLogWithException(lm, g_message);
     }
     else
     {
-      test_logger.expect_eq_log_no_exception(lm, g_message);
+      test_logger.ExpectEqLogNoException(lm, g_message);
     }
   }
 }
@@ -128,14 +130,14 @@ TEST(Logger, ConstructingUsingException)
 //   std::string name = "name";
 //   std::string filename = "log.txt";
 //   std::string msg = "message";
-//   auto logger = create_default_logger(name, filename);
+//   auto logger = CreateDefaultLogger(name, filename);
 //   TestLogger test_logger(logger.get());
 //   for (size_t i = 0; i < EVENTS.size(); ++i) {
 //     LabeledModifier lm(EVENTS[i]);
-//     if (EVENTS[i] == event_level_t::EL_ERROR) {
-//       test_logger.expect_eq_log_with_exception(lm, g_message);
+//     if (EVENTS[i] == EL_ERROR) {
+//       test_logger.ExpectEqLogWithException(lm, g_message);
 //     } else {
-//       test_logger.expect_eq_log_no_exception(lm, g_message);
+//       test_logger.ExpectEqLogNoException(lm, g_message);
 //     }
 //   }
 // }

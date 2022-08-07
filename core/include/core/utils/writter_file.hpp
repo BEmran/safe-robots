@@ -7,9 +7,7 @@
 
 #include "core/utils/writter.hpp"
 
-namespace core
-{
-namespace utils
+namespace core::utils
 {
 /**
  * @brief A concreate class of Writter used to log data to a file using oftream
@@ -43,13 +41,13 @@ class FileWritter : public Writter
    *
    * @param str string to be logged
    */
-  void dump_to_file(const std::string& str);
+  void DumpToFile(const std::string& str);
 
   std::string filename_;
   std::shared_ptr<std::ofstream> file_;
   std::mutex dump_mutex_;
 };
-}  // namespace utils
-}  // namespace core
+
+}  // namespace core::utils
 
 #endif  // CORE_UTILS_WRITTER_FILE_HPP

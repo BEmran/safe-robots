@@ -52,7 +52,7 @@ TEST(ExceptionFactory, ThrowExceptionWithHeaderAndMsg)
 
 TEST(ExceptionFactory, ThrowExceptionWithMsgButNoHeader)
 {
-  std::string header = "";
+  std::string header;
   ExceptionFactory except_factory(header);
   std::string msg = "error msg";
   std::string caught_msg;

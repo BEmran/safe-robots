@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "core/utils/event_level.hpp"
-#include "utest/utils.hpp"
+#include "utils.hpp"
 
 using namespace core::utils;
 using event_level_t = EventLevel::event_level_t;
@@ -10,7 +10,9 @@ using event_level_t = EventLevel::event_level_t;
 TEST(EventLevelToString, AllLevels)
 {
   for (size_t i = 0; i < EVENTS.size(); i++)
-    EXPECT_EQ(LABELS[i], event_level_to_string(EVENTS[i]));
+  {
+    EXPECT_EQ(LABELS[i], EventLevelToString(EVENTS[i]));
+  }
 }
 
 // test constracting LabeledModifier with only event
@@ -19,7 +21,7 @@ TEST(LabeledModifier, ConstructWithEvent)
   for (size_t i = 0; i < EVENTS.size(); i++)
   {
     const LabeledModifier labeled(EVENTS[i]);
-    expect_eq_labeled_modifier(EVENTS[i], LABELS[i], default_modifier(),
+    expect_eq_labeled_modifier(EVENTS[i], LABELS[i], DefaultModifier(),
                                labeled);
   }
 }
@@ -31,7 +33,7 @@ TEST(LabeledModifier, ConstructWithEventAndLabel)
   for (const auto& event : EVENTS)
   {
     const LabeledModifier labeled(event, label);
-    expect_eq_labeled_modifier(event, label, default_modifier(), labeled);
+    expect_eq_labeled_modifier(event, label, DefaultModifier(), labeled);
   }
 }
 
@@ -63,38 +65,38 @@ TEST(LabeledModifier, ConstructWithEventAndLabelAndModifier)
 // function
 TEST(LabeledModifier, DebugLabeledModifier)
 {
-  const auto actual = debug_labeled_modifier();
-  const auto event = event_level_t::EL_DEBUG;
-  expect_eq_labeled_modifier(event, event_level_to_string(event),
-                             debug_modifier(), actual);
+  const auto actual = DebugLabeledModifier();
+  const auto event = EventLevel::EL_DEBUG;
+  expect_eq_labeled_modifier(event, EventLevelToString(event), DebugModifier(),
+                             actual);
 }
 
 // check error labled modifier settings created using error_labeled_modifier
 // function
 TEST(LabeledModifier, error_labeled_modifier)
 {
-  const auto actual = error_labeled_modifier();
-  const auto event = event_level_t::EL_ERROR;
-  expect_eq_labeled_modifier(event, event_level_to_string(event),
-                             error_modifier(), actual);
+  const auto actual = ErrorLabeledModifier();
+  const auto event = EventLevel::EL_ERROR;
+  expect_eq_labeled_modifier(event, EventLevelToString(event), ErrorModifier(),
+                             actual);
 }
 
 // check info labled modifier settings created using info_labeled_modifier
 // function
 TEST(LabeledModifier, info_labeled_modifier)
 {
-  const auto actual = info_labeled_modifier();
-  const auto event = event_level_t::EL_INFO;
-  expect_eq_labeled_modifier(event, event_level_to_string(event),
-                             info_modifier(), actual);
+  const auto actual = InfoLabeledModifier();
+  const auto event = EventLevel::EL_INFO;
+  expect_eq_labeled_modifier(event, EventLevelToString(event), InfoModifier(),
+                             actual);
 }
 
 // check warn labled modifier settings created using warn_labeled_modifier
 // function
 TEST(LabeledModifier, warn_labeled_modifier)
 {
-  const auto actual = warn_labeled_modifier();
-  const auto event = event_level_t::EL_WARN;
-  expect_eq_labeled_modifier(event, event_level_to_string(event),
-                             warn_modifier(), actual);
+  const auto actual = WarnLabeledModifier();
+  const auto event = EventLevel::EL_WARN;
+  expect_eq_labeled_modifier(event, EventLevelToString(event), WarnModifier(),
+                             actual);
 }

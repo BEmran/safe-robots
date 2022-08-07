@@ -6,9 +6,7 @@
 
 #include "core/utils/terminal.hpp"
 
-namespace core
-{
-namespace utils
+namespace core::utils
 {
 /**
  * @brief Defines the level of an event to be deal with
@@ -39,7 +37,7 @@ class LabeledModifier
   LabeledModifier(const EventLevel::event_level_t event,
                   const std::string& label, const Modifier& modifier);
 
-  EventLevel::event_level_t get_event_level() const;
+  EventLevel::event_level_t GetEventLevel() const;
 
   /**
    * @brief Returns the Modifier associated to an EventLevel
@@ -47,7 +45,7 @@ class LabeledModifier
    * @param event event level
    * @return terminal::Modifier* a pointer to associated the modifier
    */
-  Modifier get_modifier() const;
+  Modifier GetModifier() const;
 
   /**
    * @brief Returns the Modifier associated to an EventLevel
@@ -55,7 +53,7 @@ class LabeledModifier
    * @param event event level
    * @return terminal::Modifier* a pointer to associated the modifier
    */
-  std::string get_label() const;
+  std::string GetLabel() const;
 
  private:
   EventLevel::event_level_t event_;
@@ -69,7 +67,7 @@ class LabeledModifier
  * @param event event level
  * @return std::string name of the event
  */
-std::string event_level_to_string(const EventLevel::event_level_t event);
+std::string EventLevelToString(const EventLevel::event_level_t event);
 
 /**
  * @brief override the << operator which writes the label using the modifier
@@ -81,14 +79,14 @@ std::string event_level_to_string(const EventLevel::event_level_t event);
  */
 std::ostream& operator<<(std::ostream& os, const LabeledModifier& lm);
 
-LabeledModifier debug_labeled_modifier();
+LabeledModifier DebugLabeledModifier();
 
-LabeledModifier error_labeled_modifier();
+LabeledModifier ErrorLabeledModifier();
 
-LabeledModifier info_labeled_modifier();
+LabeledModifier InfoLabeledModifier();
 
-LabeledModifier warn_labeled_modifier();
-}  // namespace utils
-}  // namespace core
+LabeledModifier WarnLabeledModifier();
+
+}  // namespace core::utils
 
 #endif  // CORE_UTILS_COMMON_HPP

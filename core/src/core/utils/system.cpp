@@ -5,13 +5,11 @@
 
 #include "core/utils/exception.hpp"
 
-namespace core
-{
-namespace utils
+namespace core::utils
 {
 namespace fs = std::experimental::filesystem;
 
-void create_directories(const std::string& full_path)
+void CreateDirectories(const std::string& full_path)
 {
   fs::path path{full_path};
   try
@@ -24,7 +22,7 @@ void create_directories(const std::string& full_path)
   }
 }
 
-bool is_path_exists(const std::string& path)
+bool IsPathExists(const std::string& path)
 {
   struct stat buffer
   {
@@ -32,5 +30,4 @@ bool is_path_exists(const std::string& path)
   return stat(path.c_str(), &buffer) == 0;
 }
 
-}  // namespace utils
-}  // namespace core
+}  // namespace core::utils
