@@ -2,6 +2,7 @@
 #define CORE_SENSORS_MODULE_SENSOR_HPP
 
 #include "core/utils/module.hpp"
+#include "core/utils/data.hpp"
 #include <string>
 
 namespace core::sensors
@@ -31,7 +32,7 @@ std::string SensorModuleTypeToString(const SensorModuleType type);
  * @brief Abustract class used to define main object of beaglebone hardware
  *
  */
-class SensorModuleAbs : public core::utils::ModuleAbs
+class SensorModuleAbs : public utils::ModuleAbs
 {
  public:
   /**

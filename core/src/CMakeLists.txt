@@ -7,6 +7,8 @@
 set(CORE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(CORE_HEADER_LIST
     ${CORE_INCLUDE_DIR}/core/sensors/module_sensor.hpp
+    ${CORE_INCLUDE_DIR}/core/utils/cash.hpp
+    ${CORE_INCLUDE_DIR}/core/utils/data.hpp
     ${CORE_INCLUDE_DIR}/core/utils/date_time.hpp
     ${CORE_INCLUDE_DIR}/core/utils/event_level.hpp
     ${CORE_INCLUDE_DIR}/core/utils/exception.hpp
@@ -27,6 +29,7 @@ set(CORE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/core/sensors/module_sensor.cpp
     ${CORE_SOURCE_DIR}/core/utils/date_time.cpp
+    ${CORE_SOURCE_DIR}/core/utils/data.cpp
     ${CORE_SOURCE_DIR}/core/utils/event_level.cpp
     ${CORE_SOURCE_DIR}/core/utils/formatter.cpp
     ${CORE_SOURCE_DIR}/core/utils/system.cpp
@@ -54,11 +57,12 @@ target_include_directories(
     ${CORE_LIBRARY}
     PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
            $<INSTALL_INTERFACE:${ABSOLUTE_INSTALL_INCLUDEDIR}>
+           ${EIGEN3_INCLUDE_DIR}
            # $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 # Link required library
-target_link_libraries(${CORE_LIBRARY} PRIVATE stdc++fs)
+target_link_libraries(${CORE_LIBRARY} PRIVATE stdc++fs Eigen3::Eigen)
 
 # All users of this library will need at least C++17
 target_compile_features(${CORE_LIBRARY} PUBLIC cxx_std_17)

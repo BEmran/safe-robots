@@ -21,6 +21,15 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # generate compile_commands.json for clang
 # include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/MacroOutOfSourceBuild.cmake)
 
 # ##############################################################################
+# System Dependencies
+# ##############################################################################
+# find Eigen library
+find_package(Eigen3 3.3 REQUIRED)
+if (NOT Eigen3_FOUND)
+    message(FATAL_ERROR "Google Test library [Eigen3] not found")
+endif ()
+
+# ##############################################################################
 # Project Options
 # ##############################################################################
 option(WARNINGS_AS_ERRORS "Set warning as erros" OFF)
