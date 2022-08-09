@@ -21,11 +21,6 @@ std::string SensorModuleTypeToString(const SensorModuleType type)
   }
 }
 
-SensorModuleAbs::SensorModuleAbs(const SensorModuleType sensor_type)
-  : SensorModuleAbs(sensor_type, "Unnamed-"s + SensorModuleTypeToString(sensor_type))
-{
-}
-
 SensorModuleAbs::SensorModuleAbs(const SensorModuleType sensor_type,
                                  const std::string& name)
   : ModuleAbs(utils::ModuleType::SENSOR, name), sensor_type_{sensor_type}

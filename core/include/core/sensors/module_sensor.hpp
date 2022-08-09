@@ -2,7 +2,6 @@
 #define CORE_SENSORS_MODULE_SENSOR_HPP
 
 #include "core/utils/module.hpp"
-#include "core/utils/data.hpp"
 #include <string>
 
 namespace core::sensors
@@ -35,13 +34,6 @@ std::string SensorModuleTypeToString(const SensorModuleType type);
 class SensorModuleAbs : public utils::ModuleAbs
 {
  public:
-  /**
-   * @brief Construct a new Sensor Module object
-   *
-   * @param sensor_type sensor module's type
-   */
-  explicit SensorModuleAbs(const SensorModuleType sensor_type);
-
   /**
    * @brief Construct a new Sensor Module object
    *

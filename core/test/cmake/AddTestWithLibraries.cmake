@@ -6,7 +6,7 @@ macro(package_add_test_with_libraries TESTNAME FILES LIBRARIES
        TEST_WORKING_DIRECTORY)
 
     # create an exectuable in which the tests will be stored
-    add_executable(${TESTNAME} ${FILES})
+    add_executable(${TESTNAME} "${FILES}")
 
     # add the binary tree to the search path for include files so that we will
     # find include files
@@ -14,12 +14,12 @@ macro(package_add_test_with_libraries TESTNAME FILES LIBRARIES
         ${TESTNAME}
         PUBLIC # "${CMAKE_BINARY_DIR}"
                "${CMAKE_SOURCE_DIR}/include"
-               "${CMAKE_CURRENT_SOURCE_DIR}/include")
+               "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 
     # link the Google test infrastructure, mocking library, testing libraries
     # and a default main fuction to the test executable. Remove gtest_main if
     # writing your own main function.
-    target_link_libraries(${TESTNAME} PUBLIC ${LIBRARIES} ${GOOGLE_LIBRARIES}
+    target_link_libraries(${TESTNAME} PUBLIC "${LIBRARIES}" ${GOOGLE_LIBRARIES}
                                              pthread)
 
     # # gtest_discover_tests replaces gtest_add_tests, # see

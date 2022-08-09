@@ -118,7 +118,8 @@ endforeach ()
 # ##############################################################################
 # define library name
 set(CORE_LIBRARY core)
-
+set(SENSORS_LIBRARY sensors)
+set(HARDWARE_LIBRARY hardware)
 if (BUILD_SHARED_LIBS)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)
 endif ()

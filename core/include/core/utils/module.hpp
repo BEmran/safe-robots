@@ -34,13 +34,6 @@ class ModuleAbs
    * @brief Construct a new Module object
    *
    * @param type module's type
-   */
-  explicit ModuleAbs(const ModuleType type);
-
-  /**
-   * @brief Construct a new Module object
-   *
-   * @param type module's type
    * @param name module's name
    */
   ModuleAbs(const ModuleType type, const std::string& name);
@@ -65,11 +58,6 @@ class ModuleAbs
    */
   std::string Name() const;
 
-  // /**
-  //  * @brief prtints info to screen
-  //  *
-  //  */
-  // virtual void PrintOnScreen() = 0;
  private:
   ModuleType type_{ModuleType::UNDEFINED};
   std::string name_;

@@ -5,6 +5,7 @@
 using namespace core::utils;
 
 constexpr auto UndefinedType = core::utils::ModuleType::UNDEFINED;
+constexpr auto Name = "name";
 
 TEST(ModuleType, ToString)
 {
@@ -14,12 +15,12 @@ TEST(ModuleType, ToString)
 
 TEST(ModuleType, Type)
 {
-  const ModuleAbs mod(UndefinedType);
+  const ModuleAbs mod(UndefinedType, Name);
   EXPECT_EQ(UndefinedType, mod.Type());
 }
 
 TEST(ModuleType, Name)
 {
-  const ModuleAbs mod(UndefinedType);
-  EXPECT_EQ("UNDEFINED-Unnamed", mod.Name());
+  const ModuleAbs mod(UndefinedType, Name);
+  EXPECT_EQ(Name, mod.Name());
 }

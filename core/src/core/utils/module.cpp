@@ -15,11 +15,6 @@ std::string ModuleTypeToString(const ModuleType type)
   }
 }
 
-ModuleAbs::ModuleAbs(const ModuleType type)
-  : ModuleAbs(type, ModuleTypeToString(type) + "-Unnamed"s)
-{
-}
-
 ModuleAbs::ModuleAbs(const ModuleType type, const std::string& name)
   : type_{type}, name_{name}
 {

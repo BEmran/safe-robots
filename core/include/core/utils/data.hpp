@@ -4,6 +4,9 @@
 // #include <Eigen/Core>
 #include <iomanip>
 #include <iostream>
+#include <array>
+#include <algorithm>
+#include <assert.h>
 
 namespace core::utils
 {
@@ -14,28 +17,38 @@ namespace core::utils
  * @brief general struct to hold 3 dimension vector
  *
  */
-struct Vec3 {
-  double x, y, z;  // value for each dimension
+struct Vec3
+{
+  std::array<double, 3> data;
+  /**
+   * @brief Construct a new Vec3 object and initialize it with zeros
+   *
+   */
+  Vec3() : data({0.0, 0.0, 0.0})
+  {
+  }
 
   /**
    * @brief Construct a new Vec3 object
    *
-   * @param x_ value of x-axis
-   * @param y_ value of y-axis
-   * @param z_ value of z-axis
+   * @param x value of x-axis
+   * @param y value of y-axis
+   * @param z value of z-axis
    */
-  Vec3(const double x_ = 0.0, const double y_ = 0.0, const double z_ = 0.0)
-      : x(x_), y(y_), z(z_) {}
+  Vec3(const double x, const double y, const double z) : data({x, y, z})
+  {
+  }
 
   /**
    * @brief Construct a new Vec3 object from c-array
    *
    * @param arr c-array with size of three
    */
-  explicit Vec3(const double* arr) {
-    x = arr[0];
-    y = arr[1];
-    z = arr[2];
+  template <class T, std::size_t N>
+  explicit Vec3(const T (&arr)[N])
+  {
+    assert(N==3);
+    std::copy(std::begin(arr), std::end(arr), data.begin());
   }
 
   /**
@@ -44,17 +57,47 @@ struct Vec3 {
    * @param index index of the array
    * @return double& the corresponding index value
    */
-  double& operator[](int index) {
-    switch (index) {
-      case 0:
-        return x;
-      case 1:
-        return y;
-      case 2:
-        return z;
-      default:
-        throw std::logic_error("In struct Vec3: index out of bound");
-    }
+  inline double& operator[](const size_t index)
+  {
+    assert(index < 3);
+    return data[index];
+  }
+
+  /**
+   * @brief override operator[] to be used similadr to c-array
+   *
+   * @param index index of the array
+   * @return double the corresponding index value
+   */
+  inline double operator[](const size_t index) const
+  {
+    assert(index < 3);
+    return data[index];
+  }
+
+  inline double& x()
+  {
+    return data[0];
+  }
+  inline double& y()
+  {
+    return data[1];
+  }
+  inline double& z()
+  {
+    return data[2];
+  }
+  inline double x() const
+  {
+    return data[0];
+  }
+  inline double y() const
+  {
+    return data[1];
+  }
+  inline double z() const
+  {
+    return data[2];
   }
 };
 
@@ -62,52 +105,31 @@ struct Vec3 {
  * @brief general struct to hold unit quaternion
  *
  */
-struct Quat {
-  double w, x, y, z;  // value for angle rotation and each unit vector
-
+struct Quat
+{
+  double angle = 1;  // value for angle rotation
+  Vec3 vector = {0, 0, 0};        // value for unit vector
   /**
    * @brief Construct a new Quat object
    *
-   * @param w_ value of angle of rotation
-   * @param x_ value of unit vector i
-   * @param y_ value of unit vector j
-   * @param z_ value of unit vector k
+   * @param w value of angle of rotation
+   * @param x value of unit vector i
+   * @param y value of unit vector j
+   * @param z value of unit vector k
    */
-  Quat(const double w_ = 1.0, const double x_ = 0.0, const double y_ = 0.0,
-       const double z_ = 0.0)
-      : w(w_), x(x_), y(y_), z(z_) {}
-
-  /**
-   * @brief Construct a new Quat object from c-array
-   *
-   * @param arr c-array with size of four
-   */
-  explicit Quat(const double* arr) {
-    w = arr[0];
-    x = arr[1];
-    y = arr[2];
-    z = arr[3];
+  Quat(const double w, const double x, const double y, const double z)
+    : angle(w), vector({x, y, z})
+  {
   }
-
   /**
-   * @brief override operator[] to be used similar to c-array
+   * @brief Construct a new Quat object
    *
-   * @param index index of the array
-   * @return double& the corresponding index value
+   * @param rot angle of rotation
+   * @param unit_vec unit vector
    */
-  double& operator[](int index) {
-    switch (index) {
-      case 0:
-        return w;
-      case 1:
-        return x;
-      case 2:
-        return y;
-      case 3:
-        return z;
-      default:
-        throw std::logic_error("In struct Quat: index out of bound");
-    }
+  Quat(const double rot = 1, const Vec3& unit_vec = Vec3())
+    : angle(rot), vector(unit_vec)
+  {
   }
 };
 
@@ -115,63 +137,79 @@ std::ostream& operator<<(std::ostream& os, const Vec3& vec3);
 
 std::ostream& operator<<(std::ostream& os, const Quat& quat);
 
-class Data
+struct Data
 {
-  public:
-  virtual ~Data() {};
+ public:
+  virtual ~Data(){};
+  virtual void Clear() = 0;
   // std::string ToString();
   virtual void Print() = 0;
 };
 
-class AdcData : public Data
+struct AdcData : public Data
 {
- public:
-  void Print() override
-  {
-    std::cout << "Adc data: " << values
-              << std::endl;
-  }
-  private:
   Vec3 values{0.0, 0.0, 0.0};
-};
 
-class BarData : public Data
-{
- public:
   void Print() override
   {
-    std::cout << "Barometer data: " << value
-              << std::endl;
+    std::cout << "Adc data: " << values << std::endl;
   }
- private:
+
+  void Clear() override
+  {
+    values = Vec3();
+  }
+};
+
+struct BarData : public Data
+{
   double value = 0.0;
-};
-
- class GpsData : public Data
-{
- public:
   void Print() override
   {
-    std::cout << "GPS data: "
-              << "\n- latitude: " << lat
-              << "\n- longitude: " << lon
-              << "\n- altitude: " << alt
-              << std::endl;
+    std::cout << "Barometer data: " << value << std::endl;
   }
+  void Clear() override
+  {
+    value = 0.0;
+  }
+};
 
- private:
+struct GpsData : public Data
+{
   double lat = 0.0;
   double lon = 0.0;
   double alt = 0.0;
+
+  void Print() override
+  {
+    std::cout << "GPS data: "
+              << "\n- latitude: " << lat << "\n- longitude: " << lon
+              << "\n- altitude: " << alt << std::endl;
+  }
+
+  void Clear() override
+  {
+    lat = 0.0;
+    lon = 0.0;
+    alt = 0.0;
+  }
 };
 
 /**
  * @brief holds simple version of IMU sensor data
  *
  */
-class ImuData : public Data
+struct ImuData : public Data
 {
-  public:
+  double temp = 0.0;     ///< thermometer, in units of degrees Celsius
+  double heading = 0.0;  ///< fused heading filtered with gyro and accel data,
+                         ///< same as Tait-Bryan yaw in radians
+  Vec3 accel;            ///< accelerometer (XYZ) in units of m/s^2
+  Vec3 gyro;             ///< gyroscope (XYZ) in units of degrees/s
+  Vec3 mag;              ///< magnetometer (XYZ) in units of uT
+  Quat quat;             ///< normalized quaternion
+  Vec3 tait_bryan;       ///< Tait-Bryan angles (roll pitch yaw) in radians
+
   /**
    * @brief print imu data details
    *
@@ -182,47 +220,22 @@ class ImuData : public Data
               << "\n- Accel XYZ(m/s^2): " << accel
               << "\n- Gyro  XYZ(rad/s): " << gyro
               << "\n- Mag Field XYZ(uT): " << mag << "\n- quat  WXYZ: " << quat
-              << "\n- TaitBryan RPY(rad): " << TaitBryan
+              << "\n- TaitBryan RPY(rad): " << tait_bryan
               << "\n- heading (rad): " << heading << "\n- Temp (C): " << temp
               << std::endl;
   }
-  private:
-  double temp = 0.0;     ///< thermometer, in units of degrees Celsius
-  double heading = 0.0;  ///< fused heading filtered with gyro and accel data,
-                         ///< same as Tait-Bryan yaw in radians
-  Vec3 accel;            ///< accelerometer (XYZ) in units of m/s^2
-  Vec3 gyro;             ///< gyroscope (XYZ) in units of degrees/s
-  Vec3 mag;              ///< magnetometer (XYZ) in units of uT
-  Quat quat;             ///< normalized quaternion
-  Vec3 TaitBryan;        ///< Tait-Bryan angles (roll pitch yaw) in radians
 
+  void Clear() override
+  {
+    temp = 0.0;
+    heading = 0.0;
+    accel = Vec3();
+    gyro = Vec3();
+    mag = Vec3();
+    quat = Quat();
+    tait_bryan = Vec3();
+  }
 };
 
-// /**
-//  * @brief holds simple version of mpu sensor data
-//  *
-//  */
-// struct Led {
-//   bool led1 = false;
-
-//   /**
-//    * @brief print led data details
-//    *
-//    */
-//   void Print() {
-//     std::cout << "LED data: "
-//               << "\n- led1: " << BoolToChar(led1) << std::endl;
-//   }
-//   const char* BoolToChar(const bool b) { return b == true ? "On" : "Off"; }
-// };
-
-// /**
-//  * @brief holds all types of data
-//  *
-//  */
-// struct General {
-//   struct Imu imu;
-//   struct Led led;
-// };
-}
+}  // namespace core::utils
 #endif  // CORE_UTILS_DATA_HPP

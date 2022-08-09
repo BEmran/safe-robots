@@ -36,7 +36,7 @@ class Cash
   void Set(const T& data)
   {
     std::unique_lock lock(mutex_);
-    data_ = data;
+    *data_ptr_.get() = data;
   }
 
   /**
@@ -48,12 +48,22 @@ class Cash
   T Get() const
   {
     std::shared_lock lock(mutex_);
-    return data_;
+    return *data_ptr_.get();
+  }
+
+  /**
+   * @brief Clear data by calling its default constructor
+   *
+   */
+  void Clear()
+  {
+    std::unique_lock lock(mutex_);
+    data_ptr_->Clear();
   }
 
  private:
   mutable std::shared_mutex mutex_;
-  T data_;
+  std::unique_ptr<T> data_ptr_  = std::make_unique<T>();
 };
 
 }  // namespace core::utils
