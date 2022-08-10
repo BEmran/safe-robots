@@ -1,61 +1,92 @@
 #include <gtest/gtest.h>
 
-#include "core/utils/data.hpp"
 #include "utest_data.hpp"
+#include <sstream>
 
 using namespace core::utils;
 
-// constexpr auto UndefinedType = core::utils::ModuleType::UNDEFINED;
+// AdcData --------------------------------------------------------------------
 
-TEST(Vec3, DefaultValuesUsingBrackets)
+TEST(AdcData, Consruct)
 {
-  Vec3 vec = Vec3::Zero();
-  EXPECT_FLOAT_EQ(0, vec[0]);
-  EXPECT_FLOAT_EQ(0, vec[1]);
-  EXPECT_FLOAT_EQ(0, vec[2]);
+  const AdcData adc;
+  ExpectVec3Eq(Vec3::Zero(), adc.values);
 }
 
-TEST(Vec3, DefaultValuesUsingNames)
+TEST(AdcData, Clear)
 {
-  const Vec3 vec = Vec3::Zero();
-  EXPECT_FLOAT_EQ(0, vec.x());
-  EXPECT_FLOAT_EQ(0, vec.y());
-  EXPECT_FLOAT_EQ(0, vec.z());
+  AdcData adc;
+  Vec3 vec(1.4F, 2.5F, 3.6F);
+  adc.values = vec;
+  ExpectVec3Eq(vec, adc.values);
+  adc.Clear();
+  ExpectVec3Eq(Vec3::Zero(), adc.values);
 }
 
-TEST(Vec3, Construct)
+TEST(AdcData, Print)
 {
-  const Vec3 vec(1, 2, 3);
-  EXPECT_FLOAT_EQ(1, vec[0]);
-  EXPECT_FLOAT_EQ(2, vec[1]);
-  EXPECT_FLOAT_EQ(3, vec[2]);
+  AdcData adc;
+  adc.values = Vec3(1.4F, 2.5F, 3.6F);
+  std::stringstream ss;
+  ss << adc;
+  EXPECT_EQ("ADC data: [1.4, 2.5, 3.6]\n", ss.str());
 }
 
-TEST(Vec3, ConstructInRowStyle)
+// BarData --------------------------------------------------------------------
+
+TEST(BarData, Consruct)
 {
-  const float arr[] = {4, 5, 6};
-  Vec3 vec;
-  vec << arr[0], arr[1], arr[2];
-  EXPECT_FLOAT_EQ(arr[0], vec[0]);
-  EXPECT_FLOAT_EQ(arr[1], vec[1]);
-  EXPECT_FLOAT_EQ(arr[2], vec[2]);
+  const BarData bar;
+  EXPECT_DOUBLE_EQ(0, bar.value);
 }
 
-TEST(Vec3, RefernceValue)
+TEST(BarData, Clear)
 {
-  Vec3 vec;
-  vec.x() = 1;
-  EXPECT_FLOAT_EQ(1, vec.x());
+  BarData bar;
+  bar.value = 1.2;
+  EXPECT_DOUBLE_EQ(1.2, bar.value);
+  bar.Clear();
+  EXPECT_DOUBLE_EQ(0, bar.value);
 }
 
-TEST(Quat, DefaultValuesUsingNames)
+TEST(BarData, Print)
 {
-  const Quat quat = Quat::Identity();
-  EXPECT_FLOAT_EQ(1, quat.w());
-  EXPECT_FLOAT_EQ(0, quat.x());
-  EXPECT_FLOAT_EQ(0, quat.y());
-  EXPECT_FLOAT_EQ(0, quat.z());
+  BarData bar;
+  bar.value = 1.2;
+  std::stringstream ss;
+  ss << bar;
+  EXPECT_EQ("Barometer data: 1.2\n", ss.str());
 }
+
+// GpsData --------------------------------------------------------------------
+
+TEST(GpsData, Consruct)
+{
+  const GpsData gps;
+  ExpectGPSData(0, 0, 0, gps);
+}
+
+TEST(GpsData, Clear)
+{
+  GpsData gps;
+  gps.lat = 1.2;
+  EXPECT_DOUBLE_EQ(1.2, gps.lat);
+  gps.Clear();
+  EXPECT_DOUBLE_EQ(0, gps.lat);
+}
+
+TEST(GpsData, Print)
+{
+  GpsData gps;
+  gps.lat = 1.4;
+  gps.lon = 2.5;
+  gps.alt = 3.6;
+  std::stringstream ss;
+  ss << gps;
+  EXPECT_EQ("GPS data: \n- Lat: 1.4\n- Lon: 2.5\n- Alt: 3.6\n", ss.str());
+}
+
+// ImuData --------------------------------------------------------------------
 
 TEST(ImuData, Consruct)
 {
@@ -70,4 +101,25 @@ TEST(ImuData, Clear)
   EXPECT_FLOAT_EQ(1, imu.gyro.x());
   imu.Clear();
   EXPECT_FLOAT_EQ(0, imu.gyro.x());
+}
+
+TEST(ImuData, Print)
+{
+  ImuData imu;
+  imu.accel = Vec3(1.4F, 2.5F, 3.6F);
+  imu.gyro = Vec3(4.4F, 5.5F, 6.6F);
+  imu.mag = Vec3(4.1F, 5.2F, 6.3F);
+  imu.quat.w() = 4.7F;
+  imu.quat.vec() = Vec3(1.4F, 2.5F, 3.6F);
+  imu.tait_bryan = Vec3(7.4F, 8.5F, 9.6F);
+  imu.heading = 10.1;
+  imu.temp = 11.2;
+  const std::string msg =
+      "IMU data:\n- Accel XYZ(m/s^2): [1.4, 2.5, 3.6]\n- Gyro  XYZ(rad/s): "
+      "[4.4, 5.5, 6.6]\n- Mag Field XYZ(uT): [4.1, 5.2, 6.3]\n- Quat WXYZ: ang "
+      "= 4.7, [1.4, 2.5, 3.6]\n- TaitBryan RPY(rad): [7.4, 8.5, 9.6]\n- "
+      "heading (rad): 10.1\n- Temp (C): 11.2\n";
+  std::stringstream ss;
+  ss << imu;
+  EXPECT_EQ(msg, ss.str());
 }

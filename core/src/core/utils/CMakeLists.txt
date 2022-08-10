@@ -25,7 +25,6 @@ set(CORE_HEADER_LIST
 set(CORE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/date_time.cpp
-    ${CORE_SOURCE_DIR}/data.cpp
     ${CORE_SOURCE_DIR}/event_level.cpp
     ${CORE_SOURCE_DIR}/formatter.cpp
     ${CORE_SOURCE_DIR}/system.cpp

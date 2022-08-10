@@ -21,7 +21,7 @@ TEST(LabeledModifier, ConstructWithEvent)
   for (size_t i = 0; i < EVENTS.size(); i++)
   {
     const LabeledModifier labeled(EVENTS[i]);
-    expect_eq_labeled_modifier(EVENTS[i], LABELS[i], DefaultModifier(),
+    ExpectEqLabeledModifier(EVENTS[i], LABELS[i], DefaultModifier(),
                                labeled);
   }
 }
@@ -33,7 +33,7 @@ TEST(LabeledModifier, ConstructWithEventAndLabel)
   for (const auto& event : EVENTS)
   {
     const LabeledModifier labeled(event, label);
-    expect_eq_labeled_modifier(event, label, DefaultModifier(), labeled);
+    ExpectEqLabeledModifier(event, label, DefaultModifier(), labeled);
   }
 }
 
@@ -44,7 +44,7 @@ TEST(LabeledModifier, ConstructWithEventAndModifier)
   for (size_t i = 0; i < EVENTS.size(); i++)
   {
     const LabeledModifier labeled(EVENTS[i], modifier);
-    expect_eq_labeled_modifier(EVENTS[i], LABELS[i], modifier, labeled);
+    ExpectEqLabeledModifier(EVENTS[i], LABELS[i], modifier, labeled);
   }
 }
 
@@ -57,7 +57,7 @@ TEST(LabeledModifier, ConstructWithEventAndLabelAndModifier)
   for (const auto& event : EVENTS)
   {
     const LabeledModifier labeled(event, label, modifier);
-    expect_eq_labeled_modifier(event, label, modifier, labeled);
+    ExpectEqLabeledModifier(event, label, modifier, labeled);
   }
 }
 
@@ -67,7 +67,7 @@ TEST(LabeledModifier, DebugLabeledModifier)
 {
   const auto actual = DebugLabeledModifier();
   const auto event = EventLevel::EL_DEBUG;
-  expect_eq_labeled_modifier(event, EventLevelToString(event), DebugModifier(),
+  ExpectEqLabeledModifier(event, EventLevelToString(event), DebugModifier(),
                              actual);
 }
 
@@ -77,7 +77,7 @@ TEST(LabeledModifier, error_labeled_modifier)
 {
   const auto actual = ErrorLabeledModifier();
   const auto event = EventLevel::EL_ERROR;
-  expect_eq_labeled_modifier(event, EventLevelToString(event), ErrorModifier(),
+  ExpectEqLabeledModifier(event, EventLevelToString(event), ErrorModifier(),
                              actual);
 }
 
@@ -87,7 +87,7 @@ TEST(LabeledModifier, info_labeled_modifier)
 {
   const auto actual = InfoLabeledModifier();
   const auto event = EventLevel::EL_INFO;
-  expect_eq_labeled_modifier(event, EventLevelToString(event), InfoModifier(),
+  ExpectEqLabeledModifier(event, EventLevelToString(event), InfoModifier(),
                              actual);
 }
 
@@ -97,6 +97,6 @@ TEST(LabeledModifier, warn_labeled_modifier)
 {
   const auto actual = WarnLabeledModifier();
   const auto event = EventLevel::EL_WARN;
-  expect_eq_labeled_modifier(event, EventLevelToString(event), WarnModifier(),
+  ExpectEqLabeledModifier(event, EventLevelToString(event), WarnModifier(),
                              actual);
 }

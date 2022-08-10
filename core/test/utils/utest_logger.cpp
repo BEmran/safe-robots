@@ -60,8 +60,8 @@ class TestLogger
 
   void GetLoggedData()
   {
-    logs_console_ = buf_->restore_cout_buffer();
-    logs_file_ = read_all_lines_from_file(g_filename);
+    logs_console_ = buf_->RestoreCoutBuffer();
+    logs_file_ = ReadAllLinesFromFile(g_filename);
   }
 
   Logger* logger_;

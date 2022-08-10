@@ -42,10 +42,10 @@ TEST(NodeLabeledModifiers, Construct)
   const LabeledModifier lm_warn(EventLevel::EL_WARN, WarnModifier());
   const NodeLabeledModifiers node_lm(lm_debug, lm_error, lm_info, lm_warn);
 
-  expect_eq_labeled_modifier(node_lm.debug, lm_debug);
-  expect_eq_labeled_modifier(node_lm.error, lm_error);
-  expect_eq_labeled_modifier(node_lm.info, lm_info);
-  expect_eq_labeled_modifier(node_lm.warn, lm_warn);
+  ExpectEqLabeledModifier(node_lm.debug, lm_debug);
+  ExpectEqLabeledModifier(node_lm.error, lm_error);
+  ExpectEqLabeledModifier(node_lm.info, lm_info);
+  ExpectEqLabeledModifier(node_lm.warn, lm_warn);
 }
 
 // check creating Default NodeLabel Modifier using
@@ -53,10 +53,10 @@ TEST(NodeLabeledModifiers, Construct)
 TEST(NodeLabeledModifiers, DefaultConstruct)
 {
   const NodeLabeledModifiers node_lm;
-  expect_eq_labeled_modifier(node_lm.debug, DebugLabeledModifier());
-  expect_eq_labeled_modifier(node_lm.error, ErrorLabeledModifier());
-  expect_eq_labeled_modifier(node_lm.info, InfoLabeledModifier());
-  expect_eq_labeled_modifier(node_lm.warn, WarnLabeledModifier());
+  ExpectEqLabeledModifier(node_lm.debug, DebugLabeledModifier());
+  ExpectEqLabeledModifier(node_lm.error, ErrorLabeledModifier());
+  ExpectEqLabeledModifier(node_lm.info, InfoLabeledModifier());
+  ExpectEqLabeledModifier(node_lm.warn, WarnLabeledModifier());
 }
 
 // check construct Node with Name and Logger
@@ -88,7 +88,7 @@ TEST(Node, LogWithArbitraryLabledModiffier)
   const core::utils::LabeledModifier lm(EventLevel::EL_INFO, "tmp",
                                         DefaultModifier());
   node.Log(lm, "message");
-  expect_eq_labeled_modifier(mock_logger->LM(), lm);
+  ExpectEqLabeledModifier(mock_logger->LM(), lm);
 }
 
 // check Node log_debug function to see if it calls Logger.Log function with the
@@ -99,7 +99,7 @@ TEST(Node, log_debug)
   const NodeLabeledModifiers node_lm;
   const Node node("name", mock_logger, node_lm);
   node.LogDebug("message");
-  expect_eq_labeled_modifier(mock_logger->LM(), node_lm.debug);
+  ExpectEqLabeledModifier(mock_logger->LM(), node_lm.debug);
   EXPECT_EQ(mock_logger->Msg(), "[name]: message");
 }
 
@@ -111,7 +111,7 @@ TEST(Node, log_error)
   const NodeLabeledModifiers node_lm;
   const Node node("name", mock_logger, node_lm);
   node.LogError("message");
-  expect_eq_labeled_modifier(mock_logger->LM(), node_lm.error);
+  ExpectEqLabeledModifier(mock_logger->LM(), node_lm.error);
   EXPECT_EQ(mock_logger->Msg(), "[name]: message");
 }
 
@@ -123,7 +123,7 @@ TEST(Node, log_info)
   const NodeLabeledModifiers node_lm;
   const Node node("name", mock_logger, node_lm);
   node.LogInfo("message");
-  expect_eq_labeled_modifier(mock_logger->LM(), node_lm.info);
+  ExpectEqLabeledModifier(mock_logger->LM(), node_lm.info);
   EXPECT_EQ(mock_logger->Msg(), "[name]: message");
 }
 
@@ -135,6 +135,6 @@ TEST(Node, log_warn)
   const NodeLabeledModifiers node_lm;
   Node node("name", mock_logger, node_lm);
   node.LogWarn("message");
-  expect_eq_labeled_modifier(mock_logger->LM(), node_lm.warn);
+  ExpectEqLabeledModifier(mock_logger->LM(), node_lm.warn);
   EXPECT_EQ(mock_logger->Msg(), "[name]: message");
 }

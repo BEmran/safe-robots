@@ -16,22 +16,11 @@ struct Data
  public:
   virtual ~Data(){};
   virtual void Clear() = 0;
-  virtual void Print() = 0;
 };
 
 struct AdcData : public Data
 {
-  Vec3 values;
-
-  void Print() override
-  {
-    std::cout << "Adc data: " << std::setprecision(10);
-    for (int i = 0; i < 3; i++)
-    {
-      std::cout << "[" << i << ": " << values(i);
-    }
-    std::cout << "]" << std::endl;
-  }
+  Vec3 values = Vec3::Zero();
 
   void Clear() override
   {
@@ -39,34 +28,30 @@ struct AdcData : public Data
   }
 };
 
+std::ostream& operator<<(std::ostream& os, const AdcData& adc)
+{
+  return os << "ADC data: " << adc.values.transpose() << std::endl;
+}
+
 struct BarData : public Data
 {
   double value = 0.0;
-  void Print() override
-  {
-    std::cout << "Barometer data: " << std::setprecision(10) << value
-              << std::endl;
-  }
   void Clear() override
   {
     value = 0.0;
   }
 };
 
+std::ostream& operator<<(std::ostream& os, const BarData& bar)
+{
+  return os << "Barometer data: " << bar.value << std::endl;
+}
+
 struct GpsData : public Data
 {
   double lat = 0.0;
   double lon = 0.0;
   double alt = 0.0;
-
-  void Print() override
-  {
-    std::cout << "GPS data: " << std::setprecision(10)
-              << "\n- latitude: " << lat  /* latitude */
-              << "\n- longitude: " << lon /* longitude */
-              << "\n- altitude: " << alt  /* altitude */
-              << std::endl;
-  }
 
   void Clear() override
   {
@@ -75,6 +60,14 @@ struct GpsData : public Data
     alt = 0.0;
   }
 };
+
+std::ostream& operator<<(std::ostream& os, const GpsData& gps)
+{
+  return os << "GPS data: " << std::setprecision(PRECISION) /* precision */
+            << "\n- Lat: " << gps.lat                        /* latitude */
+            << "\n- Lon: " << gps.lon                        /* longitude */
+            << "\n- Alt: " << gps.alt << std::endl;          /* altitude */
+}
 
 /**
  * @brief holds simple version of IMU sensor data
@@ -92,33 +85,33 @@ struct ImuData : public Data
   Vec3 tait_bryan =
       Vec3::Zero();  ///< Tait-Bryan angles (roll pitch yaw) in radians
 
-  /**
-   * @brief print imu data details
-   *
-   */
-  void Print() override
-  {
-    std::cout << "IMU data: "
-              << "\n- Accel XYZ(m/s^2): " << VecToString(accel)
-              << "\n- Gyro  XYZ(rad/s): " << VecToString(gyro)
-              << "\n- Mag Field XYZ(uT): " << VecToString(mag)
-              << "\n- quat  WXYZ: " << QuatToString(quat)
-              << "\n- TaitBryan RPY(rad): " << VecToString(tait_bryan)
-              << std::setprecision(10) << "\n- heading (rad): " << heading
-              << "\n- Temp (C): " << temp << std::endl;
-  }
-
   void Clear() override
   {
     temp = 0.0;
     heading = 0.0;
-    Zero(accel);
-    Zero(gyro);
-    Zero(mag);
-    Zero(tait_bryan);
-    Identity(quat);
+    accel.setZero();
+    gyro.setZero();
+    mag.setZero();
+    tait_bryan.setZero();
+    quat.setIdentity();
   }
 };
 
+/**
+ * @brief print imu data details
+ *
+ */
+std::ostream& operator<<(std::ostream& os, const ImuData& imu)
+{
+  return os << "IMU data:"
+            << "\n- Accel XYZ(m/s^2): " << imu.accel.transpose()
+            << "\n- Gyro  XYZ(rad/s): " << imu.gyro.transpose()
+            << "\n- Mag Field XYZ(uT): " << imu.mag.transpose()
+            << "\n- Quat WXYZ: " << imu.quat
+            << "\n- TaitBryan RPY(rad): " << imu.tait_bryan.transpose()
+            << std::setprecision(PRECISION) /* set precision */
+            << "\n- heading (rad): " << imu.heading
+            << "\n- Temp (C): " << imu.temp << std::endl;
+}
 }  // namespace core::utils
 #endif  // CORE_UTILS_DATA_HPP

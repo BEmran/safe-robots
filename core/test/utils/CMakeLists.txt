@@ -42,6 +42,10 @@ set(UTEST_CASH_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_cash.cpp)
 package_add_test_with_libraries(utest_cash "${UTEST_CASH_FILES}"
                                 ${CORE_LIBRARY} "")
                                 
+set(UTEST_MATH_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_math.cpp)
+package_add_test_with_libraries(utest_math "${UTEST_MATH_FILES}"
+                                ${CORE_LIBRARY} "")
+                                
 set(UTEST_DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_data.cpp)
 package_add_test_with_libraries(utest_data "${UTEST_DATA_FILES}"
                                 ${CORE_LIBRARY} "")

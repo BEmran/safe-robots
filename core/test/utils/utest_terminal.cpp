@@ -12,7 +12,7 @@ TEST(Modifier, Construct)
   auto bg = BG::BG_LIGHT_YELLOW;
   auto fmt = FMT::FMT_BOLD;
   const Modifier modifier(fg, bg, fmt);
-  expect_eq_modifier(fg, bg, fmt, modifier);
+  ExpectEqModifier(fg, bg, fmt, modifier);
 }
 
 // check default modifier settings created using DefaultModifier function
@@ -22,7 +22,7 @@ TEST(Modifier, DefaultModifier)
   auto bg = BG::BG_DEFAULT;
   auto fmt = FMT::FMT_DEFAULT;
   const Modifier modifier = DefaultModifier();
-  expect_eq_modifier(fg, bg, fmt, modifier);
+  ExpectEqModifier(fg, bg, fmt, modifier);
 }
 
 // check debug modifier settings created using DebugModifier function
@@ -32,7 +32,7 @@ TEST(Modifier, DebugModifier)
   auto bg = BG::BG_DEFAULT;
   auto fmt = FMT::FMT_BOLD;
   const Modifier modifier = DebugModifier();
-  expect_eq_modifier(fg, bg, fmt, modifier);
+  ExpectEqModifier(fg, bg, fmt, modifier);
 }
 
 // check error modifier settings created using ErrorModifier function
@@ -42,7 +42,7 @@ TEST(Modifier, ErrorModifier)
   auto bg = BG::BG_DEFAULT;
   auto fmt = FMT::FMT_BOLD;
   const Modifier modifier = ErrorModifier();
-  expect_eq_modifier(fg, bg, fmt, modifier);
+  ExpectEqModifier(fg, bg, fmt, modifier);
 }
 
 // check info modifier settings created using InfoModifier function
@@ -52,7 +52,7 @@ TEST(Modifier, InfoModifier)
   auto bg = BG::BG_DEFAULT;
   auto fmt = FMT::FMT_BOLD;
   const Modifier modifier = InfoModifier();
-  expect_eq_modifier(fg, bg, fmt, modifier);
+  ExpectEqModifier(fg, bg, fmt, modifier);
 }
 
 // check warning modifier settings created using WarnModifier function
@@ -62,7 +62,7 @@ TEST(Modifier, WarnModifier)
   auto bg = BG::BG_DEFAULT;
   auto fmt = FMT::FMT_BOLD;
   Modifier modifier = WarnModifier();
-  expect_eq_modifier(fg, bg, fmt, modifier);
+  ExpectEqModifier(fg, bg, fmt, modifier);
 }
 
 // check overloading the << operator

@@ -2,51 +2,42 @@
 #define CORE_UTILS_MATH_HPP
 
 #include <eigen3/Eigen/Dense>
-#include <sstream>
+#include <iomanip>
+// #include <sstream>
 
 namespace core::utils
 {
-
+constexpr int PRECISION = 10;
 typedef float TYPE;
 
 typedef Eigen::Matrix<TYPE, 3, 1> Vec3;
+typedef Eigen::Transpose<const Vec3> Transpose;
 typedef Eigen::Matrix<TYPE, 3, 3> Mat3;
 typedef Eigen::Rotation2D<TYPE> Rot2;
 typedef Eigen::Quaternion<TYPE> Quat;
 typedef Eigen::Transform<TYPE, 3, Eigen::Affine> Transform;
 
-Eigen::IOFormat MatFmt(Eigen::FullPrecision, 0, ", ", ";\n", "[", "]", "[", "]");
-Eigen::IOFormat VecFmt(Eigen::FullPrecision, 0, ", ", "\n", "", "", "[", "]");
+Eigen::IOFormat MatFmt(Eigen::FullPrecision, 0, ", ", ";\n", "[", "]", "[",
+                       "]");
+Eigen::IOFormat VecFmt(Eigen::FullPrecision, 0, ", ", ";\n", "", "", "[", "]");
 
-std::string VecToString(const Vec3& vec)
+std::ostream& operator<<(std::ostream& os, const Vec3& vec)
 {
-    std::stringstream ss;
-    ss << vec.format(VecFmt);
-    return ss.str();
+  return os << vec.format(VecFmt);
 }
 
-std::string MatToString(const Mat3& mat)
+std::ostream& operator<<(std::ostream& os, const Transpose& vec)
 {
-    std::stringstream ss;
-    ss << mat.format(MatFmt);
-    return ss.str();
+  return os << vec.format(VecFmt);
 }
 
-std::string QuatToString(const Quat& quat)
+std::ostream& operator<<(std::ostream& os, const Quat& quat)
 {
-    std::stringstream ss;
-    ss << "ang = " << quat.w() << ", vec = " << quat.vec().format(VecFmt);
-    return ss.str();
+  os << "ang = " << quat.w() << ", "           /* angle */
+     << quat.vec().transpose().format(VecFmt); /* axis */
+  return os;
 }
 
-void Zero(Vec3 &vec) {
-    vec.setZero();
-}
-
-void Identity(Quat &quat) {
-    quat.setIdentity();
-}
-
-}  // namespace core::math
+}  // namespace core::utils
 
 #endif  // CORE_UTILS_MATH_HPP

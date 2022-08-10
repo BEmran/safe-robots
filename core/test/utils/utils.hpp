@@ -48,7 +48,7 @@ testing::AssertionResult operator&&(const testing::AssertionResult& lhs,
  * @return testing::AssertionResult assertation result
  */
 template <typename T>
-testing::AssertionResult assert_eq_with_label(const T expect, const T actual,
+testing::AssertionResult AssertEqWithLabel(const T expect, const T actual,
                                               const char* label)
 {
   if (expect == actual)
@@ -61,7 +61,7 @@ testing::AssertionResult assert_eq_with_label(const T expect, const T actual,
 }
 
 // generate a string using the passed modifier and its label
-std::string format_labeled_modifier(const Modifier& modifier,
+std::string FormatLabeledModifier(const Modifier& modifier,
                                     const std::string& label)
 {
   std::stringstream ss;
@@ -78,7 +78,7 @@ std::string modifier_to_string(const FG fg, const BG bg, const FMT fmt)
 }
 
 // check if the passed modifier has the passed configuration
-void expect_eq_modifier(const FG expect_fg, const BG expect_bg,
+void ExpectEqModifier(const FG expect_fg, const BG expect_bg,
                         const FMT expect_fmt, const Modifier& actual)
 {
   EXPECT_EQ(modifier_to_string(expect_fg, expect_bg, expect_fmt),
@@ -86,30 +86,30 @@ void expect_eq_modifier(const FG expect_fg, const BG expect_bg,
 }
 
 // check if the passed modifiers have the same configuration
-void expect_eq_modifier(const Modifier& expect, const Modifier& actual)
+void ExpectEqModifier(const Modifier& expect, const Modifier& actual)
 {
   EXPECT_EQ(expect.ToString(), actual.ToString());
 }
 
 // check if the passed labled-modifier has the same expected configuration
-void expect_eq_labeled_modifier(const EventLevel::event_level_t expect_event,
+void ExpectEqLabeledModifier(const EventLevel::event_level_t expect_event,
                                 const std::string& expect_label,
                                 const Modifier& expect_modifier,
                                 const LabeledModifier& actual)
 {
   EXPECT_EQ(expect_event, actual.GetEventLevel());
   EXPECT_EQ(expect_label, actual.GetLabel());
-  expect_eq_modifier(expect_modifier, actual.GetModifier());
+  ExpectEqModifier(expect_modifier, actual.GetModifier());
   std::stringstream ss;
   ss << actual;
-  EXPECT_EQ(format_labeled_modifier(expect_modifier, expect_label), ss.str());
+  EXPECT_EQ(FormatLabeledModifier(expect_modifier, expect_label), ss.str());
 }
 
 // check if the passed labled-modifiers have the expected configuration
-void expect_eq_labeled_modifier(const LabeledModifier& expect,
+void ExpectEqLabeledModifier(const LabeledModifier& expect,
                                 const LabeledModifier& actual)
 {
-  expect_eq_labeled_modifier(expect.GetEventLevel(), expect.GetLabel(),
+  ExpectEqLabeledModifier(expect.GetEventLevel(), expect.GetLabel(),
                              expect.GetModifier(), actual);
 }
 
@@ -119,7 +119,7 @@ void expect_eq_labeled_modifier(const LabeledModifier& expect,
  * @param file_name file name to read from
  * @return std::list<std::string> data written in a file
  */
-std::list<std::string> read_all_lines_from_file(const std::string& file_name)
+std::list<std::string> ReadAllLinesFromFile(const std::string& file_name)
 {
   std::string line;
   std::list<std::string> lines;
@@ -166,11 +166,11 @@ class ConsoleBuffer
    *
    * @return std::list<std::string> lines printed to cout
    */
-  std::list<std::string> restore_cout_buffer()
+  std::list<std::string> RestoreCoutBuffer()
   {
     // restore cout's original buffer
     std::cout.rdbuf(backup);
-    return read_all_lines_from_file(file_name_);
+    return ReadAllLinesFromFile(file_name_);
   }
   std::string file_name_;
   std::ofstream file_;
