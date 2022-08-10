@@ -13,7 +13,7 @@ TEST(Cash, SetAndGet)
   imu.accel.x() = 1;
   imu.gyro.y() = 1;
   imu.mag.z() = 1;
-  imu.quat.angle = 0.5;
+  imu.quat.w() = 0.5;
   cash.Set(imu);
   ExpectImuData(imu, cash.Get());
 }

@@ -12,6 +12,7 @@ set(CORE_HEADER_LIST
     ${CORE_INCLUDE_DIR}/core/utils/system.hpp
     ${CORE_INCLUDE_DIR}/core/utils/terminal.hpp
     ${CORE_INCLUDE_DIR}/core/utils/logger.hpp
+    ${CORE_INCLUDE_DIR}/core/utils/math.hpp
     ${CORE_INCLUDE_DIR}/core/utils/module.hpp
     ${CORE_INCLUDE_DIR}/core/utils/node.hpp
     ${CORE_INCLUDE_DIR}/core/utils/writter_console.hpp
@@ -50,7 +51,7 @@ target_include_directories(
 )
 
 # Link required library
-target_link_libraries(${CORE_LIBRARY} PRIVATE stdc++fs)
+target_link_libraries(${CORE_LIBRARY} PRIVATE stdc++fs Eigen3::Eigen)
 
 # All users of this library will need at least C++17
 target_compile_features(${CORE_LIBRARY} PUBLIC cxx_std_17)
