@@ -13,8 +13,8 @@ macro(package_add_test_with_libraries TESTNAME FILES LIBRARIES
     target_include_directories(
         ${TESTNAME}
         PUBLIC # "${CMAKE_BINARY_DIR}"
-               "${CMAKE_SOURCE_DIR}/include"
-               "${CMAKE_CURRENT_SOURCE_DIR}/../include")
+               "${PROJECT_SOURCE_DIR}/core/include"
+               "${PROJECT_SOURCE_DIR}/core/test/include")
 
     # link the Google test infrastructure, mocking library, testing libraries
     # and a default main fuction to the test executable. Remove gtest_main if

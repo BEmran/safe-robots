@@ -44,10 +44,15 @@ if(ENABLE_CPPCHECK)
             --inline-suppr
             --inconclusive
             --template='{file}[{line}]:{severity},{id}:{message}'
-            -I ${CMAKE_CURRENT_SOURCE_DIR}/src
-            -I ${CMAKE_CURRENT_SOURCE_DIR}/include
-            ${CMAKE_CURRENT_SOURCE_DIR}/src
-            ${CMAKE_CURRENT_SOURCE_DIR}/include
+            -I ${CMAKE_CURRENT_SOURCE_DIR}/core/src
+            -I ${CMAKE_CURRENT_SOURCE_DIR}/core/test
+            -I ${CMAKE_CURRENT_SOURCE_DIR}/core/include
+            -I ${CMAKE_CURRENT_SOURCE_DIR}/hardware/navio/src
+            -I ${CMAKE_CURRENT_SOURCE_DIR}/hardware/navio/include
+            ${CMAKE_CURRENT_SOURCE_DIR}/core/src
+            ${CMAKE_CURRENT_SOURCE_DIR}/core/include
+            ${CMAKE_CURRENT_SOURCE_DIR}/hardware/navio/src
+            ${CMAKE_CURRENT_SOURCE_DIR}/hardware/navio/include
         )
     endif()
 endif()

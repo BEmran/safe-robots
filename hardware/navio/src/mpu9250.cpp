@@ -1,5 +1,5 @@
 
-#include "hardware/navio/mpu9250.hpp"
+#include "navio/mpu9250.hpp"
 
 constexpr auto G_SI = 9.80665;
 constexpr auto PI = 3.14159;
@@ -20,7 +20,7 @@ unsigned int MPU9250::WriteReg(uint8_t WriteAddr, uint8_t WriteData)
   unsigned char tx[2] = {WriteAddr, WriteData};
   unsigned char rx[2] = {0};
 
-  SPIdev::transfer("/dev/spidev0.1", tx, rx, 2);
+  // SPIdev::transfer("/dev/spidev0.1", tx, rx, 2);
 
   return rx[1];
 }

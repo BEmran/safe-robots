@@ -1,28 +1,28 @@
 # ##############################################################################
 # Create header file list for core library
 # ##############################################################################
-set(CORE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
+set(CORE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/core/utils)
 set(CORE_HEADER_LIST
-    ${CORE_INCLUDE_DIR}/core/utils/cash.hpp
-    ${CORE_INCLUDE_DIR}/core/utils/data.hpp
-    ${CORE_INCLUDE_DIR}/core/utils/date_time.hpp
-    ${CORE_INCLUDE_DIR}/core/utils/event_level.hpp
-    ${CORE_INCLUDE_DIR}/core/utils/exception.hpp
-    ${CORE_INCLUDE_DIR}/core/utils/formatter.hpp
-    ${CORE_INCLUDE_DIR}/core/utils/system.hpp
-    ${CORE_INCLUDE_DIR}/core/utils/terminal.hpp
-    ${CORE_INCLUDE_DIR}/core/utils/logger.hpp
-    ${CORE_INCLUDE_DIR}/core/utils/math.hpp
-    ${CORE_INCLUDE_DIR}/core/utils/module.hpp
-    ${CORE_INCLUDE_DIR}/core/utils/node.hpp
-    ${CORE_INCLUDE_DIR}/core/utils/writter_console.hpp
-    ${CORE_INCLUDE_DIR}/core/utils/writter_file.hpp
-    ${CORE_INCLUDE_DIR}/core/utils/writter.hpp)
+    ${CORE_INCLUDE_DIR}/cash.hpp
+    ${CORE_INCLUDE_DIR}/data.hpp
+    ${CORE_INCLUDE_DIR}/date_time.hpp
+    ${CORE_INCLUDE_DIR}/event_level.hpp
+    ${CORE_INCLUDE_DIR}/exception.hpp
+    ${CORE_INCLUDE_DIR}/formatter.hpp
+    ${CORE_INCLUDE_DIR}/system.hpp
+    ${CORE_INCLUDE_DIR}/terminal.hpp
+    ${CORE_INCLUDE_DIR}/logger.hpp
+    ${CORE_INCLUDE_DIR}/math.hpp
+    ${CORE_INCLUDE_DIR}/module.hpp
+    ${CORE_INCLUDE_DIR}/node.hpp
+    ${CORE_INCLUDE_DIR}/writter_console.hpp
+    ${CORE_INCLUDE_DIR}/writter_file.hpp
+    ${CORE_INCLUDE_DIR}/writter.hpp)
 
 # ##############################################################################
 # Create source file list for core library
 # ##############################################################################
-set(CORE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(CORE_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src/core/utils)
 set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/date_time.cpp
     ${CORE_SOURCE_DIR}/event_level.cpp
@@ -34,7 +34,9 @@ set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/node.cpp
     ${CORE_SOURCE_DIR}/writter_console.cpp
     ${CORE_SOURCE_DIR}/writter_file.cpp)
-
+set(SENSORS_SOURCE_LIST
+    ${SENSORS_SOURCE_DIR}/module_sensor_imu.cpp
+    ${SENSORS_SOURCE_DIR}/module_sensor.cpp)
 # ##############################################################################
 # Build core library
 # ##############################################################################

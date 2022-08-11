@@ -39,9 +39,10 @@ class ImuSensorModule : public SensorModuleAbs
   protected:
   void SetData(const utils::ImuData& data);
   void SetData();
+  
+  utils::ImuData data_;
 
  private:
-  utils::ImuData data_;
   utils::Cash<utils::ImuData> cashed_data_;
 };
 

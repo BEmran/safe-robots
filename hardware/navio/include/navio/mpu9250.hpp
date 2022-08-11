@@ -1,23 +1,22 @@
 #ifndef HARDWARE_NAVIO2_MPU9250_HPP
 #define HARDWARE_NAVIO2_MPU9250_HPP
 
-#include "SPIdev.h"
 #include "core/sensors/module_sensor_imu.hpp"
 using core::sensors::ImuSensorModule;
 class MPU9250 : public ImuSensorModule
 
 {
  public:
-  MPU9250();
+  MPU9250() = default;
 
   bool initialize();
   bool probe();
   void update();
 
  private:
-  unsigned int WriteReg(uint8_t WriteAddr, uint8_t WriteData);
-  unsigned int ReadReg(uint8_t ReadAddr);
-  void ReadRegs(uint8_t ReadAddr, uint8_t* ReadBuf, unsigned int Bytes);
+//   unsigned int WriteReg(uint8_t WriteAddr, uint8_t WriteData);
+//   unsigned int ReadReg(uint8_t ReadAddr);
+//   void ReadRegs(uint8_t ReadAddr, uint8_t* ReadBuf, unsigned int Bytes);
 
   unsigned int set_gyro_scale(int scale);
   unsigned int set_acc_scale(int scale);
@@ -128,7 +127,7 @@ constexpr auto MPUREG_I2C_SLV1_DO = 0x64;
 constexpr auto MPUREG_I2C_SLV2_DO = 0x65;
 constexpr auto MPUREG_I2C_SLV3_DO = 0x66;
 constexpr auto MPUREG_I2C_MST_DELAY_CTRL = 0x67;
-constexpr auto MPUREG_SIGNAL_PATH_RESET = 0x68;
+constexpr auto MPUREGSiGNAL_PATH_RESET = 0x68;
 constexpr auto MPUREG_MOT_DETECT_CTRL = 0x69;
 constexpr auto MPUREG_USER_CTRL = 0x6A;
 constexpr auto MPUREG_PWR_MGMT_1 = 0x6B;
@@ -150,8 +149,8 @@ constexpr auto MPUREG_ZA_OFFSET_H = 0x7D;
 constexpr auto MPUREG_ZA_OFFSET_L = 0x7E;
 
 /* ---- AK8963 Reg In MPU9250 ----------------------------------------------- */
-constexpr auto AK8963_I2C_ADDR 0x0c;  // should return 0x18
-constexpr auto AK8963_Device_ID 0x48;
+constexpr auto AK8963_I2C_ADDR = 0x0c;  // should return 0x18
+constexpr auto AK8963_Device_ID = 0x48;
 
 // Read-only Reg
 constexpr auto AK8963_WIA = 0x00;
