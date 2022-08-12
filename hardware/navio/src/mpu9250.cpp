@@ -10,7 +10,7 @@ Adapted for Raspberry Pi by Mikhail Avkhimenia (mikhail.avkhimenia@emlid.com)
 
 //-----------------------------------------------------------------------------------------------
 
-MPU9250::MPU9250()
+MPU9250::MPU9250() : core::sensors::ImuSensorModule("mpu")
 {
 }
 
