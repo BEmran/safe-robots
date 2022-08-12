@@ -6,7 +6,7 @@ Adapted for Raspberry Pi by Mikhail Avkhimenia (mikhail.avkhimenia@emlid.com)
 #ifndef _MPU9250_H
 #define _MPU9250_H
 
-#include "SPIdev.h"
+#include "spidev.h"
 #include <core/sensors/module_sensor_imu.hpp>
 
 class MPU9250 : public core::sensors::ImuSensorModule

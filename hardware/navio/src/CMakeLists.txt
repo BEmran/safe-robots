@@ -4,7 +4,8 @@
 set(NAVIO_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/hardware/navio/include)
 set(NAVIO_HEADER_LIST
     ${NAVIO_INCLUDE_DIR}/navio/mpu9250.h
-    ${NAVIO_INCLUDE_DIR}/navio/SPIdev.h
+    ${NAVIO_INCLUDE_DIR}/navio/spidev.h
+    ${NAVIO_INCLUDE_DIR}/navio/util.h
     )
 
 # ##############################################################################
@@ -12,7 +13,9 @@ set(NAVIO_HEADER_LIST
 # ##############################################################################
 set(NAVIO_SOURCE_DIR ${PROJECT_SOURCE_DIR}/hardware/navio/src)
 set(NAVIO_SOURCE_LIST
-    ${NAVIO_SOURCE_DIR}/mpu9250.cpp)
+    ${NAVIO_SOURCE_DIR}/mpu9250.cpp
+    ${NAVIO_SOURCE_DIR}/util.cpp
+    )
 
 # ##############################################################################
 # Build NAVIO library
