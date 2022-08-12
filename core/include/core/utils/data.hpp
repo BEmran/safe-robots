@@ -3,9 +3,6 @@
 
 #include <iomanip>
 #include <iostream>
-#include <array>
-#include <algorithm>
-#include <assert.h>
 
 #include "core/utils/math.hpp"
 
@@ -30,11 +27,7 @@ struct AdcData : public Data
   }
 };
 
-std::ostream& operator<<(std::ostream& os, const AdcData& adc)
-{
-  return os << "ADC data: " << adc.values.transpose() << std::endl;
-}
-
+std::ostream& operator<<(std::ostream& os, const AdcData& adc);
 struct BarData : public Data
 {
   double value = 0.0;
@@ -44,11 +37,7 @@ struct BarData : public Data
   }
 };
 
-std::ostream& operator<<(std::ostream& os, const BarData& bar)
-{
-  return os << "Barometer data: " << bar.value << std::endl;
-}
-
+std::ostream& operator<<(std::ostream& os, const BarData& bar);
 struct GpsData : public Data
 {
   double lat = 0.0;
@@ -63,13 +52,7 @@ struct GpsData : public Data
   }
 };
 
-std::ostream& operator<<(std::ostream& os, const GpsData& gps)
-{
-  return os << "GPS data: " << std::setprecision(COUT_PRECISION) /* precision */
-            << "\n- Lat: " << gps.lat                        /* latitude */
-            << "\n- Lon: " << gps.lon                        /* longitude */
-            << "\n- Alt: " << gps.alt << std::endl;          /* altitude */
-}
+std::ostream& operator<<(std::ostream& os, const GpsData& gps);
 
 /**
  * @brief holds simple version of IMU sensor data
@@ -103,17 +86,7 @@ struct ImuData : public Data
  * @brief print imu data details
  *
  */
-std::ostream& operator<<(std::ostream& os, const ImuData& imu)
-{
-  return os << "IMU data:"
-            << "\n- Accel XYZ(m/s^2): " << imu.accel.transpose()
-            << "\n- Gyro  XYZ(rad/s): " << imu.gyro.transpose()
-            << "\n- Mag Field XYZ(uT): " << imu.mag.transpose()
-            << "\n- Quat WXYZ: " << imu.quat
-            << "\n- TaitBryan RPY(rad): " << imu.tait_bryan.transpose()
-            << std::setprecision(COUT_PRECISION) /* set precision */
-            << "\n- heading (rad): " << imu.heading
-            << "\n- Temp (C): " << imu.temp << std::endl;
-}
+std::ostream& operator<<(std::ostream& os, const ImuData& imu);
+
 }  // namespace core::utils
 #endif  // CORE_UTILS_DATA_HPP

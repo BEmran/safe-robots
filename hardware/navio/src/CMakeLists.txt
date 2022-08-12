@@ -5,6 +5,8 @@ set(NAVIO_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/hardware/navio/include)
 set(NAVIO_HEADER_LIST
     ${NAVIO_INCLUDE_DIR}/navio/mpu9250.h
     ${NAVIO_INCLUDE_DIR}/navio/spidev.h
+    ${NAVIO_INCLUDE_DIR}/navio/old_mpu9250.h
+    ${NAVIO_INCLUDE_DIR}/navio/old_spidev.h
     ${NAVIO_INCLUDE_DIR}/navio/util.h
     )
 
@@ -15,6 +17,7 @@ set(NAVIO_SOURCE_DIR ${PROJECT_SOURCE_DIR}/hardware/navio/src)
 set(NAVIO_SOURCE_LIST
     ${NAVIO_SOURCE_DIR}/mpu9250.cpp
     ${NAVIO_SOURCE_DIR}/spidev.cpp
+    ${NAVIO_SOURCE_DIR}/old_mpu9250.cpp
     ${NAVIO_SOURCE_DIR}/util.cpp
     )
 
@@ -23,18 +26,16 @@ set(NAVIO_SOURCE_LIST
 # ##############################################################################
 # Declare a C++ library Make an automatic library - will be static or dynamic
 # based on user setting
-add_library(${NAVIO_LIBRARY} ${NAVIO_SOURCE_LIST} ${NAVIO_HEADER_LIST})
+add_library(${NAVIO_LIBRARY} ${NAVIO_SOURCE_LIST} )#${NAVIO_HEADER_LIST}
 
 # Global includes
 target_include_directories(${NAVIO_LIBRARY} PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/core/include>
+    # $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/core/include>
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/hardware/navio/include>
-    $<INSTALL_INTERFACE:${ABSOLUTE_INSTALL_INCLUDEDIR}>
+    # $<INSTALL_INTERFACE:${ABSOLUTE_INSTALL_INCLUDEDIR}>
 )
 
 # Link required library
-message (STATUS " ->>>>>>>>>>>>>>>>>>>>>>>>>>> ${CORE_LIBRARY}")
-
 target_link_libraries(${NAVIO_LIBRARY} PRIVATE ${CORE_LIBRARY})
 
 # All users of this library will need at least C++17

@@ -1,5 +1,5 @@
-#ifndef CORE_IMU_SENSORS_MODULE_SENSOR_HPP
-#define CORE_IMU_SENSORS_MODULE_SENSOR_HPP
+#ifndef CORE_SENSOR_MODULE_SENSOR_IMU_HPP
+#define CORE_SENSOR_MODULE_SENSOR_IMU_HPP
 
 #include "core/sensors/module_sensor.hpp"
 #include "core/utils/cash.hpp"
@@ -29,9 +29,9 @@ class ImuSensorModule : public SensorModuleAbs
    */
   ~ImuSensorModule() = default;
   
-  virtual void initialize() {}
-  virtual bool probe() {return false;}
-  virtual void update() {};
+  virtual void Initialize() {}
+  virtual bool Probe() {return false;}
+  virtual void Update() {};
 
   utils::ImuData GetData() const;
 
@@ -48,4 +48,4 @@ class ImuSensorModule : public SensorModuleAbs
 };
 
 }  // namespace core::sensors
-#endif  // CORE_IMU_SENSORS_MODULE_SENSOR_HPP
+#endif  // CORE_SENSOR_MODULE_SENSOR_IMU_HPP

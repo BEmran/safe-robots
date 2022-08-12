@@ -15,41 +15,42 @@ For print help:
 */
 
 #include "navio/mpu9250.h"
+#include "navio/old_mpu9250.h"
 #include "navio/util.h"
 #include <unistd.h>
 #include <string>
 #include <memory>
 
-std::unique_ptr <core::sensors::ImuSensorModule> get_inertial_sensor(std::string sensor_name)
+std::unique_ptr <core::sensors::ImuSensorModule> GetInertialSensor(std::string sensor_name)
 {
-    if (sensor_name == "mpu") {
+    if (sensor_name == "new") {
         printf("Selected: MPU9250\n");
         auto ptr = std::make_unique<MPU9250>(false);
         return ptr;
     }
-    // else if (sensor_name == "lsm") {
-    //     printf("Selected: LSM9DS1\n");
-    //     auto ptr = std::unique_ptr <InertialSensor>{ new LSM9DS1() };
-    //     return ptr;
-    // }
+    else if (sensor_name == "old") {
+        printf("Selected: MPU9250\n");
+        auto ptr = std::make_unique<OLD_MPU9250>();
+        return ptr;
+    }
     else {
         return NULL;
     }
 }
 
-void print_help()
+void PrintHelp()
 {
     printf("Possible parameters:\nSensor selection: -i [sensor name]\n");
-    printf("Sensors names: mpu is MPU9250, lsm is LSM9DS1\nFor help: -h\n");
+    printf("Sensors names: new is MPU9250, old is LSM9DS1\nFor help: -h\n");
 }
 
-std::string get_sensor_name(int argc, char *argv[])
+std::string GetSensorName(int argc, char *argv[])
 {
-    if (get_navio_version() == NAVIO2) {
+    if (GetNavioVersion() == NAVIO2) {
 
         if (argc < 2) {
             printf("Enter parameter\n");
-            print_help();
+            PrintHelp();
             return std::string();
         }
 
@@ -60,48 +61,50 @@ std::string get_sensor_name(int argc, char *argv[])
         while ((parameter = getopt(argc, argv, "i:h")) != -1) {
             switch (parameter) {
             case 'i': return optarg;
-            case 'h': print_help(); return "-1";
+            case 'h': PrintHelp(); return "-1";
             case '?': printf("Wrong parameter.\n");
-                      print_help();
+                      PrintHelp();
                       return std::string();
             }
         }
 
     } else { //sensor on NAVIO+
 
-        return "mpu";
+        return "new";
     }
 
     return std::string();
 }
 //=============================================================================
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 
-    if (check_apm()) {
+    if (CheckApm()) {
         return 1;
     }
 
-    // auto sensor_name = get_sensor_name(argc, argv);
-    // if (sensor_name.empty())
-    //     return EXIT_FAILURE;
-    auto sensor_name = "mpu";
-    auto sensor = get_inertial_sensor(sensor_name);
+    auto sensor_name = GetSensorName(argc, argv);
+    if (sensor_name.empty())
+    {
+        return EXIT_FAILURE;
+    }
+    // auto sensor_name = "mpu";
+    auto sensor = GetInertialSensor(sensor_name);
 
     if (!sensor) {
-        printf("Wrong sensor name. Select: mpu or lsm\n");
+        printf("Wrong sensor name. Select: new or old\n");
         return EXIT_FAILURE;
     }
 
-    if (!sensor->probe()) {
+    if (!sensor->Probe()) {
         printf("Sensor not enabled\n");
         return EXIT_FAILURE;
     }
-    sensor->initialize();
+    sensor->Initialize();
 //-------------------------------------------------------------------------
 
     while(1) {
-        sensor->update();
+        sensor->Update();
         auto data = sensor->GetData();
         printf("Acc: %+7.3f %+7.3f %+7.3f  ", data.accel[0], data.accel[1], data.accel[2]);
         printf("Gyr: %+8.3f %+8.3f %+8.3f  ", data.gyro[0], data.gyro[1], data.gyro[2]);

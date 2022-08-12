@@ -28,11 +28,13 @@ set(CORE_HEADER_LIST
 set(CORE_SOURCE_DIR ${PROJECT_SOURCE_DIR}/core/src/core)
 set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/utils/date_time.cpp
+    ${CORE_SOURCE_DIR}/utils/data.cpp
     ${CORE_SOURCE_DIR}/utils/event_level.cpp
     ${CORE_SOURCE_DIR}/utils/formatter.cpp
     ${CORE_SOURCE_DIR}/utils/system.cpp
     ${CORE_SOURCE_DIR}/utils/terminal.cpp
     ${CORE_SOURCE_DIR}/utils/logger.cpp
+    ${CORE_SOURCE_DIR}/utils/math.cpp
     ${CORE_SOURCE_DIR}/utils/module.cpp
     ${CORE_SOURCE_DIR}/utils/node.cpp
     ${CORE_SOURCE_DIR}/utils/writter_console.cpp
@@ -46,7 +48,7 @@ set(CORE_SOURCE_LIST
 # ##############################################################################
 # Declare a C++ library Make an automatic library - will be static or dynamic
 # based on user setting
-add_library(${CORE_LIBRARY} ${CORE_SOURCE_LIST} ${CORE_HEADER_LIST})
+add_library(${CORE_LIBRARY} ${CORE_SOURCE_LIST}) # ${CORE_HEADER_LIST}
 
 # Global includes
 target_include_directories(${CORE_LIBRARY} PUBLIC

@@ -214,7 +214,7 @@ usage: call this function to know if SPI and MPU9250 are working correctly.
 returns true if mpu9250 answers
 -----------------------------------------------------------------------------------------------*/
 
-bool MPU9250::probe()
+bool MPU9250::Probe()
 {
   uint8_t response_xg = ReadReg(MPUREG_WHOAMI | READ_FLAG);
 
@@ -251,7 +251,7 @@ returns 1 if an error occurred
 
 constexpr uint8_t MPU_INIT_REG_NUM = 16;
 
-void MPU9250::initialize()
+void MPU9250::Initialize()
 {
   uint8_t i = 0;
   uint8_t mpu_init_data[MPU_INIT_REG_NUM][2] = {
@@ -460,7 +460,7 @@ void MPU9250::CalibMagnetometer()
 
 //-----------------------------------------------------------------------------------------------
 
-void MPU9250::update()
+void MPU9250::Update()
 {
   RequestImu();
   const auto response = ReadRegs(MPUREG_ACCEL_XOUT_H, 21);
@@ -484,7 +484,7 @@ void MPU9250::RequestImu()
 }
 
 uint16_t BitDataFromResponse(const std::vector<uint8_t>& response,
-                            const uint idx)
+                             const uint idx)
 {
   const uint h_idx = idx * 2U;
   const uint l_idx = h_idx + 1U;
@@ -493,8 +493,8 @@ uint16_t BitDataFromResponse(const std::vector<uint8_t>& response,
     printf("Error: worng index (%u)", idx);
     return 0;
   }
-  const uint16_t high = response[h_idx] << 8U;
-  const uint16_t low = response[l_idx];
+  const int16_t high = response[h_idx] << 8U;
+  const int16_t low = response[l_idx];
   return high | low;
 }
 

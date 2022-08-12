@@ -16,9 +16,9 @@ class MPU9250 : public core::sensors::ImuSensorModule
  public:
   explicit MPU9250(const bool debug);
 
-  void initialize() override;
-  bool probe() override;
-  void update() override;
+  void Initialize() override;
+  bool Probe() override;
+  void Update() override;
 
   void CalibAccelerometer();
   void CalibMagnetometer();

@@ -3,7 +3,6 @@
 
 #include <eigen3/Eigen/Dense>
 #include <iomanip>
-// #include <sstream>
 
 namespace core::utils
 {
@@ -20,26 +19,11 @@ typedef Eigen::Rotation2D<MATH_TYPE> Rot2;
 typedef Eigen::Quaternion<MATH_TYPE> Quat;
 typedef Eigen::Transform<MATH_TYPE, 3, Eigen::Affine> Transform;
 
-Eigen::IOFormat MatFmt(Eigen::FullPrecision, 0, ", ", ";\n", "[", "]", "[",
-                       "]");
-Eigen::IOFormat VecFmt(Eigen::FullPrecision, 0, ", ", ";\n", "", "", "[", "]");
+std::ostream& operator<<(std::ostream& os, const Vec3& vec);
 
-std::ostream& operator<<(std::ostream& os, const Vec3& vec)
-{
-  return os << vec.format(VecFmt);
-}
+std::ostream& operator<<(std::ostream& os, const Transpose& vec);
 
-std::ostream& operator<<(std::ostream& os, const Transpose& vec)
-{
-  return os << vec.format(VecFmt);
-}
-
-std::ostream& operator<<(std::ostream& os, const Quat& quat)
-{
-  os << "ang = " << quat.w() << ", "           /* angle */
-     << quat.vec().transpose().format(VecFmt); /* axis */
-  return os;
-}
+std::ostream& operator<<(std::ostream& os, const Quat& quat);
 
 }  // namespace core::utils
 
