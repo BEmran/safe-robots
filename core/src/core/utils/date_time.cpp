@@ -16,7 +16,7 @@ tm CraeteTmStruct()
 }
 }  // namespace
 
-long TimeInSeconds()
+int64_t TimeInSeconds()
 {
   const auto now = std::chrono::system_clock::now();
   const auto epoch = now.time_since_epoch();

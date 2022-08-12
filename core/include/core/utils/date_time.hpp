@@ -88,11 +88,11 @@ class DateTime
 
 /**
  * @brief returns the current time since the start of its clock in seconds as
- * long integer
+ * long long integer
  *
- * @return long time in seconds
+ * @return int64_t time in seconds
  */
-long TimeInSeconds();
+int64_t TimeInSeconds();
 
 /**
  * @brief returns the current time since the start of its clock in seconds as
