@@ -19,8 +19,9 @@ class ImuSensorModule : public SensorModuleAbs
    * @brief Construct a new Imu Sensor Module object
    *
    * @param name sensor module's name
+   * @param debug enable/disable debug, default is false
    */
-  explicit ImuSensorModule(const std::string& name);
+  explicit ImuSensorModule(const std::string& name, const bool debug = false);
 
   /**
    * @brief Destroy the Imu Sensor Module object

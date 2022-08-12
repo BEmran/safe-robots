@@ -24,7 +24,7 @@ std::unique_ptr <core::sensors::ImuSensorModule> get_inertial_sensor(std::string
 {
     if (sensor_name == "mpu") {
         printf("Selected: MPU9250\n");
-        auto ptr = std::make_unique<MPU9250>();
+        auto ptr = std::make_unique<MPU9250>(false);
         return ptr;
     }
     // else if (sensor_name == "lsm") {

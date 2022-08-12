@@ -35,8 +35,9 @@ class ModuleAbs
    *
    * @param type module's type
    * @param name module's name
+   * @param debug enable/disable debug
    */
-  ModuleAbs(const ModuleType type, const std::string& name);
+  ModuleAbs(const ModuleType type, const std::string& name, const bool debug);
 
   /**
    * @brief Destroy the Module Abs object
@@ -58,9 +59,18 @@ class ModuleAbs
    */
   std::string Name() const;
 
+/**
+ * @brief indicate if debug flag is enabled or not
+ * 
+ * @return true if enabled
+ * @return false if disabled
+ */
+  bool IsDebugEnabled() const;
+
  private:
   ModuleType type_{ModuleType::UNDEFINED};
-  std::string name_;
+  std::string name_{"UNNAMED"};
+  bool debug_{false};
 };
 
 }  // namespace core::utils

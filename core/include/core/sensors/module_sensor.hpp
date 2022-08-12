@@ -39,8 +39,10 @@ class SensorModuleAbs : public utils::ModuleAbs
    *
    * @param sensor_type sensor module's type
    * @param name sensor module's name
+   * @param debug enable/disable debug
    */
-  SensorModuleAbs(const SensorModuleType sensor_type, const std::string& name);
+  SensorModuleAbs(const SensorModuleType sensor_type, const std::string& name,
+                  const bool debug);
 
   /**
    * @brief Destroy the Sensor Module Abs object

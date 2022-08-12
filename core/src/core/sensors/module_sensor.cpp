@@ -2,7 +2,7 @@
 
 namespace core::sensors
 {
-using namespace std::literals::string_literals;       // to use s literals
+using namespace std::literals::string_literals;  // to use s literals
 
 std::string SensorModuleTypeToString(const SensorModuleType type)
 {
@@ -22,8 +22,8 @@ std::string SensorModuleTypeToString(const SensorModuleType type)
 }
 
 SensorModuleAbs::SensorModuleAbs(const SensorModuleType sensor_type,
-                                 const std::string& name)
-  : ModuleAbs(utils::ModuleType::SENSOR, name), sensor_type_{sensor_type}
+                                 const std::string& name, const bool debug)
+  : ModuleAbs(utils::ModuleType::SENSOR, name, debug), sensor_type_{sensor_type}
 {
 }
 

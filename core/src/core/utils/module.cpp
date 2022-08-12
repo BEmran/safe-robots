@@ -15,8 +15,8 @@ std::string ModuleTypeToString(const ModuleType type)
   }
 }
 
-ModuleAbs::ModuleAbs(const ModuleType type, const std::string& name)
-  : type_{type}, name_{name}
+ModuleAbs::ModuleAbs(const ModuleType type, const std::string& name, const bool debug)
+  : type_{type}, name_{name}, debug_{debug}
 {
 }
 
@@ -30,4 +30,8 @@ std::string ModuleAbs::Name() const
   return name_;
 }
 
+bool ModuleAbs::IsDebugEnabled() const
+{
+  return debug_;
+}
 }  // namespace core::utils

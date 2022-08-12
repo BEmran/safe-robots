@@ -6,6 +6,7 @@ using namespace core::utils;
 
 constexpr auto UndefinedType = core::utils::ModuleType::UNDEFINED;
 constexpr auto Name = "name";
+constexpr auto Debug = false;
 
 TEST(ModuleType, ToString)
 {
@@ -15,12 +16,24 @@ TEST(ModuleType, ToString)
 
 TEST(ModuleType, Type)
 {
-  const ModuleAbs mod(UndefinedType, Name);
+  const ModuleAbs mod(UndefinedType, Name, Debug);
   EXPECT_EQ(UndefinedType, mod.Type());
 }
 
 TEST(ModuleType, Name)
 {
-  const ModuleAbs mod(UndefinedType, Name);
+  const ModuleAbs mod(UndefinedType, Name, Debug);
   EXPECT_EQ(Name, mod.Name());
+}
+
+TEST(ModuleType, EnableDebug)
+{
+  const ModuleAbs mod(UndefinedType, Name, true);
+  EXPECT_EQ(true, mod.IsDebugEnabled());
+}
+
+TEST(ModuleType, DisableDebug)
+{
+  const ModuleAbs mod(UndefinedType, Name, false);
+  EXPECT_EQ(false, mod.IsDebugEnabled());
 }

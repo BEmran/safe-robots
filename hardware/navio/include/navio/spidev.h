@@ -31,69 +31,110 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _SPIDEV_H_
 
 //#define _XOPEN_SOURCE 600
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
+#include <unistd.h>  // close
+#include <fcntl.h>  // open
+#include <sys/ioctl.h>  // ioctl
 #include <linux/types.h>
 #include <linux/spi/spidev.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include <cstdlib>
-#include <cstring>
-#include <cstdio>
+#include <cstring>  // memset
+#include <cstdio>	// printf
+#include <string>
 
-class SPIdev {
-public:
-    SPIdev()
+constexpr uint32_t SpeedHz = 1000000;
+constexpr uint8_t BitsPerWord = 8;
+constexpr uint8_t DelayUsecs = 0;
+
+spi_ioc_transfer CreateSpiTransfer(uint8_t* tx, uint8_t* rx, uint32_t length)
+{
+  spi_ioc_transfer spi_transfer;
+  memset(&spi_transfer, 0, sizeof(spi_ioc_transfer));
+
+  // cast pointer address to long uint
+  spi_transfer.tx_buf = reinterpret_cast<std::uintptr_t>(tx);
+  spi_transfer.rx_buf = reinterpret_cast<std::uintptr_t>(rx);
+  spi_transfer.len = length;
+  spi_transfer.speed_hz = SpeedHz;
+  spi_transfer.bits_per_word = BitsPerWord;
+  spi_transfer.delay_usecs = DelayUsecs;
+  return spi_transfer;
+}
+
+class SPIdev
+{
+ public:
+  SPIdev(const std::string& path) : SPIdev(path, false)
+  {
+  }
+
+  SPIdev(const std::string& path, const bool debug) : path_(path), debug_(debug)
+  {
+  }
+
+  int Transfer(uint8_t* tx, uint8_t* rx, const uint32_t length)
+  {
+    const int fd = Open();
+    if (fd == -1)
     {
+      return -1;
     }
 
-	static int transfer(const char *spidev,
-                        unsigned char *tx,
-                        unsigned char *rx,
-                        unsigned int length,
-                        unsigned int speed_hz = 1000000,
-                        unsigned char bits_per_word = 8,
-                        unsigned short delay_usecs = 0)
+    spi_ioc_transfer spi_transfer = CreateSpiTransfer(tx, rx, length);
+    int status = ioctl(fd, SPI_IOC_MESSAGE(1), &spi_transfer);
+    Close(fd);
+
+    if (debug_)
     {
-		spi_ioc_transfer spi_transfer;
-		
-		memset(&spi_transfer, 0, sizeof(spi_ioc_transfer));
+      PrintDebugInfo(tx, rx, length);
+    }
 
-		spi_transfer.tx_buf = (unsigned long)tx;
-		spi_transfer.rx_buf = (unsigned long)rx;
-		spi_transfer.len = length;
-		spi_transfer.speed_hz = speed_hz;
-		spi_transfer.bits_per_word = bits_per_word;
-		spi_transfer.delay_usecs = delay_usecs;
+    return status;
+  }
 
-		int spi_fd = ::open(spidev, O_RDWR);
+ protected:
+  int Open() const
+  {
+    int fd = ::open(path_.c_str(), O_RDWR);
+    if (fd < 0)
+    {
+      printf("Error: Can not open SPI device: %s\n", path_.c_str());
+      return -1;
+    }
+    return fd;
+  }
 
-		if (spi_fd < 0 ) {
-			printf("Error: Can not open SPI device\n");
-            
-            return -1;
-		}
+  void Close(const int fd) const
+  {
+    if (fd < 0)
+    {
+      printf("Warning: spi alrady closed\n");
+      return;
+    }
+    ::close(fd);
+  }
 
-		int status = ioctl(spi_fd, SPI_IOC_MESSAGE(1), &spi_transfer);
+  void PrintDebugInfo(uint8_t* tx, uint8_t* rx, const uint32_t length) const
+  {
+    printf("Tx: ");
+    PrintCArrayData(tx, length);
 
-		::close(spi_fd);
+    printf("Rx: ");
+    PrintCArrayData(rx, length);
+  }
 
-        // Debug information
-		/*
-		printf("Tx: ");
-		for (int i = 0; i < length; i++)
-			printf("%x ", tx[i]);
-		printf("\n");
+  void PrintCArrayData(uint8_t* array, const uint32_t length) const
+  {
+    for (uint i = 0; i < length; i++)
+    {
+      printf("[%3x]: %x", i, array[i]);
+    }
+    printf("\n");
+  }
 
-		printf("Rx: ");
-		for (int i = 0; i < length; i++)
-			printf("%x ", rx[i]);
-		printf("\n");
-		*/
-
-        return status;
-	}
+ private:
+  std::string path_;
+  bool debug_;
 };
 
-#endif //_SPIDEV_H_
+#endif  //_SPIDEV_H_

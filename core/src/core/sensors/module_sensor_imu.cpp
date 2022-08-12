@@ -2,8 +2,8 @@
 
 namespace core::sensors
 {
-ImuSensorModule::ImuSensorModule(const std::string& name)
-  : SensorModuleAbs(SensorModuleType::IMU, name)
+ImuSensorModule::ImuSensorModule(const std::string& name, const bool debug)
+  : SensorModuleAbs(SensorModuleType::IMU, name, debug)
 {
 }
 

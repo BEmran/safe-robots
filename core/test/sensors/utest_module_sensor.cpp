@@ -7,6 +7,7 @@ using namespace core::sensors;
 constexpr auto ModuleTypeSensor = core::utils::ModuleType::SENSOR;
 constexpr auto UndefinedSensorType = SensorModuleType::UNDEFINED;
 constexpr auto Name = "name";
+constexpr auto Debug = false;
 
 TEST(SensorModuleType, ToString)
 {
@@ -19,17 +20,17 @@ TEST(SensorModuleType, ToString)
 
 TEST(SensorModuleType, Type)
 {
-  const SensorModuleAbs sensor(UndefinedSensorType, Name);
+  const SensorModuleAbs sensor(UndefinedSensorType, Name, Debug);
   EXPECT_EQ(ModuleTypeSensor, sensor.Type());
 }
 
 TEST(SensorModuleType, SensorType)
 {
-  const SensorModuleAbs sensor(UndefinedSensorType, Name);
+  const SensorModuleAbs sensor(UndefinedSensorType, Name, Debug);
   EXPECT_EQ(UndefinedSensorType, sensor.SensorType());
 }
 TEST(SensorModuleType, Name)
 {
-  const SensorModuleAbs sensor(UndefinedSensorType, Name);
+  const SensorModuleAbs sensor(UndefinedSensorType, Name, Debug);
   EXPECT_EQ(Name, sensor.Name());
 }

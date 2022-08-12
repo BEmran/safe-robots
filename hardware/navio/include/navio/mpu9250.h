@@ -8,11 +8,12 @@ Adapted for Raspberry Pi by Mikhail Avkhimenia (mikhail.avkhimenia@emlid.com)
 
 #include "spidev.h"
 #include <core/sensors/module_sensor_imu.hpp>
+#include <memory>
 
 class MPU9250 : public core::sensors::ImuSensorModule
 {
 public:
-    MPU9250();
+    MPU9250(const bool debug);
 
     void initialize() override;
     bool probe() override;
@@ -34,6 +35,7 @@ private:
 
     int calib_data[3];
     float magnetometer_asa[3];
+    std::unique_ptr<SPIdev> spidev_;
 };
 
 #endif //_MPU9250_H
