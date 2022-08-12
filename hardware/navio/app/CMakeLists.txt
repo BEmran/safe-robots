@@ -3,9 +3,9 @@ add_executable(imu_app imu_app.cpp)
 
 # include include folder
 target_include_directories(imu_app PRIVATE ${CMAKE_SOURCE_DIR}/hardware/navio/include)
-message(STATUS "------------------------>" ${CMAKE_SOURCE_DIR}/hardware/navio/include)
+
 # Should be linked to the main library
-target_link_libraries(imu_app PRIVATE ${NAVIO_LIBRARY})
+target_link_libraries(imu_app PRIVATE ${CORE_LIBRARY} ${NAVIO_LIBRARY})
 
 install(
     TARGETS imu_app
