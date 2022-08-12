@@ -3,7 +3,7 @@ SHELL := /bin/bash
 #############################################
 ## .PHONY: install coverage test docs help
 #############################################
-.PHONY: build test clang-format-all cmake-format-all help
+.PHONY: build-all test-all clang-format-all cmake-format-all help
 .DEFAULT_GOAL := help
 
 ################################
@@ -26,7 +26,7 @@ export PRINT_HELP_PYSCRIPT
 help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-build: ## build target
+build-all: ## build target
 	@if [ ! -d "./build" ]; then	\
 		mkdir build;				\
 	fi
@@ -45,7 +45,7 @@ clang-format-all: ## clang format all source and header files
 cmake-format-all: ## cmake format all CMakeList.txt files
 	utils/cmake-format
 
-test: ## run tests with ctest
+test-all: ## run tests with ctest
 	@if [ ! -d "./build" ]; then    								\
 		echo "Please build the project first using: make build";	\
 	else															\

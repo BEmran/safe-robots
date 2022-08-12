@@ -7,15 +7,18 @@
 
 namespace core::utils
 {
-constexpr int PRECISION = 10;
-typedef float TYPE;
+constexpr float GRAVITY = 9.80665F;
+constexpr float PI = 3.14159F;
+constexpr float PI_2 = 1.570796F;
 
-typedef Eigen::Matrix<TYPE, 3, 1> Vec3;
+typedef float MATH_TYPE;
+
+typedef Eigen::Matrix<MATH_TYPE, 3, 1> Vec3;
 typedef Eigen::Transpose<const Vec3> Transpose;
-typedef Eigen::Matrix<TYPE, 3, 3> Mat3;
-typedef Eigen::Rotation2D<TYPE> Rot2;
-typedef Eigen::Quaternion<TYPE> Quat;
-typedef Eigen::Transform<TYPE, 3, Eigen::Affine> Transform;
+typedef Eigen::Matrix<MATH_TYPE, 3, 3> Mat3;
+typedef Eigen::Rotation2D<MATH_TYPE> Rot2;
+typedef Eigen::Quaternion<MATH_TYPE> Quat;
+typedef Eigen::Transform<MATH_TYPE, 3, Eigen::Affine> Transform;
 
 Eigen::IOFormat MatFmt(Eigen::FullPrecision, 0, ", ", ";\n", "[", "]", "[",
                        "]");

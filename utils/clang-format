@@ -19,12 +19,15 @@ export -f format
 
 if [ $#  -eq  0 ]
 then
-  # Declare directories to search through as a string array
+  # Declare projects and directories to search through as a string array
+  declare -a projects=("core" "hardware/navio")
   declare -a directories=("include" "test" "src")
   # Search for c++ files through passed directories and call foramt function
-  for dir in "${directories[@]}"; do
-    printf "\n- searching through: $PACKAGE_ROOT_PATH/$dir\n"
-    find "$PACKAGE_ROOT_PATH/$dir" -regextype posix-extended -regex '.*\.(cpp|c|hpp|h)' -exec bash -c 'format "$0"' {} \;
+  for pro in "${projects[@]}"; do
+    for dir in "${directories[@]}"; do
+      printf "\n- searching through: $PACKAGE_ROOT_PATH/$pro/$dir\n"
+      find "$PACKAGE_ROOT_PATH/$pro/$dir" -regextype posix-extended -regex '.*\.(cpp|c|hpp|h)' -exec bash -c 'format "$0"' {} \;
+    done
   done
 else
   printf "\n- foramting passed file(s):\n"

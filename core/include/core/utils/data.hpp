@@ -11,6 +11,8 @@
 
 namespace core::utils
 {
+constexpr int COUT_PRECISION = 10;
+
 struct Data
 {
  public:
@@ -63,7 +65,7 @@ struct GpsData : public Data
 
 std::ostream& operator<<(std::ostream& os, const GpsData& gps)
 {
-  return os << "GPS data: " << std::setprecision(PRECISION) /* precision */
+  return os << "GPS data: " << std::setprecision(COUT_PRECISION) /* precision */
             << "\n- Lat: " << gps.lat                        /* latitude */
             << "\n- Lon: " << gps.lon                        /* longitude */
             << "\n- Alt: " << gps.alt << std::endl;          /* altitude */
@@ -109,7 +111,7 @@ std::ostream& operator<<(std::ostream& os, const ImuData& imu)
             << "\n- Mag Field XYZ(uT): " << imu.mag.transpose()
             << "\n- Quat WXYZ: " << imu.quat
             << "\n- TaitBryan RPY(rad): " << imu.tait_bryan.transpose()
-            << std::setprecision(PRECISION) /* set precision */
+            << std::setprecision(COUT_PRECISION) /* set precision */
             << "\n- heading (rad): " << imu.heading
             << "\n- Temp (C): " << imu.temp << std::endl;
 }

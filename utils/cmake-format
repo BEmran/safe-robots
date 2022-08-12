@@ -21,12 +21,15 @@ export -f cformat
 if [ $#  -eq  0 ]
 then
   cformat "$PACKAGE_ROOT_PATH/CMakeLists.txt"
-  # Declare directories to search through as a string array
+  # Declare projects and directories to search through as a string array
+  declare -a projects=("core" "hardware/navio")
   declare -a directories=("app" "include" "src" "test")
   # Search for CMakeLists.txt files through passed directories and call foramt function
-  for dir in "${directories[@]}"; do
-    printf "\n- searching through: $PACKAGE_ROOT_PATH/$dir\n"
-    find "$PACKAGE_ROOT_PATH/$dir" -regextype posix-extended -regex '.*CMakeLists.txt' -exec bash -c 'cformat "$0"' {} \;
+  for dir in "${projects[@]}"; do
+    for dir in "${directories[@]}"; do
+      printf "\n- searching through: $PACKAGE_ROOT_PATH/$pro/$dir\n"
+      find "$PACKAGE_ROOT_PATH/$pro/$dir" -regextype posix-extended -regex '.*CMakeLists.txt' -exec bash -c 'cformat "$0"' {} \;
+    done
   done
 else
   printf "\n- foramting passed file(s):\n"

@@ -3,7 +3,7 @@
 # ##############################################################################
 set(NAVIO_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/hardware/navio/include)
 set(NAVIO_HEADER_LIST
-    ${NAVIO_INCLUDE_DIR}/navio/mpu9250.hpp)
+    ${NAVIO_INCLUDE_DIR}/navio/mpu9250.h)
 
 # ##############################################################################
 # Create source file list for NAVIO library
