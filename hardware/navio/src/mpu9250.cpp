@@ -204,8 +204,7 @@ std::vector<uint8_t> MPU9250::ReadRegs(const uint8_t addr,
   spidev_->Transfer(tx, rx, length + 1U);
   usleep(50);
 
-  std::vector<uint8_t> buf(length);
-  std::copy(std::begin(rx) + 1, std::end(rx), buf.begin());
+  std::vector<uint8_t> buf(rx + 1, rx + length);
   return buf;
 }
 
@@ -448,7 +447,7 @@ void MPU9250::CalibMagnetometer()
   usleep(10000);
   // response[0]=WriteReg(MPUREG_EXT_SENS_DATA_01 | READ_FLAG, 0x00);    //Read
   // I2C
-  const std::vector<uint8_t> response = ReadRegs(MPUREG_EXT_SENS_DATA_00, 3);
+  const auto response = ReadRegs(MPUREG_EXT_SENS_DATA_00, 3);
 
   // response=WriteReg(MPUREG_I2C_SLV0_DO, 0x00);    //Read I2C
   for (size_t i = 0; i < response.size(); i++)
@@ -464,11 +463,8 @@ void MPU9250::CalibMagnetometer()
 void MPU9250::update()
 {
   RequestImu();
-printf("ReadRegs\n");
-  const std::vector<uint8_t> response = ReadRegs(MPUREG_ACCEL_XOUT_H, 21);
-printf("ExtractData\n");
+  const auto response = ReadRegs(MPUREG_ACCEL_XOUT_H, 21);
   const auto data = ExtractData(response);
-printf("SetData\n");
   SetData(data);
 }
 
@@ -530,7 +526,7 @@ MPU9250::ExtractGyroscope(const std::vector<uint8_t>& response) const
   {
     const uint idx = static_cast<uint>(i);
     const auto bit_data = static_cast<float>(BitDataFromResponse(response, idx));
-    gyro[i] = (PI / 180) * bit_data / gyro_divider_;
+    gyro[i-4] = (PI / 180) * bit_data / gyro_divider_;
   }
   return gyro;
 }
@@ -543,7 +539,7 @@ MPU9250::ExtractMagnetometer(const std::vector<uint8_t>& response) const
   {
     const uint idx = static_cast<uint>(i);
     const auto bit_data = static_cast<float>(BitDataFromResponse(response, idx));
-    mag[0] = bit_data * magnetometer_asa_[i-7];
+    mag[i-7] = bit_data * magnetometer_asa_[i-7];
   }
   return mag;
 }
@@ -551,13 +547,9 @@ MPU9250::ExtractMagnetometer(const std::vector<uint8_t>& response) const
 core::utils::ImuData MPU9250::ExtractData(const std::vector<uint8_t>& response) const
 {
   core::utils::ImuData data;
-printf("ExtractTempreture\n");
   data.temp = ExtractTempreture(response);
-printf("ExtractAccelerometer\n");
   data.accel = ExtractAccelerometer(response);
-printf("ExtractGyroscope\n");
   data.gyro = ExtractGyroscope(response);
-printf("ExtractMagnetometer\n");
   data.mag = ExtractMagnetometer(response);
   return data;
 }
