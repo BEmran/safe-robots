@@ -14,7 +14,7 @@ constexpr uint32_t SpeedHz = 1000000;
 constexpr uint8_t BitsPerWord = 8;
 constexpr uint8_t DelayUsecs = 0;
 
-void PrintDebugInfo(const uint8_t* const tx, const uint8_t* const rx, const uint32_t length)
+void PrintDebugInfo(uint8_t* tx, uint8_t* rx, const uint32_t length)
 {
   printf("Tx: ");
   PrintCArrayData(tx, length);
@@ -23,7 +23,7 @@ void PrintDebugInfo(const uint8_t* const tx, const uint8_t* const rx, const uint
   PrintCArrayData(rx, length);
 }
 
-void PrintCArrayData(const uint8_t* const array, const uint32_t length)
+void PrintCArrayData(uint8_t* array, const uint32_t length)
 {
   for (uint i = 0; i < length; i++)
   {

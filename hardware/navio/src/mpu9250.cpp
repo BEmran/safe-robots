@@ -464,11 +464,11 @@ void MPU9250::CalibMagnetometer()
 void MPU9250::update()
 {
   RequestImu();
-
+printf("ReadRegs\n");
   const std::vector<uint8_t> response = ReadRegs(MPUREG_ACCEL_XOUT_H, 21);
-
+printf("ExtractData\n");
   const auto data = ExtractData(response);
-
+printf("SetData\n");
   SetData(data);
 }
 
@@ -551,9 +551,13 @@ MPU9250::ExtractMagnetometer(const std::vector<uint8_t>& response) const
 core::utils::ImuData MPU9250::ExtractData(const std::vector<uint8_t>& response) const
 {
   core::utils::ImuData data;
+printf("ExtractTempreture\n");
   data.temp = ExtractTempreture(response);
+printf("ExtractAccelerometer\n");
   data.accel = ExtractAccelerometer(response);
+printf("ExtractGyroscope\n");
   data.gyro = ExtractGyroscope(response);
+printf("ExtractMagnetometer\n");
   data.mag = ExtractMagnetometer(response);
   return data;
 }

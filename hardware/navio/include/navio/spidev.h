@@ -34,9 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <linux/spi/spidev.h>
 #include <string>
 
-void PrintDebugInfo(const uint8_t* const tx, const uint8_t* const rx, const uint32_t length);
+void PrintDebugInfo(uint8_t* tx, uint8_t* rx, const uint32_t length);
 
-void PrintCArrayData(const uint8_t* const array, const uint32_t length);
+void PrintCArrayData(uint8_t* array, const uint32_t length);
 
 spi_ioc_transfer CreateSpiTransfer(uint8_t* tx, uint8_t* rx, const uint32_t length);
 
