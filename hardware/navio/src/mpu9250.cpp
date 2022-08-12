@@ -473,11 +473,16 @@ void MPU9250::Update()
 {
   RequestImu();
   const auto response = ReadRegs(MPUREG_ACCEL_XOUT_H, 21);
-  for(int i=0; i<10; i++)
-  {
-    printf("%d: (%3u,%3u)\t", i, response[i*2], response[i*2+1]);
-  }
-  printf("\n");
+  // for(int i=0; i<10; i++)
+  // {
+  //   const int h = i * 2;
+  //   const int l = h + 1;
+  //   const int16_t high = (int16_t)response[h] << 8;
+  //   const int16_t low = response[l];
+  //   const int16_t x = high | low;
+  //   printf("%6d\t", x);
+  // }
+  // printf("\n");
   const auto data = ExtractData(response);
   SetData(data);
 }
@@ -500,17 +505,18 @@ void MPU9250::RequestImu()
 uint16_t BitDataFromResponse(const std::vector<uint8_t>& response,
                              const uint idx)
 {
-  const uint h_idx = idx * 2U;
-  const uint l_idx = h_idx + 1U;
-  if (response.size() < l_idx)
-  {
-    printf("Error: worng index (%u)\n", idx);
-    return 0;
-  }
-  const int16_t high = response[h_idx] << 8U;
-  const int16_t low = response[l_idx];
-  // return high | low;
-  return ((int16_t)response[idx*2] << 8) | response[idx*2+1];
+  // const uint h_idx = idx * 2U;
+  // const uint l_idx = h_idx + 1U;
+  // if (response.size() < l_idx)
+  // {
+  //   printf("Error: worng index (%u)\n", idx);
+  //   return 0;
+  // }
+  // const int16_t high = response[h_idx] << 8U;
+  // const int16_t low = response[l_idx];
+    const int16_t high = (int16_t)response[idx * 2] << 8;
+    const uint8_t low = response[idx * 2 + 1];
+    return high | low;
 }
 
 double MPU9250::ExtractTempreture(const std::vector<uint8_t>& response)

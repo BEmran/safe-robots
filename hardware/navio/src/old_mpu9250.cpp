@@ -310,11 +310,12 @@ void OLD_MPU9250::Update()
 
     ReadRegs(MPUREG_ACCEL_XOUT_H, response, 21);
     
-    for(int i=0; i<10; i++)
-    {
-        printf("%2d: (%3u,%3u)\t", i, response[i*2], response[i*2+1]);
-    }
-    printf("\n");
+    // for(int i=0; i<10; i++)
+    // {
+    //     auto x = ((int16_t)response[i*2] << 8) | response[i*2+1];
+    //     printf("%6d\t", x);
+    // }
+    // printf("\n");
     core::utils::ImuData data;
     //Get accelerometer value
     for(i=0; i<3; i++) {
