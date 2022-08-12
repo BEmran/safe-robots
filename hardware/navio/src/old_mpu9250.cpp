@@ -185,7 +185,7 @@ unsigned int OLD_MPU9250::set_acc_scale(int scale)
         temp_scale = 16;
         break;
     }
-    printf("set_acc_scale %u -> %u", scale, temp_scale);
+    printf("set_acc_scale %u -> %u\n", scale, temp_scale);
     return temp_scale;
 }
 
@@ -235,7 +235,7 @@ unsigned int OLD_MPU9250::set_gyro_scale(int scale)
         temp_scale = 2000;
         break;
     }
-    printf("set_gyro_scale %u -> %u", scale, temp_scale);
+    printf("set_gyro_scale %u -> %u\n", scale, temp_scale);
     return temp_scale;
 }
 

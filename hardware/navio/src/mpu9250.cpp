@@ -205,7 +205,7 @@ std::vector<uint8_t> MPU9250::ReadRegs(const uint8_t addr,
   spidev_->Transfer(tx, rx, length + 1U);
   usleep(50);
 
-  std::vector<uint8_t> buf(rx + 1, rx + length);
+  std::vector<uint8_t> buf(rx + 1, rx + length + 1);
   return buf;
 }
 
@@ -351,9 +351,9 @@ uint32_t MPU9250::SetAccelerometerScale(const uint8_t scale)
       returned_scale = 16U;
       break;
     default:
-      printf("Error: undefined accelerometer temp scale (%u)", returned_scale);
+      printf("Error: undefined accelerometer temp scale (%u)\n", returned_scale);
   }
-  printf("SetAccelerometerScale %u -> %u", scale, returned_scale);
+  printf("SetAccelerometerScale %u -> %u\n", scale, returned_scale);
   return returned_scale;
 }
 
@@ -404,9 +404,9 @@ uint32_t MPU9250::SetGyroScale(const uint8_t scale)
       returned_scale = 2000U;
       break;
     default:
-      printf("Error: undefined returned gyro scale (%u)", returned_scale);
+      printf("Error: undefined returned gyro scale (%u)\n", returned_scale);
   }
-  printf("SetGyroScale %u -> %u", scale, returned_scale);
+  printf("SetGyroScale %u -> %u\n", scale, returned_scale);
   return returned_scale;
 }
 
@@ -496,7 +496,7 @@ uint16_t BitDataFromResponse(const std::vector<uint8_t>& response,
   const uint l_idx = h_idx + 1U;
   if (response.size() < l_idx)
   {
-    printf("Error: worng index (%u)", idx);
+    printf("Error: worng index (%u)\n", idx);
     return 0;
   }
   const int16_t high = response[h_idx] << 8U;
