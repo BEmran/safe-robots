@@ -353,7 +353,7 @@ uint32_t MPU9250::SetAccelerometerScale(const uint8_t scale)
     default:
       printf("Error: undefined accelerometer temp scale (%u)\n", returned_scale);
   }
-  printf("SetAccelerometerScale %u -> %u\n", scale, returned_scale);
+  printf("SetAccelerometerScale %u -> %u acc_divider %f\n", scale, returned_scale, acc_divider_);
   return returned_scale;
 }
 
@@ -406,7 +406,7 @@ uint32_t MPU9250::SetGyroScale(const uint8_t scale)
     default:
       printf("Error: undefined returned gyro scale (%u)\n", returned_scale);
   }
-  printf("SetGyroScale %u -> %u\n", scale, returned_scale);
+  printf("SetGyroScale %u -> %u gyro_divider_ %f\n", scale, returned_scale, gyro_divider_);
   return returned_scale;
 }
 
