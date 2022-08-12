@@ -475,7 +475,7 @@ void MPU9250::Update()
   const auto response = ReadRegs(MPUREG_ACCEL_XOUT_H, 21);
   for(int i=0; i<10; i++)
   {
-    printf("[%2d] (%3u,%3u)\t", i, response[i*2], response[i*2+1]);
+    printf("%d: (%3u,%3u)\t", i, response[i*2], response[i*2+1]);
   }
   printf("\n");
   const auto data = ExtractData(response);

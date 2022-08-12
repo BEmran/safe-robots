@@ -106,9 +106,9 @@ int main(int argc, char* argv[])
     while(1) {
         sensor->Update();
         auto data = sensor->GetData();
-        printf("Acc: %+7.3f %+7.3f %+7.3f  ", data.accel[0], data.accel[1], data.accel[2]);
-        printf("Gyr: %+8.3f %+8.3f %+8.3f  ", data.gyro[0], data.gyro[1], data.gyro[2]);
-        printf("Mag: %+7.3f %+7.3f %+7.3f\n", data.mag[0], data.mag[1], data.mag[2]);
+        // printf("Acc: %+7.3f %+7.3f %+7.3f  ", data.accel[0], data.accel[1], data.accel[2]);
+        // printf("Gyr: %+8.3f %+8.3f %+8.3f  ", data.gyro[0], data.gyro[1], data.gyro[2]);
+        // printf("Mag: %+7.3f %+7.3f %+7.3f\n", data.mag[0], data.mag[1], data.mag[2]);
 
        usleep(500000);
     }

@@ -312,7 +312,7 @@ void OLD_MPU9250::Update()
     
     for(int i=0; i<10; i++)
     {
-        printf("[%2d] (%3u,%3u)\t", i, response[i*2], response[i*2+1]);
+        printf("%2d: (%3u,%3u)\t", i, response[i*2], response[i*2+1]);
     }
     printf("\n");
     core::utils::ImuData data;
