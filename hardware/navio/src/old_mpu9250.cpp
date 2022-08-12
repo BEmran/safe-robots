@@ -309,6 +309,12 @@ void OLD_MPU9250::Update()
     //must start your read from AK8963A register 0x03 and read seven bytes so that upon read of ST2 register 0x09 the AK8963A will unlatch the data registers for the next measurement.
 
     ReadRegs(MPUREG_ACCEL_XOUT_H, response, 21);
+    
+    for(int i=0; i<10; i++)
+    {
+        printf("[%2d] (%3u,%3u)\t", response[i*2], response[i*2+1]);
+    }
+    printf("\n");
     core::utils::ImuData data;
     //Get accelerometer value
     for(i=0; i<3; i++) {
