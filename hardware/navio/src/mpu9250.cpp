@@ -333,5 +333,5 @@ void MPU9250::update()
     data.mag[0] = bit_data[0] * magnetometer_ASA[0];
     data.mag[1] = bit_data[1] * magnetometer_ASA[1];
     data.mag[2] = bit_data[2] * magnetometer_ASA[2];
-    SetData();
+    SetData(data);
 }
