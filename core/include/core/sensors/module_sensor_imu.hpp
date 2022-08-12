@@ -28,8 +28,8 @@ class ImuSensorModule : public SensorModuleAbs
    */
   ~ImuSensorModule() = default;
   
-  virtual bool initialize() {return true;}
-  virtual bool probe() {return true;}
+  virtual void initialize() {}
+  virtual bool probe() {return false;}
   virtual void update() {};
 
   utils::ImuData GetData() const;
