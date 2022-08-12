@@ -4,11 +4,12 @@ Adapted for Raspberry Pi by Mikhail Avkhimenia (mikhail.avkhimenia@emlid.com)
 */
 
 #include "navio/mpu9250.h"
-#include <unistd.h>     // usleep
+#include <unistd.h>  // usleep
 #include <string>
 #include <algorithm>
 
-namespace {
+namespace
+{
 constexpr float G_SI = 9.80665F;
 constexpr float PI = 3.14159F;
 
@@ -352,6 +353,7 @@ uint32_t MPU9250::SetAccelerometerScale(const uint8_t scale)
     default:
       printf("Error: undefined accelerometer temp scale (%u)", returned_scale);
   }
+  printf("SetAccelerometerScale %u -> %u", scale, returned_scale);
   return returned_scale;
 }
 
@@ -404,6 +406,7 @@ uint32_t MPU9250::SetGyroScale(const uint8_t scale)
     default:
       printf("Error: undefined returned gyro scale (%u)", returned_scale);
   }
+  printf("SetGyroScale %u -> %u", scale, returned_scale);
   return returned_scale;
 }
 
@@ -450,12 +453,15 @@ void MPU9250::CalibMagnetometer()
   const auto response = ReadRegs(MPUREG_EXT_SENS_DATA_00, 3);
 
   // response=WriteReg(MPUREG_I2C_SLV0_DO, 0x00);    //Read I2C
+  printf("magnetometer_ASA: ");
   for (size_t i = 0; i < response.size(); i++)
   {
     const auto data = static_cast<float>(response[i]);
     magnetometer_asa_[i] =
         ((data - 128.0F) / 256.0F + 1) * Magnetometer_Sensitivity_Scale_Factor;
+    printf("\t%f", magnetometer_asa_[i]);
   }
+  printf("\n");
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -512,7 +518,8 @@ MPU9250::ExtractAccelerometer(const std::vector<uint8_t>& response) const
   for (int i = 0; i < 3; i++)
   {
     const uint idx = static_cast<uint>(i);
-    const auto bit_data = static_cast<float>(BitDataFromResponse(response, idx));
+    const auto bit_data =
+        static_cast<float>(BitDataFromResponse(response, idx));
     accel[i] = G_SI * bit_data / acc_divider_;
   }
   return accel;
@@ -525,8 +532,9 @@ MPU9250::ExtractGyroscope(const std::vector<uint8_t>& response) const
   for (int i = 4; i < 7; i++)
   {
     const uint idx = static_cast<uint>(i);
-    const auto bit_data = static_cast<float>(BitDataFromResponse(response, idx));
-    gyro[i-4] = (PI / 180) * bit_data / gyro_divider_;
+    const auto bit_data =
+        static_cast<float>(BitDataFromResponse(response, idx));
+    gyro[i - 4] = (PI / 180) * bit_data / gyro_divider_;
   }
   return gyro;
 }
@@ -538,13 +546,15 @@ MPU9250::ExtractMagnetometer(const std::vector<uint8_t>& response) const
   for (int i = 7; i < 10; i++)
   {
     const uint idx = static_cast<uint>(i);
-    const auto bit_data = static_cast<float>(BitDataFromResponse(response, idx));
-    mag[i-7] = bit_data * magnetometer_asa_[i-7];
+    const auto bit_data =
+        static_cast<float>(BitDataFromResponse(response, idx));
+    mag[i - 7] = bit_data * magnetometer_asa_[i - 7];
   }
   return mag;
 }
 
-core::utils::ImuData MPU9250::ExtractData(const std::vector<uint8_t>& response) const
+core::utils::ImuData
+MPU9250::ExtractData(const std::vector<uint8_t>& response) const
 {
   core::utils::ImuData data;
   data.temp = ExtractTempreture(response);
