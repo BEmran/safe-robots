@@ -27,7 +27,7 @@ int64_t TimeInSeconds()
 std::string TimeInSecondsString()
 {
   char buff[15];
-  sprintf(buff, "%ld", TimeInSeconds());
+  sprintf(buff, "%lld", TimeInSeconds());
   return buff;
 }
 
