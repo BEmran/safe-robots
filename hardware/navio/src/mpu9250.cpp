@@ -205,7 +205,10 @@ std::vector<uint8_t> MPU9250::ReadRegs(const uint8_t addr,
   spidev_->Transfer(tx, rx, length + 1U);
   usleep(50);
 
-  std::vector<uint8_t> buf(rx + 1, rx + length + 1);
+  // std::vector<uint8_t> buf(rx + 1, rx + length + 1);
+  std::vector<uint8_t> buf(length);
+  for(size_t i=0; i<length; i++)
+    buf[i] = rx[i + 1];
   return buf;
 }
 
@@ -501,7 +504,8 @@ uint16_t BitDataFromResponse(const std::vector<uint8_t>& response,
   }
   const int16_t high = response[h_idx] << 8U;
   const int16_t low = response[l_idx];
-  return high | low;
+  // return high | low;
+  return ((int16_t)response[idx*2] << 8) | response[idx*2+1];
 }
 
 double MPU9250::ExtractTempreture(const std::vector<uint8_t>& response)
