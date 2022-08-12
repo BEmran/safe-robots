@@ -14,6 +14,7 @@ set(NAVIO_HEADER_LIST
 set(NAVIO_SOURCE_DIR ${PROJECT_SOURCE_DIR}/hardware/navio/src)
 set(NAVIO_SOURCE_LIST
     ${NAVIO_SOURCE_DIR}/mpu9250.cpp
+    ${NAVIO_SOURCE_DIR}/spidev.cpp
     ${NAVIO_SOURCE_DIR}/util.cpp
     )
 
