@@ -82,7 +82,13 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif ()
 
 include(${CMAKE_SOURCE_DIR}/cmake/StaticAnalyzers.cmake)
+
+if (CMAKE_BUILD_TYPE STREQUAL Release)
+set(PROJECT_WARNINGS "")
+else()
 include(${CMAKE_SOURCE_DIR}/cmake/CompilerWarnings.cmake)
+endif()
+
 add_compile_options(${PROJECT_WARNINGS})
 
 # ##############################################################################
