@@ -164,7 +164,7 @@ constexpr uint8_t AK8963_ASAZ = 0x12;
 constexpr const char* SPI_PATH = "/dev/spidev0.1";
 //-----------------------------------------------------------------------------------------------
 
-MPU9250::MPU9250(const bool debug)
+MyMPU9250::MyMPU9250(const bool debug)
   : core::sensors::ImuSensorModule("mpu", debug)
   , spidev_{std::make_unique<SPIdev>(SPI_PATH, debug)}
 {
@@ -175,7 +175,7 @@ MPU9250::MPU9250(const bool debug)
 usage: use these methods to read and write MPU9250 registers over SPI
 -----------------------------------------------------------------------------------------------*/
 
-uint8_t MPU9250::WriteReg(const uint8_t addr, const uint8_t data)
+uint8_t MyMPU9250::WriteReg(const uint8_t addr, const uint8_t data)
 {
   uint8_t tx[2] = {addr, data};
   uint8_t rx[2] = {0};
@@ -187,14 +187,14 @@ uint8_t MPU9250::WriteReg(const uint8_t addr, const uint8_t data)
 
 //-----------------------------------------------------------------------------------------------
 
-uint8_t MPU9250::ReadReg(const uint8_t addr)
+uint8_t MyMPU9250::ReadReg(const uint8_t addr)
 {
   return WriteReg(addr | READ_FLAG, 0x00);
 }
 
 //-----------------------------------------------------------------------------------------------
 
-std::vector<uint8_t> MPU9250::ReadRegs(const uint8_t addr,
+std::vector<uint8_t> MyMPU9250::ReadRegs(const uint8_t addr,
                                        const uint32_t length)
 {
   uint8_t tx[255] = {0};
@@ -218,7 +218,7 @@ usage: call this function to know if SPI and MPU9250 are working correctly.
 returns true if mpu9250 answers
 -----------------------------------------------------------------------------------------------*/
 
-bool MPU9250::Probe()
+bool MyMPU9250::Probe()
 {
   uint8_t response_xg = ReadReg(MPUREG_WHOAMI | READ_FLAG);
 
@@ -255,7 +255,7 @@ returns 1 if an error occurred
 
 constexpr uint8_t MPU_INIT_REG_NUM = 16;
 
-void MPU9250::Initialize()
+void MyMPU9250::Initialize()
 {
   uint8_t i = 0;
   uint8_t mpu_init_data[MPU_INIT_REG_NUM][2] = {
@@ -315,7 +315,7 @@ BITS_FS_16G
 returns the range set (2,4,8 or 16)
 -----------------------------------------------------------------------------------------------*/
 
-uint32_t MPU9250::SetAccelerometerScale(const uint8_t scale)
+uint32_t MyMPU9250::SetAccelerometerScale(const uint8_t scale)
 {
   WriteReg(MPUREG_ACCEL_CONFIG, scale);
 
@@ -369,7 +369,7 @@ BITS_FS_2000DPS
 returns the range set (250,500,1000 or 2000)
 -----------------------------------------------------------------------------------------------*/
 
-uint32_t MPU9250::SetGyroScale(const uint8_t scale)
+uint32_t MyMPU9250::SetGyroScale(const uint8_t scale)
 {
   WriteReg(MPUREG_GYRO_CONFIG, scale);
   switch (scale)
@@ -419,7 +419,7 @@ usage: call this function to read accelerometer data. Axis represents selected
 axis: 0 -> X axis 1 -> Y axis 2 -> Z axis returns Factory Trim value
 -----------------------------------------------------------------------------------------------*/
 
-void MPU9250::CalibAccelerometer()
+void MyMPU9250::CalibAccelerometer()
 {
   // read current acc scale
   const auto temp_scale = WriteReg(MPUREG_ACCEL_CONFIG | READ_FLAG, 0x00);
@@ -439,7 +439,7 @@ void MPU9250::CalibAccelerometer()
 
 //-----------------------------------------------------------------------------------------------
 
-void MPU9250::CalibMagnetometer()
+void MyMPU9250::CalibMagnetometer()
 {
   WriteReg(MPUREG_I2C_SLV0_ADDR,
            AK8963_I2C_ADDR | READ_FLAG);  // Set the I2C slave addres of AK8963
@@ -469,7 +469,7 @@ void MPU9250::CalibMagnetometer()
 
 //-----------------------------------------------------------------------------------------------
 
-void MPU9250::Update()
+void MyMPU9250::Update()
 {
   RequestImu();
   const auto response = ReadRegs(MPUREG_ACCEL_XOUT_H, 21);
@@ -487,7 +487,7 @@ void MPU9250::Update()
   SetData(data);
 }
 
-void MPU9250::RequestImu()
+void MyMPU9250::RequestImu()
 {
   // Send I2C command at first
   WriteReg(MPUREG_I2C_SLV0_ADDR,
@@ -519,7 +519,7 @@ uint16_t BitDataFromResponse(const std::vector<uint8_t>& response,
     return high | low;
 }
 
-double MPU9250::ExtractTempreture(const std::vector<uint8_t>& response)
+double MyMPU9250::ExtractTempreture(const std::vector<uint8_t>& response)
 {
   const auto temp = BitDataFromResponse(response, 3U);
   const auto celcious = ((temp - 21) / 333.87) + 21;
@@ -527,7 +527,7 @@ double MPU9250::ExtractTempreture(const std::vector<uint8_t>& response)
 }
 
 core::utils::Vec3
-MPU9250::ExtractAccelerometer(const std::vector<uint8_t>& response) const
+MyMPU9250::ExtractAccelerometer(const std::vector<uint8_t>& response) const
 {
   core::utils::Vec3 accel = core::utils::Vec3::Zero();
   for (int i = 0; i < 3; i++)
@@ -541,7 +541,7 @@ MPU9250::ExtractAccelerometer(const std::vector<uint8_t>& response) const
 }
 
 core::utils::Vec3
-MPU9250::ExtractGyroscope(const std::vector<uint8_t>& response) const
+MyMPU9250::ExtractGyroscope(const std::vector<uint8_t>& response) const
 {
   core::utils::Vec3 gyro = core::utils::Vec3::Zero();
   for (int i = 4; i < 7; i++)
@@ -555,7 +555,7 @@ MPU9250::ExtractGyroscope(const std::vector<uint8_t>& response) const
 }
 
 core::utils::Vec3
-MPU9250::ExtractMagnetometer(const std::vector<uint8_t>& response) const
+MyMPU9250::ExtractMagnetometer(const std::vector<uint8_t>& response) const
 {
   core::utils::Vec3 mag = core::utils::Vec3::Zero();
   for (int i = 7; i < 10; i++)
@@ -569,7 +569,7 @@ MPU9250::ExtractMagnetometer(const std::vector<uint8_t>& response) const
 }
 
 core::utils::ImuData
-MPU9250::ExtractData(const std::vector<uint8_t>& response) const
+MyMPU9250::ExtractData(const std::vector<uint8_t>& response) const
 {
   core::utils::ImuData data;
   data.temp = ExtractTempreture(response);

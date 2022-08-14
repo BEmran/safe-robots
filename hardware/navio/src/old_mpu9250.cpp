@@ -21,12 +21,11 @@ usage: use these methods to read and write MPU9250 registers over SPI
 
 unsigned int OLD_MPU9250::WriteReg(uint8_t WriteAddr, uint8_t WriteData)
 {
-    unsigned char tx[2] = {WriteAddr, WriteData};
-    unsigned char rx[2] = {0};
+    unsigned char buf[2] = {WriteAddr, WriteData};
 
-    OLDSPIdev::transfer("/dev/spidev0.1", tx, rx, 2);
+    OLDSPIdev::transfer("/dev/spidev0.1", buf, 2);
 
-    return rx[1];
+    return buf[1];
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -42,15 +41,14 @@ void OLD_MPU9250::ReadRegs(uint8_t ReadAddr, uint8_t *ReadBuf, unsigned int Byte
 {
     unsigned int  i = 0;
 
-    unsigned char tx[255] = {0};
-    unsigned char rx[255] = {0};
+    unsigned char buf[255] = {0};
 
-    tx[0] = ReadAddr | READ_FLAG;
+    buf[0] = ReadAddr | READ_FLAG;
 
-    OLDSPIdev::transfer("/dev/spidev0.1", tx, rx, Bytes + 1);
+    OLDSPIdev::transfer("/dev/spidev0.1", buf, Bytes + 1);
 
     for(i=0; i<Bytes; i++)
-        ReadBuf[i] = rx[i + 1];
+        ReadBuf[i] = buf[i + 1];
 
     usleep(50);
 }
@@ -66,13 +64,23 @@ bool OLD_MPU9250::Probe()
     uint8_t responseXG, responseM;
 
     responseXG = ReadReg(MPUREG_WHOAMI | READ_FLAG);
-
+    printf("MPUREG_USER_CTRL:\n");
     WriteReg(MPUREG_USER_CTRL, 0x20);  // I2C Master mode
+    printf("MPUREG_I2C_MST_CTRL:\n");
     WriteReg(MPUREG_I2C_MST_CTRL, 0x0D); // I2C configuration multi-master  IIC 400KHz
+    
+    printf("MPUREG_I2C_SLV0_ADDR:\n");
     WriteReg(MPUREG_I2C_SLV0_ADDR, AK8963_I2C_ADDR | READ_FLAG); //Set the I2C slave addres of AK8963 and set for read.
+    
+    printf("MPUREG_I2C_SLV0_REG:\n");
     WriteReg(MPUREG_I2C_SLV0_REG, AK8963_WIA); //I2C slave 0 register address from where to begin data transfer
+    
+    printf("MPUREG_I2C_SLV0_CTRL:\n");
     WriteReg(MPUREG_I2C_SLV0_CTRL, 0x81); //Read 1 byte from the magnetometer
+    
     usleep(10000);
+    
+    printf("MPUREG_EXT_SENS_DATA_00:\n");
     responseM = ReadReg(MPUREG_EXT_SENS_DATA_00);
 
     if (responseXG == 0x71 && responseM == 0x48)

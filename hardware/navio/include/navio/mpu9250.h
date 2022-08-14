@@ -11,10 +11,10 @@ Adapted for Raspberry Pi by Mikhail Avkhimenia (mikhail.avkhimenia@emlid.com)
 #include <memory>
 #include <vector>
 
-class MPU9250 : public core::sensors::ImuSensorModule
+class MyMPU9250 : public core::sensors::ImuSensorModule
 {
  public:
-  explicit MPU9250(const bool debug);
+  explicit MyMPU9250(const bool debug);
 
   void Initialize() override;
   bool Probe() override;

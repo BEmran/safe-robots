@@ -25,7 +25,7 @@ std::unique_ptr <core::sensors::ImuSensorModule> GetInertialSensor(std::string s
 {
     if (sensor_name == "new") {
         printf("Selected: MPU9250\n");
-        auto ptr = std::make_unique<MPU9250>(false);
+        auto ptr = std::make_unique<MyMPU9250>(false);
         return ptr;
     }
     else if (sensor_name == "old") {
@@ -100,15 +100,17 @@ int main(int argc, char* argv[])
         printf("Sensor not enabled\n");
         return EXIT_FAILURE;
     }
+    // return EXIT_FAILURE;
     sensor->Initialize();
 //-------------------------------------------------------------------------
 
     while(1) {
         sensor->Update();
         auto data = sensor->GetData();
-        printf("Acc: %+7.3f %+7.3f %+7.3f  ", data.accel[0], data.accel[1], data.accel[2]);
-        printf("Gyr: %+8.3f %+8.3f %+8.3f  ", data.gyro[0], data.gyro[1], data.gyro[2]);
-        printf("Mag: %+7.3f %+7.3f %+7.3f\n", data.mag[0], data.mag[1], data.mag[2]);
+        printf("Acc: %+7.3f %+7.3f %+7.3f\t", data.accel[0], data.accel[1], data.accel[2]);
+        printf("Gyr: %+7.3f %+7.3f %+7.3f\t", data.gyro[0], data.gyro[1], data.gyro[2]);
+        printf("Mag: %+7.3f %+7.3f %+7.3f\t", data.mag[0], data.mag[1], data.mag[2]);
+        printf("Temp: %+7.3f\n", data.temp);
 
        usleep(500000);
     }
