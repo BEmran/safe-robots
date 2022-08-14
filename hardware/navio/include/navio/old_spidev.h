@@ -47,8 +47,7 @@ public:
     }
 
 	static int transfer(const char *spidev,
-                        unsigned char *tx,
-                        unsigned char *rx,
+                        unsigned char *buf,
                         unsigned int length,
                         unsigned int speed_hz = 1000000,
                         unsigned char bits_per_word = 8,
@@ -58,8 +57,8 @@ public:
 		
 		memset(&spi_transfer, 0, sizeof(spi_ioc_transfer));
 
-		spi_transfer.tx_buf = (unsigned long)tx;
-		spi_transfer.rx_buf = (unsigned long)rx;
+		spi_transfer.tx_buf = (unsigned long)buf;
+		spi_transfer.rx_buf = spi_transfer.tx_buf;
 		spi_transfer.len = length;
 		spi_transfer.speed_hz = speed_hz;
 		spi_transfer.bits_per_word = bits_per_word;
@@ -73,23 +72,23 @@ public:
             return -1;
 		}
 
+		// printf("Tx: ");
+		// for (int i = 0; i < length; i++)
+		// 	printf("[%d] %x\t", i, buf[i]);
+		// printf("\n");
+
 		int status = ioctl(spi_fd, SPI_IOC_MESSAGE(1), &spi_transfer);
 
 		::close(spi_fd);
 
-        // Debug information
-		/*
-		printf("Tx: ");
-		for (int i = 0; i < length; i++)
-			printf("%x ", tx[i]);
-		printf("\n");
-		printf("Rx: ");
-		for (int i = 0; i < length; i++)
-			printf("%x ", rx[i]);
-		printf("\n");
-		*/
+    // Debug information
 
-        return status;
+		// printf("Rx: ");
+		// for (int i = 0; i < length; i++)
+		// 	printf("[%d] %x\t", i, buf[i]);
+		// printf("\n");
+		
+		return status;
 	}
 };
 
