@@ -19,6 +19,10 @@ set(NAVIO_SOURCE_LIST
     ${NAVIO_SOURCE_DIR}/spidev.cpp
     ${NAVIO_SOURCE_DIR}/old_mpu9250.cpp
     ${NAVIO_SOURCE_DIR}/util.cpp
+    ${NAVIO_SOURCE_DIR}/mpu/MPU.cpp
+    ${NAVIO_SOURCE_DIR}/mpu/MPU9250_Master_SPI.cpp
+    ${NAVIO_SOURCE_DIR}/mpu/MPU9250_Master.cpp
+    ${NAVIO_SOURCE_DIR}/mpu/MPU9250.cpp
     )
 
 # ##############################################################################
