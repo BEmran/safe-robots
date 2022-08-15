@@ -7,23 +7,19 @@ ImuSensorModule::ImuSensorModule(const std::string& name, const bool debug)
 {
 }
 
-utils::ImuData ImuSensorModule::GetData() const
+void ImuSensorModule::Initialize()
 {
-  return cashed_data_.Get();
 }
 
-void ImuSensorModule::SetData(const utils::ImuData& data)
+bool ImuSensorModule::Probe()
 {
-  return cashed_data_.Set(data);
+  return false;
 }
 
-void ImuSensorModule::SetData()
+bool ImuSensorModule::Test()
 {
-  return cashed_data_.Set(data_);
+  return false;
 }
 
-void ImuSensorModule::ClearData()
-{
-  return cashed_data_.Clear();
-}
+void ImuSensorModule::Update(){};
 }  // namespace core::sensors

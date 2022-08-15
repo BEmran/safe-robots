@@ -2,6 +2,7 @@
 #define CORE_SENSORS_MODULE_SENSOR_HPP
 
 #include "core/utils/module.hpp"
+#include "core/utils/cash.hpp"
 #include <string>
 
 namespace core::sensors
@@ -16,6 +17,10 @@ enum class SensorModuleType
   ADC,
   GPS,
   IMU,
+  ACCELOMETER,
+  GYROSCOPE,
+  MAGNETOMETER,
+  TEMPERATURE,
   UNDEFINED
 };
 
@@ -31,6 +36,7 @@ std::string SensorModuleTypeToString(const SensorModuleType type);
  * @brief Abustract class used to define main object of beaglebone hardware
  *
  */
+template <class T>
 class SensorModuleAbs : public utils::ModuleAbs
 {
  public:
@@ -42,7 +48,11 @@ class SensorModuleAbs : public utils::ModuleAbs
    * @param debug enable/disable debug
    */
   SensorModuleAbs(const SensorModuleType sensor_type, const std::string& name,
-                  const bool debug);
+                  const bool debug)
+    : ModuleAbs(utils::ModuleType::SENSOR, name, debug)
+    , sensor_type_(sensor_type)
+  {
+  }
 
   /**
    * @brief Destroy the Sensor Module Abs object
@@ -55,9 +65,40 @@ class SensorModuleAbs : public utils::ModuleAbs
    *
    * @return SensorModuleType sensor module's type
    */
-  SensorModuleType SensorType() const;
+  SensorModuleType SensorType() const
+  {
+    return sensor_type_;
+  }
+
+  virtual void Initialize() {cashed_data_.Clear();}
+  virtual bool Probe() {return false;}
+  virtual bool Test() {return false;}
+  virtual void Update() {SetData();}
+
+  T GetData() const
+  {
+    return cashed_data_.Get();
+  }
+
+  void ClearData()
+  {
+    return cashed_data_.Clear();
+  }
+
+ protected:
+  void SetData(const T& data)
+  {
+    return cashed_data_.Set(data);
+  }
+
+  void SetData()
+  {
+    return cashed_data_.Set(data_);
+  }
 
  private:
+  T data_;
+  core::utils::Cash<T> cashed_data_;
   SensorModuleType sensor_type_{SensorModuleType::UNDEFINED};
 };
 

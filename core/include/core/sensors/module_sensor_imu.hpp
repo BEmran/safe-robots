@@ -2,17 +2,15 @@
 #define CORE_SENSOR_MODULE_SENSOR_IMU_HPP
 
 #include "core/sensors/module_sensor.hpp"
-#include "core/utils/cash.hpp"
 #include "core/utils/data.hpp"
-#include <string>
 
 namespace core::sensors
 {
 /**
- * @brief a class module sensor used to interface the Imu sensor 
+ * @brief a class module sensor used to interface the Imu sensor
  *
  */
-class ImuSensorModule : public SensorModuleAbs
+class ImuSensorModule : public SensorModuleAbs<utils::ImuData>
 {
  public:
   /**
@@ -28,23 +26,14 @@ class ImuSensorModule : public SensorModuleAbs
    *
    */
   ~ImuSensorModule() = default;
-  
-  virtual void Initialize() {}
-  virtual bool Probe() {return false;}
-  virtual void Update() {};
 
-  utils::ImuData GetData() const;
+  void Initialize() override;
+  bool Probe() override;
+  bool Test() override;
+  void Update() override;
 
-  void ClearData();
-
-  protected:
-  void SetData(const utils::ImuData& data);
-  void SetData();
-  
-  utils::ImuData data_;
-
+ protected:
  private:
-  utils::Cash<utils::ImuData> cashed_data_;
 };
 
 }  // namespace core::sensors

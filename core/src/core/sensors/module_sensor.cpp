@@ -16,19 +16,17 @@ std::string SensorModuleTypeToString(const SensorModuleType type)
       return "GPS"s;
     case SensorModuleType::IMU:
       return "IMU"s;
+    case SensorModuleType::ACCELOMETER:
+      return "ACCELOMETER"s;
+    case SensorModuleType::GYROSCOPE:
+      return "GYROSCOPE"s;
+    case SensorModuleType::MAGNETOMETER:
+      return "MAGNETOMETER"s;
+    case SensorModuleType::TEMPERATURE:
+      return "TEMPERATURE"s;
     default:
       return "UNDEFINED"s;
   }
 }
 
-SensorModuleAbs::SensorModuleAbs(const SensorModuleType sensor_type,
-                                 const std::string& name, const bool debug)
-  : ModuleAbs(utils::ModuleType::SENSOR, name, debug), sensor_type_{sensor_type}
-{
-}
-
-SensorModuleType SensorModuleAbs::SensorType() const
-{
-  return sensor_type_;
-}
 }  // namespace core::sensors
