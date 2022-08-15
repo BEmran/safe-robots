@@ -10,7 +10,7 @@ void MPU9250_Master::initMPU6500(Ascale_t ascale, Gscale_t gscale, uint8_t sampl
     MPU9250::initMPU6500(ascale, gscale, sampleRateDivisor, false); 
 }
 
-void MPU9250_Master::writeAK8963Register(uint8_t subAddress, uint8_t data)
+void MPU9250_Master::writeAK8963Register(const uint8_t subAddress, const uint8_t data)
 {
     uint8_t count = 1;
 
@@ -26,7 +26,7 @@ void MPU9250_Master::writeAK8963Register(uint8_t subAddress, uint8_t data)
     // writeMPURegister(I2C_SLV0_CTRL, 0x81); //Read 1 byte from
 }
 
-void MPU9250_Master::readAK8963Registers(uint8_t subAddress, uint8_t count, uint8_t* dest)
+void MPU9250_Master::readAK8963Registers(const uint8_t subAddress, const uint8_t count, uint8_t* dest)
 {
     // writeMPURegister(USER_CTRL, I2C_MST_EN);  // I2C Master mode
     // writeMPURegister(I2C_MST_CTRL, 0x0D); // I2C configuration multi-master  IIC 400KHz

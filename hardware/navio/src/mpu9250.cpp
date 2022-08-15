@@ -519,51 +519,52 @@ uint16_t BitDataFromResponse(const std::vector<uint8_t>& response,
     return high | low;
 }
 
-double MyMPU9250::ExtractTempreture(const std::vector<uint8_t>& response)
+core::utils::TemperatureData MyMPU9250::ExtractTemperature(const std::vector<uint8_t>& response)
 {
-  const auto temp = BitDataFromResponse(response, 3U);
-  const auto celcious = ((temp - 21) / 333.87) + 21;
-  return celcious;
+  const auto bid_data = BitDataFromResponse(response, 3U);
+  core::utils::TemperatureData temp;
+  temp.value = ((bid_data - 21) / 333.87) + 21;
+  return temp;
 }
 
-core::utils::Vec3
+core::utils::AccelData
 MyMPU9250::ExtractAccelerometer(const std::vector<uint8_t>& response) const
 {
-  core::utils::Vec3 accel = core::utils::Vec3::Zero();
+  core::utils::AccelData accel;
   for (int i = 0; i < 3; i++)
   {
     const uint idx = static_cast<uint>(i);
     const auto bit_data =
         static_cast<float>(BitDataFromResponse(response, idx));
-    accel[i] = G_SI * bit_data / acc_divider_;
+    accel.data[i] = G_SI * bit_data / acc_divider_;
   }
   return accel;
 }
 
-core::utils::Vec3
+core::utils::GyroData
 MyMPU9250::ExtractGyroscope(const std::vector<uint8_t>& response) const
 {
-  core::utils::Vec3 gyro = core::utils::Vec3::Zero();
+  core::utils::GyroData gyro;
   for (int i = 4; i < 7; i++)
   {
     const uint idx = static_cast<uint>(i);
     const auto bit_data =
         static_cast<float>(BitDataFromResponse(response, idx));
-    gyro[i - 4] = (PI / 180) * bit_data / gyro_divider_;
+    gyro.data[i - 4] = (PI / 180) * bit_data / gyro_divider_;
   }
   return gyro;
 }
 
-core::utils::Vec3
+core::utils::MagData
 MyMPU9250::ExtractMagnetometer(const std::vector<uint8_t>& response) const
 {
-  core::utils::Vec3 mag = core::utils::Vec3::Zero();
+  core::utils::MagData mag;
   for (int i = 7; i < 10; i++)
   {
     const uint idx = static_cast<uint>(i);
     const auto bit_data =
         static_cast<float>(BitDataFromResponse(response, idx));
-    mag[i - 7] = bit_data * magnetometer_asa_[i - 7];
+    mag.data[i - 7] = bit_data * magnetometer_asa_[i - 7];
   }
   return mag;
 }
@@ -572,7 +573,7 @@ core::utils::ImuData
 MyMPU9250::ExtractData(const std::vector<uint8_t>& response) const
 {
   core::utils::ImuData data;
-  data.temp = ExtractTempreture(response);
+  data.temp = ExtractTemperature(response);
   data.accel = ExtractAccelerometer(response);
   data.gyro = ExtractGyroscope(response);
   data.mag = ExtractMagnetometer(response);

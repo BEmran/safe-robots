@@ -8,7 +8,7 @@ class OLD_MPU9250 : public core::sensors::ImuSensorModule
 {
 public:
     OLD_MPU9250();
-
+    ~OLD_MPU9250(){}
     void Initialize() override;
     bool Probe() override;
     void Update() override;

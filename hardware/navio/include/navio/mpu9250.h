@@ -25,15 +25,15 @@ class MyMPU9250 : public core::sensors::ImuSensorModule
 
  protected:
   void RequestImu();
-  static double ExtractTempreture(const std::vector<uint8_t>& response);
+  static core::utils::TemperatureData ExtractTemperature(const std::vector<uint8_t>& response);
 
-  core::utils::Vec3
+  core::utils::AccelData
   ExtractAccelerometer(const std::vector<uint8_t>& response) const;
 
-  core::utils::Vec3
+  core::utils::GyroData
   ExtractGyroscope(const std::vector<uint8_t>& response) const;
 
-  core::utils::Vec3
+  core::utils::MagData
   ExtractMagnetometer(const std::vector<uint8_t>& response) const;
 
   core::utils::ImuData ExtractData(const std::vector<uint8_t>& response) const;

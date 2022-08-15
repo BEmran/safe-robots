@@ -40,7 +40,7 @@ target_include_directories(${NAVIO_LIBRARY} PUBLIC
 )
 
 # Link required library
-target_link_libraries(${NAVIO_LIBRARY} PRIVATE ${CORE_LIBRARY})
+target_link_libraries(${NAVIO_LIBRARY} PRIVATE ${CORE_LIBRARY} pthread)
 
 # All users of this library will need at least C++17
 target_compile_features(${NAVIO_LIBRARY} PUBLIC cxx_std_17)

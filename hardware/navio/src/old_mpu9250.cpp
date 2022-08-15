@@ -329,28 +329,28 @@ void OLD_MPU9250::Update()
     for(i=0; i<3; i++) {
         bit_data[i] = ((int16_t)response[i*2] << 8) | response[i*2+1];
     }
-    data.accel[0] = G_SI * bit_data[0] / acc_divider;
-    data.accel[1] = G_SI * bit_data[1] / acc_divider;
-    data.accel[2] = G_SI * bit_data[2] / acc_divider;
+    data.accel.data[0] = G_SI * bit_data[0] / acc_divider;
+    data.accel.data[1] = G_SI * bit_data[1] / acc_divider;
+    data.accel.data[2] = G_SI * bit_data[2] / acc_divider;
 
     //Get temperature
     bit_data[0] = ((int16_t)response[i*2] << 8) | response[i*2+1];
-    data.temp = ((bit_data[0] - 21) / 333.87) + 21;
+    data.temp.value = ((bit_data[0] - 21) / 333.87) + 21;
 
     //Get gyroscope value
     for(i=4; i<7; i++) {
         bit_data[i-4] = ((int16_t)response[i*2] << 8) | response[i*2+1];
     }
-    data.gyro[0] = (PI / 180) * bit_data[0] / gyro_divider;
-    data.gyro[1] = (PI / 180) * bit_data[1] / gyro_divider;
-    data.gyro[2] = (PI / 180) * bit_data[2] / gyro_divider;
+    data.gyro.data[0] = (PI / 180) * bit_data[0] / gyro_divider;
+    data.gyro.data[1] = (PI / 180) * bit_data[1] / gyro_divider;
+    data.gyro.data[2] = (PI / 180) * bit_data[2] / gyro_divider;
 
     //Get Magnetometer value
     for(i=7; i<10; i++) {
         bit_data[i-7] = ((int16_t)response[i*2+1] << 8) | response[i*2];
     }
-    data.mag[0] = bit_data[0] * magnetometer_ASA[0];
-    data.mag[1] = bit_data[1] * magnetometer_ASA[1];
-    data.mag[2] = bit_data[2] * magnetometer_ASA[2];
+    data.mag.data[0] = bit_data[0] * magnetometer_ASA[0];
+    data.mag.data[1] = bit_data[1] * magnetometer_ASA[1];
+    data.mag.data[2] = bit_data[2] * magnetometer_ASA[2];
     SetData(data);
 }

@@ -102,9 +102,9 @@ class MPU9250 : public MPUIMU
   float _magCalibration[3];
 
   // virtual void writeMPURegsiter(uint8_t subAddress, uint8_t data) = 0;
-  virtual void writeRegister(uint8_t address, uint8_t subAddress,
-                             uint8_t data) = 0;
-  virtual void readRegisters(uint8_t address, uint8_t subAddress, uint8_t count,
+  virtual void writeRegister(const uint8_t address, const uint8_t subAddress,
+                             const uint8_t data) = 0;
+  virtual void readRegisters(const uint8_t address, uint8_t subAddress, uint8_t count,
                              uint8_t* dest) = 0;
 
  private:

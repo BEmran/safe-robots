@@ -11,28 +11,28 @@ MPUIMU::Error_t MPU9250_Master_SPI::begin(void)
     return runTests();
 }
 
-void MPU9250_Master_SPI::readRegisters(uint8_t address, uint8_t subAddress, uint8_t count, uint8_t * data)
+void MPU9250_Master_SPI::readRegisters(const uint8_t address, const uint8_t subAddress, const uint8_t count, uint8_t * data)
 {
     (void)address;
     readMPURegisters(subAddress, count, data);
 }
 
 
-void MPU9250_Master_SPI::writeRegister(uint8_t address, uint8_t subAddress, uint8_t data)
+void MPU9250_Master_SPI::writeRegister(const uint8_t address, const uint8_t subAddress, const uint8_t data)
 {
     (void)address;
     writeMPURegister(subAddress, data);
 }
 
-void MPU9250_Master_SPI::writeMPURegister(uint8_t subAddress, uint8_t data)
+void MPU9250_Master_SPI::writeMPURegister(const uint8_t subAddress, const uint8_t data)
 {
     uint8_t buf[2] = {subAddress, data};
     OLDSPIdev::transfer("/dev/spidev0.1", buf, 2);
 }
 
-void MPU9250_Master_SPI::readMPURegisters(uint8_t subAddress, uint8_t count, uint8_t * dest)
+void MPU9250_Master_SPI::readMPURegisters(const uint8_t subAddress, const uint8_t count, uint8_t * dest)
 {
-    unsigned char buf[count + 1] = {0};
+    unsigned char buf[100] = {0};
     buf[0] = subAddress | 0x80;
     OLDSPIdev::transfer("/dev/spidev0.1", buf, count + 1);
 

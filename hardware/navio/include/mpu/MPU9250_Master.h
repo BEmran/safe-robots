@@ -12,9 +12,9 @@ class MPU9250_Master : public MPU9250 {
 
     protected:
 
-        virtual void writeAK8963Register(uint8_t subAddress, uint8_t data) override;
+        virtual void writeAK8963Register(const uint8_t subAddress, const uint8_t data) override;
 
-        virtual void readAK8963Registers(uint8_t subAddress, uint8_t count, uint8_t* dest) override;
+        virtual void readAK8963Registers(const uint8_t subAddress, const uint8_t count, uint8_t* dest) override;
 
 
     private:
