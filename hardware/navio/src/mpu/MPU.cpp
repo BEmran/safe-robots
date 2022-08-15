@@ -1,4 +1,5 @@
 #include "mpu/MPU.h"
+#include <iostream>
 
 #define G_SI 9.80665
 #define PI 3.14159
@@ -20,7 +21,7 @@ MPUIMU::MPUIMU(Ascale_t ascale, Gscale_t gscale, uint8_t sampleRateDivisor)
 
   uint16_t gvals[4] = {250, 500, 1000, 2000};
   _gRes = getRes(gscale, gvals);
-  _gyrosensitivity = getSen(ascale, avals);
+  _gyrosensitivity = getSen(gscale, gvals);
 }
 
 float MPUIMU::getRes(uint8_t scale, uint16_t vals[4])
@@ -77,9 +78,12 @@ void MPUIMU::readGyrometer(float& gx, float& gy, float& gz)
   int16_t z = ((int16_t)rawData[4] << 8) | rawData[5];
 
   // Convert the gyro value into degrees per second
+  printf("resolution_:%f\n", _gRes);
+  printf("gyroCount x:%d\t y:%d\t z:%d\n", x, y, z);
   gx = (PI / 180) * (float)x * _gRes;
   gy = (PI / 180) * (float)y * _gRes;
   gz = (PI / 180) * (float)z * _gRes;
+
 }
 
 int16_t MPUIMU::readRawTemperature(void)
