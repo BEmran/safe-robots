@@ -4,11 +4,10 @@ twitter.com/emlidtech || www.emlid.com || info@emlid.com
 Example: Read accelerometer, gyroscope and magnetometer values from
 inertial measurement unit: MPU9250 or LSM9DS1 over SPI on Raspberry Pi + Navio.
 Navio's onboard sensors are connected to the SPI bus on Raspberry Pi
-and can be read through /dev/spidev0.1 (MPU9250), /dev/spidev0.3 (acc/gyro LSM9DS1)
-and /dev/spidev0.2 (mag LSM9DS1).
-To run this example navigate to the directory containing it and run following commands:
-make
-./AccelGyroMag -i [sensor name]
+and can be read through /dev/spidev0.1 (MPU9250), /dev/spidev0.3 (acc/gyro
+LSM9DS1) and /dev/spidev0.2 (mag LSM9DS1). To run this example navigate to the
+directory containing it and run following commands: make
+./AccelGyroMag -i .data[sensor name]
 Sensors names: mpu is MPU9250, lsm is LSM9DS1.
 For print help:
 ./AccelGyroMag -h
@@ -21,97 +20,109 @@ For print help:
 #include <string>
 #include <memory>
 
-std::unique_ptr <core::sensors::ImuSensorModule> GetInertialSensor(std::string sensor_name)
+std::unique_ptr<core::sensors::ImuSensorModule>
+GetInertialSensor(std::string sensor_name)
 {
-    if (sensor_name == "new") {
-        printf("Selected: MPU9250\n");
-        auto ptr = std::make_unique<MyMPU9250>(false);
-        return ptr;
-    }
-    else if (sensor_name == "old") {
-        printf("Selected: MPU9250\n");
-        auto ptr = std::make_unique<OLD_MPU9250>();
-        return ptr;
-    }
-    else {
-        return NULL;
-    }
+  if (sensor_name == "new")
+  {
+    printf("Selected: MPU9250\n");
+    auto ptr = std::make_unique<MyMPU9250>(false);
+    return ptr;
+  }
+  else if (sensor_name == "old")
+  {
+    printf("Selected: MPU9250\n");
+    auto ptr = std::make_unique<OLD_MPU9250>();
+    return ptr;
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 void PrintHelp()
 {
-    printf("Possible parameters:\nSensor selection: -i [sensor name]\n");
-    printf("Sensors names: new is MPU9250, old is LSM9DS1\nFor help: -h\n");
+  printf("Possible parameters:\nSensor selection: -i .data[sensor name]\n");
+  printf("Sensors names: new is MPU9250, old is LSM9DS1\nFor help: -h\n");
 }
 
-std::string GetSensorName(int argc, char *argv[])
+std::string GetSensorName(int argc, char* argv[])
 {
-    if (GetNavioVersion() == NAVIO2) {
-
-        if (argc < 2) {
-            printf("Enter parameter\n");
-            PrintHelp();
-            return std::string();
-        }
-
-        // prevent the error message
-        opterr = 0;
-        int parameter;
-
-        while ((parameter = getopt(argc, argv, "i:h")) != -1) {
-            switch (parameter) {
-            case 'i': return optarg;
-            case 'h': PrintHelp(); return "-1";
-            case '?': printf("Wrong parameter.\n");
-                      PrintHelp();
-                      return std::string();
-            }
-        }
-
-    } else { //sensor on NAVIO+
-
-        return "new";
+  if (GetNavioVersion() == NAVIO2)
+  {
+    if (argc < 2)
+    {
+      printf("Enter parameter\n");
+      PrintHelp();
+      return std::string();
     }
 
-    return std::string();
+    // prevent the error message
+    opterr = 0;
+    int parameter;
+
+    while ((parameter = getopt(argc, argv, "i:h")) != -1)
+    {
+      switch (parameter)
+      {
+        case 'i':
+          return optarg;
+        case 'h':
+          PrintHelp();
+          return "-1";
+        case '?':
+          printf("Wrong parameter.\n");
+          PrintHelp();
+          return std::string();
+      }
+    }
+  }
+  else
+  {  // sensor on NAVIO+
+
+    return "new";
+  }
+
+  return std::string();
 }
 //=============================================================================
 int main(int argc, char* argv[])
 {
+  if (CheckApm())
+  {
+    return 1;
+  }
 
-    if (CheckApm()) {
-        return 1;
-    }
+  auto sensor_name = GetSensorName(argc, argv);
+  if (sensor_name.empty())
+  {
+    return EXIT_FAILURE;
+  }
+  // auto sensor_name = "mpu";
+  auto sensor = GetInertialSensor(sensor_name);
 
-    auto sensor_name = GetSensorName(argc, argv);
-    if (sensor_name.empty())
-    {
-        return EXIT_FAILURE;
-    }
-    // auto sensor_name = "mpu";
-    auto sensor = GetInertialSensor(sensor_name);
+  if (!sensor)
+  {
+    printf("Wrong sensor name. Select: new or old\n");
+    return EXIT_FAILURE;
+  }
 
-    if (!sensor) {
-        printf("Wrong sensor name. Select: new or old\n");
-        return EXIT_FAILURE;
-    }
+  if (!sensor->Probe())
+  {
+    printf("Sensor not enabled\n");
+    return EXIT_FAILURE;
+  }
+  // return EXIT_FAILURE;
+  sensor->Initialize();
+  //-------------------------------------------------------------------------
 
-    if (!sensor->Probe()) {
-        printf("Sensor not enabled\n");
-        return EXIT_FAILURE;
-    }
-    // return EXIT_FAILURE;
-    sensor->Initialize();
-//-------------------------------------------------------------------------
-
-    while(1) {
-        sensor->Update();
-        auto data = sensor->GetData();
-        printf("Acc: %+7.3f %+7.3f %+7.3f\t", data.accel[0], data.accel[1], data.accel[2]);
-        printf("Gyr: %+7.3f %+7.3f %+7.3f\t", data.gyro[0], data.gyro[1], data.gyro[2]);
-        printf("Mag: %+7.3f %+7.3f %+7.3f\t", data.mag[0], data.mag[1], data.mag[2]);
-        printf("Temp: %+7.3f\n", data.temp);
-
-       usleep(500000);
-    }
+  while (1)
+  {
+    sensor->Update();
+    auto data = sensor->GetData();
+    std::cout << data.accel << " \t" << data.gyro << " \t" << data.mag << " \t"
+              << data.temp << std::endl;
+    usleep(500000);
+  }
 }
