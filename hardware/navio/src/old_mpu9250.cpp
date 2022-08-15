@@ -352,5 +352,11 @@ void OLD_MPU9250::Update()
     data.mag.data[0] = bit_data[0] * magnetometer_ASA[0];
     data.mag.data[1] = bit_data[1] * magnetometer_ASA[1];
     data.mag.data[2] = bit_data[2] * magnetometer_ASA[2];
+//     printf("bit_data x:%u\t y:%u\t z:%u\n", bit_data[0],
+//          bit_data[1], bit_data[2]);
+//   printf("magnetometer_ASA x:%f\t y:%f\t z:%f\n", magnetometer_ASA[0],
+//          magnetometer_ASA[1], magnetometer_ASA[2]);
+//   printf("magnetometer_ASA x:%f\t y:%f\t z:%f\n", magnetometer_ASA[0]/Magnetometer_Sensitivity_Scale_Factor,
+//          magnetometer_ASA[1]/Magnetometer_Sensitivity_Scale_Factor, magnetometer_ASA[2]/Magnetometer_Sensitivity_Scale_Factor);
     SetData(data);
 }

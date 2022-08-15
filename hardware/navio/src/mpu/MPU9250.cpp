@@ -513,6 +513,15 @@ void MPU9250::readMagnetometer(float& mx, float& my, float& mz)
   mx *= _magScale[0];
   my *= _magScale[1];
   mz *= _magScale[2];
+  // printf("magCount x:%u\t y:%u\t z:%u\n", magCount[0],
+  //        magCount[1], magCount[2]);
+  // printf("_mRes: %f\n", _mRes);
+  // printf("_magCalibration x:%f\t y:%f\t z:%f\n", _magCalibration[0],
+  //        _magCalibration[1], _magCalibration[2]);
+  // printf("_magBias x:%f\t y:%f\t z:%f\n", _magBias[0],
+  //        _magBias[1], _magBias[2]);
+  // printf("_magScale x:%f\t y:%f\t z:%f\n", _magScale[0],
+  //        _magScale[1], _magScale[2]);
 }
 
 void MPU9250::readMagData(int16_t* destination)
@@ -552,6 +561,9 @@ void MPU9250::initAK8963(Mscale_t mscale, Mmode_t Mmode, float* magCalibration)
   _magCalibration[0] = magCalibration[0];
   _magCalibration[1] = magCalibration[1];
   _magCalibration[2] = magCalibration[2];
+
+    // printf("sensitivity x:%f\t y:%f\t z:%f\n", _magCalibration[0],
+    //      _magCalibration[1], _magCalibration[2]);
   _mMode = Mmode;
   writeAK8963Register(AK8963_CNTL, 0x00);  // Power down magnetometer
   delay(10);
