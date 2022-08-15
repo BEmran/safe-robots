@@ -4,19 +4,6 @@
 
 namespace mpu
 {
-static spi::SPI spidev("/dev/spidev0.1", false);
-
-void delay(uint32_t msec)
-{
-  usleep(msec * 1000);
-}
-
-// Turn the MSB and LSB into a signed 16-bit value
-int16_t To16Bit(const uint8_t msb, const uint8_t lsb)
-{
-  return (static_cast<int16_t>(msb) << 8) | static_cast<int16_t>(lsb);
-}
-
 namespace ak8963
 {
 // Magnetometer legister map
@@ -65,18 +52,18 @@ void AK8963::MagRes()
 void AK8963::Reset()
 {
   printf("USER_CTRL: disable internal\n");
-  spidev.WriteRegister(mpu::USER_CTRL, 0);  // disable internal I2C bus
+  GetSpi()->WriteRegister(mpu::USER_CTRL, 0);  // disable internal I2C bus
 
   // reset device
   printf("PWR_MGMT_1\n");
-  spidev.WriteRegister(mpu::PWR_MGMT_1, 0x80);  // Set bit 7 to reset MPU9250
+  GetSpi()->WriteRegister(mpu::PWR_MGMT_1, 0x80);  // Set bit 7 to reset MPU9250
   delay(10);
 
   printf("USER_CTRL:\n");
-  spidev.WriteRegister(mpu::USER_CTRL, I2C_MST_EN);  // re-enable internal I2C bus
+  GetSpi()->WriteRegister(mpu::USER_CTRL, I2C_MST_EN);  // re-enable internal I2C bus
 
   printf("I2C_MST_CTRL:\n");
-  spidev.WriteRegister(mpu::I2C_MST_CTRL, 0x0D); // I2C configuration multi-master  IIC 400KHz
+  GetSpi()->WriteRegister(mpu::I2C_MST_CTRL, 0x0D); // I2C configuration multi-master  IIC 400KHz
   
   delay(100);  // Wait for all registers to reset
 }
@@ -159,13 +146,13 @@ void AK8963::WriteRegister(const uint8_t reg, const uint8_t data) const
 {
   const uint8_t count = 1;
   // set slave 0 to the AK8963 and set for write
-  spidev.WriteRegister(mpu::I2C_SLV0_ADDR, mpu::AK8963_ADDRESS);
+  GetSpi()->WriteRegister(mpu::I2C_SLV0_ADDR, mpu::AK8963_ADDRESS);
   // set the register to the desired AK8963 sub address
-  spidev.WriteRegister(mpu::I2C_SLV0_REG, reg);
+  GetSpi()->WriteRegister(mpu::I2C_SLV0_REG, reg);
   // store the data for write
-  spidev.WriteRegister(mpu::I2C_SLV0_DO, data);
+  GetSpi()->WriteRegister(mpu::I2C_SLV0_DO, data);
   // enable I2C and send 1 byte
-  spidev.WriteRegister(mpu::I2C_SLV0_CTRL, mpu::I2C_SLV0_EN | count);
+  GetSpi()->WriteRegister(mpu::I2C_SLV0_CTRL, mpu::I2C_SLV0_EN | count);
 }
 
 uint8_t AK8963::ReadRegister(uint8_t reg) const
@@ -179,16 +166,16 @@ void AK8963::ReadRegisters(const uint8_t reg, const uint8_t count,
                            uint8_t* dest) const
 {
   // set slave 0 to the AK8963 and set for read
-  spidev.WriteRegister(mpu::I2C_SLV0_ADDR,
+  GetSpi()->WriteRegister(mpu::I2C_SLV0_ADDR,
                        mpu::AK8963_ADDRESS | mpu::I2C_READ_FLAG);
   // set the register to the desired AK8963 sub address
-  spidev.WriteRegister(mpu::I2C_SLV0_REG, reg);
+  GetSpi()->WriteRegister(mpu::I2C_SLV0_REG, reg);
   // enable I2C and request the bytes
-  spidev.WriteRegister(mpu::I2C_SLV0_CTRL, mpu::I2C_SLV0_EN | count);
+  GetSpi()->WriteRegister(mpu::I2C_SLV0_CTRL, mpu::I2C_SLV0_EN | count);
   // takes some time for these registers to fill
   delay(10);
   // read the bytes off the MPU9250 EXT_SENS_DATA registers
-  spidev.ReadRegisters(EXT_SENS_DATA_00, count, dest);
+  GetSpi()->ReadRegisters(EXT_SENS_DATA_00, count, dest);
 }
 
 MagData AK8963::ReadMagnetometer() const

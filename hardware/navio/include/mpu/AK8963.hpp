@@ -1,7 +1,7 @@
 #ifndef MPU_AK8963_HPP
 #define MPU_AK8963_HPP
 
-#include "mpu/mpu9250_register_map.h"
+#include "mpu/my_utils.hpp"
 
 #include <core/sensors/module_sensor.hpp>
 #include <core/utils/data.hpp>
