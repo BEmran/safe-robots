@@ -70,10 +70,29 @@ class SensorModuleAbs : public utils::ModuleAbs
     return sensor_type_;
   }
 
-  virtual void Initialize() {cashed_data_.Clear();}
-  virtual bool Probe() {return false;}
-  virtual bool Test() {return false;}
-  virtual void Update() {SetData();}
+  virtual void Initialize()
+  {
+    cashed_data_.Clear();
+  }
+
+  virtual bool Probe()
+  {
+    return false;
+  }
+
+  virtual bool Test()
+  {
+    return false;
+  }
+
+  virtual void Update()
+  {
+    SetData();
+  }
+  
+  virtual void Calibrate()
+  {
+  }
 
   T GetData() const
   {
