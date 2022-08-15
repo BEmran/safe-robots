@@ -3,7 +3,8 @@
 
 #include <eigen3/Eigen/Dense>
 #include <iomanip>
-
+#undef EIGEN_DEFAULT_DENSE_INDEX_TYPE
+#define EIGEN_DEFAULT_DENSE_INDEX_TYPE size_t
 namespace core::utils
 {
 constexpr float GRAVITY = 9.80665F;

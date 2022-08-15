@@ -8,7 +8,7 @@ spi::SPI* GetSpi()
   return &spi;
 }
 
-void delay(uint32_t msec)
+void Delay(uint32_t msec)
 {
   usleep(msec * 1000);
 }

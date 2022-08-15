@@ -12,9 +12,6 @@
 
 namespace mpu
 {
-
-void delay(uint32_t msec);
-
 using MagData = core::utils::MagData;
 using SensorModuleMagnetometer = core::sensors::SensorModuleAbs<MagData>;
 constexpr auto MagnetometerType = core::sensors::SensorModuleType::MAGNETOMETER;
@@ -93,5 +90,5 @@ class AK8963 : public SensorModuleMagnetometer
   std::array<float, 3> scale_correction_ = {1.0F, 1.0F,
                                             1.0F};  // soft iron correction
 };
-};      // namespace mpu
+}  // namespace mpu
 #endif  // MPU_AK8963_HPP

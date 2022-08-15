@@ -4,7 +4,7 @@
 
 namespace mpu
 {
-constexpr uint16_t GyroScales[4] = {250, 500, 1000, 2000};
+constexpr int GyroScales[4] = {250, 500, 1000, 2000};
 
 MpuGyro::MpuGyro(const GyroConfig& config, const bool debug)
   : SensorModuleGyroscope(GyroscopeType, GyroscopeSensorName, debug)
@@ -12,16 +12,17 @@ MpuGyro::MpuGyro(const GyroConfig& config, const bool debug)
 {
   GyroResolution();
   GyroSensitivity();
-  printf("scale %u sensitivity_ %f resolution_ %f\n", Scale(), sensitivity_, resolution_);
+  printf("scale %u sensitivity_ %d resolution_ %f\n", Scale(), sensitivity_, resolution_);
 }
 
 void MpuGyro::GyroSensitivity()
 {
   sensitivity_ = 32768 / GyroScales[Scale()];
 }
+
 void MpuGyro::GyroResolution()
 {
-  resolution_ = GyroScales[Scale()] / 32768.f;
+  resolution_ = static_cast<float>(GyroScales[Scale()]) / 32768.0F;
 }
 
 void MpuGyro::Reset()
@@ -34,12 +35,12 @@ void MpuGyro::Initialize()
   // GetSpi()->WriteRegister(PWR_MGMT_1, 0x00); // Clear sleep mode bit (6),
   // enable all sensors Clear sleep mode bit (6), enable all sensors
   GetSpi()->WriteRegister(PWR_MGMT_1, 0x80);
-  delay(100);  // Wait for all registers to reset
+  Delay(100);  // Wait for all registers to reset
 
   // get stable time source. Auto select clock source to be PLL  gyroscope
   // reference if ready else
   GetSpi()->WriteRegister(PWR_MGMT_1, 0x01);
-  delay(200);
+  Delay(200);
 
   // Configure Gyro and Thermometer
   // Disable FSYNC and set thermometer and gyro bandwidth to 41 and 42 Hz,
@@ -64,9 +65,9 @@ void MpuGyro::Initialize()
   // get current GYRO_CONFIG register value
   uint8_t c = ReadRegister(GYRO_CONFIG);
   // c = c & ~0xE0; // Clear self-test bits [7:5]
-  c = c & ~0x03;    // Clear Fchoice bits [1:0]
-  c = c & ~0x18;    // Clear AFS bits [4:3]
-  c = c | Scale() << 3;  // Set full scale range for the gyro
+  c = static_cast<uint8_t>(c & 0xFC_uc);    // Clear Fchoice bits [1:0]
+  c = static_cast<uint8_t>(c & 0xE7_uc);    // Clear AFS bits [4:3]
+  c = static_cast<uint8_t>(c | Scale() << 3);  // Set full scale range for the gyro
   // c =| 0x00; // Set Fchoice for the gyro to 11 by writing its inverse to bits
   // 1:0 of GYRO_CONFIG
   // Write new GYRO_CONFIG value to register
@@ -105,7 +106,7 @@ void MpuGyro::Initialize()
 
   // GetSpi()->WriteRegister(INT_ENABLE, 0x01);  // Enable data ready (bit 0)
   // interrupt
-  delay(100);
+  Delay(100);
 }
 
 uint8_t MpuGyro::Scale() const
@@ -131,7 +132,7 @@ void MpuGyro::Update()
   SetData(data);
 }
 
-uint8_t MpuGyro::ReadRegister(uint8_t reg) const
+uint8_t MpuGyro::ReadRegister(uint8_t reg)
 {
   uint8_t buffer[1] = {0};
   GetSpi()->ReadRegisters(reg, 1, buffer);
@@ -145,7 +146,7 @@ GyroData MpuGyro::ReadGyroscope() const
   GyroData gyro;
   for (size_t i = 0; i < gyro_full_bits.size(); i++)
   {
-    gyro.data[i] = (PI / 180.0F) * (float)gyro_full_bits[i] * resolution_;
+    gyro.data[i] = (PI / 180.0F) * static_cast<float>(gyro_full_bits[i]) * resolution_;
   }
   printf("resolution_:%f\n", resolution_);
   printf("gyroCount x:%d\t y:%d\t z:%d\n", gyro_full_bits[0], gyro_full_bits[1], gyro_full_bits[2]);
@@ -153,7 +154,7 @@ GyroData MpuGyro::ReadGyroscope() const
   return gyro;
 }
 
-std::array<int16_t, 3> MpuGyro::ReadGyroFullBits() const
+std::array<int16_t, 3> MpuGyro::ReadGyroFullBits()
 {
   std::array<int16_t, 3> values = {0, 0, 0};
   // Read the six raw data registers sequentially into data array
@@ -167,7 +168,7 @@ std::array<int16_t, 3> MpuGyro::ReadGyroFullBits() const
   return values;
 }
 
-void MpuGyro::Calibrate(void)
+void MpuGyro::Calibrate()
 {
 }
 

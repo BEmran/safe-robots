@@ -16,8 +16,8 @@ std::string SensorModuleTypeToString(const SensorModuleType type)
       return "GPS"s;
     case SensorModuleType::IMU:
       return "IMU"s;
-    case SensorModuleType::ACCELOMETER:
-      return "ACCELOMETER"s;
+    case SensorModuleType::ACCELEROMETER:
+      return "ACCELEROMETER"s;
     case SensorModuleType::GYROSCOPE:
       return "GYROSCOPE"s;
     case SensorModuleType::MAGNETOMETER:

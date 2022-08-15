@@ -3,24 +3,24 @@
 namespace core::utils
 {
 
-Eigen::IOFormat MatFmt(Eigen::FullPrecision, 0, ", ", ";\n", "[", "]", "[",
+static const Eigen::IOFormat kMatFmt(Eigen::FullPrecision, 0, ", ", ";\n", "[", "]", "[",
                        "]");
-Eigen::IOFormat VecFmt(Eigen::FullPrecision, 0, ", ", ";\n", "", "", "[", "]");
+static const Eigen::IOFormat kVecFmt(Eigen::FullPrecision, 0, ", ", ";\n", "", "", "[", "]");
 
 std::ostream& operator<<(std::ostream& os, const Vec3& vec)
 {
-  return os << vec.format(VecFmt);
+  return os << vec.format(kVecFmt);
 }
 
 std::ostream& operator<<(std::ostream& os, const Transpose& vec)
 {
-  return os << vec.format(VecFmt);
+  return os << vec.format(kVecFmt);
 }
 
 std::ostream& operator<<(std::ostream& os, const Quat& quat)
 {
   os << "ang = " << quat.w() << ", "           /* angle */
-     << quat.vec().transpose().format(VecFmt); /* axis */
+     << quat.vec().transpose().format(kVecFmt); /* axis */
   return os;
 }
 

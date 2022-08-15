@@ -17,7 +17,7 @@ enum class SensorModuleType
   ADC,
   GPS,
   IMU,
-  ACCELOMETER,
+  ACCELEROMETER,
   GYROSCOPE,
   MAGNETOMETER,
   TEMPERATURE,

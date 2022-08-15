@@ -57,7 +57,7 @@ void AK8963::Reset()
   // reset device
   printf("PWR_MGMT_1\n");
   GetSpi()->WriteRegister(mpu::PWR_MGMT_1, 0x80);  // Set bit 7 to reset MPU9250
-  delay(10);
+  Delay(10);
 
   printf("USER_CTRL:\n");
   GetSpi()->WriteRegister(mpu::USER_CTRL,
@@ -67,7 +67,7 @@ void AK8963::Reset()
   GetSpi()->WriteRegister(mpu::I2C_MST_CTRL,
                           0x0D);  // I2C configuration multi-master  IIC 400KHz
 
-  delay(100);  // Wait for all registers to reset
+  Delay(100);  // Wait for all registers to reset
 }
 
 void AK8963::Initialize()
@@ -81,17 +81,17 @@ void AK8963::ExtractSensitivityAdjustmentValues()
 {
   // Power down magnetometer
   WriteRegister(ak8963::CNTL, 0x00);
-  delay(10);
+  Delay(10);
   // Enter Fuse ROM access mode
   WriteRegister(ak8963::CNTL, 0x0F);
-  delay(10);
+  Delay(10);
   // Read the x-, y-, and z-axis calibration values
   uint8_t asa_values[3];
   ReadRegisters(ak8963::ASAX, 3, &asa_values[0]);
   // Return xyz-axis sensitivity adjustment values
   for (size_t i = 0; i < 3; i++)
   {
-    sensitivity_calibration_[i] = (float)(asa_values[i] - 128) / 256.0f + 1.0f;
+    sensitivity_calibration_[i] = (float)(asa_values[i] - 128) / 256.0F + 1.0F;
   }
   // debug
   printf("sensitivity x:%f\t y:%f\t z:%f\n", sensitivity_calibration_[0],
@@ -101,7 +101,7 @@ void AK8963::ExtractSensitivityAdjustmentValues()
 void AK8963::ConfigureScaleAndMode() const
 {
   WriteRegister(ak8963::CNTL, POWER_DOWN_MODE);
-  delay(10);
+  Delay(10);
   // Configure the magnetometer for continuous read and highest resolution
   // set Scale bit 4 to 1 or (0) to enable 16 or (14) bit resolution in CNTL
   // register, and enable continuous mode data acquisition Mode (bits [3:0]),
@@ -110,7 +110,7 @@ void AK8963::ConfigureScaleAndMode() const
   printf("scale %u\n", Scale());
   printf("Mode %u\n", Mode());
   WriteRegister(ak8963::CNTL, Scale() | Mode());
-  delay(10);
+  Delay(10);
 }
 
 uint8_t AK8963::Mode() const
@@ -176,7 +176,7 @@ void AK8963::ReadRegisters(const uint8_t reg, const uint8_t count,
   // enable I2C and request the bytes
   GetSpi()->WriteRegister(mpu::I2C_SLV0_CTRL, mpu::I2C_SLV0_EN | count);
   // takes some time for these registers to fill
-  delay(10);
+  Delay(10);
   // read the bytes off the MPU9250 EXT_SENS_DATA registers
   GetSpi()->ReadRegisters(EXT_SENS_DATA_00, count, dest);
 }
@@ -191,8 +191,8 @@ MagData AK8963::ReadMagnetometer() const
   MagData mag;
   for (size_t i = 0; i < mag_full_bits.size(); i++)
   {
-    const float tmp =
-        (float)mag_full_bits[i] * resolution_ * sensitivity_calibration_[i] -
+    const auto tmp =
+        static_cast<float>(mag_full_bits[i]) * resolution_ * sensitivity_calibration_[i] -
         bias_correction_[i];
     mag.data[i] = tmp * scale_correction_[i];
   }
@@ -240,7 +240,6 @@ void AK8963::Calibrate(void)
   // data is available every 10 ms
   const uint16_t samples =
       config_.mode == MagMode::CONTINUES_8HZ_MODE ? 128 : 1500;
-  constexpr int16_t max_val = 32767;  // 2^16/2
   std::vector<uint16_t> vector_of_values(samples);
   std::array<std::vector<uint16_t>, 3> mag_all_values{vector_of_values};
 
@@ -253,31 +252,31 @@ void AK8963::Calibrate(void)
     {
       mag_all_values[j][i] = mag_full_bits[j];
     }
-    config_.mode == MagMode::CONTINUES_8HZ_MODE ? delay(130) : delay(15);
+    config_.mode == MagMode::CONTINUES_8HZ_MODE ? Delay(130) : Delay(15);
   }
 
   for (size_t j = 0; j < mag_all_values.size(); j++)
   {
     const auto [min, max] =
         std::minmax_element(begin(mag_all_values[j]), end(mag_all_values[j]));
-    printf("[%u] max: %u\t min: %u\n", j, *max, *min);
+    printf("[%lu] max: %u\t min: %u\n", j, *max, *min);
     // Get hard iron correction: get average xyz mag bias in counts
-    const auto tmp = (float)(*max + *min) / 2.0;
+    const auto tmp = static_cast<float>(*max + *min) / 2.0F;
     bias_correction_[j] = tmp * resolution_ * sensitivity_calibration_[j];
     // Get soft iron correction estimate: get average xyz axis max chord length
     // in counts
-    scale_correction_[j] = (float)(*max - *min) / 2.0;
+    scale_correction_[j] = (float)(*max - *min) / 2.0F;
   }
 
   const float avg_rad =
-      std::accumulate(scale_correction_.begin(), scale_correction_.end(), 0.0) /
+      std::accumulate(scale_correction_.begin(), scale_correction_.end(), 0.0F) /
       scale_correction_.size();
   std::for_each(scale_correction_.begin(), scale_correction_.end(),
                 [avg_rad](auto& sc) { sc = avg_rad / sc; });
   // debug
   for (size_t j = 0; j < scale_correction_.size(); j++)
   {
-    printf("[%u] bias: %f\t scale: %f\n", j, bias_correction_[j],
+    printf("[%lu] bias: %f\t scale: %f\n", j, bias_correction_[j],
            scale_correction_[j]);
   }
 }

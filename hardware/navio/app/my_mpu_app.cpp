@@ -6,10 +6,10 @@
 #include <memory>
 
 // static const MPUIMU::Ascale_t ASCALE = MPUIMU::AFS_16G;
-static const mpu::GyroScale GSCALE = mpu::GyroScale::GFS_2000DPS;
-static const mpu::MagScale MSCALE = mpu::MagScale::MFS_16BITS;
-static const mpu::MagMode MMODE = mpu::MagMode::CONTINUES_100HZ_MODE;
-static const uint8_t SAMPLE_RATE_DIVISOR = 4;
+constexpr mpu::GyroScale GSCALE = mpu::GyroScale::GFS_2000DPS;
+constexpr mpu::MagScale MSCALE = mpu::MagScale::MFS_16BITS;
+constexpr mpu::MagMode MMODE = mpu::MagMode::CONTINUES_100HZ_MODE;
+constexpr uint8_t SAMPLE_RATE_DIVISOR = 4;
 
 //=============================================================================
 int main(int /*argc*/, char** /*argv[]*/)
@@ -21,33 +21,33 @@ int main(int /*argc*/, char** /*argv[]*/)
   mpu::AK8963Config mag_config;
   mag_config.mode = MMODE;
   mag_config.scale = MSCALE;
-  auto Mag = std::make_unique<mpu::AK8963>(mag_config, true);
+  auto mag_sensor = std::make_unique<mpu::AK8963>(mag_config, true);
 
   mpu::GyroConfig gyro_config;
   gyro_config.sample_rate_divisor = SAMPLE_RATE_DIVISOR;
   gyro_config.scale = GSCALE;
-  auto Gyro = std::make_unique<mpu::MpuGyro>(gyro_config, true);
+  auto gyro_sensor = std::make_unique<mpu::MpuGyro>(gyro_config, true);
   
   // Start the MPU9250
-  if (!Gyro->Probe())
+  if (!gyro_sensor->Probe())
   {
     printf("Bad Gyro device ID\n");
-    // return EXIT_FAILURE;
+    return EXIT_FAILURE;
   }
-  if (!Mag->Probe())
+  if (!mag_sensor->Probe())
   {
     printf("Bad Magnetometer device ID\n");
-    // return EXIT_FAILURE;
+    return EXIT_FAILURE;
   }
 
-  Gyro->Initialize();
+  gyro_sensor->Initialize();
 
-  Mag->Initialize();
+  mag_sensor->Initialize();
   
   //-------------------------------------------------------------------------
   // float ax, ay, az, gx, gy, gz, mx, my, mz, temperature;
 
-  while (1)
+  while (true)
   {
     // if (sensor->checkNewData())  {
     // sensor->readAccelerometer(ax, ay, az);
@@ -55,9 +55,9 @@ int main(int /*argc*/, char** /*argv[]*/)
     // sensor->readMagnetometer(mx, my, mz);
     // temperature = sensor->readTemperature();
     // }
-    Mag->Update();
-    Gyro->Update();
-    std::cout << Gyro->GetData() << "\t" << Mag->GetData() << std::endl;
+    mag_sensor->Update();
+    gyro_sensor->Update();
+    std::cout << gyro_sensor->GetData() << "\t" << mag_sensor->GetData() << std::endl;
     // auto data = sensor->GetData();
     // printf("Acc: %+7.3f %+7.3f %+7.3f\t", ax, ay, az);
     // printf("Gyr: %+7.3f %+7.3f %+7.3f\t", gx, gy, gz);
@@ -66,4 +66,5 @@ int main(int /*argc*/, char** /*argv[]*/)
 
     usleep(500000);
   }
+  return EXIT_SUCCESS;
 }

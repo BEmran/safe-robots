@@ -21,5 +21,5 @@ bool ImuSensorModule::Test()
   return false;
 }
 
-void ImuSensorModule::Update(){};
+void ImuSensorModule::Update(){}
 }  // namespace core::sensors

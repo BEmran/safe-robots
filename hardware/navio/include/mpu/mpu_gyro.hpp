@@ -12,9 +12,6 @@
 
 namespace mpu
 {
-
-void delay(uint32_t msec);
-
 using GyroData = core::utils::GyroData;
 using SensorModuleGyroscope = core::sensors::SensorModuleAbs<GyroData>;
 constexpr auto GyroscopeType = core::sensors::SensorModuleType::GYROSCOPE;
@@ -52,20 +49,19 @@ class MpuGyro : public SensorModuleGyroscope
  protected:
   void Reset();
 
-  std::array<int16_t, 3> ReadGyroFullBits() const;
   GyroData ReadGyroscope() const;
+  static std::array<int16_t, 3> ReadGyroFullBits();
   void GyroSensitivity();
   void GyroResolution();
 
  private:
-
   uint8_t Scale() const;
 
-  uint8_t ReadRegister(uint8_t reg) const;
+  static uint8_t ReadRegister(uint8_t reg);
 
   GyroConfig config_;
-  float sensitivity_{1.0};  // sensitivity
-  float resolution_{1.0};  // bit resolution
+  int sensitivity_{1};  // sensitivity
+  float resolution_{1.0};   // bit resolution
   // std::array<float, 3> sensitivity_calibration_ = {
   //     1.0F, 1.0F, 1.0F};  // factory calibration
   // std::array<float, 3> bias_correction_ = {0.0F, 0.0F,
@@ -73,5 +69,5 @@ class MpuGyro : public SensorModuleGyroscope
   // std::array<float, 3> scale_correction_ = {1.0F, 1.0F,
   //                                           1.0F};  // soft iron correction
 };
-};      // namespace mpu
+}  // namespace mpu
 #endif  // MPU_MPU_GYRO_HPP

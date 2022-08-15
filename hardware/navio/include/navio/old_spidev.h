@@ -57,7 +57,7 @@ public:
 		
 		memset(&spi_transfer, 0, sizeof(spi_ioc_transfer));
 
-		spi_transfer.tx_buf = (unsigned long)buf;
+		spi_transfer.tx_buf = reinterpret_cast<unsigned long long>(buf);
 		spi_transfer.rx_buf = spi_transfer.tx_buf;
 		spi_transfer.len = length;
 		spi_transfer.speed_hz = speed_hz;

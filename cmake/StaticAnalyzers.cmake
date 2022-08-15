@@ -43,7 +43,7 @@ if(ENABLE_CPPCHECK)
             --enable=all
             --inline-suppr
             --inconclusive
-            --template='{file}[{line}]:{severity},{id}:{message}'
+            --template='{file}:{line},{severity},{id}:{message}'
             -I ${CMAKE_CURRENT_SOURCE_DIR}/core/src
             -I ${CMAKE_CURRENT_SOURCE_DIR}/core/test
             -I ${CMAKE_CURRENT_SOURCE_DIR}/core/include
