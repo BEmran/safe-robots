@@ -56,7 +56,7 @@ class AK8963 : public SensorModuleMagnetometer
  protected:
   void Reset();
 
-  std::array<uint16_t, 3> ReadMagFullBits() const;
+  std::array<int16_t, 3> ReadMagFullBits() const;
   MagData ReadMagnetometer() const;
   void MagRes();
 

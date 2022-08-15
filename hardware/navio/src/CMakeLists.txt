@@ -26,6 +26,7 @@ set(NAVIO_SOURCE_LIST
     ${NAVIO_SOURCE_DIR}/mpu/spi.cpp
     ${NAVIO_SOURCE_DIR}/mpu/AK8963.cpp
     ${NAVIO_SOURCE_DIR}/mpu/my_utils.cpp
+    ${NAVIO_SOURCE_DIR}/mpu/mpu_gyro.cpp
     )
 
 # ##############################################################################

@@ -60,11 +60,13 @@ void AK8963::Reset()
   delay(10);
 
   printf("USER_CTRL:\n");
-  GetSpi()->WriteRegister(mpu::USER_CTRL, I2C_MST_EN);  // re-enable internal I2C bus
+  GetSpi()->WriteRegister(mpu::USER_CTRL,
+                          I2C_MST_EN);  // re-enable internal I2C bus
 
   printf("I2C_MST_CTRL:\n");
-  GetSpi()->WriteRegister(mpu::I2C_MST_CTRL, 0x0D); // I2C configuration multi-master  IIC 400KHz
-  
+  GetSpi()->WriteRegister(mpu::I2C_MST_CTRL,
+                          0x0D);  // I2C configuration multi-master  IIC 400KHz
+
   delay(100);  // Wait for all registers to reset
 }
 
@@ -113,18 +115,19 @@ void AK8963::ConfigureScaleAndMode() const
 
 uint8_t AK8963::Mode() const
 {
-  return static_cast<uint16_t>(config_.mode);
+  return static_cast<uint8_t>(config_.mode);
 }
 
 uint8_t AK8963::Scale() const
 {
-  return static_cast<uint16_t>(config_.scale);
+  return static_cast<uint8_t>(config_.scale);
 }
 
 bool AK8963::Probe()
 {
   // check AK8963 WHO AM I register, expected value is 0x48 (decimal 72)
-  return ReadRegister(ak8963::WHO_AM_I) != 0x48;
+  printf("Mag Whom %u\n", ReadRegister(ak8963::WHO_AM_I));
+  return ReadRegister(ak8963::WHO_AM_I) == 0x48;
 }
 
 bool AK8963::Test()
@@ -167,7 +170,7 @@ void AK8963::ReadRegisters(const uint8_t reg, const uint8_t count,
 {
   // set slave 0 to the AK8963 and set for read
   GetSpi()->WriteRegister(mpu::I2C_SLV0_ADDR,
-                       mpu::AK8963_ADDRESS | mpu::I2C_READ_FLAG);
+                          mpu::AK8963_ADDRESS | mpu::I2C_READ_FLAG);
   // set the register to the desired AK8963 sub address
   GetSpi()->WriteRegister(mpu::I2C_SLV0_REG, reg);
   // enable I2C and request the bytes
@@ -180,7 +183,7 @@ void AK8963::ReadRegisters(const uint8_t reg, const uint8_t count,
 
 MagData AK8963::ReadMagnetometer() const
 {
-  std::array<uint16_t, 3> mag_full_bits = ReadMagFullBits();
+  std::array<int16_t, 3> mag_full_bits = ReadMagFullBits();
 
   // Calculate the magnetometer values in milliGauss
   // Include factory calibration per data sheet and user environmental
@@ -205,9 +208,9 @@ MagData AK8963::ReadMagnetometer() const
   return mag;
 }
 
-std::array<uint16_t, 3> AK8963::ReadMagFullBits() const
+std::array<int16_t, 3> AK8963::ReadMagFullBits() const
 {
-  std::array<uint16_t, 3> values = {0, 0, 0};
+  std::array<int16_t, 3> values = {0, 0, 0};
   // Read the six raw data and ST2 registers, must read ST2 at end of data
   // acquisition
   uint8_t raw_data[7];
@@ -243,8 +246,8 @@ void AK8963::Calibrate(void)
 
   for (size_t i = 0; i < vector_of_values.size(); i++)
   {
-    std::array<uint16_t, 3> mag_full_bits = ReadMagFullBits();
-    printf("[%u] x:%u\t y:%u\t z:%u\n", i, mag_full_bits[0], mag_full_bits[1],
+    std::array<int16_t, 3> mag_full_bits = ReadMagFullBits();
+    printf("[%u] x:%d\t y:%d\t z:%d\n", i, mag_full_bits[0], mag_full_bits[1],
            mag_full_bits[2]);
     for (size_t j = 0; j < mag_all_values.size(); j++)
     {
