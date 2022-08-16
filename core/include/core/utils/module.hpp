@@ -24,7 +24,7 @@ enum class ModuleType
 std::string ModuleTypeToString(const ModuleType type);
 
 /**
- * @brief Abustract class used to define main object of beaglebone hardware
+ * @brief Abstracts class used to define main object of beaglebone hardware
  *
  */
 class ModuleAbs

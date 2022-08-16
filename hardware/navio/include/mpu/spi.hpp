@@ -19,9 +19,11 @@ class SPI
 
   int Transfer(uint8_t* buff, const uint32_t length) const;
 
-  void WriteRegister(const uint8_t reg, const uint8_t data);
+  void WriteRegister(const uint8_t reg, const uint8_t data) const;
+  
+  uint8_t ReadRegister(const uint8_t reg) const;
 
-  void ReadRegisters(const uint8_t reg, const uint8_t count, uint8_t * dest);
+  void ReadRegisters(const uint8_t reg, const uint8_t count, uint8_t * dest) const;
 
  protected:
   int Open() const;

@@ -33,7 +33,7 @@ enum class SensorModuleType
 std::string SensorModuleTypeToString(const SensorModuleType type);
 
 /**
- * @brief Abustract class used to define main object of beaglebone hardware
+ * @brief Abstracts class used to define sensor module hardware
  *
  */
 template <class T>

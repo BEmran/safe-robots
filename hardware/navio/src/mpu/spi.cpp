@@ -47,13 +47,20 @@ int SPI::Transfer(uint8_t* buff, const uint32_t length) const
   return status;
 }
 
-void SPI::WriteRegister(const uint8_t reg, const uint8_t data)
+void SPI::WriteRegister(const uint8_t reg, const uint8_t data) const
 {
     uint8_t buf[2] = {reg, data};
     Transfer(buf, 2);
 }
 
-void SPI::ReadRegisters(const uint8_t reg, const uint8_t count, uint8_t * dest)
+uint8_t SPI::ReadRegister(const uint8_t reg) const
+{
+  uint8_t buffer[1] = {0};
+  ReadRegisters(reg, 1, buffer);
+  return buffer[0];
+}
+
+void SPI::ReadRegisters(const uint8_t reg, const uint8_t count, uint8_t * dest) const
 {
     unsigned char buf[100] = {0};
     buf[0] = reg | 0x80;
@@ -80,7 +87,7 @@ void SPI::Close(const int fd)
 {
   if (fd < 0)
   {
-    printf("Warning: spi alrady closed\n");
+    printf("Warning: spi already closed\n");
     return;
   }
   ::close(fd);
