@@ -1,5 +1,5 @@
-#ifndef MPU_MPU_GYRO_HPP
-#define MPU_MPU_GYRO_HPP
+#ifndef MPU_MPU_ACCEL_HPP
+#define MPU_MPU_ACCEL_HPP
 
 #include "mpu/my_utils.hpp"
 
@@ -12,31 +12,33 @@
 
 namespace mpu
 {
-using GyroData = core::utils::GyroData;
-using SensorModuleGyroscope = core::sensors::SensorModuleAbs<GyroData>;
 
-enum class GyroScale : uint8_t
+using AccelData = core::utils::AccelData;
+using SensorModuleAccelerometer = core::sensors::SensorModuleAbs<AccelData>;
+
+enum class AccelScale : uint8_t
 {
-  GFS_250DPS = 0x00,
-  GFS_500DPS = 0x01,
-  GFS_1000DPS = 0x02,
-  GFS_2000DPS = 0x03
+  AFS_2G = 0x00,
+  AFS_4G = 0x01,
+  AFS_8G = 0x02,
+  AFS_16G = 0x03
 };
 
-struct GyroConfig
+struct AccelConfig
 {
-  GyroScale scale;
+  AccelScale scale;
   uint8_t sample_rate_divisor;
 };
 
-class MpuGyro : public SensorModuleGyroscope
+class MpuAccel : public SensorModuleAccelerometer
 {
-  typedef GyroData SensorData;
-  static constexpr auto SensorType = core::sensors::SensorModuleType::GYROSCOPE;
-  static constexpr const char* SensorName = "Gyro";
+  typedef AccelData SensorData;
+  static constexpr auto SensorType =
+      core::sensors::SensorModuleType::ACCELEROMETER;
+  static constexpr const char* SensorName = "Accel";
 
  public:
-  MpuGyro(const GyroConfig& config, const bool debug);
+  MpuAccel(const AccelConfig& config, const bool debug);
 
   void Initialize() override;
 
@@ -51,15 +53,16 @@ class MpuGyro : public SensorModuleGyroscope
  protected:
   void Reset();
 
-  SensorData ReadGyroscope() const;
-  static std::array<int16_t, 3> ReadGyroFullBits();
-  void GyroSensitivity();
-  void GyroResolution();
+  SensorData ReadAccelData() const;
+  void AccelSensitivity();
+  void AccelResolution();
 
  private:
   uint8_t Scale() const;
 
-  GyroConfig config_;
+  static uint8_t ReadRegister(uint8_t reg);
+
+  AccelConfig config_;
   int sensitivity_{1};     // sensitivity
   float resolution_{1.0};  // bit resolution
   // std::array<float, 3> sensitivity_calibration_ = {
@@ -70,4 +73,4 @@ class MpuGyro : public SensorModuleGyroscope
   //                                           1.0F};  // soft iron correction
 };
 }  // namespace mpu
-#endif  // MPU_MPU_GYRO_HPP
+#endif  // MPU_MPU_ACCEL_HPP

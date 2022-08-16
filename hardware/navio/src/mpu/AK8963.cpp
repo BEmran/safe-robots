@@ -4,26 +4,6 @@
 
 namespace mpu
 {
-namespace ak8963
-{
-// Magnetometer legister map
-constexpr uint8_t WHO_AM_I = 0x00;
-constexpr uint8_t INFO = 0x01;
-constexpr uint8_t ST1 = 0x02;
-constexpr uint8_t XOUT_L = 0x03;
-constexpr uint8_t XOUT_H = 0x04;
-constexpr uint8_t YOUT_L = 0x05;
-constexpr uint8_t YOUT_H = 0x06;
-constexpr uint8_t ZOUT_L = 0x07;
-constexpr uint8_t ZOUT_H = 0x08;
-constexpr uint8_t ST2 = 0x09;
-constexpr uint8_t CNTL = 0x0A;
-constexpr uint8_t ASTC = 0x0C;
-constexpr uint8_t I2CDIS = 0x0F;
-constexpr uint8_t ASAX = 0x10;
-constexpr uint8_t ASAY = 0x11;
-constexpr uint8_t ASAZ = 0x12;
-}  // namespace ak8963
 
 AK8963::AK8963(const AK8963Config& config, const bool debug)
   : SensorModuleMagnetometer(MagnetometerType, MagnetometerSensorName, debug)
@@ -39,7 +19,7 @@ void AK8963::MagRes()
     // Possible magnetometer scales (and their register bit settings) are:
     // 14 bit resolution (bit: 0) and 16 bit resolution (bit: 1)
     // We multiply by 10 to convert microteslas to milligauss
-    // mag_res_ = 18 * Maximum Magnetic flux density [µT] / half bit resolution
+    // mag_res_ = 10 * Maximum Magnetic flux density [µT] / half bit resolution
     case MagScale::MFS_16BITS:
       resolution_ = 10. * 4912.0 / 32760.0;
       break;
@@ -52,20 +32,20 @@ void AK8963::MagRes()
 void AK8963::Reset()
 {
   printf("USER_CTRL: disable internal\n");
-  GetSpi()->WriteRegister(mpu::USER_CTRL, 0);  // disable internal I2C bus
+  // disable internal I2C bus
+  GetSpi()->WriteRegister(mpu::USER_CTRL, 0);
 
   // reset device
   printf("PWR_MGMT_1\n");
-  GetSpi()->WriteRegister(mpu::PWR_MGMT_1, 0x80);  // Set bit 7 to reset MPU9250
-  Delay(10);
+  // Set bit 7 to reset MPU9250
+  GetSpi()->WriteRegister(mpu::PWR_MGMT_1, 0x80);
 
-  printf("USER_CTRL:\n");
-  GetSpi()->WriteRegister(mpu::USER_CTRL,
-                          I2C_MST_EN);  // re-enable internal I2C bus
-
+  // enable master mode
+  GetSpi()->WriteRegister(USER_CTRL, I2C_MST_EN);
+  
+  // I2C configuration multi-master  IIC 400KHz
   printf("I2C_MST_CTRL:\n");
-  GetSpi()->WriteRegister(mpu::I2C_MST_CTRL,
-                          0x0D);  // I2C configuration multi-master  IIC 400KHz
+  GetSpi()->WriteRegister(mpu::I2C_MST_CTRL, 0x0D); 
 
   Delay(100);  // Wait for all registers to reset
 }

@@ -37,7 +37,7 @@ GetInertialSensor(std::string sensor_name)
   }
   else
   {
-    return NULL;
+    return nullptr;
   }
 }
 
