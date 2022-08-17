@@ -116,6 +116,14 @@ class Mpu9250 : public ImuSensorModule
 
   void ExtractSensitivityAdjustmentValues();
 
+  static uint8_t ReadRegister(const uint8_t reg);
+  static void ReadRegisters(const uint8_t reg, const uint8_t count, uint8_t* dest);
+  static uint8_t ReadAK8963Register(const uint8_t reg);
+  static void RequestReadAK8963Registers(const uint8_t reg, const uint8_t count);
+  static void ReadAK8963Registers(const uint8_t reg, const uint8_t count, uint8_t* dest);
+  static void WriteRegister(const uint8_t reg, const uint8_t data);
+  static void WriteAK8963Register(const uint8_t reg, const uint8_t data);
+
  private:
   typedef enum
   {
