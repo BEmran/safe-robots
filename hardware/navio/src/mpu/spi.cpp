@@ -49,6 +49,7 @@ int SPI::Transfer(uint8_t* buff, const uint32_t length) const
 
 void SPI::WriteRegister(const uint8_t reg, const uint8_t data) const
 {
+    printf("->>>>>>>>>>> WRITE reg %d: %d\n", (int)reg, (int)data);
     uint8_t buf[2] = {reg, data};
     Transfer(buf, 2);
 }
@@ -56,6 +57,8 @@ void SPI::WriteRegister(const uint8_t reg, const uint8_t data) const
 uint8_t SPI::ReadRegister(const uint8_t reg) const
 {
   uint8_t buffer[1] = {0};
+  
+  printf("->>>>>>>>>>> READ reg %d\n", (int)reg);
   ReadRegisters(reg, 1, buffer);
   return buffer[0];
 }
@@ -106,7 +109,7 @@ void PrintCArrayData(uint8_t* array, const uint32_t length)
 {
   for (uint i = 0; i < length; i++)
   {
-    printf("[%2x]: %x\t", i, array[i]);
+    printf("[%2d]: %d\t", (int)i, (int)array[i]);
   }
   printf("\n");
 }

@@ -25,13 +25,17 @@ int main(int /*argc*/, char** /*argv[]*/)
   config.sample_rate_divisor = SAMPLE_RATE_DIVISOR;
   
   auto sensor = std::make_unique<mpu::Mpu9250>(config, true);
+  
+  sensor->fake();
+  
+  // sensor->Reset();
 
-  if (!sensor->Probe())
-  {
-    // return EXIT_FAILURE;
-  }
+  // if (!sensor->Probe())
+  // {
+  //   return EXIT_FAILURE;
+  // }
 
-  sensor->Initialize();
+  // sensor->Initialize();
   
   //-------------------------------------------------------------------------
 

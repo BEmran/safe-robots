@@ -89,7 +89,9 @@ class Mpu9250 : public ImuSensorModule
  public:
   Mpu9250(const Config& config, const bool debug);
 
+  void fake();
   void Initialize() override;
+  static void Reset();
 
   bool Probe() override;
 
@@ -100,7 +102,6 @@ class Mpu9250 : public ImuSensorModule
   void Calibrate() override;
 
  protected:
-  static void Reset();
   
   static ImuData ReadAll();
   static std::array<int16_t, 7> ReadAccelGyroTemp();
