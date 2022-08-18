@@ -102,7 +102,8 @@ class Mpu9250 : public ImuSensorModule
   void Calibrate() override;
 
  protected:
-  
+  static void ConfigureI2C();
+
   static ImuData ReadAll();
   static std::array<int16_t, 7> ReadAccelGyroTemp();
   static std::array<int16_t, 3> ReadMagnetometer();
