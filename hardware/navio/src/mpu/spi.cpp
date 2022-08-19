@@ -49,7 +49,6 @@ int SPI::Transfer(uint8_t* buff, const uint32_t length) const
 
 void SPI::WriteRegister(const uint8_t reg, const uint8_t data) const
 {
-    printf("->>>>>>>>>>> WRITE reg %d: %d\n", (int)reg, (int)data);
     uint8_t buf[2] = {reg, data};
     Transfer(buf, 2);
 }
@@ -58,7 +57,6 @@ uint8_t SPI::ReadRegister(const uint8_t reg) const
 {
   uint8_t buffer[1] = {0};
   
-  printf("->>>>>>>>>>> READ reg %d\n", (int)reg);
   ReadRegisters(reg, 1, buffer);
   return buffer[0];
 }

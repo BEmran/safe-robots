@@ -26,13 +26,10 @@ int main(int /*argc*/, char** /*argv[]*/)
   
   auto sensor = std::make_unique<mpu::Mpu9250>(config, true);
     
-  sensor->Reset();
-
   if (!sensor->Probe())
   {
     return EXIT_FAILURE;
   }
-  // sensor->fake();
   sensor->Initialize();
   
   //-------------------------------------------------------------------------

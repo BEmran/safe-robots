@@ -3,10 +3,11 @@
 
 #include <stdint.h>
 
+// Register mpu9250 map
 namespace mpu9250
 {
+constexpr uint8_t WHO_AM_I_RESPONSE = 0x71;
 constexpr uint8_t ADDRESS = 0x68;
-// Register map
 constexpr uint8_t SELF_TEST_X_ACCEL = 0x0D;
 constexpr uint8_t SELF_TEST_Y_ACCEL = 0x0E;
 constexpr uint8_t SELF_TEST_Z_ACCEL = 0x0F;
@@ -120,9 +121,10 @@ constexpr uint8_t I2C_SLV0_EN = 0x80;
 constexpr uint8_t I2C_READ_FLAG = 0x80;
 }  // namespace mpu9250
 
+// Magnetometer register map
 namespace ak8963
 {
-// Magnetometer register map
+constexpr uint8_t WHO_AM_I_RESPONSE = 0x48;
 constexpr uint8_t I2C_ADDR = 0x0C;
 constexpr uint8_t WHO_AM_I = 0x00;
 constexpr uint8_t INFO = 0x01;

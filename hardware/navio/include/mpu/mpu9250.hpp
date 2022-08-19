@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <array>
+#include <map>
 
 namespace mpu
 {
@@ -83,16 +84,26 @@ class Mpu9250 : public ImuSensorModule
   using GyroData = core::utils::GyroData;
   using MagData = core::utils::MagData;
   using TemperatureData = core::utils::TemperatureData;
-  static constexpr auto SensorType = core::sensors::SensorModuleType::IMU;
+  typedef std::array<int16_t, 3> SensorFullBits;
   static constexpr const char* SensorName = "mpu9250";
 
  public:
   Mpu9250(const Config& config, const bool debug);
 
   void fake();
-  void Initialize() override;
-  static void Reset();
 
+  /**
+   * @implement Initialize function
+   *
+   */
+  void Initialize() override;
+
+  /**
+   * @brief Check if able to communicate with MPU and AK8963 sensors
+   *
+   * @return true if both sensors can be probe
+   * @return false otherwise
+   */
   bool Probe() override;
 
   bool Test() override;
@@ -103,26 +114,56 @@ class Mpu9250 : public ImuSensorModule
 
  protected:
   static void ConfigureI2C();
+  /**
+   * @brief Check MPU WHO AM I register, expected value is 0x71 (decimal 113)
+   *
+   * @return true if able to communicate with MPU sensor
+   * @return false otherwise
+   */
+  bool ProbeMpu() const;
 
-  static ImuData ReadAll();
-  static std::array<int16_t, 7> ReadAccelGyroTemp();
-  static std::array<int16_t, 3> ReadMagnetometer();
-  static AccelData ExtractAccelerometer(const std::array<int16_t, 7>& full_bits);
-  static GyroData ExtractGyroscope(const std::array<int16_t, 7>& full_bits);
-  static TemperatureData ExtractTemperature(const std::array<int16_t, 7>& full_bits);
-  static MagData ExtractMagnetometer(const std::array<int16_t, 3>& full_bits);
+  /**
+   * @brief Check Ak8963 WHO AM I register, expected value is 0x48 (decimal 72)
+   *
+   * @return true if able to communicate with AK8963 sensor
+   * @return false otherwise
+   */
+  bool ProbeAk8963() const;
+
+  /**
+   * @brief reset sensor registers and data
+   *
+   */
+  static void Reset();
+
+  ImuData ReadAll() const;
+  ImuData ReadAccelGyroTemp() const;
+  MagData ReadMagnetometer() const;
+
+  AccelData ExtractAccelerometer(const SensorFullBits& full_bits) const;
+  GyroData ExtractGyroscope(const SensorFullBits& full_bits) const;
+  MagData ExtractMagnetometer(const SensorFullBits& full_bits,
+                              const bool over_flow) const;
+  static TemperatureData ExtractTemperature(const int16_t full_bits);
 
   void InitializeAccel() const;
   void InitializeGyro() const;
   void InitializeMag() const;
 
-  void ExtractSensitivityAdjustmentValues();
+  /**
+   * @brief Extract magnetometer manufacture sensitivity adjustment values
+   * @details calculate xyz-axis sensitivity using manufacture formula
+   */
+  void ExtractMagnetometerSensitivityAdjustmentValues();
 
   static uint8_t ReadRegister(const uint8_t reg);
-  static void ReadRegisters(const uint8_t reg, const uint8_t count, uint8_t* dest);
+  static void ReadRegisters(const uint8_t reg, const uint8_t count,
+                            uint8_t* dest);
   static uint8_t ReadAK8963Register(const uint8_t reg);
-  static void RequestReadAK8963Registers(const uint8_t reg, const uint8_t count);
-  static void ReadAK8963Registers(const uint8_t reg, const uint8_t count, uint8_t* dest);
+  static void RequestReadAK8963Registers(const uint8_t reg,
+                                         const uint8_t count);
+  static void ReadAK8963Registers(const uint8_t reg, const uint8_t count,
+                                  uint8_t* dest);
   static void WriteRegister(const uint8_t reg, const uint8_t data);
   static void WriteAK8963Register(const uint8_t reg, const uint8_t data);
 
@@ -137,6 +178,9 @@ class Mpu9250 : public ImuSensorModule
   } mag_mode_t;
 
   Config config_;
+
+  mutable std::map<core::sensors::SensorModuleType, SensorSpecs>
+      sensor_specs_map;
 
   std::array<float, 3> sensitivity_calibration_ = {
       1.0F, 1.0F, 1.0F};  // factory calibration
