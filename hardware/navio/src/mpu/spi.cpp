@@ -8,6 +8,9 @@
 #include <linux/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <vector>
+#include <algorithm>
+#include <iostream>
 
 namespace spi
 {
@@ -20,7 +23,7 @@ SPI::SPI(const std::string& path, const bool debug)
 {
 }
 
-int SPI::Transfer(uint8_t* buff, const uint32_t length) const
+int SPI::Transfer(const std::vector<uint8_t>& buff) const
 {
   const int fd = Open();
   if (fd == -1)
@@ -30,18 +33,18 @@ int SPI::Transfer(uint8_t* buff, const uint32_t length) const
 
   if (debug_)
   {
-    printf("Tx: ");
-    PrintCArrayData(buff, length);
+    std::cout << "Tx: ";
+    PrintVec(buff);
   }
 
-  spi_ioc_transfer spi_transfer = CreateSpiTransfer(buff, buff, length);
+  spi_ioc_transfer spi_transfer = CreateSpiTransfer(buff);
   int status = ioctl(fd, SPI_IOC_MESSAGE(1), &spi_transfer);
   Close(fd);
 
   if (debug_)
   {
-    printf("Rx: ");
-    PrintCArrayData(buff, length);
+    std::cout << "Rx: ";
+    PrintVec(buff);
   }
 
   return status;
@@ -49,28 +52,29 @@ int SPI::Transfer(uint8_t* buff, const uint32_t length) const
 
 void SPI::WriteRegister(const uint8_t reg, const uint8_t data) const
 {
-    uint8_t buf[2] = {reg, data};
-    Transfer(buf, 2);
+    Transfer({reg, data});
+}
+
+void SPI::WriteRegisters(const std::vector<std::pair<uint8_t, uint8_t>>& reg_and_data) const
+{
+  std::for_each(reg_and_data.begin(), reg_and_data.end(), [this](const auto rd){
+    Transfer({rd.first, rd.second});
+  });
 }
 
 uint8_t SPI::ReadRegister(const uint8_t reg) const
 {
-  uint8_t buffer[1] = {0};
-  
-  ReadRegisters(reg, 1, buffer);
-  return buffer[0];
+  return ReadRegisters(reg, 1)[0];
 }
 
-void SPI::ReadRegisters(const uint8_t reg, const uint8_t count, uint8_t * dest) const
+std::vector<uint8_t> SPI::ReadRegisters(const uint8_t reg, const uint8_t count) const
 {
-    unsigned char buf[100] = {0};
+    std::vector<uint8_t> buf(count+1, 0);
     buf[0] = reg | 0x80;
-    Transfer(buf, count + 1);
-
-    for(uint8_t i=0; i < count; i++)
-        dest[i] = buf[i + 1];
-
+    Transfer(buf);
     usleep(50);
+    buf.erase(buf.begin());
+    return buf;
 }
 
 int SPI::Open() const
@@ -94,33 +98,23 @@ void SPI::Close(const int fd)
   ::close(fd);
 }
 
-// void PrintDebugInfo(uint8_t* tx, uint8_t* rx, const uint32_t length)
-// {
-//   printf("Tx: ");
-//   PrintCArrayData(tx, length);
-
-//   printf("Rx: ");
-//   PrintCArrayData(rx, length);
-// }
-
-void PrintCArrayData(uint8_t* array, const uint32_t length)
+void PrintVec(const std::vector<uint8_t>& vec)
 {
-  for (uint i = 0; i < length; i++)
-  {
-    printf("[%2d]: %d\t", (int)i, (int)array[i]);
-  }
-  printf("\n");
+  std::for_each(vec.begin(), vec.end(), [](const auto data){
+    std::cout << (int)data << "\t";
+  });
+  std::cout << std::endl;
 }
 
-spi_ioc_transfer CreateSpiTransfer(uint8_t* tx, uint8_t* rx, const uint32_t length)
+spi_ioc_transfer CreateSpiTransfer(const std::vector<uint8_t>& buf)
 {
   spi_ioc_transfer spi_transfer;
   memset(&spi_transfer, 0, sizeof(spi_ioc_transfer));
 
   // cast pointer address to long uint
-  spi_transfer.tx_buf = reinterpret_cast<std::uintptr_t>(tx);
-  spi_transfer.rx_buf = reinterpret_cast<std::uintptr_t>(rx);
-  spi_transfer.len = length;
+  spi_transfer.tx_buf = reinterpret_cast<std::uintptr_t>(buf.data());
+  spi_transfer.rx_buf = reinterpret_cast<std::uintptr_t>(buf.data());
+  spi_transfer.len = buf.size();
   spi_transfer.speed_hz = SpeedHz;
   spi_transfer.bits_per_word = BitsPerWord;
   spi_transfer.delay_usecs = DelayUsecs;

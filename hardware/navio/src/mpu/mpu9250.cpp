@@ -197,13 +197,11 @@ void Mpu9250::ExtractMagnetometerSensitivityAdjustmentValues()
   // WriteAK8963Register(ak8963::CNTL, mag_mode_t::FUSE_ROM_ACCESS_MODE);
   // Delay(10);
 
-  uint8_t asa_values[3];
-  ReadAK8963Registers(ak8963::ASAX, 3, asa_values);
+  const auto asa_values = ReadAK8963Registers(ak8963::ASAX, 3);
   for (size_t i = 0; i < 3; i++)
   {
     sensitivity_calibration_[i] =
         static_cast<float>(asa_values[i] - 128) / 256.0F + 1.0F;
-        std::cout << sensitivity_calibration_[i] << std::endl;
   }
 
   // re-initialize magnetometer to reset mode
@@ -235,8 +233,7 @@ ImuData Mpu9250::ReadAll() const
 ImuData Mpu9250::ReadAccelGyroTemp() const
 {
   // Read raw data registers sequentially into data array
-  uint8_t raw_data[14];
-  ReadRegisters(mpu9250::ACCEL_XOUT_H, 14, raw_data);
+  const auto raw_data = ReadRegisters(mpu9250::ACCEL_XOUT_H, 14);
 
   // Turn the MSB and LSB into a signed 16-bit value)
   std::array<int16_t, 7> full_bits{0};
@@ -280,9 +277,7 @@ Mpu9250::TemperatureData Mpu9250::ExtractTemperature(const int16_t full_bits)
 
 Mpu9250::MagData Mpu9250::ReadMagnetometer() const
 {
-  // Read raw data registers sequentially into data array
-  uint8_t raw_data[7];
-  ReadRegisters(mpu9250::EXT_SENS_DATA_00, 7, raw_data);
+  const auto raw_data = ReadRegisters(mpu9250::EXT_SENS_DATA_00, 7);
   // Turn the LSB and MSB into a signed 16-bit value
   SensorFullBits full_bits{0};
   for (size_t i = 0; i < full_bits.size(); i++)
@@ -310,22 +305,17 @@ Mpu9250::MagData Mpu9250::ExtractMagnetometer(const SensorFullBits& full_bits,
 
 uint8_t Mpu9250::ReadRegister(const uint8_t reg)
 {
-  uint8_t data[1] = {0};
-  ReadRegisters(reg, 1, data);
-  return data[0];
+  return ReadRegisters(reg, 1)[0];
 }
 
-void Mpu9250::ReadRegisters(const uint8_t reg, const uint8_t count,
-                            uint8_t* dest)
+std::vector<uint8_t> Mpu9250::ReadRegisters(const uint8_t reg, const uint8_t count)
 {
-  GetSpi()->ReadRegisters(reg, count, dest);
+  return GetSpi()->ReadRegisters(reg, count);
 }
 
 uint8_t Mpu9250::ReadAK8963Register(const uint8_t reg)
 {
-  uint8_t data[1] = {0};
-  ReadAK8963Registers(reg, 1, data);
-  return data[0];
+  return ReadAK8963Registers(reg, 1)[0];
 }
 
 void Mpu9250::RequestReadAK8963Registers(const uint8_t reg, const uint8_t count)
@@ -344,19 +334,15 @@ void Mpu9250::RequestReadAK8963Registers(const uint8_t reg, const uint8_t count)
     {mpu9250::I2C_SLV0_CTRL, mpu9250::I2C_SLV0_EN | count},
   };
   
-  for (const auto rd : reg_and_data) 
-  {
-    GetSpi()->WriteRegister(rd.first, rd.second);
-  }
+  GetSpi()->WriteRegisters(reg_and_data);
   Delay(10);
 }
 
-void Mpu9250::ReadAK8963Registers(const uint8_t reg, const uint8_t count,
-                                  uint8_t* dest)
+std::vector<uint8_t> Mpu9250::ReadAK8963Registers(const uint8_t reg, const uint8_t count)
 {
   RequestReadAK8963Registers(reg, count);
   // read the bytes off the MPU9250 EXT_SENS_DATA registers
-  GetSpi()->ReadRegisters(mpu9250::EXT_SENS_DATA_00, count, dest);
+  return GetSpi()->ReadRegisters(mpu9250::EXT_SENS_DATA_00, count);
 }
 
 void Mpu9250::WriteRegister(const uint8_t reg, const uint8_t data)
@@ -381,9 +367,9 @@ void Mpu9250::WriteAK8963Register(const uint8_t reg, const uint8_t data)
   // GetSpi()->WriteRegister(mpu9250::I2C_SLV0_DO, data);
   // // enable I2C and send 1 byte
   // GetSpi()->WriteRegister(mpu9250::I2C_SLV0_CTRL, mpu9250::I2C_SLV0_EN | count);
-  for (const auto rd : reg_and_data) 
-  {
-    GetSpi()->WriteRegister(rd.first, rd.second);
-  }
+  // for (const auto rd : reg_and_data) 
+  // {
+    GetSpi()->WriteRegisters(reg_and_data);
+  // }
 }
 }  // namespace mpu

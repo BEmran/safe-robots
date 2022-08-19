@@ -2,28 +2,28 @@
 #define _MPU_SPI_HPP
 
 #include <linux/spi/spidev.h>
-#include <string>    
+#include <stdint.h>
+#include <string>
+#include <vector>
 
 namespace spi
 {
-// void PrintDebugInfo(uint8_t* tx, uint8_t* rx, const uint32_t length);
+void PrintVec(const std::vector<uint8_t>& vec);
 
-void PrintCArrayData(uint8_t* array, const uint32_t length);
-
-spi_ioc_transfer CreateSpiTransfer(uint8_t* tx, uint8_t* rx, const uint32_t length);
+spi_ioc_transfer CreateSpiTransfer(const std::vector<uint8_t>& buf);
 
 class SPI
 {
  public:
   SPI(const std::string& path, const bool debug);
 
-  int Transfer(uint8_t* buff, const uint32_t length) const;
+  int Transfer(const std::vector<uint8_t>& buff) const;
 
   void WriteRegister(const uint8_t reg, const uint8_t data) const;
+  void WriteRegisters(const std::vector<std::pair<uint8_t, uint8_t>>& reg_and_data) const;
   
   uint8_t ReadRegister(const uint8_t reg) const;
-
-  void ReadRegisters(const uint8_t reg, const uint8_t count, uint8_t * dest) const;
+  std::vector<uint8_t> ReadRegisters(const uint8_t reg, const uint8_t count) const;
 
  protected:
   int Open() const;
