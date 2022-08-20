@@ -12,79 +12,20 @@ constexpr auto GyroType = SensorModuleType::GYROSCOPE;
 constexpr auto MagType = SensorModuleType::MAGNETOMETER;
 constexpr auto AccelType = SensorModuleType::ACCELEROMETER;
 
-std::map<AccelScale, float> accel_scale_map = {{AccelScale::AFS_2G, 2.F},
+const std::map<AccelScale, float> accel_scale_map = {{AccelScale::AFS_2G, 2.F},
                                                {AccelScale::AFS_4G, 4.F},
                                                {AccelScale::AFS_8G, 8.F},
                                                {AccelScale::AFS_16G, 16.F}};
 
-std::map<GyroScale, float> gyro_scale_map = {{GyroScale::GFS_250DPS, 250.F},
+const std::map<GyroScale, float> gyro_scale_map = {{GyroScale::GFS_250DPS, 250.F},
                                              {GyroScale::GFS_500DPS, 500.F},
                                              {GyroScale::GFS_1000DPS, 1000.F},
                                              {GyroScale::GFS_2000DPS, 2000.F}};
 
-std::map<MagScale, float> mag_scale_map = {
+const std::map<MagScale, float> mag_scale_map = {
     {MagScale::MFS_14BITS, 0.25F * max_micro_tesla},
     {MagScale::MFS_16BITS, 1.00F * max_micro_tesla}};
-
-
-enum class GyroScale : uint8_t
-{
-  GFS_250DPS = 0x00,
-  GFS_500DPS = 0x08,
-  GFS_1000DPS = 0x10,
-  GFS_2000DPS = 0x18
-};
-
-enum class GyroBandWidthHz : uint8_t
-{
-  GBW_250HZ = 0x00,  // Gyro sf: 8 kHz delay: 0.97 ms, Temperature BW: 4000 Hz
-  GBW_184HZ = 0x01,  // Gyro sf: 1 kHz delay: 2.9 ms, Temperature BW: 188 Hz
-  GBW_92HZ = 0x02,   // Gyro sf: 1 kHz delay: 3.9 ms, Temperature BW: 98 Hz
-  GBW_41HZ = 0x03,   // Gyro sf: 1 kHz delay: 5.9 ms, Temperature BW: 42 Hz
-  GBW_20HZ = 0x04,   // Gyro sf: 1 kHz delay: 9.9 ms, Temperature BW: 20 Hz
-  GBW_10HZ = 0x05,   // Gyro sf: 1 kHz delay: 17.85 ms, Temperature BW: 10 Hz
-  GBW_5HZ = 0x06,    // Gyro sf: 1 kHz delay: 33.48 ms, Temperature BW: 5 Hz
-  GBW_3600HZ = 0x07  // Gyro sf: 8 kHz delay: 0.17 ms, Temperature BW: 4000 Hz
-};
-
-enum class AccelBandWidthHz : uint8_t
-{
-  GBW_218HZ = 0x01,  // sf: 1 kHz delay: 1.88 ms
-  GBW_99HZ = 0x02,   // sf: 1 kHz delay: 2.88 ms
-  GBW_44HZ = 0x03,   // sf: 1 kHz delay: 4.88 ms
-  GBW_21HZ = 0x04,   // sf: 1 kHz delay: 8.78 ms
-  GBW_10HZ = 0x05,   // sf: 1 kHz delay: 16.83 ms
-  GBW_5HZ = 0x06,    // sf: 1 kHz delay: 32.48 ms
-};
-
-enum class AccelScale : uint8_t
-{
-  AFS_2G = 0x00,
-  AFS_4G = 0x08,
-  AFS_8G = 0x10,
-  AFS_16G = 0x18
-};
-
-enum class MagScale : uint8_t
-{
-  MFS_14BITS = 0x00,  // 0.6 mG per LSB
-  MFS_16BITS = 0x10   // 0.15 mG per LSB
-};
-
-enum class MagMode : uint8_t
-{
-  CONTINUES_8HZ_MODE = 0x02,
-  CONTINUES_100HZ_MODE = 0x06
-};
-
-struct SpecInfo
-{
-  uint8_t byte;
-  std::string name;
-};
-
-
-}  // namespace
+} // namespace
 
 Mpu9250::Mpu9250(const Config& config, const bool debug)
   : ImuSensorModule(ImuType, SensorName, debug), config_(config)
