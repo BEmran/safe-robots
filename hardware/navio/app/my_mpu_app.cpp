@@ -4,18 +4,18 @@
 #include <string>
 #include <memory>
 
-constexpr mpu::AccelScale ASCALE = mpu::AccelScale::AFS_4G;
-constexpr mpu::GyroScale GSCALE = mpu::GyroScale::GFS_250DPS;
-constexpr mpu::MagScale MSCALE = mpu::MagScale::MFS_16BITS;
-constexpr mpu::MagMode MMODE = mpu::MagMode::CONTINUES_100HZ_MODE;
-constexpr mpu::AccelBandWidthHz ABW = mpu::AccelBandWidthHz::GBW_21HZ;
-constexpr mpu::GyroBandWidthHz GBW = mpu::GyroBandWidthHz::GBW_250HZ;
+constexpr mpu::AccelScale ASCALE = mpu::AccelScale::FS_4G;
+constexpr mpu::GyroScale GSCALE = mpu::GyroScale::FS_250DPS;
+constexpr mpu::MagScale MSCALE = mpu::MagScale::FS_16BITS;
+constexpr mpu::MagMode MMODE = mpu::MagMode::CONTINUES_100HZ;
+constexpr mpu::AccelBandWidthHz ABW = mpu::AccelBandWidthHz::BW_21HZ;
+constexpr mpu::GyroBandWidthHz GBW = mpu::GyroBandWidthHz::BW_250HZ;
 constexpr uint8_t SAMPLE_RATE_DIVISOR = 4;
 
 //=============================================================================
 int main(int /*argc*/, char** /*argv[]*/)
 {
-  if (CheckApm())
+  if (navio::CheckApm())
   {
     return 1;
   }
@@ -27,8 +27,8 @@ int main(int /*argc*/, char** /*argv[]*/)
   config.accel_bw = ABW;
   config.gyro_bw = GBW;
   config.sample_rate_divisor = SAMPLE_RATE_DIVISOR;
-  
-  auto sensor = std::make_unique<mpu::Mpu9250>(config, true);
+  auto spi = std::make_unique<SPI>(navio::MPU_SPI_PATH, true);
+  auto sensor = std::make_unique<mpu::Mpu9250>(config, std::move(spi), true);
     
   if (!sensor->Probe())
   {

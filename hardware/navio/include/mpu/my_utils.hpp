@@ -14,7 +14,7 @@ namespace mpu
 
 constexpr int max_bit_val = 32767;  // Measurement range is from -32760 ~ +32760
                                     // decimal in 16-bit output.
-constexpr int max_micro_tesla = 4912;  // Magnetic flux density in micro Tesla
+constexpr int max_utesla = 4912;  // Magnetic flux density in micro Tesla
 
 using core::utils::GRAVITY;
 using core::utils::MATH_TYPE;
@@ -78,12 +78,12 @@ struct SensorSpecs
  */
 SensorSpecs CreateSensorSpecs(const MATH_TYPE scale, const MATH_TYPE unit);
 
-/**
- * @brief Get the Spi object
- *
- * @return spi::SPI* pointer to local static variable
- */
-spi::SPI* GetSpi();
+// /**
+//  * @brief Get the Spi object
+//  *
+//  * @return spi::SPI* pointer to local static variable
+//  */
+// spi::SPI* GetSpi();
 
 /**
  * @brief Sleep for some milliseconds, calls linux usleep function
@@ -120,6 +120,8 @@ core::utils::Vec3 ArrayToVec3(const std::array<MATH_TYPE, 3>& array);
  */
 std::array<MATH_TYPE, 3> ApplySensorSpecs(const std::array<int16_t, 3>& raw,
                                           const SensorSpecs& spec);
+
+void PrintVec(const std::vector<uint8_t>& vec);
 
 }  // namespace mpu
 

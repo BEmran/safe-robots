@@ -6,11 +6,11 @@
 namespace mpu
 {
 
-spi::SPI* GetSpi()
-{
-  static spi::SPI spi("/dev/spidev0.1", true);
-  return &spi;
-}
+// spi::SPI* GetSpi()
+// {
+//   static spi::SPI spi("/dev/spidev0.1", true);
+//   return &spi;
+// }
 
 void Delay(uint32_t msec)
 {
@@ -46,4 +46,13 @@ std::array<MATH_TYPE, 3> ApplySensorSpecs(const std::array<int16_t, 3>& raw,
   });
   return data;
 }
+
+void PrintVec(const std::vector<uint8_t>& vec)
+{
+  std::for_each(vec.begin(), vec.end(), [](const auto data){
+    std::cout << static_cast<int>(data) << "\t";
+  });
+  std::cout << std::endl;
+}
+
 }  // namespace mpu

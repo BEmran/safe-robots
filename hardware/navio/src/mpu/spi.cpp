@@ -1,4 +1,5 @@
 #include "mpu/spi.hpp"
+#include "mpu/my_utils.hpp"
 
 #include <unistd.h>     // close
 #include <fcntl.h>      // open
@@ -8,7 +9,6 @@
 #include <linux/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include <vector>
 #include <algorithm>
 #include <iostream>
 
@@ -18,8 +18,24 @@ constexpr uint32_t SpeedHz = 1000000;
 constexpr uint8_t BitsPerWord = 8;
 constexpr uint8_t DelayUsecs = 0;
 
+spi_ioc_transfer CreateSpiTransfer(const std::vector<uint8_t>& buf)
+{
+  spi_ioc_transfer spi_transfer;
+  memset(&spi_transfer, 0, sizeof(spi_ioc_transfer));
+
+  // cast pointer address to long uint
+  spi_transfer.tx_buf = reinterpret_cast<std::uintptr_t>(buf.data());
+  spi_transfer.rx_buf = reinterpret_cast<std::uintptr_t>(buf.data());
+  spi_transfer.len = static_cast<unsigned int>(buf.size());
+  spi_transfer.speed_hz = SpeedHz;
+  spi_transfer.bits_per_word = BitsPerWord;
+  spi_transfer.delay_usecs = DelayUsecs;
+  return spi_transfer;
+}
+}  // namespace spi
+
 SPI::SPI(const std::string& path, const bool debug)
-  : path_(path), debug_(debug)
+  : CommAbs(debug), path_(path)
 {
 }
 
@@ -31,21 +47,22 @@ int SPI::Transfer(const std::vector<uint8_t>& buff) const
     return -1;
   }
 
-  if (debug_)
+  if (IsDebug())
   {
-    std::cout << "Tx: ";
-    PrintVec(buff);
+    std::cout << "Rx: ";
+    mpu::PrintVec(buff);
   }
 
-  spi_ioc_transfer spi_transfer = CreateSpiTransfer(buff);
+  spi_ioc_transfer spi_transfer = spi::CreateSpiTransfer(buff);
   int status = ioctl(fd, SPI_IOC_MESSAGE(1), &spi_transfer);
   Close(fd);
 
-  if (debug_)
+  if (IsDebug())
   {
     std::cout << "Rx: ";
-    PrintVec(buff);
+    mpu::PrintVec(buff);
   }
+
   usleep(1000);
 
   return status;
@@ -53,14 +70,16 @@ int SPI::Transfer(const std::vector<uint8_t>& buff) const
 
 void SPI::WriteRegister(const uint8_t reg, const uint8_t data) const
 {
-    Transfer({reg, data});
+  Transfer({reg, data});
 }
 
-void SPI::WriteRegisters(const std::vector<std::pair<uint8_t, uint8_t>>& reg_and_data) const
+void SPI::WriteRegisters(
+    const std::vector<std::pair<uint8_t, uint8_t>>& reg_and_data) const
 {
-  std::for_each(reg_and_data.begin(), reg_and_data.end(), [this](const auto rd){
-    Transfer({rd.first, rd.second});
-  });
+  std::for_each(reg_and_data.begin(), reg_and_data.end(),
+                [this](const auto rd) {
+                  Transfer({rd.first, rd.second});
+                });
 }
 
 uint8_t SPI::ReadRegister(const uint8_t reg) const
@@ -68,13 +87,15 @@ uint8_t SPI::ReadRegister(const uint8_t reg) const
   return ReadRegisters(reg, 1)[0];
 }
 
-std::vector<uint8_t> SPI::ReadRegisters(const uint8_t reg, const uint8_t count) const
+std::vector<uint8_t> SPI::ReadRegisters(const uint8_t reg,
+                                        const uint8_t count) const
 {
-    std::vector<uint8_t> buf(count+1, 0);
-    buf[0] = reg | 0x80;
-    Transfer(buf);
-    buf.erase(buf.begin());
-    return buf;
+  std::vector<uint8_t> buf(count + 1, 0);
+  buf[0] = reg | 0x80;
+  Transfer(buf);
+  usleep(50);
+  buf.erase(buf.begin());
+  return buf;
 }
 
 int SPI::Open() const
@@ -97,27 +118,3 @@ void SPI::Close(const int fd)
   }
   ::close(fd);
 }
-
-void PrintVec(const std::vector<uint8_t>& vec)
-{
-  std::for_each(vec.begin(), vec.end(), [](const auto data){
-    std::cout << (int)data << "\t";
-  });
-  std::cout << std::endl;
-}
-
-spi_ioc_transfer CreateSpiTransfer(const std::vector<uint8_t>& buf)
-{
-  spi_ioc_transfer spi_transfer;
-  memset(&spi_transfer, 0, sizeof(spi_ioc_transfer));
-
-  // cast pointer address to long uint
-  spi_transfer.tx_buf = reinterpret_cast<std::uintptr_t>(buf.data());
-  spi_transfer.rx_buf = reinterpret_cast<std::uintptr_t>(buf.data());
-  spi_transfer.len = buf.size();
-  spi_transfer.speed_hz = SpeedHz;
-  spi_transfer.bits_per_word = BitsPerWord;
-  spi_transfer.delay_usecs = DelayUsecs;
-  return spi_transfer;
-}
-}  // namespace spi
