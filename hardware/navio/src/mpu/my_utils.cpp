@@ -8,7 +8,7 @@ namespace mpu
 
 spi::SPI* GetSpi()
 {
-  static spi::SPI spi("/dev/spidev0.1", false);
+  static spi::SPI spi("/dev/spidev0.1", true);
   return &spi;
 }
 

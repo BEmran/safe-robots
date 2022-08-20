@@ -136,7 +136,13 @@ class Mpu9250 : public ImuSensorModule
    */
   static void Reset();
 
+  void InitializeAccel() const;
+  void InitializeGyro() const;
+  void InitializeMag() const;
+
   ImuData ReadAll() const;
+  std::vector<int16_t> ExtractFullBits(const std::vector<uint8_t>& raw) const;
+
   ImuData ReadAccelGyroTemp() const;
   MagData ReadMagnetometer() const;
 
@@ -146,10 +152,9 @@ class Mpu9250 : public ImuSensorModule
                               const bool over_flow) const;
   static TemperatureData ExtractTemperature(const int16_t full_bits);
 
-  void InitializeAccel() const;
-  void InitializeGyro() const;
-  void InitializeMag() const;
-
+  void ReadAccelScaleAndBandWidth() const;
+  void ReadGyroScaleAndBandWidth() const;
+  void ReadMagModeAndResolution() const;
   /**
    * @brief Extract magnetometer manufacture sensitivity adjustment values
    * @details calculate xyz-axis sensitivity using manufacture formula
@@ -172,7 +177,9 @@ class Mpu9250 : public ImuSensorModule
   {
     POWER_DOWN_MODE = 0x00,
     SINGLE_MEASUREMENT_MODE = 0x01,
+    CONTINUES_8HZ_MODE = static_cast<uint8_t>(MagMode::CONTINUES_8HZ_MODE),
     EXTERNAL_TRIGGER_MODE = 0x04,
+    CONTINUES_100HZ_MODE = static_cast<uint8_t>(MagMode::CONTINUES_100HZ_MODE)
     SELF_TEST_MODE = 0x08,
     FUSE_ROM_ACCESS_MODE = 0x0F
   } mag_mode_t;

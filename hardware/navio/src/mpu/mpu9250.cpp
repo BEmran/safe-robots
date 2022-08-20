@@ -26,6 +26,64 @@ std::map<MagScale, float> mag_scale_map = {
     {MagScale::MFS_14BITS, 0.25F * max_micro_tesla},
     {MagScale::MFS_16BITS, 1.00F * max_micro_tesla}};
 
+
+enum class GyroScale : uint8_t
+{
+  GFS_250DPS = 0x00,
+  GFS_500DPS = 0x08,
+  GFS_1000DPS = 0x10,
+  GFS_2000DPS = 0x18
+};
+
+enum class GyroBandWidthHz : uint8_t
+{
+  GBW_250HZ = 0x00,  // Gyro sf: 8 kHz delay: 0.97 ms, Temperature BW: 4000 Hz
+  GBW_184HZ = 0x01,  // Gyro sf: 1 kHz delay: 2.9 ms, Temperature BW: 188 Hz
+  GBW_92HZ = 0x02,   // Gyro sf: 1 kHz delay: 3.9 ms, Temperature BW: 98 Hz
+  GBW_41HZ = 0x03,   // Gyro sf: 1 kHz delay: 5.9 ms, Temperature BW: 42 Hz
+  GBW_20HZ = 0x04,   // Gyro sf: 1 kHz delay: 9.9 ms, Temperature BW: 20 Hz
+  GBW_10HZ = 0x05,   // Gyro sf: 1 kHz delay: 17.85 ms, Temperature BW: 10 Hz
+  GBW_5HZ = 0x06,    // Gyro sf: 1 kHz delay: 33.48 ms, Temperature BW: 5 Hz
+  GBW_3600HZ = 0x07  // Gyro sf: 8 kHz delay: 0.17 ms, Temperature BW: 4000 Hz
+};
+
+enum class AccelBandWidthHz : uint8_t
+{
+  GBW_218HZ = 0x01,  // sf: 1 kHz delay: 1.88 ms
+  GBW_99HZ = 0x02,   // sf: 1 kHz delay: 2.88 ms
+  GBW_44HZ = 0x03,   // sf: 1 kHz delay: 4.88 ms
+  GBW_21HZ = 0x04,   // sf: 1 kHz delay: 8.78 ms
+  GBW_10HZ = 0x05,   // sf: 1 kHz delay: 16.83 ms
+  GBW_5HZ = 0x06,    // sf: 1 kHz delay: 32.48 ms
+};
+
+enum class AccelScale : uint8_t
+{
+  AFS_2G = 0x00,
+  AFS_4G = 0x08,
+  AFS_8G = 0x10,
+  AFS_16G = 0x18
+};
+
+enum class MagScale : uint8_t
+{
+  MFS_14BITS = 0x00,  // 0.6 mG per LSB
+  MFS_16BITS = 0x10   // 0.15 mG per LSB
+};
+
+enum class MagMode : uint8_t
+{
+  CONTINUES_8HZ_MODE = 0x02,
+  CONTINUES_100HZ_MODE = 0x06
+};
+
+struct SpecInfo
+{
+  uint8_t byte;
+  std::string name;
+};
+
+
 }  // namespace
 
 Mpu9250::Mpu9250(const Config& config, const bool debug)
@@ -86,16 +144,18 @@ void Mpu9250::Reset()
   // Delay(100);
 
   // reset all registers to reset bit (7)
-  WriteRegister(mpu9250::PWR_MGMT_1, 0x80);
-  Delay(30);
+  // WriteRegister(mpu9250::PWR_MGMT_1, 0x80);
+  // Delay(50);
 
   // Auto select clock source to be PLL gyroscope reference, else internal 20MHz
   WriteRegister(mpu9250::PWR_MGMT_1, 0x01);
+  Delay(10);
 
   // Enable Acc & Gyro
   WriteRegister(mpu9250::PWR_MGMT_2, 0x00);
+  Delay(10);
 
-  ConfigureI2C();
+  // ConfigureI2C();
 }
 
 void Mpu9250::Initialize()
@@ -106,11 +166,17 @@ void Mpu9250::Initialize()
   // reduced by a factor of 5 to 200 Hz because of the SMPLRT_DIV setting
   // Set sample rate = sensor output rate/(1 + SMPLRT_DIV)
   // Use a 200 Hz rate; a rate consistent with the filter update rate
-  WriteRegister(mpu9250::SMPLRT_DIV, config_.sample_rate_divisor);
+  // WriteRegister(mpu9250::SMPLRT_DIV, config_.sample_rate_divisor);
 
-  InitializeAccel();
   InitializeGyro();
+  InitializeAccel();
+  ConfigureI2C();
   InitializeMag();
+  ExtractMagnetometerSensitivityAdjustmentValues();
+  
+  ReadAccelScaleAndBandWidth();
+  ReadGyroScaleAndBandWidth();
+  ReadMagModeAndResolution();
 }
 
 bool Mpu9250::Test()
@@ -122,7 +188,7 @@ void Mpu9250::InitializeAccel() const
 {
   // Set accelerometer full-scale range configuration
   uint8_t c1 = ReadRegister(mpu9250::ACCEL_CONFIG);
-  c1 = static_cast<uint8_t>(c1 & 0xF8_uc);  // Clear AFS bits [4:3]
+  c1 = static_cast<uint8_t>(c1 & 0xE7_uc);  // Clear AFS bits [4:3]
   const uint8_t configured_scale = static_cast<uint8_t>(config_.accel_scale);
   c1 = static_cast<uint8_t>(c1 | configured_scale);
   // Write new ACCEL_CONFIG register value
@@ -141,8 +207,6 @@ void Mpu9250::InitializeAccel() const
   c2 = static_cast<uint8_t>(c2 | configured_bw);
   // Write new ACCEL_CONFIG2 register value
   WriteRegister(mpu9250::ACCEL_CONFIG2, c2);
-
-  Delay(10);
 }
 
 void Mpu9250::InitializeGyro() const
@@ -169,7 +233,6 @@ void Mpu9250::InitializeGyro() const
   c = static_cast<uint8_t>(c | configured_scale);
   // Write new GYRO_CONFIG value to register
   WriteRegister(mpu9250::GYRO_CONFIG, c);
-  Delay(10);
 }
 
 void Mpu9250::InitializeMag() const
@@ -185,29 +248,190 @@ void Mpu9250::InitializeMag() const
   // Set magnetometer data resolution and sample ODR+
   const auto configured_scale = static_cast<uint8_t>(config_.mag_scale);
   const auto configured_mode = static_cast<uint8_t>(config_.mag_mode);
-  WriteAK8963Register(ak8963::CNTL, configured_mode | configured_scale);
+  const auto res = static_cast<uint8_t>(configured_scale|configured_mode);
+  printf("scale %d mode %d or %d\n", configured_scale, configured_mode, res);
+  WriteAK8963Register(ak8963::CNTL, res);
 }
 
 void Mpu9250::ExtractMagnetometerSensitivityAdjustmentValues()
 {
-  // printf("write CNTL\n");
-  // WriteAK8963Register(ak8963::CNTL, mag_mode_t::POWER_DOWN_MODE);
-  // Delay(10);
-  // printf("write CNTL\n");
-  // WriteAK8963Register(ak8963::CNTL, mag_mode_t::FUSE_ROM_ACCESS_MODE);
-  // Delay(10);
+  WriteAK8963Register(ak8963::CNTL, mag_mode_t::POWER_DOWN_MODE);
+  Delay(10);
+  WriteAK8963Register(ak8963::CNTL, mag_mode_t::FUSE_ROM_ACCESS_MODE);
+  Delay(10);
 
   const auto asa_values = ReadAK8963Registers(ak8963::ASAX, 3);
   for (size_t i = 0; i < 3; i++)
   {
     sensitivity_calibration_[i] =
         static_cast<float>(asa_values[i] - 128) / 256.0F + 1.0F;
+    std::cout << sensitivity_calibration_[i] << std::endl;
   }
 
   // re-initialize magnetometer to reset mode
   InitializeMag();
 }
 
+void Mpu9250::ReadAccelScaleAndBandWidth() const
+{
+  const auto fs = ReadRegister(mpu9250::ACCEL_CONFIG) & 0x18;
+   // Clear Fchoice bits [3] and AFS bits [2:0]
+  const auto data = ReadRegister(mpu9250::ACCEL_CONFIG2);
+  const auto f_choice_inv = data & 0x08;
+  const auto bw = data & 0x7;
+
+  switch (bw) {
+    case (static_cast<uint8_t>(AccelBandWidthHz::GBW_5HZ)):
+      std::cout << "Accel bandwidth: GBW_5HZ" << std::endl;
+      break;
+    case (static_cast<uint8_t>(AccelBandWidthHz::GBW_10HZ)):
+      std::cout << "Accel bandwidth: GBW_10HZ" << std::endl;
+      break;
+    case (static_cast<uint8_t>(AccelBandWidthHz::GBW_21HZ)):
+      std::cout << "Accel bandwidth: GBW_21HZ" << std::endl;
+      break;
+    case (static_cast<uint8_t>(AccelBandWidthHz::GBW_44HZ)):
+      std::cout << "Accel bandwidth: GBW_44HZ" << std::endl;
+      break;
+    case (static_cast<uint8_t>(AccelBandWidthHz::GBW_99HZ)):
+      std::cout << "Accel bandwidth: GBW_99HZ" << std::endl;
+      break;
+    case (static_cast<uint8_t>(AccelBandWidthHz::GBW_218HZ)):
+      std::cout << "Accel bandwidth: GBW_218HZ" << std::endl;
+      break;
+    default:
+      std::wcerr << "Accel bandwidth: undefined" << std::endl;
+  }
+
+  switch (f_choice_inv) {
+    case (0x00):
+      std::cout << "Accel: fChoice: enabled" << std::endl;
+      break;
+    default:
+      std::wcerr << "Accel fChoice: disabled" << std::endl;
+  }
+
+  switch (fs) {
+    case (static_cast<uint8_t>(AccelScale::AFS_2G)):
+      std::cout << "Accel scale : AFS_2G" << std::endl;
+      break;
+    case (static_cast<uint8_t>(AccelScale::AFS_4G)):
+      std::cout << "Accel scale : AFS_4G" << std::endl;
+      break;
+    case (static_cast<uint8_t>(AccelScale::AFS_8G)):
+      std::cout << "Accel scale : AFS_8G" << std::endl;
+      break;
+    case (static_cast<uint8_t>(AccelScale::AFS_16G)):
+      std::cout << "Accel scale : AFS_16G" << std::endl;
+      break;
+    default:
+      std::wcerr << "Accel scale : undefined" << std::endl;
+  }
+}
+
+void Mpu9250::ReadGyroScaleAndBandWidth() const
+{
+  const auto dlpf = ReadRegister(mpu9250::CONFIG) & 0x07;
+   // Clear Fchoice bits [1:0] and AFS bits [4:3]
+  const auto data = ReadRegister(mpu9250::GYRO_CONFIG);
+  const auto f_choice_inv = data & 0x03;
+  const auto fs = data & 0x18;
+
+  switch (dlpf) {
+    case (static_cast<uint8_t>(GyroBandWidthHz::GBW_5HZ)):
+      std::cout << "Gyro bandwidth: GBW_5HZ" << std::endl;
+      break;
+    case (static_cast<uint8_t>(GyroBandWidthHz::GBW_10HZ)):
+      std::cout << "Gyro bandwidth: GBW_10HZ" << std::endl;
+      break;
+    case (static_cast<uint8_t>(GyroBandWidthHz::GBW_20HZ)):
+      std::cout << "Gyro bandwidth: GBW_20HZ" << std::endl;
+      break;
+    case (static_cast<uint8_t>(GyroBandWidthHz::GBW_41HZ)):
+      std::cout << "Gyro bandwidth: GBW_41HZ" << std::endl;
+      break;
+    case (static_cast<uint8_t>(GyroBandWidthHz::GBW_92HZ)):
+      std::cout << "Gyro bandwidth: GBW_92HZ" << std::endl;
+      break;
+    case (static_cast<uint8_t>(GyroBandWidthHz::GBW_184HZ)):
+      std::cout << "Gyro bandwidth: GBW_184HZ" << std::endl;
+      break;
+    case (static_cast<uint8_t>(GyroBandWidthHz::GBW_250HZ)):
+      std::cout << "Gyro bandwidth: GBW_250HZ" << std::endl;
+      break;
+    case (static_cast<uint8_t>(GyroBandWidthHz::GBW_3600HZ)):
+      std::cout << "Gyro bandwidth: GBW_3600HZ" << std::endl;
+      break;
+    default:
+      std::wcerr << "Gyro bandwidth: undefined" << std::endl;
+  }
+
+  switch (f_choice_inv) {
+    case (0x00):
+      std::cout << "Gyro fChoice: enabled" << std::endl;
+      break;
+    default:
+      std::wcerr << "Gyro fChoice: disabled" << std::endl;
+  }
+
+  switch (fs) {
+    case (static_cast<uint8_t>(GyroScale::GFS_250DPS)):
+      std::cout << "Gyro scale: GFS_250DPS" << std::endl;
+      break;
+    case (static_cast<uint8_t>(GyroScale::GFS_500DPS)):
+      std::cout << "Gyro scale: GFS_250DPS" << std::endl;
+      break;
+    case (static_cast<uint8_t>(GyroScale::GFS_1000DPS)):
+      std::cout << "Gyro scale: GFS_1000DPS" << std::endl;
+      break;
+    case (static_cast<uint8_t>(GyroScale::GFS_2000DPS)):
+      std::cout << "Gyro scale: GFS_2000DPS" << std::endl;
+      break;
+    default:
+      std::wcerr << "Gyro scale: undefined" << std::endl;
+  }
+}
+void Mpu9250::ReadMagModeAndResolution() const
+{
+  const auto data = ReadAK8963Register(ak8963::CNTL);
+  const auto mode = data & 0x0F;
+  const auto res = data & 0x10;
+  
+  switch (mode) {
+    case (static_cast<uint8_t>(MagMode::CONTINUES_8HZ_MODE)):
+      std::cout << "Magnetometer mode: CONTINUES_8HZ_MODE" << std::endl;
+      break;
+    case (static_cast<uint8_t>(MagMode::CONTINUES_100HZ_MODE)):
+      std::cout << "Magnetometer mode: CONTINUES_100HZ_MODE" << std::endl;
+      break;
+    case (static_cast<uint8_t>(mag_mode_t::POWER_DOWN_MODE)):
+      std::cout << "Magnetometer mode: POWER_DOWN_MODE" << std::endl;
+      break;
+    case (static_cast<uint8_t>(mag_mode_t::FUSE_ROM_ACCESS_MODE)):
+      std::cout << "Magnetometer mode: FUSE_ROM_ACCESS_MODE" << std::endl;
+      break;
+    case (static_cast<uint8_t>(mag_mode_t::SELF_TEST_MODE)):
+      std::cout << "Magnetometer mode: SELF_TEST_MODE" << std::endl;
+      break;
+    case (static_cast<uint8_t>(mag_mode_t::SINGLE_MEASUREMENT_MODE)):
+      std::cout << "Magnetometer mode: SINGLE_MEASUREMENT_MODE" << std::endl;
+      break;
+    default:
+      std::wcerr << "Undefined Magnetometer mode" << std::endl;
+  }
+
+  switch (res) {
+    case (static_cast<uint8_t>(MagScale::MFS_14BITS)):
+      std::cout << "Magnetometer resolution: MFS_14BITS" << std::endl;
+      break;
+    case (static_cast<uint8_t>(MagScale::MFS_16BITS)):
+      std::cout << "Magnetometer resolution: MFS_16BITS" << std::endl;
+      break;
+    default:
+      std::wcerr << "Undefined Magnetometer resolution" << std::endl;
+  }
+
+}
 void Mpu9250::Calibrate()
 {
   ExtractMagnetometerSensitivityAdjustmentValues();
@@ -222,32 +446,32 @@ void Mpu9250::Update()
 ImuData Mpu9250::ReadAll() const
 {
   RequestReadAK8963Registers(ak8963::XOUT_L, 7);
-  Delay(10);
-
-  ImuData imu = ReadAccelGyroTemp();
-  imu.mag = ReadMagnetometer();
-
-  return imu;
-}
-
-ImuData Mpu9250::ReadAccelGyroTemp() const
-{
   // Read raw data registers sequentially into data array
-  const auto raw_data = ReadRegisters(mpu9250::ACCEL_XOUT_H, 14);
-
-  // Turn the MSB and LSB into a signed 16-bit value)
-  std::array<int16_t, 7> full_bits{0};
-  for (size_t i = 0; i < full_bits.size(); i++)
-  {
-    full_bits[i] = To16Bit(raw_data[i * 2], raw_data[i * 2 + 1]);
-  }
+  const auto raw_data = ReadRegisters(mpu9250::ACCEL_XOUT_H, 21);
+  const auto full_bits = ExtractFullBits(raw_data);
 
   ImuData imu;
   imu.accel = ExtractAccelerometer({full_bits[0], full_bits[1], full_bits[2]});
   imu.temp = ExtractTemperature(full_bits[3]);
   imu.gyro = ExtractGyroscope({full_bits[4], full_bits[5], full_bits[6]});
+  const auto over_flow = raw_data[20] & 0x08;  // HOFS 4th bit
+  imu.mag = ExtractMagnetometer({full_bits[7], full_bits[8], full_bits[9]}, over_flow);
 
   return imu;
+}
+
+std::vector<int16_t> Mpu9250::ExtractFullBits(const std::vector<uint8_t>& raw) const
+{
+  // Turn the MSB and LSB into a signed 16-bit value)
+  std::vector<int16_t> full_bits(10, 0);
+  for (size_t i = 0; i < full_bits.size(); i++)
+  {
+    if (i<7)
+      full_bits[i] = To16Bit(raw[i * 2], raw[i * 2 + 1]);
+    else
+      full_bits[i] = To16Bit(raw[i * 2 + 1], raw[i * 2]);
+  }
+  return full_bits;
 }
 
 Mpu9250::AccelData
@@ -273,21 +497,6 @@ Mpu9250::TemperatureData Mpu9250::ExtractTemperature(const int16_t full_bits)
   TemperatureData temp;
   temp.value = ((full_bits - 21.F) / 333.87F) + 21.F;
   return temp;
-}
-
-Mpu9250::MagData Mpu9250::ReadMagnetometer() const
-{
-  const auto raw_data = ReadRegisters(mpu9250::EXT_SENS_DATA_00, 7);
-  // Turn the LSB and MSB into a signed 16-bit value
-  SensorFullBits full_bits{0};
-  for (size_t i = 0; i < full_bits.size(); i++)
-  {
-    full_bits[i] = To16Bit(raw_data[i * 2 + 1], raw_data[i * 2]);
-  }
-
-  const auto over_flow = full_bits[6] & 0x08;  // HOFS 4th bit
-
-  return ExtractMagnetometer(full_bits, over_flow);
 }
 
 Mpu9250::MagData Mpu9250::ExtractMagnetometer(const SensorFullBits& full_bits,
@@ -335,7 +544,7 @@ void Mpu9250::RequestReadAK8963Registers(const uint8_t reg, const uint8_t count)
   };
   
   GetSpi()->WriteRegisters(reg_and_data);
-  Delay(10);
+  Delay(1);
 }
 
 std::vector<uint8_t> Mpu9250::ReadAK8963Registers(const uint8_t reg, const uint8_t count)
@@ -356,7 +565,7 @@ void Mpu9250::WriteAK8963Register(const uint8_t reg, const uint8_t data)
   const std::vector<std::pair<uint8_t, uint8_t>> reg_and_data {
     {mpu9250::I2C_SLV0_ADDR, ak8963::I2C_ADDR},
     {mpu9250::I2C_SLV0_REG, reg},
-    {mpu9250::I2C_SLV0_DO, ak8963::I2C_ADDR},
+    {mpu9250::I2C_SLV0_DO, data},
     {mpu9250::I2C_SLV0_CTRL, mpu9250::I2C_SLV0_EN | count},
   };
   // // set slave 0 to the AK8963 and set for write

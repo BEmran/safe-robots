@@ -46,6 +46,7 @@ int SPI::Transfer(const std::vector<uint8_t>& buff) const
     std::cout << "Rx: ";
     PrintVec(buff);
   }
+  usleep(1000);
 
   return status;
 }
@@ -72,7 +73,6 @@ std::vector<uint8_t> SPI::ReadRegisters(const uint8_t reg, const uint8_t count) 
     std::vector<uint8_t> buf(count+1, 0);
     buf[0] = reg | 0x80;
     Transfer(buf);
-    usleep(50);
     buf.erase(buf.begin());
     return buf;
 }

@@ -4,10 +4,12 @@
 #include <string>
 #include <memory>
 
-constexpr mpu::AccelScale ASCALE = mpu::AccelScale::AFS_16G;
-constexpr mpu::GyroScale GSCALE = mpu::GyroScale::GFS_2000DPS;
+constexpr mpu::AccelScale ASCALE = mpu::AccelScale::AFS_4G;
+constexpr mpu::GyroScale GSCALE = mpu::GyroScale::GFS_250DPS;
 constexpr mpu::MagScale MSCALE = mpu::MagScale::MFS_16BITS;
 constexpr mpu::MagMode MMODE = mpu::MagMode::CONTINUES_100HZ_MODE;
+constexpr mpu::AccelBandWidthHz ABW = mpu::AccelBandWidthHz::GBW_21HZ;
+constexpr mpu::GyroBandWidthHz GBW = mpu::GyroBandWidthHz::GBW_250HZ;
 constexpr uint8_t SAMPLE_RATE_DIVISOR = 4;
 
 //=============================================================================
@@ -22,6 +24,8 @@ int main(int /*argc*/, char** /*argv[]*/)
   config.gyro_scale = GSCALE;
   config.mag_scale = MSCALE;
   config.mag_mode = MMODE;
+  config.accel_bw = ABW;
+  config.gyro_bw = GBW;
   config.sample_rate_divisor = SAMPLE_RATE_DIVISOR;
   
   auto sensor = std::make_unique<mpu::Mpu9250>(config, true);
@@ -38,7 +42,7 @@ int main(int /*argc*/, char** /*argv[]*/)
   {
     sensor->Update();
     std::cout << sensor->GetData();
-    usleep(200000);
+    usleep(500000);
   }
   return EXIT_SUCCESS;
 }
