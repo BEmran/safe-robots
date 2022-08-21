@@ -1,5 +1,7 @@
 #include "mpu/mpu9250.hpp"
 #include "mpu/spi.hpp"
+#include "mpu/calibrate.hpp"
+
 namespace mpu
 {
 namespace
@@ -10,6 +12,10 @@ constexpr auto ImuType = SensorModuleType::IMU;
 constexpr auto GyroType = SensorModuleType::GYROSCOPE;
 constexpr auto MagType = SensorModuleType::MAGNETOMETER;
 constexpr auto AccelType = SensorModuleType::ACCELEROMETER;
+constexpr auto TempType = SensorModuleType::TEMPERATURE;
+constexpr auto TempScale = 333.87F;
+const auto kTempBias = Vec3::Ones() * 21.F;
+const auto kTempOffset = Vec3::Ones() * 21.F;
 
 template <typename T,
           typename =
@@ -139,13 +145,24 @@ Mpu9250::Mpu9250(const Config& config, std::unique_ptr<SPI> comm,
       CreateSensorSpecs(gyro_scale_map[config.gyro_scale].value, PI / 180.0F);
   sensor_specs_map[MagType] =
       CreateSensorSpecs(mag_scale_map[config.mag_scale].value, 1.0F);
+  sensor_specs_map[TempType] =
+      SensorSpecs(TempScale, 1.0F, kTempBias, kTempOffset);
+
+  Mat3 accel_misalignment;
+  accel_misalignment << 0.998122F, 0.00794836F, 0.000548448F,  //
+      -0.00552448F, 0.998181F, -0.00669443F,                   //
+      0.0189156F, 0.00407755F, 0.993244F;
+  sensor_specs_map[AccelType].SetMisalignment(accel_misalignment);  //
+  sensor_specs_map[AccelType].SetOffset(
+      Vec3(-0.00387028F, -0.0128085F, 0.0108167F));
+  sensor_specs_map[GyroType].SetBias(Vec3(12.629F, 7.572F, -9.618F));
 }
 
 bool Mpu9250::ProbeMpu() const
 {
   if (ReadRegister(mpu9250::WHO_AM_I) != mpu9250::WHO_AM_I_RESPONSE)
   {
-    std::cout << "Bad IMU device ID" << std::endl;
+    std::cerr << "Bad IMU device ID" << std::endl;
     return false;
   }
   return true;
@@ -156,7 +173,7 @@ bool Mpu9250::ProbeAk8963() const
   ConfigureI2C();
   if (ReadAK8963Register(ak8963::WHO_AM_I) != ak8963::WHO_AM_I_RESPONSE)
   {
-    std::cout << "Bad Magnetometer device ID" << std::endl;
+    std::cerr << "Bad Magnetometer device ID\n";
     return false;
   }
   return true;
@@ -166,7 +183,7 @@ bool Mpu9250::Probe()
 {
   if (ProbeMpu() && ProbeAk8963())
   {
-    std::cout << "MPU9250 online!" << std::endl;
+    std::cout << "MPU9250 online!\n";
     return true;
   }
   return false;
@@ -191,7 +208,8 @@ void Mpu9250::Reset() const
   // WriteRegister(mpu9250::PWR_MGMT_1, 0x80);
   // Delay(50);
 
-  // Auto select clock source to be PLL gyroscope reference, else internal 20MHz
+  // Auto select clock source to be PLL gyroscope reference, else internal
+  // 20MHz
   WriteRegister(mpu9250::PWR_MGMT_1, 0x01);
   Delay(10);
 
@@ -216,7 +234,7 @@ void Mpu9250::Initialize()
   InitializeAccel();
   ConfigureI2C();
   InitializeMag();
-  ExtractMagnetometerSensitivityAdjustmentValues();
+  // ExtractMagnetometerSensitivityAdjustmentValues();
 
   ValidateConfiguration();
 }
@@ -238,9 +256,8 @@ void Mpu9250::InitializeAccel() const
 
   // Set accelerometer sample rate configuration
   // It is possible to get a 4 kHz sample rate from the accelerometer by
-  // choosing 1 for accel_fchoice_b bit [3]; in this case the bandwidth is 1.03
-  // kHz
-  // get current ACCEL_CONFIG2 register value
+  // choosing 1 for accel_fchoice_b bit [3]; in this case the bandwidth
+  // is 1.03 kHz get current ACCEL_CONFIG2 register value
   const auto conf2 = ReadRegister(mpu9250::ACCEL_CONFIG2);
   const auto bw = accel_bw_map[config_.accel_bw].byte;
   // Clear b_fChoice (bit 3) and A_DLPFG (bits [2:0])
@@ -255,9 +272,9 @@ void Mpu9250::InitializeGyro() const
   // Disable FSYNC and set thermometer and gyro bandwidth to 41 and 42 Hz,
   // respectively; minimum delay time for this setting is 5.9 ms, which means
   // sensor fusion update rates cannot be higher than 1 / 0.0059 = 170 Hz
-  // DLPF_CFG = bits 2:0 = 011; this limits the sample rate to 1000 Hz for both
-  // With the MPU9250, it is possible to get gyro sample rates of 32 kHz (!), 8
-  // kHz, or 1 kHz
+  // DLPF_CFG = bits 2:0 = 011; this limits the sample rate to 1000 Hz for
+  // both With the MPU9250, it is possible to get gyro sample rates of 32 kHz
+  // (!), 8 kHz, or 1 kHz
   const auto conf = ReadRegister(mpu9250::GYRO_CONFIG);
   const auto bw = gyro_bw_map[config_.gyro_bw].byte;
   // Clear DLPF bits [2:0]
@@ -289,7 +306,6 @@ void Mpu9250::InitializeMag() const
   const auto scale = mag_scale_map[config_.mag_scale].byte;
   const auto mode = mag_mode_map[config_.mag_mode].byte;
   const auto res = static_cast<uint8_t>(scale | mode);
-  printf("scale %d mode %d or %d\n", scale, mode, res);
   WriteAK8963Register(ak8963::CNTL, res);
 }
 
@@ -327,7 +343,7 @@ AccelBandWidthHz Mpu9250::ReadAccelBandWidth() const
   const auto bw = static_cast<uint8_t>(data & 0x07);     // mask bits [2:0]
   if (f_inv != 0)
   {
-    std::cerr << "Error: Accelerometer fChoice is disabled" << std::endl;
+    std::cerr << "Error: Accelerometer fChoice is disabled\n";
   }
   return accel_bw_map.Find(bw);
 }
@@ -346,7 +362,7 @@ GyroScale Mpu9250::ReadGyroScale() const
   const auto fs = static_cast<uint8_t>(data & 0x18);     // mask bits [4:3]
   if (f_inv != 0)
   {
-    std::cerr << "Error: Gyroscope fChoice is disabled" << std::endl;
+    std::cerr << "Error: Gyroscope fChoice is disabled\n";
   }
   return gyro_scale_map.Find(fs);
 }
@@ -387,11 +403,13 @@ std::pair<bool, Config> Mpu9250::ValidateConfiguration() const
 
   if (valid)
   {
-    std::cout << "MPU9250 is successfully initialized! configuration is set to";
+    std::cout << "MPU9250 is successfully initialized! configuration is set "
+                 "to";
   }
   else
   {
-    std::cerr << "MPU9250 Failed to initialized properly! Actual configuration "
+    std::cerr << "MPU9250 Failed to initialized properly! Actual "
+                 "configuration "
                  "is set to";
   }
   PrintConfig(actual_cfg);
@@ -402,66 +420,80 @@ std::pair<bool, Config> Mpu9250::ValidateConfiguration() const
 void Mpu9250::Calibrate()
 {
   ExtractMagnetometerSensitivityAdjustmentValues();
+  auto read_gyro_data = [this]() {
+    const auto raw = ReadRawData();
+    return raw.gyro;
+  };
+  auto read_accel_data = [this]() {
+    const auto raw = ReadRawData();
+    return raw.accel;
+  };
+  sensor_specs_map[GyroType] =
+      CalibrateGyroscope(read_gyro_data, sensor_specs_map[GyroType]);
+  sensor_specs_map[AccelType] =
+      CalibrateAccelerometer(read_accel_data, sensor_specs_map[AccelType]);
 }
 
 void Mpu9250::Update()
 {
-  ImuData imu = ReadAll();
+  const auto raw = ReadRawData();
+  ImuData imu = ApplySensorSpecs(raw);
   SetData(imu);
 }
 
-ImuData Mpu9250::ReadAll() const
+SensorRawData Mpu9250::ReadRawData() const
 {
   RequestReadAK8963Registers(ak8963::XOUT_L, 7);
-  // Read raw data registers sequentially into data array
-  const auto raw_data = ReadRegisters(mpu9250::ACCEL_XOUT_H, 21);
-  const auto full_bits = ExtractFullBits(raw_data);
-
-  ImuData imu;
-  imu.accel = ExtractAccelerometer({full_bits[0], full_bits[1], full_bits[2]});
-  imu.temp = ExtractTemperature(full_bits[3]);
-  imu.gyro = ExtractGyroscope({full_bits[4], full_bits[5], full_bits[6]});
-  const auto over_flow = raw_data[20] == 0x08_uc;  // HOFS 4th bit
-  imu.mag = ExtractMagnetometer({full_bits[7], full_bits[8], full_bits[9]},
-                                over_flow);
-
-  return imu;
+  const auto data = ReadRegisters(mpu9250::ACCEL_XOUT_H, 21);
+  const auto full_bits = ExtractFullBits(data);
+  return FullBitsToRawData(full_bits);
 }
 
-std::vector<int16_t> Mpu9250::ExtractFullBits(const std::vector<uint8_t>& raw)
+std::vector<int16_t> Mpu9250::ExtractFullBits(const std::vector<uint8_t>& data)
 {
+  assert(data.size() == 21);
   // Turn the MSB and LSB into a signed 16-bit value)
-  std::vector<int16_t> full_bits(10, 0);
+  std::vector<int16_t> full_bits(11, 0);
   for (size_t i = 0; i < full_bits.size(); i++)
   {
     if (i < 7)
     {
-      full_bits[i] = To16Bit(raw[i * 2], raw[i * 2 + 1]);
+      full_bits[i] = To16Bit(data[i * 2], data[i * 2 + 1]);
     }
     else
     {
-      full_bits[i] = To16Bit(raw[i * 2 + 1], raw[i * 2]);
+      full_bits[i] = To16Bit(data[i * 2 + 1], data[i * 2]);
     }
   }
+  full_bits[10] = data[20];
   return full_bits;
 }
 
-Mpu9250::AccelData
-Mpu9250::ExtractAccelerometer(const SensorFullBits& full_bits) const
+SensorRawData Mpu9250::FullBitsToRawData(const std::vector<int16_t>& full_bits)
 {
-  const auto data = ApplySensorSpecs(full_bits, sensor_specs_map[AccelType]);
-  AccelData accel;
-  accel.data = ArrayToVec3(data);
-  return accel;
+  assert(full_bits.size() == 11);
+  SensorRawData raw;
+  raw.accel = Vec3From16Bits(full_bits.begin() + 0);
+  raw.gyro = Vec3From16Bits(full_bits.begin() + 4);
+  raw.mag = Vec3From16Bits(full_bits.begin() + 7);
+  raw.temp = static_cast<float>(full_bits[3]);
+  raw.mag_over_flow = full_bits[10] == 0x08_uc;  // HOFS 4th bit
+  return raw;
 }
 
-Mpu9250::GyroData
-Mpu9250::ExtractGyroscope(const SensorFullBits& full_bits) const
+ImuData Mpu9250::ApplySensorSpecs(const SensorRawData& raw) const
 {
-  const auto data = ApplySensorSpecs(full_bits, sensor_specs_map[GyroType]);
-  GyroData gyro;
-  gyro.data = ArrayToVec3(data);
-  return gyro;
+  ImuData imu;
+  imu.accel.data = sensor_specs_map[AccelType].Apply(raw.accel);
+  imu.gyro.data = sensor_specs_map[GyroType].Apply(raw.gyro);
+  imu.mag.data = sensor_specs_map[MagType].Apply(raw.mag);
+  imu.temp.value = sensor_specs_map[TempType].Apply(raw.temp);
+  if (raw.mag_over_flow)
+  {
+    std::wcerr << "detect over flow\n";
+    // imu.mag.data = Vec3::Zero();
+  }
+  return imu;
 }
 
 Mpu9250::TemperatureData Mpu9250::ExtractTemperature(const int16_t full_bits)
@@ -505,8 +537,8 @@ void Mpu9250::RequestReadAK8963Registers(const uint8_t reg,
 {
   const std::vector<std::pair<uint8_t, uint8_t>> reg_and_data{
       {mpu9250::I2C_SLV0_ADDR,
-       ak8963::I2C_ADDR | mpu9250::I2C_READ_FLAG},  // set slave 0 to the AK8963
-                                                    // and set for read
+       ak8963::I2C_ADDR | mpu9250::I2C_READ_FLAG},  // set slave 0 to the
+                                                    // AK8963 and set for read
       {mpu9250::I2C_SLV0_REG, reg},  // set the register to the desired AK8963
                                      // sub address
       {mpu9250::I2C_SLV0_CTRL,
@@ -534,13 +566,14 @@ void Mpu9250::WriteAK8963Register(const uint8_t reg, const uint8_t data) const
 {
   constexpr uint8_t count = 1;
   const std::vector<std::pair<uint8_t, uint8_t>> reg_and_data{
-      {mpu9250::I2C_SLV0_ADDR, ak8963::I2C_ADDR},  // set slave 0 to the AK8963
-                                                   // and set for write
+      {mpu9250::I2C_SLV0_ADDR, ak8963::I2C_ADDR},  // set slave 0 to the
+                                                   // AK8963 and set for write
       {mpu9250::I2C_SLV0_REG, reg},  // set the register to the desired AK8963
                                      // sub address
       {mpu9250::I2C_SLV0_DO, data},  // store the data for write
-      {mpu9250::I2C_SLV0_CTRL, mpu9250::I2C_SLV0_EN | count},  // enable I2C and
-                                                               // send 1 byte
+      {mpu9250::I2C_SLV0_CTRL, mpu9250::I2C_SLV0_EN | count},  // enable I2C
+                                                               // and send 1
+                                                               // byte
   };
   comm_->WriteRegisters(reg_and_data);
 }

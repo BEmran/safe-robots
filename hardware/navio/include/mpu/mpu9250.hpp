@@ -15,9 +15,6 @@
 namespace mpu
 {
 
-using ImuData = core::utils::ImuData;
-using ImuSensorModule = core::sensors::SensorModuleAbs<ImuData>;
-
 enum class GyroScale : uint8_t
 {
   FS_250DPS,
@@ -73,6 +70,15 @@ enum class MagMode : uint8_t
   FUSE_ROM_ACCESS
 };
 
+struct SensorRawData
+{
+  Vec3 accel = Vec3::Zero();
+  Vec3 gyro = Vec3::Zero();
+  Vec3 mag = Vec3::Zero();
+  MATH_TYPE temp = 0;
+  bool mag_over_flow = false;
+};
+
 struct Config
 {
   AccelScale accel_scale = AccelScale::FS_16G;
@@ -119,6 +125,7 @@ class Mpu9250 : public ImuSensorModule
 
   void Calibrate() override;
 
+  SensorRawData ReadRawData() const;
  protected:
   void ConfigureI2C() const;
   /**
@@ -144,11 +151,15 @@ class Mpu9250 : public ImuSensorModule
   void Reset() const;
 
   void InitializeAccel() const;
+
   void InitializeGyro() const;
+
   void InitializeMag() const;
 
-  ImuData ReadAll() const;
-  static std::vector<int16_t> ExtractFullBits(const std::vector<uint8_t>& raw);
+  ImuData ApplySensorSpecs(const SensorRawData& raw) const;
+
+  static std::vector<int16_t> ExtractFullBits(const std::vector<uint8_t>& data);
+  static SensorRawData FullBitsToRawData(const std::vector<int16_t>& full_bits);
 
   ImuData ReadAccelGyroTemp() const;
   MagData ReadMagnetometer() const;
