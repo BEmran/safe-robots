@@ -438,6 +438,7 @@ void Mpu9250::Update()
 {
   const auto raw = ReadRawData();
   ImuData imu = ApplySensorSpecs(raw);
+  imu.tait_bryan.data = EstimateRPY(imu);
   SetData(imu);
 }
 
@@ -496,24 +497,17 @@ ImuData Mpu9250::ApplySensorSpecs(const SensorRawData& raw) const
   return imu;
 }
 
-Mpu9250::TemperatureData Mpu9250::ExtractTemperature(const int16_t full_bits)
+#include <cmath>
+Vec3 Mpu9250::EstimateRPY(const ImuData& imu)
 {
-  TemperatureData temp;
-  temp.value = ((static_cast<float>(full_bits) - 21.F) / 333.87F) + 21.F;
-  return temp;
-}
+  const auto accel = imu.accel.data.normalized();
+  const auto ay2 = accel.y() * accel.y();
+  const auto az2 = accel.z() * accel.z();
 
-Mpu9250::MagData Mpu9250::ExtractMagnetometer(const SensorFullBits& full_bits,
-                                              const bool over_flow) const
-{
-  const auto data = ApplySensorSpecs(full_bits, sensor_specs_map[MagType]);
-  MagData mag;
-  if (over_flow)
-  {
-    std::wcerr << "detect over flow" << std::endl;
-  }
-  mag.data = ArrayToVec3(data);
-  return mag;
+  const auto rx = std::atan2(accel.y(), accel.z());
+  const auto ry = std::atan2(-accel.x(), std::sqrt(ay2 + az2));
+  const auto rz = 0.F;
+  return Vec3(rx, ry, rz);
 }
 
 uint8_t Mpu9250::ReadRegister(const uint8_t reg) const
