@@ -168,7 +168,7 @@ class Mpu9250 : public ImuSensorModule
   GyroData ExtractGyroscope(const SensorFullBits& full_bits) const;
   MagData ExtractMagnetometer(const SensorFullBits& full_bits,
                               const bool over_flow) const;
-  static TemperatureData ExtractTemperature(const int16_t full_bits);
+  static Vec3 EstimateRPY(const ImuData& imu);
 
   AccelBandWidthHz ReadAccelBandWidth() const;
   AccelScale ReadAccelScale() const;
