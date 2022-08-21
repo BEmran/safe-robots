@@ -4,10 +4,10 @@
 #include <string>
 #include <memory>
 
-constexpr mpu::AccelScale ASCALE = mpu::AccelScale::FS_4G;
-constexpr mpu::AccelBandWidthHz ABW = mpu::AccelBandWidthHz::BW_21HZ;
-constexpr mpu::GyroScale GSCALE = mpu::GyroScale::FS_250DPS;
-constexpr mpu::GyroBandWidthHz GBW = mpu::GyroBandWidthHz::BW_250HZ;
+constexpr mpu::AccelScale ASCALE = mpu::AccelScale::FS_16G;
+constexpr mpu::AccelBandWidthHz ABW = mpu::AccelBandWidthHz::BW_44HZ;
+constexpr mpu::GyroScale GSCALE = mpu::GyroScale::FS_2000DPS;
+constexpr mpu::GyroBandWidthHz GBW = mpu::GyroBandWidthHz::BW_184HZ;
 constexpr mpu::MagMode MMODE = mpu::MagMode::CONTINUES_100HZ;
 constexpr mpu::MagScale MSCALE = mpu::MagScale::FS_16BITS;
 constexpr uint8_t SAMPLE_RATE_DIVISOR = 4;
@@ -27,7 +27,7 @@ int main(int /*argc*/, char** /*argv[]*/)
   config.mag_mode = MMODE;
   config.mag_scale = MSCALE;
   config.sample_rate_divisor = SAMPLE_RATE_DIVISOR;
-  auto spi = std::make_unique<SPI>(navio::MPU_SPI_PATH, true);
+  auto spi = std::make_unique<SPI>(navio::MPU_SPI_PATH, false);
   auto sensor = std::make_unique<mpu::Mpu9250>(config, std::move(spi), true);
     
   if (!sensor->Probe())
@@ -35,6 +35,7 @@ int main(int /*argc*/, char** /*argv[]*/)
     return EXIT_FAILURE;
   }
   sensor->Initialize();
+  // sensor->Calibrate();
   
   //-------------------------------------------------------------------------
 
