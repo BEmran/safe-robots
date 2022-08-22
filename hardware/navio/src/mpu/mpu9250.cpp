@@ -229,7 +229,7 @@ void Mpu9250::Initialize()
   // Set sample rate = sensor output rate/(1 + SMPLRT_DIV)
   // Use a 200 Hz rate; a rate consistent with the filter update rate
   WriteRegister(mpu9250::SMPLRT_DIV, config_.sample_rate_divisor);
-
+  WriteRegister(mpu9250::FIFO_EN, 0x00);
   InitializeGyro();
   InitializeAccel();
   ConfigureI2C();

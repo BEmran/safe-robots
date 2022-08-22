@@ -28,7 +28,7 @@ std::string FormatFuncWithModifierEnabled(const LabeledModifier& lm,
   return ss.str();
 }
 
-// test Null foramtter
+// test Null formatter
 TEST(NullFormatter, Format)
 {
   std::string msg = "message";
@@ -39,7 +39,7 @@ TEST(NullFormatter, Format)
   }
 }
 
-// test Default foramtter's Format function constracted without disobliging the
+// test Default formatter's Format function constructed without enabling the
 // use of using modifier
 TEST(DefaultFormater, FormatWithothModifier)
 {
@@ -53,7 +53,7 @@ TEST(DefaultFormater, FormatWithothModifier)
   }
 }
 
-// test Default foramtter's Format function constracted with enabling the use of
+// test Default formatter's Format function constructed with enabling the use of
 // modifier and time zone information
 TEST(DefaultFormater, FormatWithModifier)
 {
