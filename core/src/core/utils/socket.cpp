@@ -1,6 +1,6 @@
 // Implementation of the Socket class.
 
-#include "navio/socket.hpp"
+#include "core/utils/socket.hpp"
 #include "string.h"
 #include <string.h>
 #include <errno.h>

@@ -5,8 +5,8 @@
 #include <memory>
 #include <core/utils/writter_file.hpp>
 #include <core/utils/date_time.hpp>
-#include "navio/server_socket.hpp"
-#include "navio/socket_exception.hpp"
+#include <core/utils/server_socket.hpp>
+#include <core/utils/socket_exception.hpp>
 #include <iostream>
 
 constexpr mpu::AccelScale ASCALE = mpu::AccelScale::FS_16G;
