@@ -91,7 +91,7 @@ void ExpectEqModifier(const Modifier& expect, const Modifier& actual)
   EXPECT_EQ(expect.ToString(), actual.ToString());
 }
 
-// check if the passed labled-modifier has the same expected configuration
+// check if the passed labeled-modifier has the same expected configuration
 void ExpectEqLabeledModifier(const EventLevel::event_level_t expect_event,
                                 const std::string& expect_label,
                                 const Modifier& expect_modifier,
@@ -105,7 +105,7 @@ void ExpectEqLabeledModifier(const EventLevel::event_level_t expect_event,
   EXPECT_EQ(FormatLabeledModifier(expect_modifier, expect_label), ss.str());
 }
 
-// check if the passed labled-modifiers have the expected configuration
+// check if the passed labeled-modifiers have the expected configuration
 void ExpectEqLabeledModifier(const LabeledModifier& expect,
                                 const LabeledModifier& actual)
 {

@@ -61,7 +61,7 @@ TEST(LabeledModifier, ConstructWithEventAndLabelAndModifier)
   }
 }
 
-// check debug labled modifier settings created using DebugLabeledModifier
+// check debug labeled modifier settings created using DebugLabeledModifier
 // function
 TEST(LabeledModifier, DebugLabeledModifier)
 {
@@ -71,7 +71,7 @@ TEST(LabeledModifier, DebugLabeledModifier)
                              actual);
 }
 
-// check error labled modifier settings created using error_labeled_modifier
+// check error labeled modifier settings created using error_labeled_modifier
 // function
 TEST(LabeledModifier, error_labeled_modifier)
 {
@@ -81,7 +81,7 @@ TEST(LabeledModifier, error_labeled_modifier)
                              actual);
 }
 
-// check info labled modifier settings created using info_labeled_modifier
+// check info labeled modifier settings created using info_labeled_modifier
 // function
 TEST(LabeledModifier, info_labeled_modifier)
 {
@@ -91,7 +91,7 @@ TEST(LabeledModifier, info_labeled_modifier)
                              actual);
 }
 
-// check warn labled modifier settings created using warn_labeled_modifier
+// check warn labeled modifier settings created using warn_labeled_modifier
 // function
 TEST(LabeledModifier, warn_labeled_modifier)
 {

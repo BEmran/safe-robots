@@ -82,4 +82,4 @@ int GetNavioVersion()
     ReadFile("/sys/firmware/devicetree/base/hat/product_id", "%x",&version);
     return version;
 }
-} // namespace
+}  // namespace navio

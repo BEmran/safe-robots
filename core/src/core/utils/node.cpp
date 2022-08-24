@@ -67,4 +67,17 @@ Node CreateNode(const std::string& node_name)
   return utils::Node(node_name, log);
 }
 
+Node CreateDefaultNode(const std::string& node_name)
+{
+  const static auto console_formater =
+      std::make_shared<utils::DefaultFormater>(true);
+  const static auto file_formater =
+      std::make_shared<utils::DefaultFormater>(false);
+  const static auto exception = std::make_shared<utils::ExceptionFactory>("");
+  const static auto logger_name = "sys_logger.txt";
+  const static auto log = std::make_shared<utils::Logger>(
+      logger_name, file_formater, console_formater, exception);
+
+  return utils::Node(node_name, log);
+}
 }  // namespace core::utils

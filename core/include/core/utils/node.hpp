@@ -57,7 +57,7 @@ class Node
 
   /**
    * @brief Construct a new Node object using its name, logger with specific
-   * labeld modifiers
+   * labeled modifiers
    *
    * @param name node name
    * @param logger shared ptr to a logger object
@@ -113,8 +113,8 @@ class Node
    * @brief Logs a message with specific LabeledModifier
    * @details this function is also called internally by all log_* functions
    *
-   * @param lm labled modiefer which defines event and its label
-   * @param msg message to be looged
+   * @param lm labeled modifier which defines event and its label
+   * @param msg message to be logged
    */
   void Log(const LabeledModifier& lm, const std::string& msg) const;
 
@@ -125,18 +125,26 @@ class Node
 };
 
 /**
- * @brief calls node's log_error fiunction and pass to it error information
+ * @brief calls node's log_error function and pass to it error information
  *
  */
 #define LOG_ERROR(node, msg) node.LogError(LOG_INFORMATION_STRING + ": " + msg)
 
 /**
- * @brief Create a Node with using labeld modifier
+ * @brief Create a Node with labeled modifier
  *
  * @param node_name node name
  * @return Node object
  */
 Node CreateNode(const std::string& node_name);
+
+/**
+ * @brief Create a Node with a same logger
+ * 
+ * @param node_name node name
+ * @return Node object
+ */
+Node CreateDefaultNode(const std::string& node_name);
 
 }  // namespace core::utils
 
