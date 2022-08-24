@@ -6,7 +6,6 @@
 #include <core/utils/writter_file.hpp>
 #include <core/utils/date_time.hpp>
 #include <core/utils/server_socket.hpp>
-#include <core/utils/socket_exception.hpp>
 #include <iostream>
 
 constexpr mpu::AccelScale ASCALE = mpu::AccelScale::FS_16G;
@@ -23,21 +22,27 @@ uint TimeInMilliSec()
   const auto epoch = now.time_since_epoch();
   return std::chrono::duration_cast<std::chrono::milliseconds>(epoch).count();
 }
+
 //=============================================================================
 int main(int argc, char* argv[])
 {
+  auto app = core::utils::CreateDefaultNode("app");
+  app.LogDebug("running....");
+
   if (argc < 2)
   {
-    fprintf(stderr, "ERROR, no port provided\n");
-    exit(1);
+    app.LogError("no port provided");
+    return EXIT_FAILURE;
   }
 
   const int port = atoi(argv[1]);
 
   if (navio::CheckApm())
   {
-    return 1;
+    app.LogError("APM is busy. Can't launch the app");
+    return EXIT_FAILURE;
   }
+
   mpu::Config config;
   config.accel_bw = ABW;
   config.accel_scale = ASCALE;
@@ -51,54 +56,41 @@ int main(int argc, char* argv[])
 
   if (!sensor->Probe())
   {
+    app.LogError("MPU sensor can't be probed");
     return EXIT_FAILURE;
   }
+
   sensor->Initialize();
+  app.LogDebug("MPU is initialized successfully");
 
   core::utils::FileWritter file("imu.txt");
-  // sensor->Calibrate();
-
   //-------------------------------------------------------------------------
-
   // Create the socket
-  ServerSocket server(port);
-  int trials = 3;
+  core::utils::ServerSocket server(port);
+
   const auto begin = TimeInMilliSec();
-  while (trials--)
+  auto tries = 5;
+
+  while(--tries > 0)
   {
-    try
-    {
-      std::cout << "Wait for connect to client....\n";
-      ServerSocket new_sock;
-      server.Accept(new_sock);
+    server.Accept();
+    while (server.IsReady())
+    {        
+      const auto raw = sensor->ReadRawData();
+      std::stringstream ss;
+      ss << TimeInMilliSec() - begin << ", "  //
+          << raw.accel.x() << ", " << raw.accel.y() << ", " << raw.accel.z()
+          << ", "  //
+          << raw.gyro.x() << ", " << raw.gyro.y() << ", " << raw.gyro.z()
+          << ", "  //
+          << raw.mag.x() << ", " << raw.mag.y() << ", " << raw.mag.z()
+          << ", "  //
+          << raw.mag_over_flow << ";";
 
-      try
-      {
-        while (true)
-        {
-          auto raw = sensor->ReadRawData();
-          std::stringstream ss;
-          ss << TimeInMilliSec() - begin << ", "  //
-             << raw.accel.x() << ", " << raw.accel.y() << ", " << raw.accel.z()
-             << ", "  //
-             << raw.gyro.x() << ", " << raw.gyro.y() << ", " << raw.gyro.z()
-             << ", "  //
-             << raw.mag.x() << ", " << raw.mag.y() << ", " << raw.mag.z()
-             << ", "  //
-             << raw.mag_over_flow << ";";
-
-          new_sock << ss.str();
-          usleep(10000);
-        }
-      }
-      catch (SocketException&)
-      {
-      }
+        server << ss.str();
+        usleep(10000);
     }
-    catch (SocketException& e)
-    {
-      std::cout << "Exception was caught:" << e.description() << "\n";
-    }
+    app.LogWarn("Lost connection");
   }
 
   return EXIT_SUCCESS;
