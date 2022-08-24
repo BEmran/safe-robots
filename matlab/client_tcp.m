@@ -5,21 +5,21 @@ MaxSize = 1000;
 RunInfity = true;
 
 %% user config
-adress = input('Enter IP address: ');
-if isempty(adress)
-    disp(["no address is entered used default", DefaultAddress])
+% adress = input('Enter IP address: ');
+% if isempty(adress)
+%     disp("no address is entered. Using default address: "+ DefaultAddress);
     adress = DefaultAddress;
-end
-
-port = input('Enter Port number: ');
-if isempty(port)
-    disp(["no port is entered used default", DefaultPort])
+% end
+% 
+% port = input('Enter Port number: ');
+% if isempty(port)
+%     disp("no port is entered. Using default port: "+ num2str(DefaultPort));
     port = DefaultPort;
-else
-    port = str2num(port);
-end
+% else
+%     port = str2num(port);
+% end
 %% read Imu specs
-specs()
+specs;
 
 %% store data
 if RunInfity
