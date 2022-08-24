@@ -1,22 +1,23 @@
 // Definition of the Socket class
 
-#ifndef Socket_class
-#define Socket_class
+#ifndef CORE_UTILS_SOCKET_HPP
+#define CORE_UTILS_SOCKET_HPP
 
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <unistd.h>
-#include <string>
 #include <arpa/inet.h>
 
-constexpr auto MAXHOSTNAME = 200;
-constexpr auto MAXCONNECTIONS = 5;
-constexpr auto MAXRECV = 500;
+#include <string>
+
+namespace core::utils
+{
 
 /**
- * @brief A socket is a channel to connect two ip address
+ * @brief Wrapper for C socket function. A socket is a channel to connect two ip
+ * address
  *
  */
 class Socket
@@ -43,7 +44,7 @@ class Socket
   bool Create();
 
   /**
-   * @brief Give the socket FD the local address.
+   * @brief Bind the socket to the current IP address on port
    *
    * @param port port number.
    * @return true if success.
@@ -52,43 +53,48 @@ class Socket
   bool Bind(const int port);
 
   /**
-   * @brief Prepare to accept connections on socket FD.
-   *
+   * @brief tells the socket to listen to the incoming connections. It places
+   * all incoming connection into a backlog queue until Accept() call accepts
+   * the connection.
    * @return true if success.
    * @return false otherwise.
    */
   bool Listen() const;
 
   /**
-   * @brief Wait for a connection on socket FD. When a connection arrives, open
-   * a new socket to communicate with it. and update the socket number.
+   * @brief Wait for a connection on socket FD.
+   * @details returns a new socket file descriptor for the accepted connection.
+   * So, the original socket file descriptor can continue to be used
+   * for accepting new connections while the new socket file descriptor is used
+   * for communicating with the connected client.
    *
-   * @return true if success.
-   * @return false otherwise.
+   * @return std::pair<bool, int> accept status and new socket file descriptor
    */
-  bool Accept(Socket& new_socket) const;
+  std::pair<bool, int> Accept();
 
-  // Client initialization
-  bool Connect(const std::string& host, const int port);
+  // // Client initialization
+  // bool Connect(const std::string& host, const int port);
 
   /**
    * @brief Send a string message to socket FD.
    *
-   * @param msg string message
+   * @param client_sock client socket file descriptor
+   * @param msg string message to be sent
    * @return true if msg is sent successfully
    * @return false otherwise
    */
-  bool Send(const std::string& msg) const;
+  bool Send(const int client_sock, const std::string& msg) const;
 
   /**
    * @brief Read a msg from socket FD.
    *
+   * @param client_sock client socket file descriptor
    * @param msg received message
    * @return int
    */
-  int Recv(std::string& msg) const;
+  int Recv(const int client_sock, std::string& msg) const;
 
-  void SetNonBlocking(const bool block);
+  // void SetNonBlocking(const bool block);
 
   /**
    * @brief Check if socket is valid to be used
@@ -111,5 +117,5 @@ class Socket
   int sock_;
   sockaddr_in address_;
 };
-
-#endif
+}  // namespace core::utils
+#endif  // CORE_UTILS_SOCKET_HPP
