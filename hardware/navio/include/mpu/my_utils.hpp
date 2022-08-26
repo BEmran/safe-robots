@@ -16,13 +16,13 @@ namespace mpu
 
 constexpr int max_bit_val = 32767;  // Measurement range is from -32760 ~ +32760
                                     // decimal in 16-bit output.
-constexpr int max_utesla = 4912;    // Magnetic flux density in micro Tesla
+constexpr int max_utesla = 10 * 4912;  // Magnetic flux density in milliGauss
 
 using core::utils::GRAVITY;
+using core::utils::Mat3;
 using core::utils::MATH_TYPE;
 using core::utils::PI;
 using core::utils::Vec3;
-using core::utils::Mat3;
 
 using core::utils::ImuData;
 using ImuSensorModule = core::sensors::SensorModuleAbs<ImuData>;
@@ -77,7 +77,8 @@ struct SensorSpecs
    * @param sen sensitivity value
    * @param unit unit conversion row -> iso unit
    */
-  SensorSpecs(const MATH_TYPE sen, const MATH_TYPE unit, const Vec3& bias_, const Vec3& offset_)
+  SensorSpecs(const MATH_TYPE sen, const MATH_TYPE unit, const Vec3& bias_,
+              const Vec3& offset_)
     : sensitivity(sen), unit_conversion(unit), bias(bias_), offset(offset_)
   {
     UpdateEquation();
@@ -95,20 +96,10 @@ struct SensorSpecs
     return A(0) * raw + b[0];
   }
 
-  void SetMisalignment(const Mat3& m)
+  void SetCalibration(const Mat3& m, const Vec3& bias_, const Vec3& offset_)
   {
     misalignment = m;
-    UpdateEquation();
-  }
-
-  void SetBias(const Vec3& bias_)
-  {
     bias = bias_;
-    UpdateEquation();
-  }
-
-  void SetOffset(const Vec3& offset_)
-  {
     offset = offset_;
     UpdateEquation();
   }
@@ -118,6 +109,7 @@ struct SensorSpecs
     A = misalignment * unit_conversion / sensitivity;
     b = misalignment * (offset - bias / sensitivity) * unit_conversion;
   }
+
   /**
    * @brief apply specs on a vector raw measurement
    *
@@ -126,7 +118,8 @@ struct SensorSpecs
    */
   Vec3 Apply(const Vec3& raw) const
   {
-    // return ((misalignment * (raw - bias) / sensitivity) + offset) * unit_conversion;
+    // return ((misalignment * (raw - bias) / sensitivity) + offset) *
+    // unit_conversion;
     return A * raw + b;
   }
 };
@@ -172,8 +165,7 @@ int16_t To16Bit(const uint8_t msb, const uint8_t lsb);
  */
 Vec3 ArrayToVec3(const std::array<MATH_TYPE, 3>& array);
 
-Vec3
-Vec3From16Bits(const std::vector<int16_t>::const_iterator begin);
+Vec3 Vec3From16Bits(const std::vector<int16_t>::const_iterator begin);
 
 /**
  * @brief Apply sensor specs on the passed raw data
@@ -184,9 +176,18 @@ Vec3From16Bits(const std::vector<int16_t>::const_iterator begin);
  */
 std::array<MATH_TYPE, 3> ApplySensorSpecs(const std::array<int16_t, 3>& raw,
                                           const SensorSpecs& spec);
-Vec3 ApplySensorSpecs(const Vec3& raw,
-                                   const SensorSpecs& spec);
+                                          
+Vec3 ApplySensorSpecs(const Vec3& raw, const SensorSpecs& spec);
+
 void PrintVec(const std::vector<uint8_t>& vec);
+
+/**
+ * @brief Estimate roll and pitch angles from accelerometer
+ * 
+ * @param accel accelerometer sensor data
+ * @return Vec3 angle vector [roll, pitch, yaw]
+ */
+Vec3 EstimateRPY(const Vec3& accel);
 
 }  // namespace mpu
 

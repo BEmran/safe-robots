@@ -2,15 +2,10 @@
 #include <iostream>
 
 #include <algorithm>
+#include <cmath>
 
 namespace mpu
 {
-
-// spi::SPI* GetSpi()
-// {
-//   static spi::SPI spi("/dev/spidev0.1", true);
-//   return &spi;
-// }
 
 void Delay(uint32_t msec)
 {
@@ -47,8 +42,7 @@ Vec3 Vec3From16Bits(const std::vector<int16_t>::const_iterator begin)
   return vec;
 }
 
-Vec3 ApplySensorSpecs(const Vec3& raw,
-                                   const SensorSpecs& spec)
+Vec3 ApplySensorSpecs(const Vec3& raw, const SensorSpecs& spec)
 {
   Vec3 vec;
   for (size_t i = 0; i < raw.size(); i++)
@@ -74,6 +68,18 @@ void PrintVec(const std::vector<uint8_t>& vec)
     std::cout << static_cast<int>(data) << "\t";
   });
   std::cout << std::endl;
+}
+
+Vec3 EstimateRPY(const Vec3& accel)
+{
+  const auto accel_normalized = accel.normalized();
+  const auto ay2 = accel_normalized.y() * accel_normalized.y();
+  const auto az2 = accel_normalized.z() * accel_normalized.z();
+
+  const auto rx = std::atan2(accel_normalized.y(), accel_normalized.z());
+  const auto ry = std::atan2(-accel_normalized.x(), std::sqrt(ay2 + az2));
+  const auto rz = 0.F;
+  return Vec3(rx, ry, rz);
 }
 
 }  // namespace mpu
