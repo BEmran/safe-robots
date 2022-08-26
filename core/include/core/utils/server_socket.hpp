@@ -16,7 +16,7 @@ class ServerSocket
    *
    * @param port port number
    */
-  explicit ServerSocket(const int port);
+  explicit ServerSocket(const uint16_t port);
 
   /**
    * @brief Destroy the Server Socket object

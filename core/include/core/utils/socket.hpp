@@ -50,7 +50,7 @@ class Socket
    * @return true if success.
    * @return false otherwise.
    */
-  bool Bind(const int port);
+  bool Bind(const uint16_t port);
 
   /**
    * @brief tells the socket to listen to the incoming connections. It places
@@ -83,7 +83,7 @@ class Socket
    * @return true if msg is sent successfully
    * @return false otherwise
    */
-  bool Send(const int client_sock, const std::string& msg) const;
+  static bool Send(const int client_sock, const std::string& msg);
 
   /**
    * @brief Read a msg from socket FD.
@@ -92,7 +92,7 @@ class Socket
    * @param msg received message
    * @return int
    */
-  int Recv(const int client_sock, std::string& msg) const;
+  static int Recv(const int client_sock, std::string& msg);
 
   // void SetNonBlocking(const bool block);
 
@@ -111,7 +111,7 @@ class Socket
    * @return true if setting option was successful
    * @return false otherwise
    */
-  bool SetSocketOpt();
+  bool SetSocketOpt() const;
 
  private:
   int sock_;

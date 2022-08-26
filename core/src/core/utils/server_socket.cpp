@@ -1,12 +1,11 @@
 // Implementation of the ServerSocket class
 
 #include "core/utils/server_socket.hpp"
-#include "core/utils/socket_exception.hpp"
 
 namespace core::utils
 {
 
-ServerSocket::ServerSocket(const int port)
+ServerSocket::ServerSocket(const uint16_t port)
   : ready(false)
   , port_(port)
   , node_(std::make_unique<Node>(CreateDefaultNode("Socket")))

@@ -2,12 +2,13 @@
 
 #include "core/utils/socket.hpp"
 
-#include <string.h>
-#include <errno.h>
+#include <cstring>
+#include <cerrno>
 #include <fcntl.h>
 #include <iostream>
 
-namespace {
+namespace
+{
 constexpr auto kMaxConnection = 5;
 }  // namespace
 
@@ -21,7 +22,9 @@ Socket::Socket() : sock_(-1)
 Socket::~Socket()
 {
   if (IsValid())
+  {
     ::close(sock_);
+  }
 }
 
 bool Socket::Create()
@@ -30,7 +33,7 @@ bool Socket::Create()
   return SetSocketOpt();
 }
 
-bool Socket::SetSocketOpt()
+bool Socket::SetSocketOpt() const
 {
   if (!IsValid())
   {
@@ -40,11 +43,11 @@ bool Socket::SetSocketOpt()
   // TIME_WAIT - argh
   int on = 1;
   const auto res = ::setsockopt(sock_, SOL_SOCKET, SO_REUSEADDR,
-                                (const char*)&on, sizeof(on));
+                                reinterpret_cast<const char*>(&on), sizeof(on));
   return res != -1;
 }
 
-bool Socket::Bind(const int port)
+bool Socket::Bind(const uint16_t port)
 {
   if (!IsValid())
   {
@@ -55,7 +58,8 @@ bool Socket::Bind(const int port)
   address_.sin_addr.s_addr = INADDR_ANY;
   address_.sin_port = htons(port);
 
-  const auto res = ::bind(sock_, (struct sockaddr*)&address_, sizeof(address_));
+  const auto res =
+      ::bind(sock_, reinterpret_cast<sockaddr*>(&address_), sizeof(address_));
   return res != -1;
 }
 
@@ -72,20 +76,21 @@ bool Socket::Listen() const
 
 std::pair<bool, int> Socket::Accept()
 {
-  const int addr_length = sizeof(address_);
-  const auto new_sock =
-      ::accept(sock_, (sockaddr*)&address_, (socklen_t*)&addr_length);
+  int addr_length = sizeof(address_);
+  const auto new_sock = ::accept(sock_, reinterpret_cast<sockaddr*>(&address_),
+                                 reinterpret_cast<socklen_t*>(&addr_length));
 
   return {sock_ > 0, new_sock};
 }
 
-bool Socket::Send(const int client_sock, const std::string& msg) const
+bool Socket::Send(const int client_sock, const std::string& msg)
 {
-  const auto status = ::send(client_sock, msg.c_str(), msg.size(), MSG_NOSIGNAL);
+  const auto status =
+      ::send(client_sock, msg.c_str(), msg.size(), MSG_NOSIGNAL);
   return status != -1;
 }
 
-int Socket::Recv(const int client_sock, std::string& msg) const
+int Socket::Recv(const int client_sock, std::string& msg)
 {
   const auto buf_size = msg.size() + 1;
   char buf[buf_size];
