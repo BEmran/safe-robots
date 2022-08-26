@@ -20,6 +20,7 @@ uint TimeInMilliSec()
   const auto epoch = now.time_since_epoch();
   return std::chrono::duration_cast<std::chrono::milliseconds>(epoch).count();
 }
+
 //=============================================================================
 int main(int /*argc*/, char** /*argv[]*/)
 {
@@ -27,6 +28,7 @@ int main(int /*argc*/, char** /*argv[]*/)
   {
     return 1;
   }
+  auto node = std::make_unique<core::utils::Node>(core::utils::CreateDefaultNode("imu"));
   mpu::Config config;
   config.accel_bw = ABW;
   config.accel_scale = ASCALE;
@@ -36,7 +38,7 @@ int main(int /*argc*/, char** /*argv[]*/)
   config.mag_scale = MSCALE;
   config.sample_rate_divisor = SAMPLE_RATE_DIVISOR;
   auto spi = std::make_unique<SPI>(navio::MPU_SPI_PATH, false);
-  auto sensor = std::make_unique<mpu::Mpu9250>(config, std::move(spi), true);
+  auto sensor = std::make_unique<mpu::Mpu9250>(config, std::move(spi), std::move(node));
 
   if (!sensor->Probe())
   {
@@ -45,7 +47,7 @@ int main(int /*argc*/, char** /*argv[]*/)
   sensor->Initialize();
 
   core::utils::FileWritter file("imu.txt");
-  // sensor->Calibrate();
+  sensor->Calibrate();
 
   //-------------------------------------------------------------------------
   const auto begin = TimeInMilliSec();
