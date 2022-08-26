@@ -1,4 +1,5 @@
 #include "mpu/spi.hpp"
+#include "mpu/my_utils.hpp"
 
 #include <unistd.h>     // close
 #include <fcntl.h>      // open
@@ -8,6 +9,8 @@
 #include <linux/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <algorithm>
+#include <iostream>
 
 namespace spi
 {
@@ -15,12 +18,28 @@ constexpr uint32_t SpeedHz = 1000000;
 constexpr uint8_t BitsPerWord = 8;
 constexpr uint8_t DelayUsecs = 0;
 
+spi_ioc_transfer CreateSpiTransfer(const std::vector<uint8_t>& buf)
+{
+  spi_ioc_transfer spi_transfer;
+  memset(&spi_transfer, 0, sizeof(spi_ioc_transfer));
+
+  // cast pointer address to long uint
+  spi_transfer.tx_buf = reinterpret_cast<std::uintptr_t>(buf.data());
+  spi_transfer.rx_buf = reinterpret_cast<std::uintptr_t>(buf.data());
+  spi_transfer.len = static_cast<unsigned int>(buf.size());
+  spi_transfer.speed_hz = SpeedHz;
+  spi_transfer.bits_per_word = BitsPerWord;
+  spi_transfer.delay_usecs = DelayUsecs;
+  return spi_transfer;
+}
+}  // namespace spi
+
 SPI::SPI(const std::string& path, const bool debug)
-  : path_(path), debug_(debug)
+  : CommAbs(debug), path_(path)
 {
 }
 
-int SPI::Transfer(uint8_t* buff, const uint32_t length) const
+int SPI::Transfer(const std::vector<uint8_t>& buff) const
 {
   const int fd = Open();
   if (fd == -1)
@@ -28,48 +47,55 @@ int SPI::Transfer(uint8_t* buff, const uint32_t length) const
     return -1;
   }
 
-  if (debug_)
+  if (IsDebug())
   {
-    printf("Tx: ");
-    PrintCArrayData(buff, length);
+    std::cout << "Rx: ";
+    mpu::PrintVec(buff);
   }
 
-  spi_ioc_transfer spi_transfer = CreateSpiTransfer(buff, buff, length);
+  spi_ioc_transfer spi_transfer = spi::CreateSpiTransfer(buff);
   int status = ioctl(fd, SPI_IOC_MESSAGE(1), &spi_transfer);
   Close(fd);
 
-  if (debug_)
+  if (IsDebug())
   {
-    printf("Rx: ");
-    PrintCArrayData(buff, length);
+    std::cout << "Rx: ";
+    mpu::PrintVec(buff);
   }
+
+  usleep(1000);
 
   return status;
 }
 
 void SPI::WriteRegister(const uint8_t reg, const uint8_t data) const
 {
-    uint8_t buf[2] = {reg, data};
-    Transfer(buf, 2);
+  Transfer({reg, data});
+}
+
+void SPI::WriteRegisters(
+    const std::vector<std::pair<uint8_t, uint8_t>>& reg_and_data) const
+{
+  std::for_each(reg_and_data.begin(), reg_and_data.end(),
+                [this](const auto rd) {
+                  Transfer({rd.first, rd.second});
+                });
 }
 
 uint8_t SPI::ReadRegister(const uint8_t reg) const
 {
-  uint8_t buffer[1] = {0};
-  ReadRegisters(reg, 1, buffer);
-  return buffer[0];
+  return ReadRegisters(reg, 1)[0];
 }
 
-void SPI::ReadRegisters(const uint8_t reg, const uint8_t count, uint8_t * dest) const
+std::vector<uint8_t> SPI::ReadRegisters(const uint8_t reg,
+                                        const uint8_t count) const
 {
-    unsigned char buf[100] = {0};
-    buf[0] = reg | 0x80;
-    Transfer(buf, count + 1);
-
-    for(uint8_t i=0; i < count; i++)
-        dest[i] = buf[i + 1];
-
-    usleep(50);
+  std::vector<uint8_t> buf(count + 1, 0);
+  buf[0] = reg | 0x80;
+  Transfer(buf);
+  usleep(50);
+  buf.erase(buf.begin());
+  return buf;
 }
 
 int SPI::Open() const
@@ -92,37 +118,3 @@ void SPI::Close(const int fd)
   }
   ::close(fd);
 }
-
-// void PrintDebugInfo(uint8_t* tx, uint8_t* rx, const uint32_t length)
-// {
-//   printf("Tx: ");
-//   PrintCArrayData(tx, length);
-
-//   printf("Rx: ");
-//   PrintCArrayData(rx, length);
-// }
-
-void PrintCArrayData(uint8_t* array, const uint32_t length)
-{
-  for (uint i = 0; i < length; i++)
-  {
-    printf("[%2x]: %x\t", i, array[i]);
-  }
-  printf("\n");
-}
-
-spi_ioc_transfer CreateSpiTransfer(uint8_t* tx, uint8_t* rx, const uint32_t length)
-{
-  spi_ioc_transfer spi_transfer;
-  memset(&spi_transfer, 0, sizeof(spi_ioc_transfer));
-
-  // cast pointer address to long uint
-  spi_transfer.tx_buf = reinterpret_cast<std::uintptr_t>(tx);
-  spi_transfer.rx_buf = reinterpret_cast<std::uintptr_t>(rx);
-  spi_transfer.len = length;
-  spi_transfer.speed_hz = SpeedHz;
-  spi_transfer.bits_per_word = BitsPerWord;
-  spi_transfer.delay_usecs = DelayUsecs;
-  return spi_transfer;
-}
-}  // namespace spi

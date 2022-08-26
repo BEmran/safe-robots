@@ -5,6 +5,8 @@
 #include <memory>
 #include <core/utils/writter_file.hpp>
 #include <core/utils/date_time.hpp>
+#include <core/utils/server_socket.hpp>
+#include <iostream>
 
 constexpr mpu::AccelScale ASCALE = mpu::AccelScale::FS_16G;
 constexpr mpu::AccelBandWidthHz ABW = mpu::AccelBandWidthHz::BW_44HZ;
@@ -22,12 +24,25 @@ uint TimeInMilliSec()
 }
 
 //=============================================================================
-int main(int /*argc*/, char** /*argv[]*/)
+int main(int argc, char* argv[])
 {
+  auto app = core::utils::CreateDefaultNode("app");
+  app.LogDebug("running....");
+
+  if (argc < 2)
+  {
+    app.LogError("no port provided");
+    return EXIT_FAILURE;
+  }
+
+  const int port = atoi(argv[1]);
+
   if (navio::CheckApm())
   {
-    return 1;
+    app.LogError("APM is busy. Can't launch the app");
+    return EXIT_FAILURE;
   }
+
   auto node = std::make_unique<core::utils::Node>(core::utils::CreateDefaultNode("imu"));
   mpu::Config config;
   config.accel_bw = ABW;
@@ -42,30 +57,42 @@ int main(int /*argc*/, char** /*argv[]*/)
 
   if (!sensor->Probe())
   {
+    app.LogError("MPU sensor can't be probed");
     return EXIT_FAILURE;
   }
+
   sensor->Initialize();
+  app.LogDebug("MPU is initialized successfully");
 
   core::utils::FileWritter file("imu.txt");
-  sensor->Calibrate();
-
   //-------------------------------------------------------------------------
-  const auto begin = TimeInMilliSec();
-  while (true)
-  {
-    // sensor->Update();
-    // std::cout << sensor->GetData();
-    // usleep(500000);
+  // Create the socket
+  core::utils::ServerSocket server(port);
 
-    auto raw = sensor->ReadRawData();
-    std::stringstream ss;
-    ss << TimeInMilliSec() - begin << ", "  //
-       << raw.accel.x() << ", " << raw.accel.y() << ", " << raw.accel.z() << ", "  //
-       << raw.gyro.x() << ", " << raw.gyro.y() << ", " << raw.gyro.z() << ", "  //
-       << raw.mag.x() << ", " << raw.mag.y() << ", " << raw.mag.z() << ", "  //
-       << raw.mag_over_flow;
-    file.dump(ss.str());
-    usleep(10000);
+  const auto begin = TimeInMilliSec();
+  auto tries = 5;
+
+  while(--tries > 0)
+  {
+    server.Accept();
+    while (server.IsReady())
+    {        
+      const auto raw = sensor->ReadRawData();
+      std::stringstream ss;
+      ss << TimeInMilliSec() - begin << ", "  //
+          << raw.accel.x() << ", " << raw.accel.y() << ", " << raw.accel.z()
+          << ", "  //
+          << raw.gyro.x() << ", " << raw.gyro.y() << ", " << raw.gyro.z()
+          << ", "  //
+          << raw.mag.x() << ", " << raw.mag.y() << ", " << raw.mag.z()
+          << ", "  //
+          << raw.mag_over_flow << ";";
+
+        server << ss.str();
+        usleep(10000);
+    }
+    app.LogWarn("Lost connection");
   }
+
   return EXIT_SUCCESS;
 }

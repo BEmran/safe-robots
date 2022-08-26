@@ -23,9 +23,11 @@ class ExceptionFactory
   explicit ExceptionFactory(const std::string& header) : header_(header)
   {
   }
+
   virtual ~ExceptionFactory()
   {
   }
+
   virtual void Throw(const std::string& msg) const
   {
     if (header_.empty())
@@ -45,9 +47,11 @@ class NullExceptionFactory : public ExceptionFactory
   explicit NullExceptionFactory() : ExceptionFactory("")
   {
   }
+  
   ~NullExceptionFactory()
   {
   }
+
   void Throw(const std::string& msg) const final
   {
     (void)msg;

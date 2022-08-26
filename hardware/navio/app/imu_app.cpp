@@ -49,7 +49,7 @@ void PrintHelp()
 
 std::string GetSensorName(int argc, char* argv[])
 {
-  if (GetNavioVersion() == NAVIO2)
+  if (navio::GetNavioVersion() == navio::NAVIO2)
   {
     if (argc < 2)
     {
@@ -89,7 +89,7 @@ std::string GetSensorName(int argc, char* argv[])
 //=============================================================================
 int main(int argc, char* argv[])
 {
-  if (CheckApm())
+  if (navio::CheckApm())
   {
     return 1;
   }

@@ -13,7 +13,7 @@ static const uint8_t SAMPLE_RATE_DIVISOR = 4;
 //=============================================================================
 int main(int /*argc*/, char** /*argv[]*/)
 {
-  if (CheckApm())
+  if (navio::CheckApm())
   {
     return 1;
   }

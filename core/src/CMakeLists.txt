@@ -18,6 +18,9 @@ set(CORE_HEADER_LIST
     ${CORE_INCLUDE_DIR}/utils/writter_console.hpp
     ${CORE_INCLUDE_DIR}/utils/writter_file.hpp
     ${CORE_INCLUDE_DIR}/utils/writter.hpp
+    ${CORE_INCLUDE_DIR}/utils/socket.hpp
+    ${CORE_INCLUDE_DIR}/utils/socket.hpp
+    ${CORE_INCLUDE_DIR}/utils/socket_exception.hpp
     ${CORE_INCLUDE_DIR}/sensors/module_sensor_imu.hpp
     ${CORE_INCLUDE_DIR}/sensors/module_sensor.hpp
     )
@@ -39,6 +42,8 @@ set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/utils/node.cpp
     ${CORE_SOURCE_DIR}/utils/writter_console.cpp
     ${CORE_SOURCE_DIR}/utils/writter_file.cpp
+    ${CORE_SOURCE_DIR}/utils/socket.cpp
+    ${CORE_SOURCE_DIR}/utils/server_socket.cpp
     ${CORE_SOURCE_DIR}/sensors/module_sensor_imu.cpp
     ${CORE_SOURCE_DIR}/sensors/module_sensor.cpp
     )
