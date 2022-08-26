@@ -19,6 +19,8 @@ SensorSpecs CalibrateAccelerometer(const std::function<Vec3(void)>& cb,
                                    const SensorSpecs& spec);
 SensorSpecs CalibrateGyroscope(const std::function<Vec3(void)>& cb,
                                const SensorSpecs& spec);
+SensorSpecs CalibrateMagnetometer(const std::function<Vec3(void)>& cb,
+                                  const SensorSpecs& spec);
 // void CalibrateMagnetometer(std::shared_ptr<ImuSensorModule> sensor);
 
 }  // namespace mpu
