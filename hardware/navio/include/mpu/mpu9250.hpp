@@ -5,6 +5,7 @@
 
 #include <core/sensors/module_sensor.hpp>
 #include <core/utils/data.hpp>
+#include <core/utils/node.hpp>
 
 #include <stdint.h>
 #include <unistd.h>
@@ -101,7 +102,7 @@ class Mpu9250 : public ImuSensorModule
 
  public:
   Mpu9250(const Config& config, std::unique_ptr<SPI> comm,
-          const bool debug);
+          std::unique_ptr<core::utils::Node> node);
 
   void fake();
 
@@ -126,6 +127,7 @@ class Mpu9250 : public ImuSensorModule
   void Calibrate() override;
 
   SensorRawData ReadRawData() const;
+
  protected:
   void ConfigureI2C() const;
   /**
@@ -145,15 +147,30 @@ class Mpu9250 : public ImuSensorModule
   bool ProbeAk8963() const;
 
   /**
-   * @brief reset sensor registers and data
+   * @brief reset sensor registers
    *
    */
   void Reset() const;
 
+  /**
+   * @brief Initialize accelerometer full-scale range and sample rate
+   * configuration
+   *
+   */
   void InitializeAccel() const;
 
+  /**
+   * @brief Initialize Gyro and Thermometer bandwidths and gyroscope full scale
+   * configuration range
+   *
+   */
   void InitializeGyro() const;
 
+  /**
+   * @brief Initialize the magnetometer for continuous mode data acquisition and
+   * sample rates configuration
+   *
+   */
   void InitializeMag() const;
 
   ImuData ApplySensorSpecs(const SensorRawData& raw) const;
@@ -192,18 +209,21 @@ class Mpu9250 : public ImuSensorModule
   void RequestReadAK8963Registers(const uint8_t reg, const uint8_t count) const;
   std::vector<uint8_t> ReadAK8963Registers(const uint8_t reg,
                                            const uint8_t count) const;
+  void SetRegisterByte(const uint8_t reg, const uint8_t byte,
+                       const uint8_t mask) const;
   void WriteRegister(const uint8_t reg, const uint8_t data) const;
   void WriteAK8963Register(const uint8_t reg, const uint8_t data) const;
 
  private:
   Config config_;
+  std::unique_ptr<SPI> comm_;
+  std::unique_ptr<core::utils::Node> node_;
   mutable std::map<core::sensors::SensorModuleType, SensorSpecs>
       sensor_specs_map;
 
-  std::array<float, 3> sensitivity_calibration_ = {
+  std::array<float, 3> mag_sensitivity_calibration_ = {
       1.0F, 1.0F, 1.0F};  // factory calibration
 
-  std::unique_ptr<SPI> comm_;
   // std::array<float, 3> bias_correction_ = {0.0F, 0.0F,
   //                                          0.0F};  // hard iron correction
   // std::array<float, 3> scale_correction_ = {1.0F, 1.0F,
