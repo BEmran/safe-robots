@@ -14,14 +14,24 @@ tm CraeteTmStruct()
   const auto raw_time = time(nullptr);
   return *localtime(&raw_time);
 }
-}  // namespace
 
-int64_t TimeInSeconds()
+template <typename T>
+constexpr int64_t TimeNow()
 {
   const auto now = std::chrono::system_clock::now();
   const auto epoch = now.time_since_epoch();
-  auto sec = std::chrono::duration_cast<std::chrono::seconds>(epoch).count();
-  return sec;
+  return std::chrono::duration_cast<T>(epoch).count();
+}
+}  // namespace
+
+int64_t TimeInMilliSec()
+{
+  return TimeNow<std::chrono::milliseconds>();
+}
+
+int64_t TimeInSeconds()
+{
+  return TimeNow<std::chrono::seconds>();
 }
 
 std::string TimeInSecondsString()
