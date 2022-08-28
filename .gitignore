@@ -3,6 +3,9 @@
 */CMakeCache.*
 */CMakeFiles/*
 
+### pre-commit generated files ###
+compile_commands.json
+
 ### VisualStudioCode ###
 .vscode/*
 .vscode/settings.json
@@ -46,5 +49,3 @@
 *.exe
 *.out
 *.app
-
-build/
