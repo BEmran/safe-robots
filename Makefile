@@ -32,7 +32,7 @@ build-all: ## build target
 	fi
 	@cmake -S . -B build
 	@cd build; \
-	make
+	make -j8
 
 clean: ## clean build file
 	@if [ -d "./build" ]; then	\
@@ -41,7 +41,7 @@ clean: ## clean build file
 
 clang-format-all: ## clang format all source and header files
 	utils/clang-format
-	
+
 cmake-format-all: ## cmake format all CMakeList.txt files
 	utils/cmake-format
 
@@ -52,4 +52,3 @@ test-all: ## run tests with ctest
 	cd build;														\
 		ctest -VV;													\
 	fi
-
