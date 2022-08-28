@@ -21,8 +21,7 @@ TEST(LabeledModifier, ConstructWithEvent)
   for (size_t i = 0; i < EVENTS.size(); i++)
   {
     const LabeledModifier labeled(EVENTS[i]);
-    ExpectEqLabeledModifier(EVENTS[i], LABELS[i], DefaultModifier(),
-                               labeled);
+    ExpectEqLabeledModifier(EVENTS[i], LABELS[i], DefaultModifier(), labeled);
   }
 }
 
@@ -68,7 +67,7 @@ TEST(LabeledModifier, DebugLabeledModifier)
   const auto actual = DebugLabeledModifier();
   const auto event = EventLevel::EL_DEBUG;
   ExpectEqLabeledModifier(event, EventLevelToString(event), DebugModifier(),
-                             actual);
+                          actual);
 }
 
 // check error labeled modifier settings created using error_labeled_modifier
@@ -78,7 +77,7 @@ TEST(LabeledModifier, error_labeled_modifier)
   const auto actual = ErrorLabeledModifier();
   const auto event = EventLevel::EL_ERROR;
   ExpectEqLabeledModifier(event, EventLevelToString(event), ErrorModifier(),
-                             actual);
+                          actual);
 }
 
 // check info labeled modifier settings created using info_labeled_modifier
@@ -88,7 +87,7 @@ TEST(LabeledModifier, info_labeled_modifier)
   const auto actual = InfoLabeledModifier();
   const auto event = EventLevel::EL_INFO;
   ExpectEqLabeledModifier(event, EventLevelToString(event), InfoModifier(),
-                             actual);
+                          actual);
 }
 
 // check warn labeled modifier settings created using warn_labeled_modifier
@@ -98,5 +97,5 @@ TEST(LabeledModifier, warn_labeled_modifier)
   const auto actual = WarnLabeledModifier();
   const auto event = EventLevel::EL_WARN;
   ExpectEqLabeledModifier(event, EventLevelToString(event), WarnModifier(),
-                             actual);
+                          actual);
 }

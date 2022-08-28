@@ -1,21 +1,23 @@
 #ifndef _MPU_SPI_HPP
 #define _MPU_SPI_HPP
 
-#include "navio/communication_abs.hpp"
-
 #include <linux/spi/spidev.h>
 #include <stdint.h>
+
 #include <string>
 #include <vector>
 
+#include "navio/communication_abs.hpp"
+
 namespace navio
 {
-
 class SPI : CommunicationAbs
 {
  public:
   SPI(const std::string& path, const bool debug);
-  ~SPI(){}
+  ~SPI()
+  {
+  }
 
   int Transfer(const std::vector<uint8_t>& buff) const;
 

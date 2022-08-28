@@ -1,12 +1,11 @@
 #include "sensors/common/utils.hpp"
-#include <iostream>
 
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 
 namespace sensors::common::utils
 {
-
 int16_t To16Bit(const uint8_t msb, const uint8_t lsb)
 {
   const auto high = static_cast<int>(msb);

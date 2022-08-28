@@ -47,7 +47,7 @@ class NullExceptionFactory : public ExceptionFactory
   explicit NullExceptionFactory() : ExceptionFactory("")
   {
   }
-  
+
   ~NullExceptionFactory()
   {
   }

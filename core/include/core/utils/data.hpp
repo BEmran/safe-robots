@@ -76,9 +76,16 @@ std::ostream& operator<<(std::ostream& os, const GpsData& gps);
 struct Vec3Data : public Data
 {
   Vec3 data = Vec3::Zero();
-  Vec3Data() : data{0, 0, 0} {}
-  explicit Vec3Data(const Vec3& vec) : data(vec){}
-  Vec3Data(const MATH_TYPE x, const MATH_TYPE y, const MATH_TYPE z) : data{x, y, z}{}
+  Vec3Data() : data{0, 0, 0}
+  {
+  }
+  explicit Vec3Data(const Vec3& vec) : data(vec)
+  {
+  }
+  Vec3Data(const MATH_TYPE x, const MATH_TYPE y, const MATH_TYPE z)
+    : data{x, y, z}
+  {
+  }
   void Clear() override
   {
     data.setZero();
@@ -156,8 +163,8 @@ struct ImuData : public Data
   HeadingData heading;   ///< fused heading filtered with gyro and accel data,
                          ///< same as Tait-Bryan yaw in radians
   AccelData accel;       ///< accelerometer (XYZ) in units of m/s^2
-  GyroData gyro;        ///< gyroscope (XYZ) in units of degrees/s
-  MagData mag;          ///< magnetometer (XYZ) in units of uT
+  GyroData gyro;         ///< gyroscope (XYZ) in units of degrees/s
+  MagData mag;           ///< magnetometer (XYZ) in units of uT
   QuatData quat;         ///< normalized quaternion
   RPYData tait_bryan;    ///< Tait-Bryan angles (roll pitch yaw) in radians
 

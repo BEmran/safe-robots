@@ -1,14 +1,13 @@
 #ifndef MPU_CALIBRATE_HPP
 #define MPU_CALIBRATE_HPP
 
-#include "sensors/common/utils.hpp"
 #include <core/utils/math.hpp>
-
 #include <functional>
+
+#include "sensors/common/utils.hpp"
 
 namespace sensors::common::calibrate
 {
-
 typedef std::function<utils::Vec3(void)> ReadFunc;
 using utils::SensorSpecs;
 // Function which accumulates gyro and accelerometer data after device

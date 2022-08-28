@@ -1,9 +1,10 @@
 #ifndef CORE_SENSORS_MODULE_SENSOR_HPP
 #define CORE_SENSORS_MODULE_SENSOR_HPP
 
-#include "core/utils/module.hpp"
-#include "core/utils/cash.hpp"
 #include <string>
+
+#include "core/utils/cash.hpp"
+#include "core/utils/module.hpp"
 
 namespace core::sensors
 {
@@ -89,7 +90,7 @@ class SensorModuleAbs : public utils::ModuleAbs
   {
     SetData();
   }
-  
+
   virtual void Calibrate()
   {
   }

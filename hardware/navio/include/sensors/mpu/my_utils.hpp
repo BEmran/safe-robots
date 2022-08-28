@@ -3,15 +3,14 @@
 
 #include <stdint.h>
 #include <unistd.h>
-#include <array>
 
+#include <array>
 #include <core/sensors/module_sensor.hpp>
 #include <core/utils/data.hpp>
 #include <core/utils/math.hpp>
 
 namespace mpu
 {
-
 constexpr int max_bit_val = 32767;  // Measurement range is from -32760 ~ +32760
                                     // decimal in 16-bit output.
 constexpr int max_utesla = 10 * 4912;  // Magnetic flux density in milliGauss
@@ -167,12 +166,12 @@ Vec3 Vec3From16BitsVector(const std::vector<int16_t>::const_iterator begin);
  */
 std::array<MATH_TYPE, 3> ApplySensorSpecs(const std::array<int16_t, 3>& raw,
                                           const SensorSpecs& spec);
-                                          
+
 Vec3 ApplySensorSpecs(const Vec3& raw, const SensorSpecs& spec);
 
 /**
  * @brief Estimate roll and pitch angles from accelerometer
- * 
+ *
  * @param accel accelerometer sensor data
  * @return Vec3 angle vector [roll, pitch, yaw]
  */

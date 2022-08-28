@@ -1,4 +1,5 @@
 #include "sensors/common/calibrate.hpp"
+
 #include "navio/hardware_utils.hpp"
 
 namespace sensors::common::calibrate
@@ -80,7 +81,7 @@ SensorSpecs CalibrateMagnetometer(const ReadFunc& cb, const SensorSpecs& spec)
   std::cout << "Mag Calibration: Wave device in a figure eight until done!"
             << std::endl;
   std::array<std::array<utils::MATH_TYPE, kNumSamples>, 3> data;
-  
+
   // collect sampled data
   std::cout << "collecting data";
   for (size_t i = 0; i < kNumSamples; i++)

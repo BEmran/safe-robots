@@ -3,22 +3,21 @@
 
 #include <stdint.h>
 #include <unistd.h>
-#include <array>
-#include <map>
 
+#include <array>
 #include <core/sensors/module_sensor.hpp>
 #include <core/utils/data.hpp>
 #include <core/utils/math.hpp>
+#include <map>
 
 namespace sensors::common::utils
 {
-
 using core::utils::GRAVITY;
+using core::utils::ImuData;
 using core::utils::Mat3;
 using core::utils::MATH_TYPE;
 using core::utils::PI;
 using core::utils::Vec3;
-using core::utils::ImuData;
 using ImuSensorModule = core::sensors::SensorModuleAbs<ImuData>;
 
 namespace literals
@@ -31,8 +30,7 @@ inline constexpr uint8_t operator"" _uc(unsigned long long arg) noexcept
 {
   return static_cast<uint8_t>(arg);
 }
-}  // literals
-
+}  // namespace literals
 
 using namespace literals;
 template <typename T,
@@ -199,12 +197,12 @@ uint8_t SetFlags(const uint8_t byte, const uint8_t mask, const uint8_t flag);
 
 /**
  * @brief Estimate roll and pitch angles from accelerometer
- * 
+ *
  * @param accel accelerometer sensor data
  * @return Vec3 angle vector [roll, pitch, yaw]
  */
 Vec3 EstimateRPY(const Vec3& accel);
 
-}  // namespace navio::sensors::utils
+}  // namespace sensors::common::utils
 
 #endif  // MPU_SENSORS_UTILS_HPP

@@ -87,8 +87,8 @@ class DateTime
 };
 
 /**
- * @brief returns the current time since the start of its clock in milliseconds as
- * long long integer
+ * @brief returns the current time since the start of its clock in milliseconds
+ * as long long integer
  *
  * @return int64_t time in milliseconds
  */
@@ -103,8 +103,8 @@ int64_t TimeInMilliSec();
 int64_t TimeInSeconds();
 
 /**
- * @brief returns the current time since the start of its clock in milliseconds as
- * long long integer
+ * @brief returns the current time since the start of its clock in milliseconds
+ * as long long integer
  *
  * @return int64_t time in milliseconds
  */

@@ -4,7 +4,8 @@ namespace core::utils
 {
 std::ostream& operator<<(std::ostream& os, const BarData& bar)
 {
-  return os << std::setprecision(HALF_PRECISION) << "Barometer data: " << bar.value;
+  return os << std::setprecision(HALF_PRECISION)
+            << "Barometer data: " << bar.value;
 }
 
 std::ostream& operator<<(std::ostream& os, const TemperatureData& temp)

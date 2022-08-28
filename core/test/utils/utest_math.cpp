@@ -1,10 +1,11 @@
 #ifndef TEST_UTEST_DATA_HPP
 #define TEST_UTEST_DATA_HPP
 
-#include "core/utils/math.hpp"
-#include "utest_data.hpp"
 #include <sstream>
+
+#include "core/utils/math.hpp"
 #include "gtest/gtest.h"
+#include "utest_data.hpp"
 
 using namespace core::utils;
 

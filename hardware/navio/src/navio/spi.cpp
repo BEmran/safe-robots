@@ -1,17 +1,19 @@
 #include "navio/spi.hpp"
 
-#include <unistd.h>     // close
-#include <fcntl.h>      // open
-#include <sys/ioctl.h>  // ioctl
-#include <cstring>      // memset
-#include <cstdio>       // printf
+#include <fcntl.h>  // open
 #include <linux/types.h>
-#include <sys/socket.h>
 #include <netdb.h>
+#include <sys/ioctl.h>  // ioctl
+#include <sys/socket.h>
+#include <unistd.h>  // close
+
 #include <algorithm>
+#include <cstdio>   // printf
+#include <cstring>  // memset
 #include <iostream>
 
-namespace navio {
+namespace navio
+{
 namespace
 {
 constexpr uint32_t SpeedHz = 1000000;

@@ -1,12 +1,11 @@
 #include "mpu/my_utils.hpp"
-#include <iostream>
 
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 
 namespace mpu
 {
-
 void Delay(uint32_t msec)
 {
   usleep(msec * 1000);

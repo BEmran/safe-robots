@@ -1,19 +1,19 @@
 #ifndef MPU_MPU9250_HPP
 #define MPU_MPU9250_HPP
 
-#include "sensors/mpu/mpu9250_register_map.hpp"
-#include "sensors/common/utils.hpp"
-#include "navio/spi.hpp"
+#include <stdint.h>
+#include <unistd.h>
 
+#include <array>
 #include <core/sensors/module_sensor.hpp>
 #include <core/utils/data.hpp>
 #include <core/utils/node.hpp>
-
-#include <stdint.h>
-#include <unistd.h>
-#include <array>
 #include <map>
 #include <memory>
+
+#include "navio/spi.hpp"
+#include "sensors/common/utils.hpp"
+#include "sensors/mpu/mpu9250_register_map.hpp"
 
 namespace sensors::mpu
 {
@@ -121,12 +121,12 @@ class Mpu9250 : public cu::ImuSensorModule
    */
   void InitializeMag() const;
 
-/**
- * @brief Apply sensor specs on the passed raw data
- *
- * @param raw raw data
- * @return ImuData holds the proceeded data
- */
+  /**
+   * @brief Apply sensor specs on the passed raw data
+   *
+   * @param raw raw data
+   * @return ImuData holds the proceeded data
+   */
   cu::ImuData ApplySensorSpecs(const SensorRawData& raw) const;
 
   static std::vector<int16_t> ExtractFullBits(const std::vector<uint8_t>& data);
@@ -178,5 +178,5 @@ class Mpu9250 : public cu::ImuSensorModule
   std::array<float, 3> mag_sensitivity_calibration_ = {
       1.0F, 1.0F, 1.0F};  // factory calibration
 };
-}  // namespace navio::sensors::mpu
+}  // namespace sensors::mpu
 #endif  // MPU_MPU9250_HPP

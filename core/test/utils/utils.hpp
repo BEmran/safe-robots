@@ -49,7 +49,7 @@ testing::AssertionResult operator&&(const testing::AssertionResult& lhs,
  */
 template <typename T>
 testing::AssertionResult AssertEqWithLabel(const T expect, const T actual,
-                                              const char* label)
+                                           const char* label)
 {
   if (expect == actual)
   {
@@ -62,7 +62,7 @@ testing::AssertionResult AssertEqWithLabel(const T expect, const T actual,
 
 // generate a string using the passed modifier and its label
 std::string FormatLabeledModifier(const Modifier& modifier,
-                                    const std::string& label)
+                                  const std::string& label)
 {
   std::stringstream ss;
   ss << modifier << "[" << label << "]" << core::utils::DefaultModifier();
@@ -79,7 +79,7 @@ std::string modifier_to_string(const FG fg, const BG bg, const FMT fmt)
 
 // check if the passed modifier has the passed configuration
 void ExpectEqModifier(const FG expect_fg, const BG expect_bg,
-                        const FMT expect_fmt, const Modifier& actual)
+                      const FMT expect_fmt, const Modifier& actual)
 {
   EXPECT_EQ(modifier_to_string(expect_fg, expect_bg, expect_fmt),
             actual.ToString());
@@ -93,9 +93,9 @@ void ExpectEqModifier(const Modifier& expect, const Modifier& actual)
 
 // check if the passed labeled-modifier has the same expected configuration
 void ExpectEqLabeledModifier(const EventLevel::event_level_t expect_event,
-                                const std::string& expect_label,
-                                const Modifier& expect_modifier,
-                                const LabeledModifier& actual)
+                             const std::string& expect_label,
+                             const Modifier& expect_modifier,
+                             const LabeledModifier& actual)
 {
   EXPECT_EQ(expect_event, actual.GetEventLevel());
   EXPECT_EQ(expect_label, actual.GetLabel());
@@ -107,10 +107,10 @@ void ExpectEqLabeledModifier(const EventLevel::event_level_t expect_event,
 
 // check if the passed labeled-modifiers have the expected configuration
 void ExpectEqLabeledModifier(const LabeledModifier& expect,
-                                const LabeledModifier& actual)
+                             const LabeledModifier& actual)
 {
   ExpectEqLabeledModifier(expect.GetEventLevel(), expect.GetLabel(),
-                             expect.GetModifier(), actual);
+                          expect.GetModifier(), actual);
 }
 
 /**

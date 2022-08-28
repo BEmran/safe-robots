@@ -1,6 +1,7 @@
 #include "sensors/mpu/mpu9250.hpp"
-#include "navio/spi.hpp"
+
 #include "navio/hardware_utils.hpp"
+#include "navio/spi.hpp"
 #include "sensors/common/calibrate.hpp"
 
 namespace sensors::mpu
@@ -9,7 +10,6 @@ namespace cu = common::utils;
 using namespace cu::literals;  // _uc
 namespace
 {
-
 using SensorModuleType = core::sensors::SensorModuleType;
 constexpr auto ImuType = SensorModuleType::IMU;
 constexpr auto GyroType = SensorModuleType::GYROSCOPE;
@@ -62,8 +62,8 @@ Mpu9250::Mpu9250(const Config& config, std::unique_ptr<navio::SPI> comm,
 
   cu::Mat3 accel_misalignment;
   accel_misalignment << 0.998122F, 0.00794836F, 0.000548448F,  //
-                       -0.00552448F, 0.998181F, -0.00669443F, //
-                        0.0189156F, 0.00407755F, 0.993244F;
+      -0.00552448F, 0.998181F, -0.00669443F,                   //
+      0.0189156F, 0.00407755F, 0.993244F;
   cu::Vec3 accel_bias{-0.00387028F, -0.0128085F, 0.0108167F};
   cu::Vec3 gyro_bias{12.629F, 7.572F, -9.618F};
   sensor_specs_map[AccelType].SetCalibration(accel_misalignment, accel_bias,
