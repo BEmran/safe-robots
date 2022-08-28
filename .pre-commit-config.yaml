@@ -6,6 +6,7 @@
 exclude: "
   (.git/.*)\
   (.vscode/.*)\
+  (.build/.*)\
   "
 
 repos:
@@ -34,31 +35,24 @@ repos:
       # keep this before clang-tidy, it generates compile_commands.json for it
       - id: compiledb
         name: compiledb
-        entry: compiledb
+        entry: compiledb -f make CC=clan -nBC ./build ## don't change: failed to pass the build directory as argument so placed all options here
         language: system
         always_run: true
         require_serial: true
         pass_filenames: false
-        args:
-          [
-            --overwrite,
-            make,
-            CC=clang,
-            -n,
-            -B
-          ]
 
-      - id: clang-tidy
-        name: clang-tidy
-        description: Find warnings/errors in C and C++ code
-        entry: clang-tidy
-        language: system
-        files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
-        args:
-          [
-            --format-style='file',
-            --extra-arg=-Wno-unknown-warning-option
-          ]
+      # - id: clang-tidy
+      #   name: clang-tidy
+      #   description: Find warnings/errors in C and C++ code
+      #   entry: clang-tidy
+      #   language: system
+      #   files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
+      #   args:
+      #     [
+      #       -p ./build
+      #       --format-style='file',
+      #       --extra-arg=-Wno-unknown-warning-option
+      #     ]
 
       - id: cppcheck
         name: cppcheck
@@ -67,39 +61,39 @@ repos:
         language: system
         files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
 
-      - id: clang-format
-        name: clang-format
-        description: Run `clang-format` against C/C++ header and source files
-        entry: clang-format
-        language: system
-        files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
-        args:
-          [
-            -i,
-            -style=file,
-            --sort-includes,
-            --verbose,
-          ]
+      # - id: clang-format
+      #   name: clang-format
+      #   description: Run `clang-format` against C/C++ header and source files
+      #   entry: clang-format
+      #   language: system
+      #   files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
+      #   args:
+      #     [
+      #       -i,
+      #       -style=file,
+      #       --sort-includes,
+      #       --verbose,
+      #     ]
 
-      - id: cmake-format
-        name: cmake-format
-        description: Run `cmake-format` against CMakefiles files
-        entry: cmake-format
-        language: system
-        files: CMakeLists.txt
-        args:
-          [
-            -i,
-            -c=.cmake-format,
-          ]
+      # - id: cmake-format
+      #   name: cmake-format
+      #   description: Run `cmake-format` against CMakefiles files
+      #   entry: cmake-format
+      #   language: system
+      #   files: CMakeLists.txt
+      #   args:
+      #     [
+      #       -i,
+      #       -c=.cmake-format,
+      #     ]
 
-      - id: cpplint
-        name: cpplint
-        description: Run `cpplint` against C/C++ header and source files
-        entry: cpplint
-        language: python
-        files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
-        args:
-          [
-            "--filter=-whitespace/braces, -legal/copyright",
-          ]
+      # - id: cpplint
+      #   name: cpplint
+      #   description: Run `cpplint` against C/C++ header and source files
+      #   entry: cpplint
+      #   language: python
+      #   files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
+      #   args:
+      #     [
+      #       "--filter=-whitespace/braces, -legal/copyright",
+      #     ]
