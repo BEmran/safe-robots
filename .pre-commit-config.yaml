@@ -1,0 +1,99 @@
+---
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0
+    hooks:
+      - id: check-added-large-files # prevents giant files from being committed.
+      - id: check-case-conflict # checks for files that would conflict in case-insensitive filesystems.
+      - id: check-executables-have-shebangs # ensures that (non-binary) executables have a shebang.
+      - id: check-json # checks json files for parseable syntax.
+      # - id: check-shebang-scripts-are-executable # ensures that (non-binary) files with a shebang are executable.
+      - id: check-merge-conflict # checks for files that contain merge conflict strings.
+      - id: check-symlinks # checks for symlinks which do not point to anything.
+      - id: check-yaml # checks yaml files for parseable syntax.
+      - id: destroyed-symlinks # detects symlinks which are changed to regular files with a content of a path which that symlink was pointing to.
+      - id: detect-private-key # detects the presence of private keys.
+      - id: end-of-file-fixer # ensures that a file is either empty, or ends with one newline.
+      - id: file-contents-sorter # sorts the lines in specified files (defaults to alphabetical). you must provide list of target files as input in your .pre-commit-config.yaml file.
+      - id: fix-byte-order-marker # removes utf-8 byte order marker.
+      - id: mixed-line-ending # replaces or checks mixed line ending.
+      - id: requirements-txt-fixer # sorts entries in requirements.txt.
+      - id: trailing-whitespace # trims trailing whitespace.
+
+  - repo: local
+    hooks:
+      # keep this before clang-tidy, it generates compile_commands.json for it
+      - id: compiledb
+        name: compiledb
+        entry: compiledb
+        language: system
+        always_run: true
+        require_serial: true
+        pass_filenames: false
+        args:
+          [
+            --overwrite,
+            make,
+            CC=clang,
+            -n,
+            -B
+          ]
+
+      - id: clang-tidy
+        name: clang-tidy
+        description: Find warnings/errors in C and C++ code
+        entry: clang-tidy
+        language: system
+        files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
+        args:
+          [
+            --format-style='file',
+            --extra-arg=-Wno-unknown-warning-option
+          ]
+
+      - id: cppcheck
+        name: cppcheck
+        description: Run `cppcheck` against C/C++ source files
+        entry: cppcheck
+        language: system
+        files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
+
+      - id: clang-format
+        name: clang-format
+        description: Run `clang-format` against C/C++ header and source files
+        entry: clang-format
+        language: system
+        files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
+        args:
+          [
+            -i,
+            -style=file,
+            --sort-includes,
+            --verbose,
+          ]
+
+      - id: cmake-format
+        name: cmake-format
+        description: Run `cmake-format` against CMakefiles files
+        entry: cmake-format
+        language: system
+        files: CMakeLists.txt
+        args:
+          [
+            -i,
+            -c=.cmake-format,
+          ]
+
+      - id: cpplint
+        name: cpplint
+        description: Run `cpplint` against C/C++ header and source files
+        entry: cpplint
+        language: python
+        files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
+        args:
+          [
+            "--filter=-whitespace/braces, -legal/copyright",
+          ]
