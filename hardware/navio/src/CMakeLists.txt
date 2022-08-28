@@ -9,8 +9,7 @@ set(NAVIO_HEADER_LIST
     ${NAVIO_INCLUDE_DIR}/sensors/common/calibrate.hpp
     ${NAVIO_INCLUDE_DIR}/sensors/common/utils.hpp
     ${NAVIO_INCLUDE_DIR}/sensors/mpu/mpu9250_register_map.hpp
-    ${NAVIO_INCLUDE_DIR}/sensors/mpu/mpu9250.hpp
-    )
+    ${NAVIO_INCLUDE_DIR}/sensors/mpu/mpu9250.hpp)
 
 # ##############################################################################
 # Create source file list for NAVIO library
@@ -21,21 +20,21 @@ set(NAVIO_SOURCE_LIST
     ${NAVIO_SOURCE_DIR}/navio/spi.cpp
     ${NAVIO_SOURCE_DIR}/sensors/common/calibrate.cpp
     ${NAVIO_SOURCE_DIR}/sensors/common/utils.cpp
-    ${NAVIO_SOURCE_DIR}/sensors/mpu/mpu9250.cpp
-    )
+    ${NAVIO_SOURCE_DIR}/sensors/mpu/mpu9250.cpp)
 
 # ##############################################################################
 # Build NAVIO library
 # ##############################################################################
 # Declare a C++ library Make an automatic library - will be static or dynamic
 # based on user setting
-add_library(${NAVIO_LIBRARY} ${NAVIO_SOURCE_LIST} )#${NAVIO_HEADER_LIST}
+add_library(${NAVIO_LIBRARY} ${NAVIO_SOURCE_LIST}) # ${NAVIO_HEADER_LIST}
 
 # Global includes
-target_include_directories(${NAVIO_LIBRARY} PUBLIC
-    # $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/core/include>
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/hardware/navio/include>
-    # $<INSTALL_INTERFACE:${ABSOLUTE_INSTALL_INCLUDEDIR}>
+target_include_directories(
+    ${NAVIO_LIBRARY}
+    PUBLIC # $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/core/include>
+           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/hardware/navio/include>
+           # $<INSTALL_INTERFACE:${ABSOLUTE_INSTALL_INCLUDEDIR}>
 )
 
 # Link required library
@@ -55,9 +54,9 @@ source_group(
 # ##############################################################################
 # Install
 # ##############################################################################
-    
+
 install(
-    TARGETS ${NAVIO_LIBRARY} 
+    TARGETS ${NAVIO_LIBRARY}
     # IMPORTANT: Add the core_library to the "export-set"
     EXPORT ${TARGETS_EXPORT_NAME}
     LIBRARY DESTINATION ${ABSOLUTE_INSTALL_LIBDIR} COMPONENT shlib
