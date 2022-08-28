@@ -2,7 +2,7 @@
 # addon dunction to create tests
 # ##############################################################################
 # This will allow you to quickly and simply add tests.
-macro(package_add_test_with_libraries TESTNAME FILES LIBRARIES
+macro (package_add_test_with_libraries TESTNAME FILES LIBRARIES
        TEST_WORKING_DIRECTORY)
 
     # create an exectuable in which the tests will be stored
@@ -34,6 +34,6 @@ macro(package_add_test_with_libraries TESTNAME FILES LIBRARIES
     set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
     add_test(NAME ${TESTNAME}_test COMMAND ${TESTNAME})
 
-endmacro()
+endmacro ()
 # example of using the macro package_add_test_with_libraries(test1 test1.cpp
 # lib_to_test "${PROJECT_DIR}/test-data/")
