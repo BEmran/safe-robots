@@ -5,8 +5,7 @@
 #include <iomanip>
 #undef EIGEN_DEFAULT_DENSE_INDEX_TYPE
 #define EIGEN_DEFAULT_DENSE_INDEX_TYPE size_t
-namespace core::utils
-{
+namespace core::utils {
 constexpr float GRAVITY = 9.80665F;
 constexpr float PI = 3.14159F;
 constexpr float PI_2 = 1.570796F;

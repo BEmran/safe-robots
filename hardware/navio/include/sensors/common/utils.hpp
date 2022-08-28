@@ -1,17 +1,19 @@
-#ifndef MPU_SENSORS_UTILS_HPP
-#define MPU_SENSORS_UTILS_HPP
+#ifndef HARDWARE_NAVIO_INCLUDE_SENSORS_COMMON_UTILS_HPP_
+#define HARDWARE_NAVIO_INCLUDE_SENSORS_COMMON_UTILS_HPP_
 
 #include <stdint.h>
 #include <unistd.h>
 
 #include <array>
-#include <core/sensors/module_sensor.hpp>
-#include <core/utils/data.hpp>
-#include <core/utils/math.hpp>
 #include <map>
+#include <string>
+#include <vector>
 
-namespace sensors::common::utils
-{
+#include "core/sensors/module_sensor.hpp"
+#include "core/utils/data.hpp"
+#include "core/utils/math.hpp"
+
+namespace sensors::common::utils {
 using core::utils::GRAVITY;
 using core::utils::ImuData;
 using core::utils::Mat3;
@@ -20,14 +22,12 @@ using core::utils::PI;
 using core::utils::Vec3;
 using ImuSensorModule = core::sensors::SensorModuleAbs<ImuData>;
 
-namespace literals
-{
+namespace literals {
 /**
  * @brief User litterer to define a number of type uint8_t
  *
  */
-inline constexpr uint8_t operator"" _uc(unsigned long long arg) noexcept
-{
+inline constexpr uint8_t operator"" _uc(unsigned long long arg) noexcept {
   return static_cast<uint8_t>(arg);
 }
 }  // namespace literals
@@ -36,41 +36,37 @@ using namespace literals;
 template <typename T,
           typename =
               typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
-struct SpecInfo
-{
+struct SpecInfo {
   T value;
   uint8_t byte;
   std::string name;
-  SpecInfo() : SpecInfo(0, 0_uc, ""){};
+  SpecInfo() : SpecInfo(0, 0_uc, "") {
+  }
   SpecInfo(const T value_, const uint8_t byte_, const std::string& name_)
-    : value(value_), byte(byte_), name(name_){};
+    : value(value_), byte(byte_), name(name_) {
+  }
 };
 
 template <typename E, typename T>
-class SpecInfoMap
-{
+class SpecInfoMap {
   typedef std::map<E, SpecInfo<T>> Map;
   using Iterator = typename Map::iterator;
 
  public:
-  explicit SpecInfoMap(const Map& map) : map_(map)
-  {
+  explicit SpecInfoMap(const Map& map) : map_(map) {
   }
 
-  E Find(const uint8_t byte)
-  {
+  E Find(const uint8_t byte) {
     auto ptr = std::find_if(map_.begin(), map_.end(), [byte](auto ele) {
       return byte == ele.second.byte;
     });
-    if (ptr == map_.end())
-    {
+    if (ptr == map_.end()) {
       throw std::runtime_error("undefined specification");
     }
     return ptr->first;
   }
 
-  SpecInfo<T> operator[](const E key)
-  {
+  SpecInfo<T> operator[](const E key) {
     return map_[key];
   }
 
@@ -83,8 +79,7 @@ class SpecInfoMap
  * reading to usable data (scalded and in iso unit)
  *
  */
-struct SensorSpecs
-{
+struct SensorSpecs {
   MATH_TYPE sensitivity;  // the smallest absolute amount of change that can be
                           // detected by a measurement = max_bit_count / scale
   MATH_TYPE unit_conversion;  // convert a raw value into iso unit
@@ -98,8 +93,7 @@ struct SensorSpecs
    * @brief Construct a new Sensor Specs object
    *
    */
-  SensorSpecs() : SensorSpecs(1.0, 1.0)
-  {
+  SensorSpecs() : SensorSpecs(1.0, 1.0) {
   }
 
   /**
@@ -109,8 +103,7 @@ struct SensorSpecs
    * @param unit unit conversion row -> iso unit
    */
   SensorSpecs(const MATH_TYPE sen, const MATH_TYPE unit)
-    : sensitivity(sen), unit_conversion(unit)
-  {
+    : sensitivity(sen), unit_conversion(unit) {
   }
 
   /**
@@ -121,8 +114,7 @@ struct SensorSpecs
    */
   SensorSpecs(const MATH_TYPE sen, const MATH_TYPE unit, const Vec3& bias_,
               const Vec3& offset_)
-    : sensitivity(sen), unit_conversion(unit), bias(bias_), offset(offset_)
-  {
+    : sensitivity(sen), unit_conversion(unit), bias(bias_), offset(offset_) {
     UpdateEquation();
   }
 
@@ -132,22 +124,19 @@ struct SensorSpecs
    * @param raw raw data
    * @return MATH_TYPE the post proceeded data
    */
-  MATH_TYPE Apply(const MATH_TYPE raw) const
-  {
+  MATH_TYPE Apply(const MATH_TYPE raw) const {
     // return (raw - bias[0]) * (unit_conversion / sensitivity) + offset[0];
     return A(0) * raw + b[0];
   }
 
-  void SetCalibration(const Mat3& m, const Vec3& bias_, const Vec3& offset_)
-  {
+  void SetCalibration(const Mat3& m, const Vec3& bias_, const Vec3& offset_) {
     misalignment = m;
     bias = bias_;
     offset = offset_;
     UpdateEquation();
   }
 
-  void UpdateEquation()
-  {
+  void UpdateEquation() {
     A = misalignment * unit_conversion / sensitivity;
     b = misalignment * (offset - bias / sensitivity) * unit_conversion;
   }
@@ -158,8 +147,7 @@ struct SensorSpecs
    * @param raw raw data vector
    * @return Vec3 the post proceeded data
    */
-  Vec3 Apply(const Vec3& raw) const
-  {
+  Vec3 Apply(const Vec3& raw) const {
     // return ((misalignment * (raw - bias) / sensitivity) + offset) *
     // unit_conversion;
     return A * raw + b;
@@ -205,4 +193,4 @@ Vec3 EstimateRPY(const Vec3& accel);
 
 }  // namespace sensors::common::utils
 
-#endif  // MPU_SENSORS_UTILS_HPP
+#endif  // HARDWARE_NAVIO_INCLUDE_SENSORS_COMMON_UTILS_HPP_

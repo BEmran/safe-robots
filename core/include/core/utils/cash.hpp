@@ -4,15 +4,13 @@
 #include <memory>
 #include <shared_mutex>
 
-namespace core::utils
-{
+namespace core::utils {
 /**
  * @brief simple class used to define a thread-safe way to handle data
  *
  */
 template <class T>
-class Cash
-{
+class Cash {
  public:
   /**
    * @brief Construct a new Cash object
@@ -32,8 +30,7 @@ class Cash
    *
    * @param data new data
    */
-  void Set(const T& data)
-  {
+  void Set(const T& data) {
     std::unique_lock lock(mutex_);
     *data_ptr_.get() = data;
   }
@@ -44,8 +41,7 @@ class Cash
    *
    * @return T data
    */
-  T Get() const
-  {
+  T Get() const {
     std::shared_lock lock(mutex_);
     return *data_ptr_.get();
   }
@@ -54,8 +50,7 @@ class Cash
    * @brief Clear data by calling its default constructor
    *
    */
-  void Clear()
-  {
+  void Clear() {
     std::unique_lock lock(mutex_);
     data_ptr_->Clear();
   }

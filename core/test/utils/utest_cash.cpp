@@ -6,8 +6,7 @@
 
 using namespace core::utils;
 
-TEST(Cash, SetAndGet)
-{
+TEST(Cash, SetAndGet) {
   ImuData imu;
   Cash<ImuData> cash;
   imu.accel.data.x() = 1;
@@ -18,8 +17,7 @@ TEST(Cash, SetAndGet)
   ExpectImuData(imu, cash.Get());
 }
 
-TEST(Cash, SetAndClear)
-{
+TEST(Cash, SetAndClear) {
   ImuData imu;
   Cash<ImuData> cash;
   imu.accel.data.x() = 1;

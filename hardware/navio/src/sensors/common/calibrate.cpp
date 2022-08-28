@@ -2,21 +2,17 @@
 
 #include "navio/hardware_utils.hpp"
 
-namespace sensors::common::calibrate
-{
+namespace sensors::common::calibrate {
 constexpr size_t kNumSamples = 1000;
 
-utils::Vec3 GetAverage(const ReadFunc& cb)
-{
+utils::Vec3 GetAverage(const ReadFunc& cb) {
   utils::Vec3 bias = utils::Vec3::Zero();
   std::cout << "collecting data";
-  for (size_t i = 0; i < kNumSamples; i++)
-  {
+  for (size_t i = 0; i < kNumSamples; i++) {
     const auto data = cb();
     bias += data;
     navio::hardware_utils::Delay(5);
-    if (i % 10 == 0)
-    {
+    if (i % 10 == 0) {
       std::cout << "." << std::flush;
     }
   }
@@ -24,15 +20,15 @@ utils::Vec3 GetAverage(const ReadFunc& cb)
   return bias / kNumSamples;
 }
 
-SensorSpecs CalibrateAccelerometer(const ReadFunc& cb, const SensorSpecs& spec)
-{
+SensorSpecs CalibrateAccelerometer(const ReadFunc& cb,
+                                   const SensorSpecs& spec) {
   Eigen::Matrix<utils::MATH_TYPE, 6, 3> y;
   y << +0.F, +0.F, +1.F,  //
-      -1.F, +0.F, +0.F,   //
-      +1.F, +0.F, +0.F,   //
-      +0.F, -1.F, +0.F,   //
-      +0.F, +1.F, +0.F,   //
-      +0.F, +0.F, -1.F;
+    -1.F, +0.F, +0.F,     //
+    +1.F, +0.F, +0.F,     //
+    +0.F, -1.F, +0.F,     //
+    +0.F, +1.F, +0.F,     //
+    +0.F, +0.F, -1.F;
   Eigen::Matrix<utils::MATH_TYPE, 6, 4> x;
   x.setZero();
   Eigen::Matrix<utils::MATH_TYPE, 4, 3> miss;
@@ -42,8 +38,7 @@ SensorSpecs CalibrateAccelerometer(const ReadFunc& cb, const SensorSpecs& spec)
   std::cout << "miss = \n" << miss << std::endl;
   const char* msg[] = {"face up",   "right side", "side left",
                        "nose down", "nose up",    "face down"};
-  for (int i = 0; i < 6; i++)
-  {
+  for (int i = 0; i < 6; i++) {
     std::cout << msg[i] << " and press enter.....";
     getchar();
     auto xn = GetAverage(cb) / spec.sensitivity;
@@ -66,8 +61,7 @@ SensorSpecs CalibrateAccelerometer(const ReadFunc& cb, const SensorSpecs& spec)
   return calib_spec;
 }
 
-SensorSpecs CalibrateGyroscope(const ReadFunc& cb, const SensorSpecs& spec)
-{
+SensorSpecs CalibrateGyroscope(const ReadFunc& cb, const SensorSpecs& spec) {
   const utils::Vec3 bias = GetAverage(cb);
   std::cout << "Gyro Bias: " << bias.transpose() << std::endl;
 
@@ -76,23 +70,20 @@ SensorSpecs CalibrateGyroscope(const ReadFunc& cb, const SensorSpecs& spec)
   return calib_spec;
 }
 
-SensorSpecs CalibrateMagnetometer(const ReadFunc& cb, const SensorSpecs& spec)
-{
+SensorSpecs CalibrateMagnetometer(const ReadFunc& cb, const SensorSpecs& spec) {
   std::cout << "Mag Calibration: Wave device in a figure eight until done!"
             << std::endl;
   std::array<std::array<utils::MATH_TYPE, kNumSamples>, 3> data;
 
   // collect sampled data
   std::cout << "collecting data";
-  for (size_t i = 0; i < kNumSamples; i++)
-  {
+  for (size_t i = 0; i < kNumSamples; i++) {
     const auto mag = cb();
     data[0][i] = mag.x();
     data[1][i] = mag.y();
     data[2][i] = mag.z();
     navio::hardware_utils::Delay(5);
-    if (i % 10 == 0)
-    {
+    if (i % 10 == 0) {
       std::cout << "." << std::flush;
     }
   }
@@ -101,8 +92,7 @@ SensorSpecs CalibrateMagnetometer(const ReadFunc& cb, const SensorSpecs& spec)
   // find min max
   utils::Vec3 max = utils::Vec3::Zero();
   utils::Vec3 min = utils::Vec3::Zero();
-  for (size_t i = 0; i < data.size(); i++)
-  {
+  for (size_t i = 0; i < data.size(); i++) {
     auto ptr = std::minmax_element(data[i].begin(), data[i].end());
     min(i) = *(ptr.first);
     max(i) = *(ptr.second);

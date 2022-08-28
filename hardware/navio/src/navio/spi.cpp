@@ -12,16 +12,13 @@
 #include <cstring>  // memset
 #include <iostream>
 
-namespace navio
-{
-namespace
-{
+namespace navio {
+namespace {
 constexpr uint32_t SpeedHz = 1000000;
 constexpr uint8_t BitsPerWord = 8;
 constexpr uint8_t DelayUsecs = 0;
 
-spi_ioc_transfer CreateSpiTransfer(const std::vector<uint8_t>& buf)
-{
+spi_ioc_transfer CreateSpiTransfer(const std::vector<uint8_t>& buf) {
   spi_ioc_transfer spi_transfer;
   memset(&spi_transfer, 0, sizeof(spi_ioc_transfer));
 
@@ -35,8 +32,7 @@ spi_ioc_transfer CreateSpiTransfer(const std::vector<uint8_t>& buf)
   return spi_transfer;
 }
 
-void PrintVec(const char* header, const std::vector<uint8_t>& vec)
-{
+void PrintVec(const char* header, const std::vector<uint8_t>& vec) {
   std::cout << header;
   std::for_each(vec.begin(), vec.end(), [](const auto data) {
     std::cout << static_cast<int>(data) << "\t";
@@ -46,20 +42,16 @@ void PrintVec(const char* header, const std::vector<uint8_t>& vec)
 }  // namespace
 
 SPI::SPI(const std::string& path, const bool debug)
-  : CommunicationAbs(debug), path_(path)
-{
+  : CommunicationAbs(debug), path_(path) {
 }
 
-int SPI::Transfer(const std::vector<uint8_t>& buff) const
-{
+int SPI::Transfer(const std::vector<uint8_t>& buff) const {
   const int fd = Open();
-  if (fd == -1)
-  {
+  if (fd == -1) {
     return -1;
   }
 
-  if (IsDebug())
-  {
+  if (IsDebug()) {
     PrintVec("Tx: ", buff);
   }
 
@@ -67,8 +59,7 @@ int SPI::Transfer(const std::vector<uint8_t>& buff) const
   int status = ioctl(fd, SPI_IOC_MESSAGE(1), &spi_transfer);
   Close(fd);
 
-  if (IsDebug())
-  {
+  if (IsDebug()) {
     PrintVec("Rx: ", buff);
   }
 
@@ -77,28 +68,24 @@ int SPI::Transfer(const std::vector<uint8_t>& buff) const
   return status;
 }
 
-void SPI::WriteRegister(const uint8_t reg, const uint8_t data) const
-{
+void SPI::WriteRegister(const uint8_t reg, const uint8_t data) const {
   Transfer({reg, data});
 }
 
 void SPI::WriteRegisters(
-    const std::vector<std::pair<uint8_t, uint8_t>>& reg_and_data) const
-{
+  const std::vector<std::pair<uint8_t, uint8_t>>& reg_and_data) const {
   std::for_each(reg_and_data.begin(), reg_and_data.end(),
                 [this](const auto rd) {
                   Transfer({rd.first, rd.second});
                 });
 }
 
-uint8_t SPI::ReadRegister(const uint8_t reg) const
-{
+uint8_t SPI::ReadRegister(const uint8_t reg) const {
   return ReadRegisters(reg, 1)[0];
 }
 
 std::vector<uint8_t> SPI::ReadRegisters(const uint8_t reg,
-                                        const uint8_t count) const
-{
+                                        const uint8_t count) const {
   std::vector<uint8_t> buf(count + 1, 0);
   buf[0] = reg | 0x80;
   Transfer(buf);
@@ -107,21 +94,17 @@ std::vector<uint8_t> SPI::ReadRegisters(const uint8_t reg,
   return buf;
 }
 
-int SPI::Open() const
-{
+int SPI::Open() const {
   int fd = ::open(path_.c_str(), O_RDWR);
-  if (fd < 0)
-  {
+  if (fd < 0) {
     printf("Error: Can not open SPI device: %s\n", path_.c_str());
     return -1;
   }
   return fd;
 }
 
-void SPI::Close(const int fd)
-{
-  if (fd < 0)
-  {
+void SPI::Close(const int fd) {
+  if (fd < 0) {
     printf("Warning: spi already closed\n");
     return;
   }

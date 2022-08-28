@@ -3,17 +3,14 @@
 
 #include <string>
 
-namespace core::utils
-{
-class Writter
-{
+namespace core::utils {
+class Writter {
  public:
   /**
    * @brief Destroy the Writter object
    *
    */
-  virtual ~Writter()
-  {
+  virtual ~Writter() {
   }
 
   virtual void dump(const std::string& str) = 0;

@@ -4,8 +4,7 @@
 
 #include <string>
 
-namespace core::utils
-{
+namespace core::utils {
 /**
  * @brief Create a Directories by calling boost::filesystem::create_directory
  * for each element of full_path that does not exist.

@@ -8,38 +8,31 @@
 #include "core/utils/event_level.hpp"
 #include "core/utils/terminal.hpp"
 
-namespace core::utils
-{
+namespace core::utils {
 /**
  * @brief Interface class used to present message in certain format (style)
  *
  */
-class FormatterInterface
-{
+class FormatterInterface {
  public:
-  virtual ~FormatterInterface()
-  {
+  virtual ~FormatterInterface() {
   }
   virtual std::string format(const LabeledModifier& lm,
                              const std::string& msg) const = 0;
 };
 
-class NullFormatter : public FormatterInterface
-{
+class NullFormatter : public FormatterInterface {
  public:
-  ~NullFormatter()
-  {
+  ~NullFormatter() {
   }
   std::string format(const LabeledModifier& lm,
                      const std::string& msg) const override;
 };
 
-class DefaultFormater : public FormatterInterface
-{
+class DefaultFormater : public FormatterInterface {
  public:
   DefaultFormater(const bool use_modifier = false);
-  ~DefaultFormater()
-  {
+  ~DefaultFormater() {
   }
 
   std::string format(const LabeledModifier& lm,

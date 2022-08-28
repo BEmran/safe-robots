@@ -4,8 +4,7 @@
 
 #include "sensors/common/utils.hpp"
 
-namespace sensors::mpu
-{
+namespace sensors::mpu {
 namespace cu = common::utils;
 
 constexpr int kMaxBitVal = 32767;  // Measurement range is from -32760 ~ +32760
@@ -18,16 +17,9 @@ constexpr auto TempScale = 333.87F;
 const auto kTempBias = cu::Vec3::Ones() * 21.F;
 const auto kTempOffset = cu::Vec3::Ones() * 21.F;
 
-enum class GyroScale : uint8_t
-{
-  FS_250DPS,
-  FS_500DPS,
-  FS_1000DPS,
-  FS_2000DPS
-};
+enum class GyroScale : uint8_t { FS_250DPS, FS_500DPS, FS_1000DPS, FS_2000DPS };
 
-enum class GyroBandWidthHz : uint8_t
-{
+enum class GyroBandWidthHz : uint8_t {
   BW_250HZ,
   BW_184HZ,
   BW_92HZ,
@@ -38,16 +30,9 @@ enum class GyroBandWidthHz : uint8_t
   BW_3600HZ
 };
 
-enum class AccelScale : uint8_t
-{
-  FS_2G,
-  FS_4G,
-  FS_8G,
-  FS_16G
-};
+enum class AccelScale : uint8_t { FS_2G, FS_4G, FS_8G, FS_16G };
 
-enum class AccelBandWidthHz : uint8_t
-{
+enum class AccelBandWidthHz : uint8_t {
   BW_218HZ,
   BW_99HZ,
   BW_44HZ,
@@ -56,14 +41,9 @@ enum class AccelBandWidthHz : uint8_t
   BW_5HZ
 };
 
-enum class MagScale : uint8_t
-{
-  FS_14BITS,
-  FS_16BITS
-};
+enum class MagScale : uint8_t { FS_14BITS, FS_16BITS };
 
-enum class MagMode : uint8_t
-{
+enum class MagMode : uint8_t {
   POWER_DOWN,
   SINGLE_MEASUREMENT,
   CONTINUES_8HZ,
@@ -76,60 +56,59 @@ enum class MagMode : uint8_t
 using namespace common::utils::literals;  // _uc
 
 cu::SpecInfoMap<AccelBandWidthHz, uint8_t> accel_bw_map({
-    {AccelBandWidthHz::BW_218HZ, {0, 0x01_uc, "218 HZ"}},  //
-    {AccelBandWidthHz::BW_99HZ, {0, 0x02_uc, "99 HZ"}},    //
-    {AccelBandWidthHz::BW_44HZ, {0, 0x03_uc, "44 HZ"}},    //
-    {AccelBandWidthHz::BW_21HZ, {0, 0x04_uc, "21 HZ"}},    //
-    {AccelBandWidthHz::BW_10HZ, {0, 0x05_uc, "10 HZ"}},    //
-    {AccelBandWidthHz::BW_5HZ, {0, 0x06_uc, "5 HZ"}}       //
+  {AccelBandWidthHz::BW_218HZ, {0, 0x01_uc, "218 HZ"}},  //
+  {AccelBandWidthHz::BW_99HZ, {0, 0x02_uc, "99 HZ"}},    //
+  {AccelBandWidthHz::BW_44HZ, {0, 0x03_uc, "44 HZ"}},    //
+  {AccelBandWidthHz::BW_21HZ, {0, 0x04_uc, "21 HZ"}},    //
+  {AccelBandWidthHz::BW_10HZ, {0, 0x05_uc, "10 HZ"}},    //
+  {AccelBandWidthHz::BW_5HZ, {0, 0x06_uc, "5 HZ"}}       //
 });
 
 cu::SpecInfoMap<AccelScale, float> accel_scale_map({
-    {AccelScale::FS_2G, {2.F, 0x00_uc, "2G"}},    //
-    {AccelScale::FS_4G, {4.F, 0x08_uc, "4G"}},    //
-    {AccelScale::FS_8G, {8.F, 0x10_uc, "8G"}},    //
-    {AccelScale::FS_16G, {16.F, 0x18_uc, "16G"}}  //
+  {AccelScale::FS_2G, {2.F, 0x00_uc, "2G"}},    //
+  {AccelScale::FS_4G, {4.F, 0x08_uc, "4G"}},    //
+  {AccelScale::FS_8G, {8.F, 0x10_uc, "8G"}},    //
+  {AccelScale::FS_16G, {16.F, 0x18_uc, "16G"}}  //
 });
 
 cu::SpecInfoMap<GyroBandWidthHz, uint8_t> gyro_bw_map({
-    {GyroBandWidthHz::BW_250HZ, {0, 0x00_uc, "250 HZ"}},   //
-    {GyroBandWidthHz::BW_184HZ, {0, 0x01_uc, "184 HZ"}},   //
-    {GyroBandWidthHz::BW_92HZ, {0, 0x02_uc, "92 HZ"}},     //
-    {GyroBandWidthHz::BW_41HZ, {0, 0x03_uc, "41 HZ"}},     //
-    {GyroBandWidthHz::BW_20HZ, {0, 0x04_uc, "20 HZ"}},     //
-    {GyroBandWidthHz::BW_10HZ, {0, 0x05_uc, "10 HZ"}},     //
-    {GyroBandWidthHz::BW_5HZ, {0, 0x06_uc, "5 HZ"}},       //
-    {GyroBandWidthHz::BW_3600HZ, {0, 0x07_uc, "3600 HZ"}}  //
+  {GyroBandWidthHz::BW_250HZ, {0, 0x00_uc, "250 HZ"}},   //
+  {GyroBandWidthHz::BW_184HZ, {0, 0x01_uc, "184 HZ"}},   //
+  {GyroBandWidthHz::BW_92HZ, {0, 0x02_uc, "92 HZ"}},     //
+  {GyroBandWidthHz::BW_41HZ, {0, 0x03_uc, "41 HZ"}},     //
+  {GyroBandWidthHz::BW_20HZ, {0, 0x04_uc, "20 HZ"}},     //
+  {GyroBandWidthHz::BW_10HZ, {0, 0x05_uc, "10 HZ"}},     //
+  {GyroBandWidthHz::BW_5HZ, {0, 0x06_uc, "5 HZ"}},       //
+  {GyroBandWidthHz::BW_3600HZ, {0, 0x07_uc, "3600 HZ"}}  //
 });
 
 cu::SpecInfoMap<GyroScale, float>
-    gyro_scale_map(std::map<GyroScale, cu::SpecInfo<float>>{
-        {GyroScale::FS_250DPS, {250.F, 0x00_uc, "250 DPS"}},     //
-        {GyroScale::FS_500DPS, {500.F, 0x08_uc, "500 DPS"}},     //
-        {GyroScale::FS_1000DPS, {1000.F, 0x10_uc, "1000 DPS"}},  //
-        {GyroScale::FS_2000DPS, {2000.F, 0x18_uc, "2000 DPS"}}   //
-    });
+  gyro_scale_map(std::map<GyroScale, cu::SpecInfo<float>>{
+    {GyroScale::FS_250DPS, {250.F, 0x00_uc, "250 DPS"}},     //
+    {GyroScale::FS_500DPS, {500.F, 0x08_uc, "500 DPS"}},     //
+    {GyroScale::FS_1000DPS, {1000.F, 0x10_uc, "1000 DPS"}},  //
+    {GyroScale::FS_2000DPS, {2000.F, 0x18_uc, "2000 DPS"}}   //
+  });
 
 cu::SpecInfoMap<MagScale, float>
-    mag_scale_map(std::map<MagScale, cu::SpecInfo<float>>{
-        {MagScale::FS_14BITS, {0.25F * kMaxUTesla, 0x00_uc, "14 BITS"}},  //
-        {MagScale::FS_16BITS, {1.00F * kMaxUTesla, 0x10_uc, "16 BITS"}}   //
-    });
+  mag_scale_map(std::map<MagScale, cu::SpecInfo<float>>{
+    {MagScale::FS_14BITS, {0.25F * kMaxUTesla, 0x00_uc, "14 BITS"}},  //
+    {MagScale::FS_16BITS, {1.00F * kMaxUTesla, 0x10_uc, "16 BITS"}}   //
+  });
 
 cu::SpecInfoMap<MagMode, uint8_t>
-    mag_mode_map(std::map<MagMode, cu::SpecInfo<uint8_t>>{
-        {MagMode::POWER_DOWN, {0, 0x00_uc, "POWER DOWN"}},                  //
-        {MagMode::SINGLE_MEASUREMENT, {0, 0x01_uc, "SINGLE MEASUREMENT"}},  //
-        {MagMode::CONTINUES_8HZ, {0, 0x02_uc, "CONTINUES 8HZ"}},            //
-        {MagMode::EXTERNAL_TRIGGER, {0, 0x04_uc, "EXTERNAL TRIGGER"}},      //
-        {MagMode::CONTINUES_100HZ, {0, 0x06_uc, "CONTINUES 100HZ"}},        //
-        {MagMode::SELF_TEST, {0, 0x08_uc, "SELF TEST"}},                    //
-        {MagMode::FUSE_ROM_ACCESS, {0, 0x0F_uc, "FUSE ROM ACCESS"}}         //
-    });
+  mag_mode_map(std::map<MagMode, cu::SpecInfo<uint8_t>>{
+    {MagMode::POWER_DOWN, {0, 0x00_uc, "POWER DOWN"}},                  //
+    {MagMode::SINGLE_MEASUREMENT, {0, 0x01_uc, "SINGLE MEASUREMENT"}},  //
+    {MagMode::CONTINUES_8HZ, {0, 0x02_uc, "CONTINUES 8HZ"}},            //
+    {MagMode::EXTERNAL_TRIGGER, {0, 0x04_uc, "EXTERNAL TRIGGER"}},      //
+    {MagMode::CONTINUES_100HZ, {0, 0x06_uc, "CONTINUES 100HZ"}},        //
+    {MagMode::SELF_TEST, {0, 0x08_uc, "SELF TEST"}},                    //
+    {MagMode::FUSE_ROM_ACCESS, {0, 0x0F_uc, "FUSE ROM ACCESS"}}         //
+  });
 
 // mpu9250 register map
-namespace mpu9250
-{
+namespace mpu9250 {
 constexpr uint8_t WHO_AM_I_RESPONSE = 0x71;
 constexpr uint8_t ADDRESS = 0x68;
 constexpr uint8_t SELF_TEST_X_ACCEL = 0x0D;
@@ -246,8 +225,7 @@ constexpr uint8_t I2C_READ_FLAG = 0x80;
 }  // namespace mpu9250
 
 // Magnetometer register map
-namespace ak8963
-{
+namespace ak8963 {
 constexpr uint8_t WHO_AM_I_RESPONSE = 0x48;
 constexpr uint8_t I2C_ADDR = 0x0C;
 constexpr uint8_t WHO_AM_I = 0x00;

@@ -6,16 +6,13 @@
 
 #include "core/utils/terminal.hpp"
 
-namespace core::utils
-{
+namespace core::utils {
 /**
  * @brief Defines the level of an event to be deal with
  *
  */
-struct EventLevel
-{
-  typedef enum
-  {
+struct EventLevel {
+  typedef enum {
     EL_INFO = 0,  // basic level of information
     EL_DEBUG,     // only for information used in debug mode
     EL_WARN,      // when system behaviour is not desirable but not fatal
@@ -23,8 +20,7 @@ struct EventLevel
   } event_level_t;
 };
 
-class LabeledModifier
-{
+class LabeledModifier {
  public:
   explicit LabeledModifier(const EventLevel::event_level_t event);
 

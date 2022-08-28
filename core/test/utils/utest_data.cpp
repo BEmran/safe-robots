@@ -8,14 +8,12 @@ using namespace core::utils;
 
 // AdcData --------------------------------------------------------------------
 
-TEST(AdcData, Consruct)
-{
+TEST(AdcData, Consruct) {
   const AdcData adc;
   ExpectVec3Eq(Vec3::Zero(), adc.values);
 }
 
-TEST(AdcData, Clear)
-{
+TEST(AdcData, Clear) {
   AdcData adc;
   Vec3 vec(1.4F, 2.5F, 3.6F);
   adc.values = vec;
@@ -24,8 +22,7 @@ TEST(AdcData, Clear)
   ExpectVec3Eq(Vec3::Zero(), adc.values);
 }
 
-TEST(AdcData, Print)
-{
+TEST(AdcData, Print) {
   AdcData adc;
   adc.values = Vec3(1.4F, 2.5F, 3.6F);
   std::stringstream ss;
@@ -35,14 +32,12 @@ TEST(AdcData, Print)
 
 // BarData --------------------------------------------------------------------
 
-TEST(BarData, Consruct)
-{
+TEST(BarData, Consruct) {
   const BarData bar;
   EXPECT_DOUBLE_EQ(0, bar.value);
 }
 
-TEST(BarData, Clear)
-{
+TEST(BarData, Clear) {
   BarData bar;
   bar.value = 1.2;
   EXPECT_DOUBLE_EQ(1.2, bar.value);
@@ -50,8 +45,7 @@ TEST(BarData, Clear)
   EXPECT_DOUBLE_EQ(0, bar.value);
 }
 
-TEST(BarData, Print)
-{
+TEST(BarData, Print) {
   BarData bar;
   bar.value = 1.2;
   std::stringstream ss;
@@ -61,14 +55,12 @@ TEST(BarData, Print)
 
 // GpsData --------------------------------------------------------------------
 
-TEST(GpsData, Consruct)
-{
+TEST(GpsData, Consruct) {
   const GpsData gps;
   ExpectGPSData(0, 0, 0, gps);
 }
 
-TEST(GpsData, Clear)
-{
+TEST(GpsData, Clear) {
   GpsData gps;
   gps.lat = 1.2;
   EXPECT_DOUBLE_EQ(1.2, gps.lat);
@@ -76,8 +68,7 @@ TEST(GpsData, Clear)
   EXPECT_DOUBLE_EQ(0, gps.lat);
 }
 
-TEST(GpsData, Print)
-{
+TEST(GpsData, Print) {
   GpsData gps;
   gps.lat = 1.4;
   gps.lon = 2.5;
@@ -87,8 +78,7 @@ TEST(GpsData, Print)
   EXPECT_EQ("GPS data: \n- Lat: 1.4\n- Lon: 2.5\n- Alt: 3.6\n", ss.str());
 }
 // Vec3Data -------------------------------------------------------------------
-TEST(Vec3Data, Print)
-{
+TEST(Vec3Data, Print) {
   Vec3Data vec;
   vec.data = Vec3(1.4F, 2.5F, 3.6F);
   const std::string msg = "[1.4, 2.5, 3.6]";
@@ -98,8 +88,7 @@ TEST(Vec3Data, Print)
 }
 
 // AccelData -------------------------------------------------------------------
-TEST(AccelData, Print)
-{
+TEST(AccelData, Print) {
   AccelData accel;
   accel.data = Vec3(1.4F, 2.5F, 3.6F);
   const std::string msg = "Accel XYZ(m/s^2): [1.4, 2.5, 3.6]";
@@ -109,8 +98,7 @@ TEST(AccelData, Print)
 }
 
 // GyroData -------------------------------------------------------------------
-TEST(GyroData, Print)
-{
+TEST(GyroData, Print) {
   GyroData gyro;
   gyro.data = Vec3(4.4F, 5.5F, 6.6F);
   const std::string msg = "Gyro  XYZ(rad/s): [4.4, 5.5, 6.6]";
@@ -120,8 +108,7 @@ TEST(GyroData, Print)
 }
 
 // GyroData -------------------------------------------------------------------
-TEST(MagData, Print)
-{
+TEST(MagData, Print) {
   MagData mag;
   mag.data = Vec3(4.1F, 5.2F, 6.3F);
   const std::string msg = "Mag Field XYZ(uT): [4.1, 5.2, 6.3]";
@@ -131,8 +118,7 @@ TEST(MagData, Print)
 }
 
 // QuatData -------------------------------------------------------------------
-TEST(QuatData, Print)
-{
+TEST(QuatData, Print) {
   QuatData quat;
   quat.data.w() = 4.7F;
   quat.data.vec() = Vec3(1.4F, 2.5F, 3.6F);
@@ -143,8 +129,7 @@ TEST(QuatData, Print)
 }
 
 // RPYData -------------------------------------------------------------------
-TEST(RPYData, Print)
-{
+TEST(RPYData, Print) {
   RPYData rpy;
   rpy.data = Vec3(7.4F, 8.5F, 9.6F);
   const std::string msg = "TaitBryan RPY(rad): [7.4, 8.5, 9.6]";
@@ -154,8 +139,7 @@ TEST(RPYData, Print)
 }
 
 // TemperatureData ------------------------------------------------------------
-TEST(TemperatureData, Print)
-{
+TEST(TemperatureData, Print) {
   TemperatureData temp;
   temp.value = 11.2F;
   const std::string msg = "Temp (C): 11.2";
@@ -165,8 +149,7 @@ TEST(TemperatureData, Print)
 }
 
 // HeadingData ----------------------------------------------------------------
-TEST(HeadingData, Print)
-{
+TEST(HeadingData, Print) {
   HeadingData head;
   head.value = 10.1F;
   const std::string msg = "heading (rad): 10.1";
@@ -177,14 +160,12 @@ TEST(HeadingData, Print)
 
 // ImuData --------------------------------------------------------------------
 
-TEST(ImuData, Consruct)
-{
+TEST(ImuData, Consruct) {
   const ImuData imu;
   ExpectImuData(ImuData(), imu);
 }
 
-TEST(ImuData, Clear)
-{
+TEST(ImuData, Clear) {
   ImuData imu;
   imu.gyro.data.x() = 1;
   EXPECT_FLOAT_EQ(1, imu.gyro.data.x());
@@ -192,8 +173,7 @@ TEST(ImuData, Clear)
   EXPECT_FLOAT_EQ(0, imu.gyro.data.x());
 }
 
-TEST(ImuData, Print)
-{
+TEST(ImuData, Print) {
   ImuData imu;
   imu.accel.data = Vec3(1.4F, 2.5F, 3.6F);
   imu.gyro.data = Vec3(4.4F, 5.5F, 6.6F);
@@ -204,10 +184,10 @@ TEST(ImuData, Print)
   imu.heading.value = 10.1;
   imu.temp.value = 11.2;
   const std::string msg =
-      "IMU data:\n- Accel XYZ(m/s^2): [1.4, 2.5, 3.6]\n- Gyro  XYZ(rad/s): "
-      "[4.4, 5.5, 6.6]\n- Mag Field XYZ(uT): [4.1, 5.2, 6.3]\n- Quat WXYZ: ang "
-      "= 4.7, [1.4, 2.5, 3.6]\n- TaitBryan RPY(rad): [7.4, 8.5, 9.6]\n- "
-      "heading (rad): 10.1\n- Temp (C): 11.2\n";
+    "IMU data:\n- Accel XYZ(m/s^2): [1.4, 2.5, 3.6]\n- Gyro  XYZ(rad/s): "
+    "[4.4, 5.5, 6.6]\n- Mag Field XYZ(uT): [4.1, 5.2, 6.3]\n- Quat WXYZ: ang "
+    "= 4.7, [1.4, 2.5, 3.6]\n- TaitBryan RPY(rad): [7.4, 8.5, 9.6]\n- "
+    "heading (rad): 10.1\n- Temp (C): 11.2\n";
   std::stringstream ss;
   ss << imu;
   EXPECT_EQ(msg, ss.str());

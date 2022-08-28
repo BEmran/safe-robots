@@ -11,20 +11,17 @@ using namespace core::utils;
 const char* g_message = "message";
 const char* g_filename = "log.txt";
 
-class TestLogger
-{
+class TestLogger {
  public:
-  explicit TestLogger(Logger* logger) : logger_(logger), buf_(nullptr)
-  {
+  explicit TestLogger(Logger* logger) : logger_(logger), buf_(nullptr) {
   }
 
-  ~TestLogger()
-  {
+  ~TestLogger() {
     delete buf_;
   }
 
-  void ExpectEqLogNoException(const LabeledModifier& lm, const std::string& msg)
-  {
+  void ExpectEqLogNoException(const LabeledModifier& lm,
+                              const std::string& msg) {
     Clear();
     logger_->Log(lm, msg);
     GetLoggedData();
@@ -32,34 +29,27 @@ class TestLogger
   }
 
   void ExpectEqLogWithException(const LabeledModifier& lm,
-                                const std::string& msg)
-  {
-    try
-    {
+                                const std::string& msg) {
+    try {
       Clear();
       logger_->Log(lm, msg);
-    }
-    catch (Exception& e)
-    {
+    } catch (Exception& e) {
       GetLoggedData();
     }
     ExpectEqLog(msg);
   }
 
  private:
-  void Clear()
-  {
+  void Clear() {
     buf_ = new ConsoleBuffer;
   }
 
-  void ExpectEqLog(const std::string& msg)
-  {
+  void ExpectEqLog(const std::string& msg) {
     EXPECT_EQ(msg, logs_console_.front());
     EXPECT_EQ(msg, logs_file_.back());
   }
 
-  void GetLoggedData()
-  {
+  void GetLoggedData() {
     logs_console_ = buf_->RestoreCoutBuffer();
     logs_file_ = ReadAllLinesFromFile(g_filename);
   }
@@ -70,57 +60,46 @@ class TestLogger
   std::list<std::string> logs_file_;
 };
 
-TEST(LoggerInformation, Construction)
-{
+TEST(LoggerInformation, Construction) {
   auto info = LOG_INFORMATION;
   EXPECT_EQ("utest_logger.cpp", info.file);
   EXPECT_EQ("TestBody", info.func);
   EXPECT_EQ(__LINE__ - 3, info.line);
 }
 
-TEST(LoggerInformation, ToString)
-{
+TEST(LoggerInformation, ToString) {
   LogLocation info("filename", "funcname", 1);
   EXPECT_EQ("[filename][funcname][1]", info.ToString());
 }
 
-TEST(Logger, ConstructingUsingFilename)
-{
+TEST(Logger, ConstructingUsingFilename) {
   auto* logger = new Logger(g_filename);
   TestLogger test_logger(logger);
-  for (const auto& event : EVENTS)
-  {
+  for (const auto& event : EVENTS) {
     LabeledModifier lm(event);
     test_logger.ExpectEqLogNoException(lm, g_message);
   }
 }
 
-TEST(Logger, ConstructingUsingFormatter)
-{
+TEST(Logger, ConstructingUsingFormatter) {
   auto formatter = std::make_shared<NullFormatter>();
   Logger logger(g_filename, formatter, formatter);
   TestLogger test_logger(&logger);
-  for (const auto& event : EVENTS)
-  {
+  for (const auto& event : EVENTS) {
     LabeledModifier lm(event);
     test_logger.ExpectEqLogNoException(lm, g_message);
   }
 }
 
-TEST(Logger, ConstructingUsingException)
-{
+TEST(Logger, ConstructingUsingException) {
   auto exception = std::make_shared<ExceptionFactory>("");
   auto* logger = new Logger(g_filename, exception);
   TestLogger test_logger(logger);
-  for (const auto& event : EVENTS)
-  {
+  for (const auto& event : EVENTS) {
     LabeledModifier lm(event);
-    if (event == EventLevel::EL_ERROR)
-    {
+    if (event == EventLevel::EL_ERROR) {
       test_logger.ExpectEqLogWithException(lm, g_message);
-    }
-    else
-    {
+    } else {
       test_logger.ExpectEqLogNoException(lm, g_message);
     }
   }

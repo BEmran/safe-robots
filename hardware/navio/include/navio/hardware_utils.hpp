@@ -7,8 +7,7 @@
 
 #define ARRAY_SIZE(a) sizeof(a) / sizeof(a[0])
 
-namespace navio::hardware_utils
-{
+namespace navio::hardware_utils {
 /**
  * @brief Sleep for some milliseconds, calls linux usleep function
  *

@@ -8,17 +8,14 @@
 #include <cstdio>
 #include <cstdlib>
 
-namespace navio::hardware_utils
-{
+namespace navio::hardware_utils {
 constexpr const char* SCRIPT_PATH = "../../../check_apm.sh";
 
-int WriteFile(const char* path, const char* fmt, ...)
-{
+int WriteFile(const char* path, const char* fmt, ...) {
   errno = 0;
 
   int fd = ::open(path, O_WRONLY | O_CLOEXEC);
-  if (fd == -1)
-  {
+  if (fd == -1) {
     return -errno;
   }
 
@@ -31,21 +28,18 @@ int WriteFile(const char* path, const char* fmt, ...)
 
   va_end(args);
 
-  if (ret < 1)
-  {
+  if (ret < 1) {
     return -errno_bkp;
   }
 
   return ret;
 }
 
-int ReadFile(const char* path, const char* fmt, ...)
-{
+int ReadFile(const char* path, const char* fmt, ...) {
   errno = 0;
 
   FILE* file = ::fopen(path, "re");
-  if (!file)
-  {
+  if (!file) {
     return -errno;
   }
   va_list args;
@@ -57,19 +51,16 @@ int ReadFile(const char* path, const char* fmt, ...)
 
   va_end(args);
 
-  if (ret < 1)
-  {
+  if (ret < 1) {
     return -errno_bkp;
   }
   return ret;
 }
 
-bool CheckApm()
-{
+bool CheckApm() {
   int ret = system("ps -AT | grep -c ap-timer > /dev/null");
 
-  if (WEXITSTATUS(ret) <= 0)
-  {
+  if (WEXITSTATUS(ret) <= 0) {
     fprintf(stderr, "APM is running. Can't launch the example\n");
     return true;
   }
@@ -77,15 +68,13 @@ bool CheckApm()
   return false;
 }
 
-int GetNavioVersion()
-{
+int GetNavioVersion() {
   int version;
   ReadFile("/sys/firmware/devicetree/base/hat/product_id", "%x", &version);
   return version;
 }
 
-void Delay(uint32_t msec)
-{
+void Delay(uint32_t msec) {
   usleep(msec * 1000);
 }
 }  // namespace navio::hardware_utils

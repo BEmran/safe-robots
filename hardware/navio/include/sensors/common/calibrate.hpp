@@ -1,7 +1,7 @@
-#ifndef MPU_CALIBRATE_HPP
-#define MPU_CALIBRATE_HPP
+#ifndef HARDWARE_NAVIO_INCLUDE_SENSORS_COMMON_CALIBRATE_HPP_
+#define HARDWARE_NAVIO_INCLUDE_SENSORS_COMMON_CALIBRATE_HPP_
 
-#include <core/utils/math.hpp>
+#include "core/utils/math.hpp"
 #include <functional>
 
 #include "sensors/common/utils.hpp"
@@ -21,4 +21,4 @@ SensorSpecs CalibrateGyroscope(const ReadFunc& cb, const SensorSpecs& spec);
 SensorSpecs CalibrateMagnetometer(const ReadFunc& cb, const SensorSpecs& spec);
 
 }  // namespace sensors::common::calibrate
-#endif  // MPU_CALIBRATE_HPP
+#endif  // HARDWARE_NAVIO_INCLUDE_SENSORS_COMMON_CALIBRATE_HPP_

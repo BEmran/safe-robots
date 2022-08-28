@@ -1,13 +1,10 @@
 #include "core/sensors/module_sensor.hpp"
 
-namespace core::sensors
-{
+namespace core::sensors {
 using namespace std::literals::string_literals;  // to use s literals
 
-std::string SensorModuleTypeToString(const SensorModuleType type)
-{
-  switch (type)
-  {
+std::string SensorModuleTypeToString(const SensorModuleType type) {
+  switch (type) {
     case SensorModuleType::ADC:
       return "ADC"s;
     case SensorModuleType::BAR:

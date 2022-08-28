@@ -3,23 +3,19 @@
 
 #include <sstream>
 
-namespace core::utils
-{
+namespace core::utils {
 std::string NullFormatter::format(const LabeledModifier& lm,
-                                  const std::string& msg) const
-{
+                                  const std::string& msg) const {
   (void)lm;
   return msg;
 }
 
 DefaultFormater::DefaultFormater(const bool use_modifier)
-  : use_modifier_(use_modifier)
-{
+  : use_modifier_(use_modifier) {
 }
 
 std::string DefaultFormater::format(const LabeledModifier& lm,
-                                    const std::string& msg) const
-{
+                                    const std::string& msg) const {
   std::stringstream ss;
   ss << "[" << DateTime().TimeToString() << "]";
   ss << AddLabeledModifier(lm);
@@ -27,15 +23,12 @@ std::string DefaultFormater::format(const LabeledModifier& lm,
   return ss.str();
 }
 
-std::string DefaultFormater::AddLabeledModifier(const LabeledModifier& lm) const
-{
+std::string
+DefaultFormater::AddLabeledModifier(const LabeledModifier& lm) const {
   std::stringstream ss;
-  if (use_modifier_)
-  {
+  if (use_modifier_) {
     ss << lm;
-  }
-  else
-  {
+  } else {
     ss << "[" << lm.GetLabel() << "]";
   }
   return ss.str();

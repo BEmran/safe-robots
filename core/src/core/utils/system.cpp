@@ -5,28 +5,20 @@
 
 #include "core/utils/exception.hpp"
 
-namespace core::utils
-{
+namespace core::utils {
 namespace fs = std::experimental::filesystem;
 
-void CreateDirectories(const std::string& full_path)
-{
+void CreateDirectories(const std::string& full_path) {
   fs::path path{full_path};
-  try
-  {
+  try {
     fs::create_directories(path);
-  }
-  catch (fs::filesystem_error& e)
-  {
+  } catch (fs::filesystem_error& e) {
     throw Exception(e.what());
   }
 }
 
-bool IsPathExists(const std::string& path)
-{
-  struct stat buffer
-  {
-  };
+bool IsPathExists(const std::string& path) {
+  struct stat buffer {};
   return stat(path.c_str(), &buffer) == 0;
 }
 

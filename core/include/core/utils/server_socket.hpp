@@ -6,10 +6,8 @@
 #include "core/utils/node.hpp"
 #include "core/utils/socket.hpp"
 
-namespace core::utils
-{
-class ServerSocket
-{
+namespace core::utils {
+class ServerSocket {
  public:
   /**
    * @brief Construct a new Server Socket object
@@ -41,8 +39,7 @@ class ServerSocket
    * @return true
    * @return false
    */
-  inline bool IsReady() const
-  {
+  inline bool IsReady() const {
     return ready;
   }
 

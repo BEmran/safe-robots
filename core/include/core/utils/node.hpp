@@ -7,15 +7,13 @@
 #include "core/utils/event_level.hpp"
 #include "core/utils/logger.hpp"
 
-namespace core::utils
-{
+namespace core::utils {
 /**
  * @brief holds various LabeledModifier objects to be used inside the node when
  * logging messages
  *
  */
-struct NodeLabeledModifiers
-{
+struct NodeLabeledModifiers {
   using event_level_t = EventLevel::event_level_t;
   LabeledModifier debug;
   LabeledModifier error;
@@ -26,19 +24,16 @@ struct NodeLabeledModifiers
                        const LabeledModifier& error_,
                        const LabeledModifier& info_,
                        const LabeledModifier& warn_)
-    : debug(debug_), error(error_), info(info_), warn(warn_)
-  {
+    : debug(debug_), error(error_), info(info_), warn(warn_) {
   }
 
   NodeLabeledModifiers()
     : NodeLabeledModifiers(DebugLabeledModifier(), ErrorLabeledModifier(),
-                           InfoLabeledModifier(), WarnLabeledModifier())
-  {
+                           InfoLabeledModifier(), WarnLabeledModifier()) {
   }
 };
 
-class Node
-{
+class Node {
  public:
   /**
    * @brief Construct a new Node object using its name

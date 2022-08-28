@@ -5,8 +5,7 @@
 using core::utils::CreateNode;
 using core::utils::Node;
 
-int main()
-{
+int main() {
   std::string name1 = "colorful";
   std::string name2 = "default";
 

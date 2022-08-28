@@ -7,15 +7,13 @@
 
 #include "core/utils/writter.hpp"
 
-namespace core::utils
-{
+namespace core::utils {
 /**
  * @brief A concreate class of Writter used to log data to a file using oftream
  * object.
  *
  */
-class FileWritter : public Writter
-{
+class FileWritter : public Writter {
  public:
   /**
    * @brief Construct a new File Logger object with a specific file name

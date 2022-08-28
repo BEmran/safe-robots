@@ -15,12 +15,10 @@
 #include "sensors/common/utils.hpp"
 #include "sensors/mpu/mpu9250_register_map.hpp"
 
-namespace sensors::mpu
-{
+namespace sensors::mpu {
 namespace cu = common::utils;
 
-struct SensorRawData
-{
+struct SensorRawData {
   cu::Vec3 accel = cu::Vec3::Zero();
   cu::Vec3 gyro = cu::Vec3::Zero();
   cu::Vec3 mag = cu::Vec3::Zero();
@@ -28,8 +26,7 @@ struct SensorRawData
   bool mag_over_flow = false;
 };
 
-struct Config
-{
+struct Config {
   AccelScale accel_scale = AccelScale::FS_16G;
   AccelBandWidthHz accel_bw = AccelBandWidthHz::BW_44HZ;
   GyroScale gyro_scale = GyroScale::FS_2000DPS;
@@ -39,8 +36,7 @@ struct Config
   uint8_t sample_rate_divisor = 4;
 };
 
-class Mpu9250 : public cu::ImuSensorModule
-{
+class Mpu9250 : public cu::ImuSensorModule {
   using AccelData = core::utils::AccelData;
   using GyroData = core::utils::GyroData;
   using MagData = core::utils::MagData;
@@ -173,10 +169,10 @@ class Mpu9250 : public cu::ImuSensorModule
   std::unique_ptr<navio::SPI> comm_;
   std::unique_ptr<core::utils::Node> node_;
   mutable std::map<core::sensors::SensorModuleType, cu::SensorSpecs>
-      sensor_specs_map;
+    sensor_specs_map;
 
   std::array<float, 3> mag_sensitivity_calibration_ = {
-      1.0F, 1.0F, 1.0F};  // factory calibration
+    1.0F, 1.0F, 1.0F};  // factory calibration
 };
 }  // namespace sensors::mpu
 #endif  // MPU_MPU9250_HPP

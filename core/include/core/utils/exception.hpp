@@ -7,31 +7,23 @@
 
 #include <stdexcept>
 
-namespace core::utils
-{
-class Exception : public std::runtime_error
-{
+namespace core::utils {
+class Exception : public std::runtime_error {
  public:
-  explicit Exception(const std::string& msg) : std::runtime_error(msg)
-  {
+  explicit Exception(const std::string& msg) : std::runtime_error(msg) {
   }
 };
 
-class ExceptionFactory
-{
+class ExceptionFactory {
  public:
-  explicit ExceptionFactory(const std::string& header) : header_(header)
-  {
+  explicit ExceptionFactory(const std::string& header) : header_(header) {
   }
 
-  virtual ~ExceptionFactory()
-  {
+  virtual ~ExceptionFactory() {
   }
 
-  virtual void Throw(const std::string& msg) const
-  {
-    if (header_.empty())
-    {
+  virtual void Throw(const std::string& msg) const {
+    if (header_.empty()) {
       throw Exception(msg);
     }
     throw Exception(header_ + ": " + msg);
@@ -41,19 +33,15 @@ class ExceptionFactory
   std::string header_;
 };
 
-class NullExceptionFactory : public ExceptionFactory
-{
+class NullExceptionFactory : public ExceptionFactory {
  public:
-  explicit NullExceptionFactory() : ExceptionFactory("")
-  {
+  explicit NullExceptionFactory() : ExceptionFactory("") {
   }
 
-  ~NullExceptionFactory()
-  {
+  ~NullExceptionFactory() {
   }
 
-  void Throw(const std::string& msg) const final
-  {
+  void Throw(const std::string& msg) const final {
     (void)msg;
   }
 };

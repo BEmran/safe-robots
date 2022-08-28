@@ -4,14 +4,12 @@
 #include "core/sensors/module_sensor.hpp"
 #include "core/utils/data.hpp"
 
-namespace core::sensors
-{
+namespace core::sensors {
 /**
  * @brief a class module sensor used to interface the Imu sensor
  *
  */
-class ImuSensorModule : public SensorModuleAbs<utils::ImuData>
-{
+class ImuSensorModule : public SensorModuleAbs<utils::ImuData> {
  public:
   /**
    * @brief Construct a new Imu Sensor Module object

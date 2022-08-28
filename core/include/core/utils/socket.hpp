@@ -12,15 +12,13 @@
 
 #include <string>
 
-namespace core::utils
-{
+namespace core::utils {
 /**
  * @brief Wrapper for C socket function. A socket is a channel to connect two ip
  * address
  *
  */
-class Socket
-{
+class Socket {
  public:
   /**
    * @brief Construct a new Socket object

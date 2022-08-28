@@ -9,14 +9,11 @@
 
 #include "navio/communication_abs.hpp"
 
-namespace navio
-{
-class SPI : CommunicationAbs
-{
+namespace navio {
+class SPI : CommunicationAbs {
  public:
   SPI(const std::string& path, const bool debug);
-  ~SPI()
-  {
+  ~SPI() {
   }
 
   int Transfer(const std::vector<uint8_t>& buff) const;
@@ -24,7 +21,7 @@ class SPI : CommunicationAbs
   void WriteRegister(const uint8_t reg, const uint8_t data) const override;
 
   void WriteRegisters(const std::vector<std::pair<uint8_t, uint8_t>>&
-                          reg_and_data) const override;
+                        reg_and_data) const override;
 
   uint8_t ReadRegister(const uint8_t reg) const override;
 

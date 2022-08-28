@@ -6,14 +6,12 @@
 #include "core/utils/cash.hpp"
 #include "core/utils/module.hpp"
 
-namespace core::sensors
-{
+namespace core::sensors {
 /**
  * @brief defines sensor module type
  *
  */
-enum class SensorModuleType
-{
+enum class SensorModuleType {
   BAR,
   ADC,
   GPS,
@@ -38,8 +36,7 @@ std::string SensorModuleTypeToString(const SensorModuleType type);
  *
  */
 template <class T>
-class SensorModuleAbs : public utils::ModuleAbs
-{
+class SensorModuleAbs : public utils::ModuleAbs {
  public:
   /**
    * @brief Construct a new Sensor Module object
@@ -51,8 +48,7 @@ class SensorModuleAbs : public utils::ModuleAbs
   SensorModuleAbs(const SensorModuleType sensor_type, const std::string& name,
                   const bool debug)
     : ModuleAbs(utils::ModuleType::SENSOR, name, debug)
-    , sensor_type_(sensor_type)
-  {
+    , sensor_type_(sensor_type) {
   }
 
   /**
@@ -66,53 +62,43 @@ class SensorModuleAbs : public utils::ModuleAbs
    *
    * @return SensorModuleType sensor module's type
    */
-  SensorModuleType SensorType() const
-  {
+  SensorModuleType SensorType() const {
     return sensor_type_;
   }
 
-  virtual void Initialize()
-  {
+  virtual void Initialize() {
     cashed_data_.Clear();
   }
 
-  virtual bool Probe()
-  {
+  virtual bool Probe() {
     return false;
   }
 
-  virtual bool Test()
-  {
+  virtual bool Test() {
     return false;
   }
 
-  virtual void Update()
-  {
+  virtual void Update() {
     SetData();
   }
 
-  virtual void Calibrate()
-  {
+  virtual void Calibrate() {
   }
 
-  T GetData() const
-  {
+  T GetData() const {
     return cashed_data_.Get();
   }
 
-  void ClearData()
-  {
+  void ClearData() {
     return cashed_data_.Clear();
   }
 
  protected:
-  void SetData(const T& data)
-  {
+  void SetData(const T& data) {
     return cashed_data_.Set(data);
   }
 
-  void SetData()
-  {
+  void SetData() {
     return cashed_data_.Set(data_);
   }
 

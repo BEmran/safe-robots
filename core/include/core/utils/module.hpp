@@ -3,17 +3,12 @@
 
 #include <string>
 
-namespace core::utils
-{
+namespace core::utils {
 /**
  * @brief defines module types
  *
  */
-enum class ModuleType
-{
-  UNDEFINED,
-  SENSOR
-};
+enum class ModuleType { UNDEFINED, SENSOR };
 
 /**
  * @brief Converts module type to string
@@ -27,8 +22,7 @@ std::string ModuleTypeToString(const ModuleType type);
  * @brief Abstracts class used to define main object of beaglebone hardware
  *
  */
-class ModuleAbs
-{
+class ModuleAbs {
  public:
   /**
    * @brief Construct a new Module object

@@ -5,8 +5,7 @@
 #include <ctime>
 #include <string>
 
-namespace core::utils
-{
+namespace core::utils {
 /**
  * @brief Gets local machine date and time
  * @details the time structure used here could be found here:
@@ -21,8 +20,7 @@ namespace core::utils
  * tm_yday	int	days since January 1	0-365
  * tm_isdst	int	Daylight Saving Time flag
  */
-class DateTime
-{
+class DateTime {
  public:
   /**
    * @brief Construct a new DateTime object using the current machine time

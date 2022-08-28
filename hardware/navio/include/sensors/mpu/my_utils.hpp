@@ -9,8 +9,7 @@
 #include <core/utils/data.hpp>
 #include <core/utils/math.hpp>
 
-namespace mpu
-{
+namespace mpu {
 constexpr int max_bit_val = 32767;  // Measurement range is from -32760 ~ +32760
                                     // decimal in 16-bit output.
 constexpr int max_utesla = 10 * 4912;  // Magnetic flux density in milliGauss
@@ -28,8 +27,7 @@ using ImuSensorModule = core::sensors::SensorModuleAbs<ImuData>;
  * @brief User litterer to define a number of type uint8_t
  *
  */
-inline constexpr uint8_t operator"" _uc(unsigned long long arg) noexcept
-{
+inline constexpr uint8_t operator"" _uc(unsigned long long arg) noexcept {
   return static_cast<uint8_t>(arg);
 }
 
@@ -38,8 +36,7 @@ inline constexpr uint8_t operator"" _uc(unsigned long long arg) noexcept
  * reading to usable data (scalded and in iso unit)
  *
  */
-struct SensorSpecs
-{
+struct SensorSpecs {
   MATH_TYPE sensitivity;  // the smallest absolute amount of change that can be
                           // detected by a measurement = max_bit_count / scale
   MATH_TYPE unit_conversion;  // convert a raw value into iso unit
@@ -53,8 +50,7 @@ struct SensorSpecs
    * @brief Construct a new Sensor Specs object
    *
    */
-  SensorSpecs() : SensorSpecs(1.0, 1.0)
-  {
+  SensorSpecs() : SensorSpecs(1.0, 1.0) {
   }
 
   /**
@@ -64,8 +60,7 @@ struct SensorSpecs
    * @param unit unit conversion row -> iso unit
    */
   SensorSpecs(const MATH_TYPE sen, const MATH_TYPE unit)
-    : sensitivity(sen), unit_conversion(unit)
-  {
+    : sensitivity(sen), unit_conversion(unit) {
   }
 
   /**
@@ -76,8 +71,7 @@ struct SensorSpecs
    */
   SensorSpecs(const MATH_TYPE sen, const MATH_TYPE unit, const Vec3& bias_,
               const Vec3& offset_)
-    : sensitivity(sen), unit_conversion(unit), bias(bias_), offset(offset_)
-  {
+    : sensitivity(sen), unit_conversion(unit), bias(bias_), offset(offset_) {
     UpdateEquation();
   }
 
@@ -87,22 +81,19 @@ struct SensorSpecs
    * @param raw raw data
    * @return MATH_TYPE the post proceeded data
    */
-  MATH_TYPE Apply(const MATH_TYPE raw) const
-  {
+  MATH_TYPE Apply(const MATH_TYPE raw) const {
     // return (raw - bias[0]) * (unit_conversion / sensitivity) + offset[0];
     return A(0) * raw + b[0];
   }
 
-  void SetCalibration(const Mat3& m, const Vec3& bias_, const Vec3& offset_)
-  {
+  void SetCalibration(const Mat3& m, const Vec3& bias_, const Vec3& offset_) {
     misalignment = m;
     bias = bias_;
     offset = offset_;
     UpdateEquation();
   }
 
-  void UpdateEquation()
-  {
+  void UpdateEquation() {
     A = misalignment * unit_conversion / sensitivity;
     b = misalignment * (offset - bias / sensitivity) * unit_conversion;
   }
@@ -113,8 +104,7 @@ struct SensorSpecs
    * @param raw raw data vector
    * @return Vec3 the post proceeded data
    */
-  Vec3 Apply(const Vec3& raw) const
-  {
+  Vec3 Apply(const Vec3& raw) const {
     // return ((misalignment * (raw - bias) / sensitivity) + offset) *
     // unit_conversion;
     return A * raw + b;

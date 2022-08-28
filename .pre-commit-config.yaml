@@ -75,25 +75,25 @@ repos:
             --verbose,
           ]
 
-      # - id: cmake-format
-      #   name: cmake-format
-      #   description: Run `cmake-format` against CMakefiles files
-      #   entry: cmake-format
-      #   language: system
-      #   files: CMakeLists.txt
-      #   args:
-      #     [
-      #       -i,
-      #       -c=.cmake-format,
-      #     ]
+      - id: cmake-format
+        name: cmake-format
+        description: Run `cmake-format` against CMakefiles files
+        entry: cmake-format
+        language: system
+        files: CMakeLists.txt
+        args:
+          [
+            -i,
+            -c=.cmake-format,
+          ]
 
-      # - id: cpplint
-      #   name: cpplint
-      #   description: Run `cpplint` against C/C++ header and source files
-      #   entry: cpplint
-      #   language: python
-      #   files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
-      #   args:
-      #     [
-      #       "--filter=-whitespace/braces, -legal/copyright",
-      #     ]
+      - id: cpplint
+        name: cpplint
+        description: Run `cpplint` against C/C++ header and source files
+        entry: cpplint
+        language: python
+        files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
+        args:
+          [
+            "--filter=-whitespace/braces, -legal/copyright",
+          ]

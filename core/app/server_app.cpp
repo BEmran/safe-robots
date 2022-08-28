@@ -3,13 +3,11 @@
 
 #include "core/utils/server_socket.hpp"
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
   auto app = core::utils::CreateDefaultNode("app");
   app.LogDebug("running....");
 
-  if (argc < 2)
-  {
+  if (argc < 2) {
     app.LogError("no port provided");
     return EXIT_FAILURE;
   }
@@ -20,11 +18,9 @@ int main(int argc, char* argv[])
   core::utils::ServerSocket server(port);
 
   auto tries = 3;
-  while (tries-- > 0)
-  {
+  while (tries-- > 0) {
     server.Accept();
-    while (server.IsReady())
-    {
+    while (server.IsReady()) {
       std::string data;
       server >> data;
       server << data;

@@ -3,15 +3,13 @@
 
 #include "core/utils/writter.hpp"
 
-namespace core::utils
-{
+namespace core::utils {
 /**
  * @brief A concreate class of Writter used to log data to the console
  * using ostream object.
  *
  */
-class ConsoleWritter : public Writter
-{
+class ConsoleWritter : public Writter {
  public:
   /**
    * @brief Construct a new Console Writter object with a specific name

@@ -6,8 +6,7 @@
 
 using namespace core::utils;
 
-TEST(WritterConsole, LogOnceNoName)
-{
+TEST(WritterConsole, LogOnceNoName) {
   ConsoleBuffer buf;
   const std::string data_to_log = "some info";
   ConsoleWritter().dump(data_to_log);
@@ -16,8 +15,7 @@ TEST(WritterConsole, LogOnceNoName)
   EXPECT_EQ(data_to_log, logged_data.front());
 }
 
-TEST(WritterFile, LogOnce)
-{
+TEST(WritterFile, LogOnce) {
   const std::string file_name = "utest_writter_file_single.txt";
   FileWritter writter(file_name);
   const std::string data_to_log = "some info 2";

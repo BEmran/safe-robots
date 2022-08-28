@@ -11,32 +11,28 @@ using namespace core::utils;
 
 // Vec3 -----------------------------------------------------------------------
 
-TEST(Vec3, DefaultValuesUsingBrackets)
-{
+TEST(Vec3, DefaultValuesUsingBrackets) {
   Vec3 vec = Vec3::Zero();
   EXPECT_FLOAT_EQ(0, vec[0]);
   EXPECT_FLOAT_EQ(0, vec[1]);
   EXPECT_FLOAT_EQ(0, vec[2]);
 }
 
-TEST(Vec3, DefaultValuesUsingNames)
-{
+TEST(Vec3, DefaultValuesUsingNames) {
   const Vec3 vec = Vec3::Zero();
   EXPECT_FLOAT_EQ(0, vec.x());
   EXPECT_FLOAT_EQ(0, vec.y());
   EXPECT_FLOAT_EQ(0, vec.z());
 }
 
-TEST(Vec3, Construct)
-{
+TEST(Vec3, Construct) {
   const Vec3 vec(1.0F, 2.0F, 3.0F);
   EXPECT_FLOAT_EQ(1, vec[0]);
   EXPECT_FLOAT_EQ(2, vec[1]);
   EXPECT_FLOAT_EQ(3, vec[2]);
 }
 
-TEST(Vec3, ConstructInRowStyle)
-{
+TEST(Vec3, ConstructInRowStyle) {
   const float arr[] = {4.0F, 5.0F, 6.0F};
   Vec3 vec;
   vec << arr[0], arr[1], arr[2];
@@ -45,15 +41,13 @@ TEST(Vec3, ConstructInRowStyle)
   EXPECT_FLOAT_EQ(arr[2], vec[2]);
 }
 
-TEST(Vec3, RefernceValue)
-{
+TEST(Vec3, RefernceValue) {
   Vec3 vec;
   vec.x() = 1.0F;
   EXPECT_FLOAT_EQ(1.0F, vec.x());
 }
 
-TEST(Vec3, Print)
-{
+TEST(Vec3, Print) {
   const Vec3 vec(1.4F, 2.5F, 3.6F);
   std::stringstream ss;
   ss << vec.transpose();
@@ -62,8 +56,7 @@ TEST(Vec3, Print)
 
 // Quat -----------------------------------------------------------------------
 
-TEST(Quat, DefaultValuesUsingNames)
-{
+TEST(Quat, DefaultValuesUsingNames) {
   const Quat quat = Quat::Identity();
   EXPECT_FLOAT_EQ(1, quat.w());
   EXPECT_FLOAT_EQ(0, quat.x());
@@ -71,16 +64,14 @@ TEST(Quat, DefaultValuesUsingNames)
   EXPECT_FLOAT_EQ(0, quat.z());
 }
 
-TEST(Quat, DefaultValuesUsingVec)
-{
+TEST(Quat, DefaultValuesUsingVec) {
   const Quat quat = Quat::Identity();
   EXPECT_FLOAT_EQ(0, quat.vec().x());
   EXPECT_FLOAT_EQ(0, quat.vec().y());
   EXPECT_FLOAT_EQ(0, quat.vec().z());
 }
 
-TEST(Quat, Print)
-{
+TEST(Quat, Print) {
   Quat quat = Quat::Identity();
   quat.w() = 4.7F;
   quat.vec() = Vec3(1.4F, 2.5F, 3.6F);

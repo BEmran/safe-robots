@@ -20,20 +20,17 @@
 #define __FILENAME__                                                           \
   (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
-namespace core::utils
-{
+namespace core::utils {
 /**
  * @brief location information about where the log came from
  *
  */
-struct LogLocation
-{
+struct LogLocation {
   std::string file;
   std::string func;
   int line;
   LogLocation(const char* file_, const char* func_, const int line_)
-    : file(file_), func(func_), line(line_)
-  {
+    : file(file_), func(func_), line(line_) {
   }
 
   /**
@@ -42,8 +39,7 @@ struct LogLocation
    *
    * @return std::string a string contains the object information
    */
-  inline std::string ToString() const
-  {
+  inline std::string ToString() const {
     return "[" + file + "][" + func + "][" + std::to_string(line) + "]";
   }
 };
@@ -56,8 +52,7 @@ struct LogLocation
  * @brief A simple class used to mimic a stream to record all sort of
  * information
  */
-class Logger
-{
+class Logger {
  public:
   /**
    * @brief Construct the Logger object using filename
@@ -103,8 +98,7 @@ class Logger
    * @brief Destroy the Logger object
    *
    */
-  virtual ~Logger()
-  {
+  virtual ~Logger() {
   }
 
   /**

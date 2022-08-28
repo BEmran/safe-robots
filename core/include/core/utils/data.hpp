@@ -6,65 +6,51 @@
 
 #include "core/utils/math.hpp"
 
-namespace core::utils
-{
+namespace core::utils {
 constexpr int FULL_PRECISION = 10;
 constexpr int HALF_PRECISION = 4;
 
-struct Data
-{
+struct Data {
  public:
   virtual ~Data(){};
   virtual void Clear() = 0;
 };
 
-struct AdcData : public Data
-{
+struct AdcData : public Data {
   Vec3 values = Vec3::Zero();
 
-  void Clear() override
-  {
+  void Clear() override {
     values.setZero();
   }
 };
 
 std::ostream& operator<<(std::ostream& os, const AdcData& adc);
 
-struct DoubleData : public Data
-{
+struct DoubleData : public Data {
   double value = 0.0;
-  void Clear() override
-  {
+  void Clear() override {
     value = 0.0;
   }
 };
 
-struct BarData : public DoubleData
-{
-};
+struct BarData : public DoubleData {};
 
 std::ostream& operator<<(std::ostream& os, const BarData& bar);
 
-struct TemperatureData : public DoubleData
-{
-};
+struct TemperatureData : public DoubleData {};
 
 std::ostream& operator<<(std::ostream& os, const TemperatureData& temp);
 
-struct HeadingData : public DoubleData
-{
-};
+struct HeadingData : public DoubleData {};
 
 std::ostream& operator<<(std::ostream& os, const HeadingData& head);
 
-struct GpsData : public Data
-{
+struct GpsData : public Data {
   double lat = 0.0;
   double lon = 0.0;
   double alt = 0.0;
 
-  void Clear() override
-  {
+  void Clear() override {
     lat = 0.0;
     lon = 0.0;
     alt = 0.0;
@@ -73,21 +59,16 @@ struct GpsData : public Data
 
 std::ostream& operator<<(std::ostream& os, const GpsData& gps);
 
-struct Vec3Data : public Data
-{
+struct Vec3Data : public Data {
   Vec3 data = Vec3::Zero();
-  Vec3Data() : data{0, 0, 0}
-  {
+  Vec3Data() : data{0, 0, 0} {
   }
-  explicit Vec3Data(const Vec3& vec) : data(vec)
-  {
+  explicit Vec3Data(const Vec3& vec) : data(vec) {
   }
   Vec3Data(const MATH_TYPE x, const MATH_TYPE y, const MATH_TYPE z)
-    : data{x, y, z}
-  {
+    : data{x, y, z} {
   }
-  void Clear() override
-  {
+  void Clear() override {
     data.setZero();
   }
 };
@@ -98,21 +79,13 @@ struct Vec3Data : public Data
  */
 std::ostream& operator<<(std::ostream& os, const Vec3Data& vec);
 
-struct AccelData : public Vec3Data
-{
-};
+struct AccelData : public Vec3Data {};
 
-struct GyroData : public Vec3Data
-{
-};
+struct GyroData : public Vec3Data {};
 
-struct MagData : public Vec3Data
-{
-};
+struct MagData : public Vec3Data {};
 
-struct RPYData : public Vec3Data
-{
-};
+struct RPYData : public Vec3Data {};
 
 /**
  * @brief print accelerometer data details
@@ -138,11 +111,9 @@ std::ostream& operator<<(std::ostream& os, const MagData& mag);
  */
 std::ostream& operator<<(std::ostream& os, const RPYData& rpy);
 
-struct QuatData : public Data
-{
+struct QuatData : public Data {
   Quat data = Quat::Identity();
-  void Clear() override
-  {
+  void Clear() override {
     data.Identity();
   }
 };
@@ -157,8 +128,7 @@ std::ostream& operator<<(std::ostream& os, const QuatData& quat);
  * @brief holds simple version of IMU sensor data
  *
  */
-struct ImuData : public Data
-{
+struct ImuData : public Data {
   TemperatureData temp;  ///< thermometer, in units of degrees Celsius
   HeadingData heading;   ///< fused heading filtered with gyro and accel data,
                          ///< same as Tait-Bryan yaw in radians
@@ -168,8 +138,7 @@ struct ImuData : public Data
   QuatData quat;         ///< normalized quaternion
   RPYData tait_bryan;    ///< Tait-Bryan angles (roll pitch yaw) in radians
 
-  void Clear() override
-  {
+  void Clear() override {
     temp.Clear();
     heading.Clear();
     accel.Clear();

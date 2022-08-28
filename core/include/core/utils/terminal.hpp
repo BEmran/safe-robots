@@ -7,13 +7,10 @@
 
 // Bash colors and formatting (ANSI/VT100 Control sequences)
 // https://misc.flogisoft.com/bash/tip_colors_and_formatting
-namespace core::utils
-{
-namespace terminal
-{
+namespace core::utils {
+namespace terminal {
 // foreground color
-enum FG
-{
+enum FG {
   FG_BLACK = 30,          // black
   FG_RED = 31,            // red
   FG_GREEN = 32,          // green
@@ -34,8 +31,7 @@ enum FG
 };
 
 // background color
-enum BG
-{
+enum BG {
   BG_RED = 41,             // red
   BG_GREEN = 42,           // green
   BG_YELLOW = 43,          // yellow
@@ -55,8 +51,7 @@ enum BG
 };
 
 // font format
-enum FMT
-{
+enum FMT {
   FMT_DEFAULT = 0,    // normal text
   FMT_BOLD = 1,       // bold
   FMT_DIM = 2,        // dim
@@ -71,8 +66,7 @@ enum FMT
  * @brief Used to format the data printed at a terminal
  *
  */
-class Modifier
-{
+class Modifier {
  public:
   /**
    * @brief Construct a new Modifier object

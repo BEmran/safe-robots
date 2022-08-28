@@ -8,36 +8,28 @@
 #include <cstring>
 #include <iostream>
 
-namespace
-{
+namespace {
 constexpr auto kMaxConnection = 5;
 }  // namespace
 
-namespace core::utils
-{
-Socket::Socket() : sock_(-1)
-{
+namespace core::utils {
+Socket::Socket() : sock_(-1) {
   memset(&address_, 0, sizeof(address_));
 }
 
-Socket::~Socket()
-{
-  if (IsValid())
-  {
+Socket::~Socket() {
+  if (IsValid()) {
     ::close(sock_);
   }
 }
 
-bool Socket::Create()
-{
+bool Socket::Create() {
   sock_ = socket(AF_INET, SOCK_STREAM, 0);
   return SetSocketOpt();
 }
 
-bool Socket::SetSocketOpt() const
-{
-  if (!IsValid())
-  {
+bool Socket::SetSocketOpt() const {
+  if (!IsValid()) {
     return false;
   }
 
@@ -48,10 +40,8 @@ bool Socket::SetSocketOpt() const
   return res != -1;
 }
 
-bool Socket::Bind(const uint16_t port)
-{
-  if (!IsValid())
-  {
+bool Socket::Bind(const uint16_t port) {
+  if (!IsValid()) {
     return false;
   }
 
@@ -60,14 +50,12 @@ bool Socket::Bind(const uint16_t port)
   address_.sin_port = htons(port);
 
   const auto res =
-      ::bind(sock_, reinterpret_cast<sockaddr*>(&address_), sizeof(address_));
+    ::bind(sock_, reinterpret_cast<sockaddr*>(&address_), sizeof(address_));
   return res != -1;
 }
 
-bool Socket::Listen() const
-{
-  if (!IsValid())
-  {
+bool Socket::Listen() const {
+  if (!IsValid()) {
     return false;
   }
 
@@ -75,8 +63,7 @@ bool Socket::Listen() const
   return res != -1;
 }
 
-std::pair<bool, int> Socket::Accept()
-{
+std::pair<bool, int> Socket::Accept() {
   int addr_length = sizeof(address_);
   const auto new_sock = ::accept(sock_, reinterpret_cast<sockaddr*>(&address_),
                                  reinterpret_cast<socklen_t*>(&addr_length));
@@ -84,23 +71,20 @@ std::pair<bool, int> Socket::Accept()
   return {sock_ > 0, new_sock};
 }
 
-bool Socket::Send(const int client_sock, const std::string& msg)
-{
+bool Socket::Send(const int client_sock, const std::string& msg) {
   const auto status =
-      ::send(client_sock, msg.c_str(), msg.size(), MSG_NOSIGNAL);
+    ::send(client_sock, msg.c_str(), msg.size(), MSG_NOSIGNAL);
   return status != -1;
 }
 
-int Socket::Recv(const int client_sock, std::string& msg)
-{
+int Socket::Recv(const int client_sock, std::string& msg) {
   const auto buf_size = msg.size() + 1;
   char buf[buf_size];
   memset(buf, 0, buf_size);
   const int status = ::recv(client_sock, buf, buf_size, 0);
   msg = "";
 
-  if (status == -1)
-  {
+  if (status == -1) {
     return 0;
   }
   msg = buf;
@@ -150,8 +134,7 @@ int Socket::Recv(const int client_sock, std::string& msg)
 //   fcntl(sock_, F_SETFL, opts);
 // }
 
-bool Socket::IsValid() const
-{
+bool Socket::IsValid() const {
   return sock_ != -1;
 }
 
