@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
   core::utils::FileWritter file("imu.txt");
   //-------------------------------------------------------------------------
   // Create the socket
-  core::utils::ServerSocket server(port);
+  core::utils::ServerSocket server(static_cast<uint16_t>(port));
 
   const auto begin = core::utils::TimeInMilliSec();
   auto tries = 5;
