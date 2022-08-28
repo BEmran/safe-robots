@@ -1,5 +1,5 @@
 ### Folders ###
-*/[Bb]uild/*
+[Bb]uild/*
 */CMakeCache.*
 */CMakeFiles/*
 
