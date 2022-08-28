@@ -61,19 +61,19 @@ repos:
         language: system
         files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
 
-      # - id: clang-format
-      #   name: clang-format
-      #   description: Run `clang-format` against C/C++ header and source files
-      #   entry: clang-format
-      #   language: system
-      #   files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
-      #   args:
-      #     [
-      #       -i,
-      #       -style=file,
-      #       --sort-includes,
-      #       --verbose,
-      #     ]
+      - id: clang-format
+        name: clang-format
+        description: Run `clang-format` against C/C++ header and source files
+        entry: clang-format
+        language: system
+        files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
+        args:
+          [
+            -i,
+            -style=file,
+            --sort-includes,
+            --verbose,
+          ]
 
       # - id: cmake-format
       #   name: cmake-format
