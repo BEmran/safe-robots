@@ -18,7 +18,7 @@ std::ostream& operator<<(std::ostream& os, const core::utils::Transpose& vec) {
 }
 
 std::ostream& operator<<(std::ostream& os, const core::utils::Quat& quat) {
-  os << "ang = " << quat.w() << ", "            /* angle */
+  os << "ang = " << quat.w() << ", "                         /* angle */
      << quat.vec().transpose().format(core::utils::kVecFmt); /* axis */
   return os;
 }

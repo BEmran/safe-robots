@@ -16,7 +16,7 @@ Checks: >
   readability-*,
   -readability-magic-numbers,
   llvm-namespace-comment
-                  
+
 # Turn all the warnings from the checks above into errors.
 # WarningsAsErrors: "*"
 
