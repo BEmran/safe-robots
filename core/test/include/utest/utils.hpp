@@ -1,15 +1,18 @@
-#ifndef TEST_UTEST_UTILS_HPP
-#define TEST_UTEST_UTILS_HPP
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
+#ifndef CORE_TEST_INCLUDE_UTEST_UTILS_HPP_
+#define CORE_TEST_INCLUDE_UTEST_UTILS_HPP_
 
 #include <array>
-#include <core/utils/event_level.hpp>
-#include <core/utils/terminal.hpp>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <list>
 #include <string>
+#include <vector>
 
+#include "core/utils/event_level.hpp"
+#include "core/utils/terminal.hpp"
 #include "gtest/gtest.h"
 
 typedef core::utils::Modifier Modifier;
@@ -19,14 +22,14 @@ typedef core::utils::terminal::FG FG;
 typedef core::utils::terminal::BG BG;
 typedef core::utils::terminal::FMT FMT;
 
-// careate list of available variables
+// carate list of available variables
 const char* LABELS[] = {"INFO", "DEBUG", "WARN", "ERROR"};
 const std::vector<EventLevel::event_level_t> EVENTS = {
   EventLevel::EL_INFO, EventLevel::EL_DEBUG, EventLevel::EL_WARN,
   EventLevel::EL_ERROR};
 
 /**
- * @brief applu and operation of two AssertionResult
+ * @brief apply and operation of two AssertionResult
  *
  * @param lhs AssertionResult of the left hand side
  * @param rhs AssertionResult of the right hand side
@@ -44,7 +47,7 @@ testing::AssertionResult operator&&(const testing::AssertionResult& lhs,
  * @param expect expected value
  * @param actual actual value
  * @param label values label
- * @return testing::AssertionResult assertation result
+ * @return testing::AssertionResult assentation result
  */
 template <typename T>
 testing::AssertionResult AssertEqWithLabel(const T expect, const T actual,
@@ -68,7 +71,7 @@ std::string FormatLabeledModifier(const Modifier& modifier,
 // convert Modifier to a string
 std::string modifier_to_string(const FG fg, const BG bg, const FMT fmt) {
   char buffer[25];
-  sprintf(buffer, "\x1B[%dm\x1B[%dm\x1B[%dm", fmt, fg, bg);
+  snprintf(buffer, sizeof(buffer), "\x1B[%dm\x1B[%dm\x1B[%dm", fmt, fg, bg);
   return buffer;
 }
 
@@ -131,7 +134,7 @@ std::list<std::string> ReadAllLinesFromFile(const std::string& file_name) {
  */
 class ConsoleBuffer {
  public:
-  ConsoleBuffer(const std::string& file_name = "console.txt")
+  explicit ConsoleBuffer(const std::string& file_name = "console.txt")
     : file_name_(file_name) {
     file_.open(file_name_, std::ios_base::out);
     backup = std::cout.rdbuf();  // back up cout's streambuf
@@ -160,4 +163,4 @@ class ConsoleBuffer {
   std::streambuf *psbuf, *backup;
 };
 
-#endif  // TEST_UTEST_UTILS_HPP
+#endif  // CORE_TEST_INCLUDE_UTEST_UTILS_HPP_

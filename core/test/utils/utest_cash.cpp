@@ -1,10 +1,12 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include <gtest/gtest.h>
 
 #include "core/utils/cash.hpp"
 #include "core/utils/data.hpp"
-#include "utest_data.hpp"
+#include "utest/utest_data.hpp"
 
-using namespace core::utils;
+using core::utils::Cash;
 
 TEST(Cash, SetAndGet) {
   ImuData imu;

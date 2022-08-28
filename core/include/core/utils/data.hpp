@@ -1,5 +1,7 @@
-#ifndef CORE_UTILS_DATA_HPP
-#define CORE_UTILS_DATA_HPP
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
+#ifndef CORE_INCLUDE_CORE_UTILS_DATA_HPP_
+#define CORE_INCLUDE_CORE_UTILS_DATA_HPP_
 
 #include <iomanip>
 #include <iostream>
@@ -12,7 +14,8 @@ constexpr int HALF_PRECISION = 4;
 
 struct Data {
  public:
-  virtual ~Data(){};
+  virtual ~Data() {
+  }
   virtual void Clear() = 0;
 };
 
@@ -24,8 +27,6 @@ struct AdcData : public Data {
   }
 };
 
-std::ostream& operator<<(std::ostream& os, const AdcData& adc);
-
 struct DoubleData : public Data {
   double value = 0.0;
   void Clear() override {
@@ -35,15 +36,9 @@ struct DoubleData : public Data {
 
 struct BarData : public DoubleData {};
 
-std::ostream& operator<<(std::ostream& os, const BarData& bar);
-
 struct TemperatureData : public DoubleData {};
 
-std::ostream& operator<<(std::ostream& os, const TemperatureData& temp);
-
 struct HeadingData : public DoubleData {};
-
-std::ostream& operator<<(std::ostream& os, const HeadingData& head);
 
 struct GpsData : public Data {
   double lat = 0.0;
@@ -56,8 +51,6 @@ struct GpsData : public Data {
     alt = 0.0;
   }
 };
-
-std::ostream& operator<<(std::ostream& os, const GpsData& gps);
 
 struct Vec3Data : public Data {
   Vec3 data = Vec3::Zero();
@@ -73,12 +66,6 @@ struct Vec3Data : public Data {
   }
 };
 
-/**
- * @brief print Vec3 data details
- *
- */
-std::ostream& operator<<(std::ostream& os, const Vec3Data& vec);
-
 struct AccelData : public Vec3Data {};
 
 struct GyroData : public Vec3Data {};
@@ -87,42 +74,12 @@ struct MagData : public Vec3Data {};
 
 struct RPYData : public Vec3Data {};
 
-/**
- * @brief print accelerometer data details
- *
- */
-std::ostream& operator<<(std::ostream& os, const AccelData& accel);
-
-/**
- * @brief print gyroscope data details
- *
- */
-std::ostream& operator<<(std::ostream& os, const GyroData& gyro);
-
-/**
- * @brief print magnetometer data details
- *
- */
-std::ostream& operator<<(std::ostream& os, const MagData& mag);
-
-/**
- * @brief print roll-pitch-yaw data details
- *
- */
-std::ostream& operator<<(std::ostream& os, const RPYData& rpy);
-
 struct QuatData : public Data {
   Quat data = Quat::Identity();
   void Clear() override {
     data.Identity();
   }
 };
-
-/**
- * @brief print quat data details
- *
- */
-std::ostream& operator<<(std::ostream& os, const QuatData& quat);
 
 /**
  * @brief holds simple version of IMU sensor data
@@ -149,11 +106,22 @@ struct ImuData : public Data {
   }
 };
 
-/**
- * @brief print imu data details
- *
- */
-std::ostream& operator<<(std::ostream& os, const ImuData& imu);
-
 }  // namespace core::utils
-#endif  // CORE_UTILS_DATA_HPP
+
+namespace cu = core::utils;
+
+/* print data details */
+std::ostream& operator<<(std::ostream& os, const cu::AdcData& adc);
+std::ostream& operator<<(std::ostream& os, const cu::BarData& bar);
+std::ostream& operator<<(std::ostream& os, const cu::TemperatureData& temp);
+std::ostream& operator<<(std::ostream& os, const cu::HeadingData& head);
+std::ostream& operator<<(std::ostream& os, const cu::GpsData& gps);
+std::ostream& operator<<(std::ostream& os, const cu::Vec3Data& vec);
+std::ostream& operator<<(std::ostream& os, const cu::QuatData& quat);
+std::ostream& operator<<(std::ostream& os, const cu::AccelData& accel);
+std::ostream& operator<<(std::ostream& os, const cu::GyroData& gyro);
+std::ostream& operator<<(std::ostream& os, const cu::MagData& mag);
+std::ostream& operator<<(std::ostream& os, const cu::RPYData& rpy);
+std::ostream& operator<<(std::ostream& os, const cu::ImuData& imu);
+
+#endif  // CORE_INCLUDE_CORE_UTILS_DATA_HPP_

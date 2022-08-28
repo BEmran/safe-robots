@@ -1,24 +1,29 @@
-#include <core/utils/date_time.hpp>
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include <iomanip>
 #include <sstream>
 #include <string>
 
+#include "core/utils/date_time.hpp"
 #include "gtest/gtest.h"
-#include "utils.hpp"
+#include "utest/utils.hpp"
 
-using namespace core::utils;
+using core::utils::DateTime;
+using core::utils::GenerateFileName;
+using core::utils::TimeInSeconds;
+using core::utils::TimeInSecondsString;
 
 tm GetLocalTime() {
   time_t now = time(nullptr);
-  tm* local_tm = localtime(&now);
-  return *local_tm;
+  tm local_tm;
+  localtime_r(&now, &local_tm);
+  return local_tm;
 }
 
-long TimeSinceEpochInSec() {
-  using namespace std::chrono;
-  auto now = system_clock::now();
+int64_t TimeSinceEpochInSec() {
+  auto now = std::chrono::system_clock::now();
   auto epoch = now.time_since_epoch();
-  return duration_cast<seconds>(epoch).count();
+  return std::chrono::duration_cast<std::chrono::seconds>(epoch).count();
 }
 
 testing::AssertionResult IsEqualDateTime(const tm& expect, const tm& actual) {

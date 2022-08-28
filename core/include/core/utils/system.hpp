@@ -1,6 +1,7 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_UTILS_SYSTEM_HPP
-#define CORE_UTILS_SYSTEM_HPP
+#ifndef CORE_INCLUDE_CORE_UTILS_SYSTEM_HPP_
+#define CORE_INCLUDE_CORE_UTILS_SYSTEM_HPP_
 
 #include <string>
 
@@ -25,4 +26,4 @@ bool IsPathExists(const std::string& path);
 
 }  // namespace core::utils
 
-#endif  // CORE_UTILS_SYSTEM_HPP
+#endif  // CORE_INCLUDE_CORE_UTILS_SYSTEM_HPP_

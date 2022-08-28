@@ -1,7 +1,11 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include "core/utils/module.hpp"
 
 namespace core::utils {
-using namespace std::literals::string_literals;  // to use s literals
+using namespace std::literals::string_literals;  // NOLINT
+                                                 // [build/namespaces_literals]
+                                                 // TODO(Bara)
 
 std::string ModuleTypeToString(const ModuleType type) {
   switch (type) {

@@ -1,6 +1,7 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef NAVIO_HARDWARE_UTILS_HPP
-#define NAVIO_HARDWARE_UTILS_HPP
+#ifndef HARDWARE_NAVIO_INCLUDE_NAVIO_HARDWARE_UTILS_HPP_
+#define HARDWARE_NAVIO_INCLUDE_NAVIO_HARDWARE_UTILS_HPP_
 
 #include <stdint.h>
 #include <unistd.h>
@@ -28,4 +29,4 @@ bool CheckApm();
 int GetNavioVersion();
 
 }  // namespace navio::hardware_utils
-#endif  // NAVIO_HARDWARE_UTILS_HPP
+#endif  // HARDWARE_NAVIO_INCLUDE_NAVIO_HARDWARE_UTILS_HPP_

@@ -1,3 +1,5 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #ifndef HARDWARE_NAVIO_INCLUDE_SENSORS_COMMON_UTILS_HPP_
 #define HARDWARE_NAVIO_INCLUDE_SENSORS_COMMON_UTILS_HPP_
 
@@ -27,12 +29,13 @@ namespace literals {
  * @brief User litterer to define a number of type uint8_t
  *
  */
-inline constexpr uint8_t operator"" _uc(unsigned long long arg) noexcept {
+inline constexpr uint8_t operator"" _uc(
+  unsigned long long arg) noexcept {  // NOLINT [runtime/int] TODO(Bara)
   return static_cast<uint8_t>(arg);
 }
 }  // namespace literals
 
-using namespace literals;
+using namespace literals;  // NOLINT [build/namespaces_literals] TODO(Bara)
 template <typename T,
           typename =
             typename std::enable_if<std::is_arithmetic<T>::value, T>::type>

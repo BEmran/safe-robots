@@ -4,7 +4,7 @@
   <name>core</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="bara.emran@gmail.com">Bara Emran</maintainer>
+  <maintainer email="Bara.emran@gmail.com">Bara Emran</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

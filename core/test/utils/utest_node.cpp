@@ -1,10 +1,24 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include <gtest/gtest.h>
 
 #include "core/utils/logger.hpp"
 #include "core/utils/node.hpp"
-#include "utils.hpp"
+#include "utest/utils.hpp"
 
-using namespace core::utils;
+using core::utils::DebugLabeledModifier;
+using core::utils::DebugModifier;
+using core::utils::DefaultModifier;
+using core::utils::ErrorLabeledModifier;
+using core::utils::ErrorModifier;
+using core::utils::InfoLabeledModifier;
+using core::utils::InfoModifier;
+using core::utils::LabeledModifier;
+using core::utils::Logger;
+using core::utils::Node;
+using core::utils::NodeLabeledModifiers;
+using core::utils::WarnLabeledModifier;
+using core::utils::WarnModifier;
 
 class MockLogger : public Logger {
  public:
@@ -63,7 +77,7 @@ TEST(Node, ConstructWithNameAndLogger) {
 }
 
 // check construct Node with Name and Logger
-TEST(Node, ConstructWithNameAndLoggerAndModiffier) {
+TEST(Node, ConstructWithNameAndLoggerAndModifier) {
   auto mock_logger = std::make_shared<MockLogger>();
   const NodeLabeledModifiers node_lm;
   const Node node("node name", mock_logger, node_lm);
@@ -73,7 +87,7 @@ TEST(Node, ConstructWithNameAndLoggerAndModiffier) {
 }
 
 // check Node Log function using MockLogger
-TEST(Node, LogWithArbitraryLabledModiffier) {
+TEST(Node, LogWithArbitraryLabeledModifier) {
   auto mock_logger = std::make_shared<MockLogger>();
   const Node node("node name", mock_logger);
   const core::utils::LabeledModifier lm(EventLevel::EL_INFO, "tmp",
@@ -83,7 +97,7 @@ TEST(Node, LogWithArbitraryLabledModiffier) {
 }
 
 // check Node log_debug function to see if it calls Logger.Log function with the
-// passed message and Debug LabeledModifer using MockLogger
+// passed message and Debug LabeledModifier using MockLogger
 TEST(Node, log_debug) {
   auto mock_logger = std::make_shared<MockLogger>();
   const NodeLabeledModifiers node_lm;
@@ -94,7 +108,7 @@ TEST(Node, log_debug) {
 }
 
 // check Node log_error function to see if it calls Logger.Log function with the
-// passed message and Error LabeledModifer using MockLogger
+// passed message and Error LabeledModifier using MockLogger
 TEST(Node, log_error) {
   auto mock_logger = std::make_shared<MockLogger>();
   const NodeLabeledModifiers node_lm;
@@ -105,7 +119,7 @@ TEST(Node, log_error) {
 }
 
 // check Node log_info function to see if it calls Logger.Log function with the
-// passed message and Info LabeledModifer using MockLogger
+// passed message and Info LabeledModifier using MockLogger
 TEST(Node, log_info) {
   auto mock_logger = std::make_shared<MockLogger>();
   const NodeLabeledModifiers node_lm;
@@ -116,7 +130,7 @@ TEST(Node, log_info) {
 }
 
 // check Node log_warn function to see if it calls Logger.Log function with the
-// passed message and Warn LabeledModifer using MockLogger
+// passed message and Warn LabeledModifier using MockLogger
 TEST(Node, log_warn) {
   auto mock_logger = std::make_shared<MockLogger>();
   const NodeLabeledModifiers node_lm;

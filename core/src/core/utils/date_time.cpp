@@ -1,3 +1,5 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include "core/utils/date_time.hpp"
 
 #include <iostream>
@@ -9,7 +11,9 @@ namespace core::utils {
 namespace {
 tm CraeteTmStruct() {
   const auto raw_time = time(nullptr);
-  return *localtime(&raw_time);
+  tm time_struct;
+  localtime_r(&raw_time, &time_struct);
+  return time_struct;
 }
 
 template <typename T>
@@ -30,7 +34,7 @@ int64_t TimeInSeconds() {
 
 std::string TimeInSecondsString() {
   char buff[15];
-  sprintf(buff, "%ld", TimeInSeconds());
+  snprintf(buff, sizeof(buff), "%ld", TimeInSeconds());
   return buff;
 }
 

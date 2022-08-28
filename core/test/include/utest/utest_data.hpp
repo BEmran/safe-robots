@@ -1,5 +1,7 @@
-#ifndef CORE_TEST_UTILS_UTEST_DATA_HPP_
-#define CORE_TEST_UTILS_UTEST_DATA_HPP_
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
+#ifndef CORE_TEST_INCLUDE_UTEST_UTEST_DATA_HPP_
+#define CORE_TEST_INCLUDE_UTEST_UTEST_DATA_HPP_
 
 #include "core/utils/data.hpp"
 #include "gtest/gtest.h"
@@ -60,4 +62,4 @@ void ExpectGPSData(const double lat, const double lon, const double alt,
   EXPECT_DOUBLE_EQ(lon, gps.lon);
   EXPECT_DOUBLE_EQ(alt, gps.alt);
 }
-#endif  // CORE_TEST_UTILS_UTEST_DATA_HPP_
+#endif  // CORE_TEST_INCLUDE_UTEST_UTEST_DATA_HPP_

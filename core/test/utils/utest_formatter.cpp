@@ -1,10 +1,14 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include <gtest/gtest.h>
 
 #include "core/utils/formatter.hpp"
-#include "utils.hpp"
+#include "utest/utils.hpp"
 
-using namespace core::utils;
-using event_level_t = EventLevel::event_level_t;
+using core::utils::DateTime;
+using core::utils::DefaultFormater;
+using core::utils::FormatterInterface;
+using core::utils::NullFormatter;
 
 // format a message with disabled Modifier
 std::string FormatFuncWithModifierDisabled(const LabeledModifier& lm,
@@ -37,7 +41,7 @@ TEST(NullFormatter, Format) {
 
 // test Default formatter's Format function constructed without enabling the
 // use of using modifier
-TEST(DefaultFormater, FormatWithothModifier) {
+TEST(DefaultFormater, FormatWithoutModifier) {
   std::string msg = "message";
   DefaultFormater formatter(false);
   for (size_t i = 0; i < EVENTS.size(); i++) {

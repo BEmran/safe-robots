@@ -1,3 +1,5 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #ifndef TEST_UTEST_DATA_HPP
 #define TEST_UTEST_DATA_HPP
 
@@ -5,12 +7,12 @@
 
 #include "core/utils/math.hpp"
 #include "gtest/gtest.h"
-#include "utest_data.hpp"
+#include "utest/utest_data.hpp"
 
-using namespace core::utils;
+using core::utils::Quat;
+using core::utils::Vec3;
 
 // Vec3 -----------------------------------------------------------------------
-
 TEST(Vec3, DefaultValuesUsingBrackets) {
   Vec3 vec = Vec3::Zero();
   EXPECT_FLOAT_EQ(0, vec[0]);

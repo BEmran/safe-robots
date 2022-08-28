@@ -1,6 +1,7 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_UTILS_FORMATTER_HPP
-#define CORE_UTILS_FORMATTER_HPP
+#ifndef CORE_INCLUDE_CORE_UTILS_FORMATTER_HPP_
+#define CORE_INCLUDE_CORE_UTILS_FORMATTER_HPP_
 
 #include <string>
 
@@ -31,7 +32,7 @@ class NullFormatter : public FormatterInterface {
 
 class DefaultFormater : public FormatterInterface {
  public:
-  DefaultFormater(const bool use_modifier = false);
+  explicit DefaultFormater(const bool use_modifier = false);
   ~DefaultFormater() {
   }
 
@@ -46,4 +47,4 @@ class DefaultFormater : public FormatterInterface {
 
 }  // namespace core::utils
 
-#endif  // CORE_UTILS_FORMATTER_HPP
+#endif  // CORE_INCLUDE_CORE_UTILS_FORMATTER_HPP_

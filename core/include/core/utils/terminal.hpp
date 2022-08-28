@@ -1,8 +1,11 @@
-#ifndef CORE_UTILS_TERMINAL_HPP
-#define CORE_UTILS_TERMINAL_HPP
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
+#ifndef CORE_INCLUDE_CORE_UTILS_TERMINAL_HPP_
+#define CORE_INCLUDE_CORE_UTILS_TERMINAL_HPP_
 
 #include <list>
 #include <ostream>
+#include <string>
 #include <vector>
 
 // Bash colors and formatting (ANSI/VT100 Control sequences)
@@ -104,4 +107,4 @@ Modifier WarnModifier();
 
 }  // namespace core::utils
 
-#endif  // CORE_UTILS_TERMINAL_HPP
+#endif  // CORE_INCLUDE_CORE_UTILS_TERMINAL_HPP_

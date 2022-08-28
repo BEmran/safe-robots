@@ -1,5 +1,9 @@
-#ifndef CORE_SENSOR_MODULE_SENSOR_IMU_HPP
-#define CORE_SENSOR_MODULE_SENSOR_IMU_HPP
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
+#ifndef CORE_INCLUDE_CORE_SENSORS_MODULE_SENSOR_IMU_HPP_
+#define CORE_INCLUDE_CORE_SENSORS_MODULE_SENSOR_IMU_HPP_
+
+#include <string>
 
 #include "core/sensors/module_sensor.hpp"
 #include "core/utils/data.hpp"
@@ -35,4 +39,4 @@ class ImuSensorModule : public SensorModuleAbs<utils::ImuData> {
 };
 
 }  // namespace core::sensors
-#endif  // CORE_SENSOR_MODULE_SENSOR_IMU_HPP
+#endif  // CORE_INCLUDE_CORE_SENSORS_MODULE_SENSOR_IMU_HPP_

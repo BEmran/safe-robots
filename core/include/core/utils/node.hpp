@@ -1,8 +1,10 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_UTILS_NODE_HPP
-#define CORE_UTILS_NODE_HPP
+#ifndef CORE_INCLUDE_CORE_UTILS_NODE_HPP_
+#define CORE_INCLUDE_CORE_UTILS_NODE_HPP_
 
 #include <memory>
+#include <string>
 
 #include "core/utils/event_level.hpp"
 #include "core/utils/logger.hpp"
@@ -143,4 +145,4 @@ Node CreateDefaultNode(const std::string& node_name);
 
 }  // namespace core::utils
 
-#endif  // CORE_UTILS_NODE_HPP
+#endif  // CORE_INCLUDE_CORE_UTILS_NODE_HPP_

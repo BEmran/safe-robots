@@ -1,3 +1,5 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include "core/sensors/module_sensor_imu.hpp"
 
 namespace core::sensors {

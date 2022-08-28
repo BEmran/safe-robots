@@ -1,8 +1,12 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include <gtest/gtest.h>
 
 #include "core/utils/exception.hpp"
 
-using namespace core::utils;
+using core::utils::Exception;
+using core::utils::ExceptionFactory;
+using core::utils::NullExceptionFactory;
 
 TEST(Exception, ThrowException) {
   auto throw_exception = []() { throw Exception(""); };

@@ -1,4 +1,4 @@
-// Implementation of the Socket class.
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
 
 #include "core/utils/socket.hpp"
 
@@ -77,18 +77,18 @@ bool Socket::Send(const int client_sock, const std::string& msg) {
   return status != -1;
 }
 
-int Socket::Recv(const int client_sock, std::string& msg) {
-  const auto buf_size = msg.size() + 1;
-  char buf[buf_size];
-  memset(buf, 0, buf_size);
-  const int status = ::recv(client_sock, buf, buf_size, 0);
-  msg = "";
+int Socket::Recv(const int client_sock, std::string* msg) {
+  constexpr size_t kBufSize = 512;
+  char buf[kBufSize];
+  memset(buf, 0, kBufSize);
+  const auto status = ::recv(client_sock, buf, kBufSize, 0);
+  *msg = "";
 
   if (status == -1) {
     return 0;
   }
-  msg = buf;
-  return status;
+  *msg = buf;
+  return static_cast<int>(status);
 }
 
 // bool Socket::Connect(const std::string& host, const int port)

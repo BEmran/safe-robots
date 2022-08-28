@@ -1,16 +1,20 @@
-#ifndef MPU_MPU9250_HPP
-#define MPU_MPU9250_HPP
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
+#ifndef HARDWARE_NAVIO_INCLUDE_SENSORS_MPU_MPU9250_HPP_
+#define HARDWARE_NAVIO_INCLUDE_SENSORS_MPU_MPU9250_HPP_
 
 #include <stdint.h>
 #include <unistd.h>
 
 #include <array>
-#include <core/sensors/module_sensor.hpp>
-#include <core/utils/data.hpp>
-#include <core/utils/node.hpp>
 #include <map>
 #include <memory>
+#include <utility>
+#include <vector>
 
+#include "core/sensors/module_sensor.hpp"
+#include "core/utils/data.hpp"
+#include "core/utils/node.hpp"
 #include "navio/spi.hpp"
 #include "sensors/common/utils.hpp"
 #include "sensors/mpu/mpu9250_register_map.hpp"
@@ -73,6 +77,8 @@ class Mpu9250 : public cu::ImuSensorModule {
   SensorRawData ReadRawData() const;
 
  protected:
+  void ReadCalibrationFile();
+
   void ConfigureI2C() const;
   /**
    * @brief Check MPU WHO AM I register, expected value is 0x71 (decimal 113)
@@ -175,4 +181,4 @@ class Mpu9250 : public cu::ImuSensorModule {
     1.0F, 1.0F, 1.0F};  // factory calibration
 };
 }  // namespace sensors::mpu
-#endif  // MPU_MPU9250_HPP
+#endif  // HARDWARE_NAVIO_INCLUDE_SENSORS_MPU_MPU9250_HPP_

@@ -1,5 +1,7 @@
-#ifndef CORE_UTILS_MODULE_HPP
-#define CORE_UTILS_MODULE_HPP
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
+#ifndef CORE_INCLUDE_CORE_UTILS_MODULE_HPP_
+#define CORE_INCLUDE_CORE_UTILS_MODULE_HPP_
 
 #include <string>
 
@@ -68,4 +70,4 @@ class ModuleAbs {
 };
 
 }  // namespace core::utils
-#endif  // CORE_UTILS_MODULE_HPP
+#endif  // CORE_INCLUDE_CORE_UTILS_MODULE_HPP_

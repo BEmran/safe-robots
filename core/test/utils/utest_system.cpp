@@ -1,3 +1,5 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include <gtest/gtest.h>
 
 #include <experimental/filesystem>
@@ -5,7 +7,8 @@
 #include "core/utils/system.hpp"
 
 namespace fs = std::experimental::filesystem;
-using namespace core::utils;
+using core::utils::CreateDirectories;
+using core::utils::IsPathExists;
 
 TEST(System, FileExist) {
   auto path = fs::current_path();

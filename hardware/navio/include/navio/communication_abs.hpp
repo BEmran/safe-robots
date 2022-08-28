@@ -1,14 +1,18 @@
-#ifndef _MPU_COMMUNICATION_ABS_HPP
-#define _MPU_COMMUNICATION_ABS_HPP
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
+#ifndef HARDWARE_NAVIO_INCLUDE_NAVIO_COMMUNICATION_ABS_HPP_
+#define HARDWARE_NAVIO_INCLUDE_NAVIO_COMMUNICATION_ABS_HPP_
 
 #include <stdint.h>
 
+#include <utility>
 #include <vector>
 
 namespace navio {
 class CommunicationAbs {
  public:
-  CommunicationAbs(const bool debug) : debug_(debug){};
+  explicit CommunicationAbs(const bool debug) : debug_(debug) {
+  }
 
   virtual ~CommunicationAbs() {
   }
@@ -31,4 +35,4 @@ class CommunicationAbs {
   bool debug_;
 };
 }  // namespace navio
-#endif  //_MPU_COMMUNICATION_ABS_HPP
+#endif  // HARDWARE_NAVIO_INCLUDE_NAVIO_COMMUNICATION_ABS_HPP_

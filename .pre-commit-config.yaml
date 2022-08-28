@@ -95,5 +95,5 @@ repos:
         files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
         args:
           [
-            "--filter=-whitespace/braces, -legal/copyright",
+            "--filter= +build, +legal, +readability, +runtime, +whitespace"
           ]

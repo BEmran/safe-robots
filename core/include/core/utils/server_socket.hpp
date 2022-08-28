@@ -1,7 +1,10 @@
-#ifndef CORE_UTILS_SERVER_SOCKET_HPP
-#define CORE_UTILS_SERVER_SOCKET_HPP
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
+#ifndef CORE_INCLUDE_CORE_UTILS_SERVER_SOCKET_HPP_
+#define CORE_INCLUDE_CORE_UTILS_SERVER_SOCKET_HPP_
 
 #include <memory>
+#include <string>
 
 #include "core/utils/node.hpp"
 #include "core/utils/socket.hpp"
@@ -20,7 +23,8 @@ class ServerSocket {
    * @brief Destroy the Server Socket object
    *
    */
-  virtual ~ServerSocket(){};
+  virtual ~ServerSocket() {
+  }
 
   // Data Transmission
   const ServerSocket& operator<<(const std::string& msg) const;
@@ -63,11 +67,11 @@ class ServerSocket {
    */
   void Listen();
 
-  mutable bool ready = false;   // ready to send and receive
-  int port_ = -1;               // port number
-  int client_sock_ = -1;        // client socket number set when call Accept()
+  mutable bool ready;           // ready to send and receive
+  uint16_t port_;               // port number
+  int client_sock_;             // client socket number set when call Accept()
   std::unique_ptr<Node> node_;  // node object
   std::unique_ptr<Socket> socket_;  // socket object
 };
 }  // namespace core::utils
-#endif  // CORE_UTILS_SERVER_SOCKET_HPP
+#endif  // CORE_INCLUDE_CORE_UTILS_SERVER_SOCKET_HPP_

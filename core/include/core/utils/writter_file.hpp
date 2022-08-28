@@ -1,9 +1,12 @@
-#ifndef CORE_UTILS_WRITTER_FILE_HPP
-#define CORE_UTILS_WRITTER_FILE_HPP
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
+#ifndef CORE_INCLUDE_CORE_UTILS_WRITTER_FILE_HPP_
+#define CORE_INCLUDE_CORE_UTILS_WRITTER_FILE_HPP_
 
 #include <fstream>
 #include <memory>
-#include <mutex>
+#include <mutex>  // NOLINT [build/c++11] TODO(Bara)
+#include <string>
 
 #include "core/utils/writter.hpp"
 
@@ -48,4 +51,4 @@ class FileWritter : public Writter {
 
 }  // namespace core::utils
 
-#endif  // CORE_UTILS_WRITTER_FILE_HPP
+#endif  // CORE_INCLUDE_CORE_UTILS_WRITTER_FILE_HPP_

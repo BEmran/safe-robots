@@ -1,10 +1,13 @@
-#ifndef _MPU_SPI_HPP
-#define _MPU_SPI_HPP
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
+#ifndef HARDWARE_NAVIO_INCLUDE_NAVIO_SPI_HPP_
+#define HARDWARE_NAVIO_INCLUDE_NAVIO_SPI_HPP_
 
 #include <linux/spi/spidev.h>
 #include <stdint.h>
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "navio/communication_abs.hpp"
@@ -38,4 +41,4 @@ class SPI : CommunicationAbs {
 };
 
 }  // namespace navio
-#endif  //_MPU_SPI_HPP
+#endif  // HARDWARE_NAVIO_INCLUDE_NAVIO_SPI_HPP_

@@ -1,3 +1,5 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include "sensors/common/calibrate.hpp"
 
 #include "navio/hardware_utils.hpp"
@@ -23,12 +25,12 @@ utils::Vec3 GetAverage(const ReadFunc& cb) {
 SensorSpecs CalibrateAccelerometer(const ReadFunc& cb,
                                    const SensorSpecs& spec) {
   Eigen::Matrix<utils::MATH_TYPE, 6, 3> y;
-  y << +0.F, +0.F, +1.F,  //
-    -1.F, +0.F, +0.F,     //
-    +1.F, +0.F, +0.F,     //
-    +0.F, -1.F, +0.F,     //
-    +0.F, +1.F, +0.F,     //
-    +0.F, +0.F, -1.F;
+  y(0, 3) = +1.F;  // face up, z+
+  y(1, 1) = -1.F;  // right side, x-
+  y(2, 1) = +1.F;  // left side, x+
+  y(3, 2) = -1.F;  // nose down, y-
+  y(4, 2) = +1.F;  // nose up, y+
+  y(5, 3) = -1.F;  // face down, z-
   Eigen::Matrix<utils::MATH_TYPE, 6, 4> x;
   x.setZero();
   Eigen::Matrix<utils::MATH_TYPE, 4, 3> miss;
@@ -36,7 +38,7 @@ SensorSpecs CalibrateAccelerometer(const ReadFunc& cb,
   std::cout << "Y = \n" << y << std::endl;
   std::cout << "x = \n" << x << std::endl;
   std::cout << "miss = \n" << miss << std::endl;
-  const char* msg[] = {"face up",   "right side", "side left",
+  const char* msg[] = {"face up",   "right side", "left side",
                        "nose down", "nose up",    "face down"};
   for (int i = 0; i < 6; i++) {
     std::cout << msg[i] << " and press enter.....";
@@ -94,8 +96,9 @@ SensorSpecs CalibrateMagnetometer(const ReadFunc& cb, const SensorSpecs& spec) {
   utils::Vec3 min = utils::Vec3::Zero();
   for (size_t i = 0; i < data.size(); i++) {
     auto ptr = std::minmax_element(data[i].begin(), data[i].end());
-    min(i) = *(ptr.first);
-    max(i) = *(ptr.second);
+    // TODO(Bara) find a better way than static_cast
+    min(static_cast<int>(i)) = *(ptr.first);
+    max(static_cast<int>(i)) = *(ptr.second);
   }
 
   // get average bias in counts

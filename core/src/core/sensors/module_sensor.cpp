@@ -1,7 +1,11 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include "core/sensors/module_sensor.hpp"
 
 namespace core::sensors {
-using namespace std::literals::string_literals;  // to use s literals
+using namespace std::literals::string_literals;  // NOLINT
+                                                 // [build/namespaces_literals]
+                                                 // TODO(Bara)
 
 std::string SensorModuleTypeToString(const SensorModuleType type) {
   switch (type) {

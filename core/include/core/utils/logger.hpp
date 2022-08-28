@@ -1,13 +1,14 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-
-#ifndef CORE_UTILS_TRACER_HPP
-#define CORE_UTILS_TRACER_HPP
+#ifndef CORE_INCLUDE_CORE_UTILS_LOGGER_HPP_
+#define CORE_INCLUDE_CORE_UTILS_LOGGER_HPP_
 
 #include <string.h>  // to use strrchr
 
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include <string>
 
 #include "core/utils/event_level.hpp"
 #include "core/utils/exception.hpp"
@@ -126,4 +127,4 @@ std::shared_ptr<Logger> CreateDefaultLogger(const std::string& name,
 
 }  // namespace core::utils
 
-#endif  // CORE_UTILS_TRACER_HPP
+#endif  // CORE_INCLUDE_CORE_UTILS_LOGGER_HPP_

@@ -1,10 +1,15 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include <gtest/gtest.h>
 
 #include "core/utils/terminal.hpp"
-#include "utils.hpp"
+#include "utest/utils.hpp"
 
-using namespace core::utils;
-
+using core::utils::DebugModifier;
+using core::utils::DefaultModifier;
+using core::utils::ErrorModifier;
+using core::utils::InfoModifier;
+using core::utils::WarnModifier;
 // check a modifier settings created using its constructor
 TEST(Modifier, Construct) {
   auto fg = FG::FG_DARK_GRAY;

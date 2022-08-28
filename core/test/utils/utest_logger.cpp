@@ -3,11 +3,18 @@
 #include "core/utils/exception.hpp"
 #include "core/utils/logger.hpp"
 #include "core/utils/terminal.hpp"
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include "core/utils/writter_console.hpp"
 #include "core/utils/writter_file.hpp"
-#include "utils.hpp"
+#include "utest/utils.hpp"
 
-using namespace core::utils;
+using core::utils::Exception;
+using core::utils::ExceptionFactory;
+using core::utils::Logger;
+using core::utils::LogLocation;
+using core::utils::NullFormatter;
+
 const char* g_message = "message";
 const char* g_filename = "log.txt";
 

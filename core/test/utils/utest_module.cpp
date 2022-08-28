@@ -1,10 +1,13 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include <gtest/gtest.h>
 
 #include "core/utils/module.hpp"
 
-using namespace core::utils;
+using core::utils::ModuleAbs;
+using core::utils::ModuleType;
 
-constexpr auto UndefinedType = core::utils::ModuleType::UNDEFINED;
+constexpr auto UndefinedType = ModuleType::UNDEFINED;
 constexpr auto Name = "name";
 constexpr auto Debug = false;
 

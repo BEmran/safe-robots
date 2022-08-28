@@ -1,7 +1,9 @@
-#ifndef CORE_SENSORS_MODULE_SENSOR_HPP
-#define CORE_SENSORS_MODULE_SENSOR_HPP
+#ifndef CORE_INCLUDE_CORE_SENSORS_MODULE_SENSOR_HPP_
+#define CORE_INCLUDE_CORE_SENSORS_MODULE_SENSOR_HPP_
 
 #include <string>
+
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
 
 #include "core/utils/cash.hpp"
 #include "core/utils/module.hpp"
@@ -109,4 +111,4 @@ class SensorModuleAbs : public utils::ModuleAbs {
 };
 
 }  // namespace core::sensors
-#endif  // CORE_SENSORS_MODULE_SENSOR_HPP
+#endif  // CORE_INCLUDE_CORE_SENSORS_MODULE_SENSOR_HPP_

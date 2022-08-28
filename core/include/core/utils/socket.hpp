@@ -1,7 +1,7 @@
-// Definition of the Socket class
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_UTILS_SOCKET_HPP
-#define CORE_UTILS_SOCKET_HPP
+#ifndef CORE_INCLUDE_CORE_UTILS_SOCKET_HPP_
+#define CORE_INCLUDE_CORE_UTILS_SOCKET_HPP_
 
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include <string>
+#include <utility>
 
 namespace core::utils {
 /**
@@ -89,7 +90,7 @@ class Socket {
    * @param msg received message
    * @return int
    */
-  static int Recv(const int client_sock, std::string& msg);
+  static int Recv(const int client_sock, std::string* msg);
 
   // void SetNonBlocking(const bool block);
 
@@ -115,4 +116,4 @@ class Socket {
   sockaddr_in address_;
 };
 }  // namespace core::utils
-#endif  // CORE_UTILS_SOCKET_HPP
+#endif  // CORE_INCLUDE_CORE_UTILS_SOCKET_HPP_

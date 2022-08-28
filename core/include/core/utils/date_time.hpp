@@ -1,7 +1,9 @@
-#ifndef CORE_UTILS_DATE_TIME_HPP
-#define CORE_UTILS_DATE_TIME_HPP
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#include <chrono>
+#ifndef CORE_INCLUDE_CORE_UTILS_DATE_TIME_HPP_
+#define CORE_INCLUDE_CORE_UTILS_DATE_TIME_HPP_
+
+#include <chrono>  // NOLINT [build/c++11] TODO(Bara)
 #include <ctime>
 #include <string>
 
@@ -125,4 +127,4 @@ std::string TimeInSecondsString();
 std::string GenerateFileName(const DateTime dt = DateTime());
 
 }  // namespace core::utils
-#endif  // CORE_UTILS_DATE_TIME_HPP
+#endif  // CORE_INCLUDE_CORE_UTILS_DATE_TIME_HPP_

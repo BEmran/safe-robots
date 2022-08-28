@@ -1,3 +1,5 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include "sensors/mpu/mpu9250.hpp"
 
 #include "navio/hardware_utils.hpp"
@@ -6,7 +8,7 @@
 
 namespace sensors::mpu {
 namespace cu = common::utils;
-using namespace cu::literals;  // _uc
+using namespace cu::literals;  // NOLINT [build/namespaces_literals] TODO(Bara)
 namespace {
 using SensorModuleType = core::sensors::SensorModuleType;
 constexpr auto ImuType = SensorModuleType::IMU;
@@ -56,12 +58,18 @@ Mpu9250::Mpu9250(const Config& config, std::unique_ptr<navio::SPI> comm,
   sensor_specs_map[TempType] =
     cu::SensorSpecs(TempScale, 1.0F, kTempBias, kTempOffset);
 
+  ReadCalibrationFile();
+}
+
+void Mpu9250::ReadCalibrationFile() {
+  // TODO(Bara) read from config file instead
   cu::Mat3 accel_misalignment;
   accel_misalignment << 0.998122F, 0.00794836F, 0.000548448F,  //
     -0.00552448F, 0.998181F, -0.00669443F,                     //
     0.0189156F, 0.00407755F, 0.993244F;
   cu::Vec3 accel_bias{-0.00387028F, -0.0128085F, 0.0108167F};
   cu::Vec3 gyro_bias{12.629F, 7.572F, -9.618F};
+
   sensor_specs_map[AccelType].SetCalibration(accel_misalignment, accel_bias,
                                              cu::Vec3::Zero());  //
   sensor_specs_map[GyroType].SetCalibration(cu::Mat3::Identity(), gyro_bias,
@@ -271,17 +279,15 @@ std::pair<bool, Config> Mpu9250::ValidateConfiguration() const {
 }
 
 void Mpu9250::Calibrate() {
-  // ExtractMagnetometerSensitivityAdjustmentValues();
+  ExtractMagnetometerSensitivityAdjustmentValues();
   auto read_gyro_data = [this]() { return ReadRawData().gyro; };
   auto read_accel_data = [this]() { return ReadRawData().accel; };
   auto read_mag_data = [this]() { return ReadRawData().mag; };
 
-  // sensor_specs_map[GyroType] =
-  //     common::calibrate::CalibrateGyroscope(read_gyro_data,
-  //     sensor_specs_map[GyroType]);
-  // sensor_specs_map[AccelType] =
-  //     common::calibrate::CalibrateAccelerometer(read_accel_data,
-  //     sensor_specs_map[AccelType]);
+  sensor_specs_map[GyroType] = common::calibrate::CalibrateGyroscope(
+    read_gyro_data, sensor_specs_map[GyroType]);
+  sensor_specs_map[AccelType] = common::calibrate::CalibrateAccelerometer(
+    read_accel_data, sensor_specs_map[AccelType]);
   sensor_specs_map[MagType] = common::calibrate::CalibrateMagnetometer(
     read_mag_data, sensor_specs_map[MagType]);
 }

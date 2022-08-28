@@ -1,6 +1,11 @@
-#ifndef SENSORS_MPU_MPU_REGISTER_MAP_HPP
-#define SENSORS_MPU_MPU_REGISTER_MAP_HPP
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
+#ifndef HARDWARE_NAVIO_INCLUDE_SENSORS_MPU_MPU9250_REGISTER_MAP_HPP_
+#define HARDWARE_NAVIO_INCLUDE_SENSORS_MPU_MPU9250_REGISTER_MAP_HPP_
+
 #include <stdint.h>
+
+#include <map>
 
 #include "sensors/common/utils.hpp"
 
@@ -13,7 +18,7 @@ constexpr int kMaxUTesla = 10 * 4912;  // Magnetic flux density in milliGauss
 
 constexpr auto TempScale = 333.87F;
 
-// TODO: change to single value instead of vector
+// TODO(Bara): change to single value instead of vector
 const auto kTempBias = cu::Vec3::Ones() * 21.F;
 const auto kTempOffset = cu::Vec3::Ones() * 21.F;
 
@@ -53,7 +58,8 @@ enum class MagMode : uint8_t {
   FUSE_ROM_ACCESS
 };
 
-using namespace common::utils::literals;  // _uc
+using namespace common::utils::literals;  // NOLINT [build/namespaces_literals]
+                                          // TODO(Bara)
 
 cu::SpecInfoMap<AccelBandWidthHz, uint8_t> accel_bw_map({
   {AccelBandWidthHz::BW_218HZ, {0, 0x01_uc, "218 HZ"}},  //
@@ -246,4 +252,4 @@ constexpr uint8_t ASAY = 0x11;
 constexpr uint8_t ASAZ = 0x12;
 }  // namespace ak8963
 }  // namespace sensors::mpu
-#endif  // SENSORS_MPU_MPU_REGISTER_MAP_HPP
+#endif  // HARDWARE_NAVIO_INCLUDE_SENSORS_MPU_MPU9250_REGISTER_MAP_HPP_

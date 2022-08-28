@@ -1,5 +1,7 @@
-#ifndef CORE_UTILS_MATH_HPP
-#define CORE_UTILS_MATH_HPP
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
+#ifndef CORE_INCLUDE_CORE_UTILS_MATH_HPP_
+#define CORE_INCLUDE_CORE_UTILS_MATH_HPP_
 
 #include <eigen3/Eigen/Dense>
 #include <iomanip>
@@ -19,12 +21,12 @@ typedef Eigen::Rotation2D<MATH_TYPE> Rot2;
 typedef Eigen::Quaternion<MATH_TYPE> Quat;
 typedef Eigen::Transform<MATH_TYPE, 3, Eigen::Affine> Transform;
 
-std::ostream& operator<<(std::ostream& os, const Vec3& vec);
-
-std::ostream& operator<<(std::ostream& os, const Transpose& vec);
-
-std::ostream& operator<<(std::ostream& os, const Quat& quat);
-
 }  // namespace core::utils
 
-#endif  // CORE_UTILS_MATH_HPP
+// need to be unscoped in namespace to be called from any file when include
+// header
+std::ostream& operator<<(std::ostream& os, const core::utils::Vec3& vec);
+std::ostream& operator<<(std::ostream& os, const core::utils::Transpose& vec);
+std::ostream& operator<<(std::ostream& os, const core::utils::Quat& quat);
+
+#endif  // CORE_INCLUDE_CORE_UTILS_MATH_HPP_

@@ -1,8 +1,10 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_UTILS_COMMON_HPP
-#define CORE_UTILS_COMMON_HPP
+#ifndef CORE_INCLUDE_CORE_UTILS_EVENT_LEVEL_HPP_
+#define CORE_INCLUDE_CORE_UTILS_EVENT_LEVEL_HPP_
 
 #include <memory>
+#include <string>
 
 #include "core/utils/terminal.hpp"
 
@@ -85,4 +87,4 @@ LabeledModifier WarnLabeledModifier();
 
 }  // namespace core::utils
 
-#endif  // CORE_UTILS_COMMON_HPP
+#endif  // CORE_INCLUDE_CORE_UTILS_EVENT_LEVEL_HPP_

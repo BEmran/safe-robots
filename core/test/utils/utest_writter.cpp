@@ -1,10 +1,13 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include <gtest/gtest.h>
 
 #include "core/utils/writter_console.hpp"
 #include "core/utils/writter_file.hpp"
-#include "utils.hpp"
+#include "utest/utils.hpp"
 
-using namespace core::utils;
+using core::utils::ConsoleWritter;
+using core::utils::FileWritter;
 
 TEST(WritterConsole, LogOnceNoName) {
   ConsoleBuffer buf;

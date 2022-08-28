@@ -1,10 +1,19 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include <gtest/gtest.h>
 
 #include "core/utils/event_level.hpp"
-#include "utils.hpp"
+#include "utest/utils.hpp"
 
-using namespace core::utils;
-using event_level_t = EventLevel::event_level_t;
+using core::utils::DebugLabeledModifier;
+using core::utils::DebugModifier;
+using core::utils::DefaultModifier;
+using core::utils::ErrorLabeledModifier;
+using core::utils::ErrorModifier;
+using core::utils::InfoLabeledModifier;
+using core::utils::InfoModifier;
+using core::utils::WarnLabeledModifier;
+using core::utils::WarnModifier;
 
 // test converting an event level to string
 TEST(EventLevelToString, AllLevels) {
@@ -13,7 +22,7 @@ TEST(EventLevelToString, AllLevels) {
   }
 }
 
-// test constracting LabeledModifier with only event
+// test constructing LabeledModifier with only event
 TEST(LabeledModifier, ConstructWithEvent) {
   for (size_t i = 0; i < EVENTS.size(); i++) {
     const LabeledModifier labeled(EVENTS[i]);
@@ -21,7 +30,7 @@ TEST(LabeledModifier, ConstructWithEvent) {
   }
 }
 
-// test constracting LabeledModifier with different events and a label
+// test constructing LabeledModifier with different events and a label
 TEST(LabeledModifier, ConstructWithEventAndLabel) {
   const char* label = "label";
   for (const auto& event : EVENTS) {
@@ -30,7 +39,7 @@ TEST(LabeledModifier, ConstructWithEventAndLabel) {
   }
 }
 
-// test constracting LabeledModifier with different events and a modifier
+// test constructing LabeledModifier with different events and a modifier
 TEST(LabeledModifier, ConstructWithEventAndModifier) {
   Modifier modifier(FG::FG_LIGHT_BLUE, BG::BG_LIGHT_CYAN, FMT::FMT_HIDDEN);
   for (size_t i = 0; i < EVENTS.size(); i++) {
@@ -39,7 +48,7 @@ TEST(LabeledModifier, ConstructWithEventAndModifier) {
   }
 }
 
-// test constracting LabeledModifier with different events, a label and a
+// test constructing LabeledModifier with different events, a label and a
 // modifier
 TEST(LabeledModifier, ConstructWithEventAndLabelAndModifier) {
   Modifier modifier(FG::FG_LIGHT_BLUE, BG::BG_LIGHT_CYAN, FMT::FMT_HIDDEN);

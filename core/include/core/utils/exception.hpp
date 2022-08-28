@@ -1,11 +1,12 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-
-#ifndef CORE_UTILS_EXCEPT_HPP
-#define CORE_UTILS_EXCEPT_HPP
+#ifndef CORE_INCLUDE_CORE_UTILS_EXCEPTION_HPP_
+#define CORE_INCLUDE_CORE_UTILS_EXCEPTION_HPP_
 
 #include <string.h>
 
 #include <stdexcept>
+#include <string>
 
 namespace core::utils {
 class Exception : public std::runtime_error {
@@ -35,7 +36,7 @@ class ExceptionFactory {
 
 class NullExceptionFactory : public ExceptionFactory {
  public:
-  explicit NullExceptionFactory() : ExceptionFactory("") {
+  NullExceptionFactory() : ExceptionFactory("") {
   }
 
   ~NullExceptionFactory() {
@@ -48,4 +49,4 @@ class NullExceptionFactory : public ExceptionFactory {
 
 }  // namespace core::utils
 
-#endif  // CORE_UTILS_EXCEPT_HPP
+#endif  // CORE_INCLUDE_CORE_UTILS_EXCEPTION_HPP_

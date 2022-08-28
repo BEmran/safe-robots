@@ -1,3 +1,5 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include "core/utils/node.hpp"
 
 namespace core::utils {
@@ -46,25 +48,25 @@ void Node::Log(const LabeledModifier& lm, const std::string& msg) const {
 }
 
 Node CreateNode(const std::string& node_name) {
-  const auto console_formater = std::make_shared<utils::DefaultFormater>(true);
-  const auto file_formater = std::make_shared<utils::DefaultFormater>(false);
-  const auto exception = std::make_shared<utils::ExceptionFactory>("");
+  const auto cformater = std::make_shared<DefaultFormater>(true);
+  const auto fformater = std::make_shared<DefaultFormater>(false);
+  const auto exception = std::make_shared<ExceptionFactory>("");
   const auto logger_name = node_name + "_logger.txt";
-  const auto log = std::make_shared<utils::Logger>(logger_name, file_formater,
-                                                   console_formater, exception);
-  return utils::Node(node_name, log);
+  const auto log =
+    std::make_shared<Logger>(logger_name, fformater, cformater, exception);
+  return Node(node_name, log);
 }
 
 Node CreateDefaultNode(const std::string& node_name) {
-  const static auto console_formater =
-    std::make_shared<utils::DefaultFormater>(true);
-  const static auto file_formater =
-    std::make_shared<utils::DefaultFormater>(false);
-  const static auto exception = std::make_shared<utils::ExceptionFactory>("");
-  const static auto logger_name = "sys_logger.txt";
-  const static auto log = std::make_shared<utils::Logger>(
-    logger_name, file_formater, console_formater, exception);
-
-  return utils::Node(node_name, log);
+  static std::shared_ptr<Logger> log = nullptr;
+  if (!log) {
+    const auto cformater = std::make_shared<DefaultFormater>(true);
+    const auto fformater = std::make_shared<DefaultFormater>(false);
+    const auto exception = std::make_shared<ExceptionFactory>("");
+    const char* logger_name = "sys_logger.txt";
+    log =
+      std::make_shared<Logger>(logger_name, fformater, cformater, exception);
+  }
+  return Node(node_name, log);
 }
 }  // namespace core::utils

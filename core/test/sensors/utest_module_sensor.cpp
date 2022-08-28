@@ -1,12 +1,16 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include <gtest/gtest.h>
 
 #include "core/sensors/module_sensor.hpp"
 #include "core/utils/data.hpp"
 
-using namespace core::sensors;
+using core::sensors::SensorModuleAbs;
+using core::sensors::SensorModuleType;
 using core::utils::DoubleData;
+using core::utils::ModuleType;
 
-constexpr auto ModuleTypeSensor = core::utils::ModuleType::SENSOR;
+constexpr auto ModuleTypeSensor = ModuleType::SENSOR;
 constexpr auto UndefinedSensorType = SensorModuleType::UNDEFINED;
 constexpr auto Name = "name";
 constexpr auto Debug = false;

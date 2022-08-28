@@ -1,4 +1,4 @@
-// Implementation of the ServerSocket class
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
 
 #include "core/utils/server_socket.hpp"
 
@@ -6,6 +6,7 @@ namespace core::utils {
 ServerSocket::ServerSocket(const uint16_t port)
   : ready(false)
   , port_(port)
+  , client_sock_(-1)
   , node_(std::make_unique<Node>(CreateDefaultNode("Socket")))
   , socket_(std::make_unique<Socket>()) {
   Create();
@@ -65,7 +66,7 @@ const ServerSocket& ServerSocket::operator<<(const std::string& msg) const {
 const ServerSocket& ServerSocket::operator>>(std::string& msg) const {
   if (!ready) {
     node_->LogWarn("Cannot read from socket. Server is not ready.");
-  } else if (!socket_->Recv(client_sock_, msg)) {
+  } else if (!socket_->Recv(client_sock_, &msg)) {
     node_->LogWarn("Failed reading from socket.");
     ready = false;
   }
