@@ -35,7 +35,7 @@ inline constexpr uint8_t operator"" _uc(unsigned long long arg) noexcept {
 using namespace literals;
 template <typename T,
           typename =
-              typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+            typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
 struct SpecInfo {
   T value;
   uint8_t byte;

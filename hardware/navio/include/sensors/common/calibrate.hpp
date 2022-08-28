@@ -1,13 +1,12 @@
 #ifndef HARDWARE_NAVIO_INCLUDE_SENSORS_COMMON_CALIBRATE_HPP_
 #define HARDWARE_NAVIO_INCLUDE_SENSORS_COMMON_CALIBRATE_HPP_
 
-#include "core/utils/math.hpp"
 #include <functional>
 
+#include "core/utils/math.hpp"
 #include "sensors/common/utils.hpp"
 
-namespace sensors::common::calibrate
-{
+namespace sensors::common::calibrate {
 typedef std::function<utils::Vec3(void)> ReadFunc;
 using utils::SensorSpecs;
 // Function which accumulates gyro and accelerometer data after device

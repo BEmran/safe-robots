@@ -45,4 +45,3 @@ SpaceBeforeAssignmentOperators: true
 ContinuationIndentWidth: 2
 SortIncludes: false
 SpaceAfterCStyleCast: false
-
