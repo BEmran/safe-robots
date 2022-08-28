@@ -25,7 +25,7 @@ then
   declare -a projects=("core" "hardware/navio")
   declare -a directories=("app" "include" "src" "test")
   # Search for CMakeLists.txt files through passed directories and call foramt function
-  for dir in "${projects[@]}"; do
+  for pro in "${projects[@]}"; do
     for dir in "${directories[@]}"; do
       printf "\n- searching through: $PACKAGE_ROOT_PATH/$pro/$dir\n"
       find "$PACKAGE_ROOT_PATH/$pro/$dir" -regextype posix-extended -regex '.*CMakeLists.txt' -exec bash -c 'cformat "$0"' {} \;

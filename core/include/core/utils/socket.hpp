@@ -3,18 +3,17 @@
 #ifndef CORE_UTILS_SOCKET_HPP
 #define CORE_UTILS_SOCKET_HPP
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <unistd.h>
 #include <arpa/inet.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <string>
 
 namespace core::utils
 {
-
 /**
  * @brief Wrapper for C socket function. A socket is a channel to connect two ip
  * address

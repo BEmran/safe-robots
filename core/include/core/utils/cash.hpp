@@ -6,7 +6,6 @@
 
 namespace core::utils
 {
-
 /**
  * @brief simple class used to define a thread-safe way to handle data
  *
@@ -63,7 +62,7 @@ class Cash
 
  private:
   mutable std::shared_mutex mutex_;
-  std::unique_ptr<T> data_ptr_  = std::make_unique<T>();
+  std::unique_ptr<T> data_ptr_ = std::make_unique<T>();
 };
 
 }  // namespace core::utils

@@ -59,12 +59,12 @@ class ModuleAbs
    */
   std::string Name() const;
 
-/**
- * @brief indicate if debug flag is enabled or not
- * 
- * @return true if enabled
- * @return false if disabled
- */
+  /**
+   * @brief indicate if debug flag is enabled or not
+   *
+   * @return true if enabled
+   * @return false if disabled
+   */
   bool IsDebugEnabled() const;
 
  private:

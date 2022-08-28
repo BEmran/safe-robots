@@ -1,13 +1,13 @@
 #ifndef CORE_UTILS_SERVER_SOCKET_HPP
 #define CORE_UTILS_SERVER_SOCKET_HPP
 
-#include "core/utils/socket.hpp"
-#include "core/utils/node.hpp"
 #include <memory>
+
+#include "core/utils/node.hpp"
+#include "core/utils/socket.hpp"
 
 namespace core::utils
 {
-
 class ServerSocket
 {
  public:

@@ -22,8 +22,7 @@ set(CORE_HEADER_LIST
     ${CORE_INCLUDE_DIR}/utils/socket.hpp
     ${CORE_INCLUDE_DIR}/utils/socket_exception.hpp
     ${CORE_INCLUDE_DIR}/sensors/module_sensor_imu.hpp
-    ${CORE_INCLUDE_DIR}/sensors/module_sensor.hpp
-    )
+    ${CORE_INCLUDE_DIR}/sensors/module_sensor.hpp)
 
 # ##############################################################################
 # Create source file list for core library
@@ -45,8 +44,7 @@ set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/utils/socket.cpp
     ${CORE_SOURCE_DIR}/utils/server_socket.cpp
     ${CORE_SOURCE_DIR}/sensors/module_sensor_imu.cpp
-    ${CORE_SOURCE_DIR}/sensors/module_sensor.cpp
-    )
+    ${CORE_SOURCE_DIR}/sensors/module_sensor.cpp)
 
 # ##############################################################################
 # Build core library
@@ -56,10 +54,9 @@ set(CORE_SOURCE_LIST
 add_library(${CORE_LIBRARY} ${CORE_SOURCE_LIST}) # ${CORE_HEADER_LIST}
 
 # Global includes
-target_include_directories(${CORE_LIBRARY} PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/core/include>
-    $<INSTALL_INTERFACE:${ABSOLUTE_INSTALL_INCLUDEDIR}>
-    )
+target_include_directories(
+    ${CORE_LIBRARY} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/core/include>
+                           $<INSTALL_INTERFACE:${ABSOLUTE_INSTALL_INCLUDEDIR}>)
 
 # Link required library
 target_link_libraries(${CORE_LIBRARY} PRIVATE pthread stdc++fs Eigen3::Eigen)
@@ -73,15 +70,14 @@ target_compile_options(${CORE_LIBRARY} PRIVATE ${PROJECT_WARNINGS})
 source_group(
     TREE "${PROJECT_SOURCE_DIR}/core/include"
     PREFIX "Header Files"
-    FILES ${CORE_HEADER_LIST}
-    )
+    FILES ${CORE_HEADER_LIST})
 
 # ##############################################################################
 # Install
 # ##############################################################################
 
 install(
-    TARGETS ${CORE_LIBRARY} 
+    TARGETS ${CORE_LIBRARY}
     # IMPORTANT: Add the core_library to the "export-set"
     EXPORT ${TARGETS_EXPORT_NAME}
     LIBRARY DESTINATION ${ABSOLUTE_INSTALL_LIBDIR} COMPONENT shlib
@@ -90,11 +86,10 @@ install(
     INCLUDES
     DESTINATION ${ABSOLUTE_INSTALL_INCLUDEDIR}
     # PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/core COMPONENT dev
-    )
+)
 
 install(
     DIRECTORY ${CORE_INCLUDE_DIR}/
     DESTINATION ${ABSOLUTE_INSTALL_INCLUDEDIR}
     COMPONENT PATTERN
-    "${CORE_HEADER_LIST}"
-    )
+    "${CORE_HEADER_LIST}")

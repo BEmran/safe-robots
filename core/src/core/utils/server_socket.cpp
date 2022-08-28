@@ -4,7 +4,6 @@
 
 namespace core::utils
 {
-
 ServerSocket::ServerSocket(const uint16_t port)
   : ready(false)
   , port_(port)

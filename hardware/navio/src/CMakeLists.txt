@@ -3,47 +3,38 @@
 # ##############################################################################
 set(NAVIO_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/hardware/navio/include)
 set(NAVIO_HEADER_LIST
-    ${NAVIO_INCLUDE_DIR}/navio/mpu9250.h
-    ${NAVIO_INCLUDE_DIR}/navio/spidev.h
-    ${NAVIO_INCLUDE_DIR}/navio/old_mpu9250.h
-    ${NAVIO_INCLUDE_DIR}/navio/old_spidev.h
-    ${NAVIO_INCLUDE_DIR}/navio/util.h
-    )
+    ${NAVIO_INCLUDE_DIR}/navio/communication_abs.hpp
+    ${NAVIO_INCLUDE_DIR}/navio/hardware_utils.hpp
+    ${NAVIO_INCLUDE_DIR}/navio/spi.hpp
+    ${NAVIO_INCLUDE_DIR}/sensors/common/calibrate.hpp
+    ${NAVIO_INCLUDE_DIR}/sensors/common/utils.hpp
+    ${NAVIO_INCLUDE_DIR}/sensors/mpu/mpu9250_register_map.hpp
+    ${NAVIO_INCLUDE_DIR}/sensors/mpu/mpu9250.hpp)
 
 # ##############################################################################
 # Create source file list for NAVIO library
 # ##############################################################################
 set(NAVIO_SOURCE_DIR ${PROJECT_SOURCE_DIR}/hardware/navio/src)
 set(NAVIO_SOURCE_LIST
-    ${NAVIO_SOURCE_DIR}/mpu9250.cpp
-    ${NAVIO_SOURCE_DIR}/spidev.cpp
-    ${NAVIO_SOURCE_DIR}/old_mpu9250.cpp
-    ${NAVIO_SOURCE_DIR}/util.cpp
-    ${NAVIO_SOURCE_DIR}/mpu/calibrate.cpp
-    ${NAVIO_SOURCE_DIR}/mpu/MPU.cpp
-    ${NAVIO_SOURCE_DIR}/mpu/MPU9250_Master_SPI.cpp
-    ${NAVIO_SOURCE_DIR}/mpu/MPU9250_Master.cpp
-    ${NAVIO_SOURCE_DIR}/mpu/MPU9250.cpp
-    ${NAVIO_SOURCE_DIR}/mpu/spi.cpp
-    # ${NAVIO_SOURCE_DIR}/mpu/AK8963.cpp
-    ${NAVIO_SOURCE_DIR}/mpu/my_utils.cpp
-    # ${NAVIO_SOURCE_DIR}/mpu/mpu_gyro.cpp
-    # ${NAVIO_SOURCE_DIR}/mpu/mpu_accel.cpp
-    ${NAVIO_SOURCE_DIR}/mpu/mpu9250.cpp
-    )
+    ${NAVIO_SOURCE_DIR}/navio/hardware_utils.cpp
+    ${NAVIO_SOURCE_DIR}/navio/spi.cpp
+    ${NAVIO_SOURCE_DIR}/sensors/common/calibrate.cpp
+    ${NAVIO_SOURCE_DIR}/sensors/common/utils.cpp
+    ${NAVIO_SOURCE_DIR}/sensors/mpu/mpu9250.cpp)
 
 # ##############################################################################
 # Build NAVIO library
 # ##############################################################################
 # Declare a C++ library Make an automatic library - will be static or dynamic
 # based on user setting
-add_library(${NAVIO_LIBRARY} ${NAVIO_SOURCE_LIST} )#${NAVIO_HEADER_LIST}
+add_library(${NAVIO_LIBRARY} ${NAVIO_SOURCE_LIST}) # ${NAVIO_HEADER_LIST}
 
 # Global includes
-target_include_directories(${NAVIO_LIBRARY} PUBLIC
-    # $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/core/include>
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/hardware/navio/include>
-    # $<INSTALL_INTERFACE:${ABSOLUTE_INSTALL_INCLUDEDIR}>
+target_include_directories(
+    ${NAVIO_LIBRARY}
+    PUBLIC # $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/core/include>
+           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/hardware/navio/include>
+           # $<INSTALL_INTERFACE:${ABSOLUTE_INSTALL_INCLUDEDIR}>
 )
 
 # Link required library
@@ -63,9 +54,9 @@ source_group(
 # ##############################################################################
 # Install
 # ##############################################################################
-    
+
 install(
-    TARGETS ${NAVIO_LIBRARY} 
+    TARGETS ${NAVIO_LIBRARY}
     # IMPORTANT: Add the core_library to the "export-set"
     EXPORT ${TARGETS_EXPORT_NAME}
     LIBRARY DESTINATION ${ABSOLUTE_INSTALL_LIBDIR} COMPONENT shlib

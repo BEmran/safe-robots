@@ -31,8 +31,8 @@ package_add_test_with_libraries(utest_logger "${UTEST_LOGGER_FILES}"
                                 ${CORE_LIBRARY} "")
 
 set(UTEST_NODE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_node.cpp)
-package_add_test_with_libraries(utest_node "${UTEST_NODE_FILES}" ${CORE_LIBRARY}
-                                "")
+package_add_test_with_libraries(utest_node "${UTEST_NODE_FILES}"
+                                ${CORE_LIBRARY} "")
 
 set(UTEST_MODULE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_module.cpp)
 package_add_test_with_libraries(utest_module "${UTEST_MODULE_FILES}"
@@ -41,12 +41,11 @@ package_add_test_with_libraries(utest_module "${UTEST_MODULE_FILES}"
 set(UTEST_CASH_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_cash.cpp)
 package_add_test_with_libraries(utest_cash "${UTEST_CASH_FILES}"
                                 ${CORE_LIBRARY} "")
-                                
+
 set(UTEST_MATH_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_math.cpp)
 package_add_test_with_libraries(utest_math "${UTEST_MATH_FILES}"
                                 ${CORE_LIBRARY} "")
-                                
+
 set(UTEST_DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_data.cpp)
 package_add_test_with_libraries(utest_data "${UTEST_DATA_FILES}"
                                 ${CORE_LIBRARY} "")
-                                

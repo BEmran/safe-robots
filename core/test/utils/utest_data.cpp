@@ -1,6 +1,7 @@
+#include "utest_data.hpp"
+
 #include <gtest/gtest.h>
 
-#include "utest_data.hpp"
 #include <sstream>
 
 using namespace core::utils;

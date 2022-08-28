@@ -2,13 +2,12 @@
 #define TEST_UTEST_DATA_HPP
 
 #include "core/utils/data.hpp"
-
 #include "gtest/gtest.h"
 
-using core::utils::MATH_TYPE;
 using core::utils::DoubleData;
 using core::utils::GpsData;
 using core::utils::ImuData;
+using core::utils::MATH_TYPE;
 using core::utils::Quat;
 using core::utils::QuatData;
 using core::utils::Vec3;

@@ -140,7 +140,7 @@ Node CreateNode(const std::string& node_name);
 
 /**
  * @brief Create a Node with a same logger
- * 
+ *
  * @param node_name node name
  * @return Node object
  */
