@@ -58,8 +58,9 @@ int64_t TimeInSeconds() {
 std::string TimeInSecondsString() {
   constexpr auto max_size = 15;
   std::string buffer(max_size, ' ', std::allocator<char>());
-  snprintf(buffer.data(),  // NOLINT [cppcoreguidelines-pro-type-vararg]
-           buffer.size(), "%ld", TimeInSeconds());
+  const auto size =
+    snprintf(buffer.data(), buffer.size(), "%ld", TimeInSeconds());  // NOLINT
+  buffer.resize(size);
   return buffer;
 }
 

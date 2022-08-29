@@ -52,7 +52,7 @@ int main(int /*argc*/, char** /*argv[]*/) {
     return EXIT_FAILURE;
   }
   sensor->Initialize();
-  // sensor->Calibrate();
+  sensor->Calibrate();
   constexpr auto display_delay = 500;
   while (true) {
     sensor->Update();
