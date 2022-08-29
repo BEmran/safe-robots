@@ -51,8 +51,10 @@ int main(int /*argc*/, char** /*argv[]*/) {
     app.LogError("Can't launch the app");
     return EXIT_FAILURE;
   }
+
   sensor->Initialize();
   sensor->Calibrate();
+
   constexpr auto display_delay = 500;
   while (true) {
     sensor->Update();
