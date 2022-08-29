@@ -37,41 +37,42 @@ inline constexpr uint8_t operator"" _uc(
 }  // namespace literals
 
 using namespace literals;  // NOLINT [build/namespaces_literals] TODO(Bara)
-template <typename T,
-          typename =
-            typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+
 struct SpecInfo {
-  T value;
-  uint8_t byte;
+  float value;
   std::string name;
-  SpecInfo() : SpecInfo(0, 0_uc, "") {
+  SpecInfo() : SpecInfo(0.F, "") {
   }
-  SpecInfo(const T value_, uint8_t byte_, const std::string& name_)
-    : value(value_), byte(byte_), name(name_) {
+  SpecInfo(float value_, const std::string& name_)
+    : value(value_), name(name_) {
   }
 };
 
-template <typename E, typename T>
+template <typename E>
 class SpecInfoMap {
-  using Map = std::map<E, SpecInfo<T>>;
+  using Map = std::map<E, SpecInfo>;
   using Iterator = typename Map::iterator;
 
  public:
   explicit SpecInfoMap(const Map& map) : map_(map) {
   }
 
-  E Find(uint8_t byte) {
-    auto ptr = std::find_if(map_.begin(), map_.end(), [byte](auto ele) {
-      return byte == ele.second.byte;
+  inline E FindByByte(uint8_t byte) {
+    auto it = std::find_if(map_.begin(), map_.end(), [byte](auto ele) {
+      return byte == static_cast<uint8_t>(ele.first);
     });
-    if (ptr == map_.end()) {
+    if (it == map_.end()) {
       throw std::runtime_error("undefined specification");
     }
-    return ptr->first;
+    return it->first;
   }
 
-  SpecInfo<T> operator[](const E key) {
+  inline SpecInfo operator[](E key) {
     return map_[key];
+  }
+
+  inline uint8_t Byte(E key) {
+    return static_cast<uint8_t>(key);
   }
 
  private:
@@ -128,19 +129,20 @@ struct SensorSpecs {
    * @param raw raw data
    * @return MATH_TYPE the post proceeded data
    */
-  MATH_TYPE Apply(MATH_TYPE raw) const {
+  inline MATH_TYPE Apply(MATH_TYPE raw) const {
     // return (raw - bias[0]) * (unit_conversion / sensitivity) + offset[0];
     return A(0) * raw + b[0];
   }
 
-  void SetCalibration(const Mat3& m, const Vec3& bias_, const Vec3& offset_) {
+  inline void SetCalibration(const Mat3& m, const Vec3& bias_,
+                             const Vec3& offset_) {
     misalignment = m;
     bias = bias_;
     offset = offset_;
     UpdateEquation();
   }
 
-  void UpdateEquation() {
+  inline void UpdateEquation() {
     A = misalignment * unit_conversion / sensitivity;
     b = misalignment * (offset - bias / sensitivity) * unit_conversion;
   }
@@ -151,20 +153,12 @@ struct SensorSpecs {
    * @param raw raw data vector
    * @return Vec3 the post proceeded data
    */
-  Vec3 Apply(const Vec3& raw) const {
+  inline Vec3 Apply(const Vec3& raw) const {
     // return ((misalignment * (raw - bias) / sensitivity) + offset) *
     // unit_conversion;
     return A * raw + b;
   }
 };
-
-/**
- * @brief Construct a new Sensor Specs object using scale and uint info
- *
- * @param scale measurement scale
- * @param unit unit conversion row -> iso unit
- */
-SensorSpecs CreateSensorSpecs(MATH_TYPE scale, MATH_TYPE unit);
 
 /**
  * @brief Turn the MSB and LSB into a signed 16-bit value
