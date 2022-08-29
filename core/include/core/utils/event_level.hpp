@@ -24,16 +24,14 @@ struct EventLevel {
 
 class LabeledModifier {
  public:
-  explicit LabeledModifier(const EventLevel::event_level_t event);
+  explicit LabeledModifier(EventLevel::event_level_t event);
 
-  LabeledModifier(const EventLevel::event_level_t event,
-                  const std::string& label);
+  LabeledModifier(EventLevel::event_level_t event, const std::string& label);
 
-  LabeledModifier(const EventLevel::event_level_t event,
+  LabeledModifier(EventLevel::event_level_t event, const Modifier& modifier);
+
+  LabeledModifier(EventLevel::event_level_t event, const std::string& label,
                   const Modifier& modifier);
-
-  LabeledModifier(const EventLevel::event_level_t event,
-                  const std::string& label, const Modifier& modifier);
 
   EventLevel::event_level_t GetEventLevel() const;
 
@@ -65,7 +63,7 @@ class LabeledModifier {
  * @param event event level
  * @return std::string name of the event
  */
-std::string EventLevelToString(const EventLevel::event_level_t event);
+std::string EventLevelToString(EventLevel::event_level_t event);
 
 /**
  * @brief override the << operator which writes the label using the modifier

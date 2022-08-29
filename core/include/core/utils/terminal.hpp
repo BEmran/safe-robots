@@ -78,8 +78,7 @@ class Modifier {
    * @param bg  background color
    * @param fmt font format
    */
-  Modifier(const terminal::FG fg, const terminal::BG bg,
-           const terminal::FMT fmt);
+  Modifier(terminal::FG fg, terminal::BG bg, terminal::FMT fmt);
   std::string ToString() const;
 
  private:

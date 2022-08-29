@@ -21,7 +21,7 @@ class ImuSensorModule : public SensorModuleAbs<utils::ImuData> {
    * @param name sensor module's name
    * @param debug enable/disable debug, default is false
    */
-  explicit ImuSensorModule(const std::string& name, const bool debug = false);
+  explicit ImuSensorModule(const std::string& name, bool debug = false);
 
   /**
    * @brief Destroy the Imu Sensor Module object

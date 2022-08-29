@@ -3,8 +3,7 @@
 #ifndef CORE_INCLUDE_CORE_UTILS_LOGGER_HPP_
 #define CORE_INCLUDE_CORE_UTILS_LOGGER_HPP_
 
-#include <string.h>  // to use strrchr
-
+#include <cstring>  // to use strrchr
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -14,8 +13,8 @@
 #include "core/utils/exception.hpp"
 #include "core/utils/formatter.hpp"
 #include "core/utils/terminal.hpp"
-#include "core/utils/writter_console.hpp"
-#include "core/utils/writter_file.hpp"
+#include "core/utils/writer_console.hpp"
+#include "core/utils/writer_file.hpp"
 
 // extract filename from file's full path
 #define __FILENAME__                                                           \
@@ -30,7 +29,7 @@ struct LogLocation {
   std::string file;
   std::string func;
   int line;
-  LogLocation(const char* file_, const char* func_, const int line_)
+  LogLocation(const char* file_, const char* func_, int line_)
     : file(file_), func(func_), line(line_) {
   }
 
@@ -58,14 +57,14 @@ class Logger {
   /**
    * @brief Construct the Logger object using filename
    *
-   * @param filename writter file name
+   * @param filename writer file name
    */
   explicit Logger(const std::string& filename);
 
   /**
    * @brief Construct the Logger object using filename
    *
-   * @param filename writter file name
+   * @param filename writer file name
    * @param expectation_factory shared ptr to exception factory
    */
   Logger(const std::string& filename,  //
@@ -74,9 +73,9 @@ class Logger {
   /**
    * @brief Construct the Logger object using filename
    *
-   * @param filename writter file name
-   * @param file_formater file formatter to use with file writter
-   * @param console_formater console formatter to use with file writter
+   * @param filename writer file name
+   * @param file_formater file formatter to use with file writer
+   * @param console_formater console formatter to use with file writer
    */
   Logger(const std::string& filename,
          std::shared_ptr<FormatterInterface> file_formater,
@@ -85,9 +84,9 @@ class Logger {
   /**
    * @brief Construct the Logger object using filename
    *
-   * @param filename writter file name
-   * @param file_formater file formatter to use with file writter
-   * @param console_formater console formatter to use with file writter
+   * @param filename writer file name
+   * @param file_formater file formatter to use with file writer
+   * @param console_formater console formatter to use with file writer
    * @param expectation_factory shared ptr to exception factory
    */
   Logger(const std::string& filename,
@@ -99,11 +98,10 @@ class Logger {
    * @brief Destroy the Logger object
    *
    */
-  virtual ~Logger() {
-  }
+  virtual ~Logger() = default;
 
   /**
-   * @brief logs the passed message using the writter
+   * @brief logs the passed message using the writer
    *
    * @param lm label modifier to use with the formatter
    * @param msg msg to log
@@ -111,12 +109,12 @@ class Logger {
   virtual void Log(const LabeledModifier& lm, const std::string& msg);
 
  protected:
-  void ThrowExceptionForErrorEvent(const EventLevel::event_level_t event,
+  void ThrowExceptionForErrorEvent(EventLevel::event_level_t event,
                                    const std::string& msg);
 
  private:
-  std::shared_ptr<FileWritter> file_writter_;
-  std::shared_ptr<ConsoleWritter> console_writter_;
+  std::shared_ptr<FileWriter> file_writer_;
+  std::shared_ptr<ConsoleWriter> console_writer_;
   std::shared_ptr<FormatterInterface> file_formater_;
   std::shared_ptr<FormatterInterface> console_formater_;
   std::shared_ptr<ExceptionFactory> expectation_factory_;

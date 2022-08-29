@@ -3,7 +3,7 @@
 #include "core/sensors/module_sensor_imu.hpp"
 
 namespace core::sensors {
-ImuSensorModule::ImuSensorModule(const std::string& name, const bool debug)
+ImuSensorModule::ImuSensorModule(const std::string& name, bool debug)
   : SensorModuleAbs(SensorModuleType::IMU, name, debug) {
 }
 

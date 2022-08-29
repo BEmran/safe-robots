@@ -3,10 +3,10 @@
 #ifndef HARDWARE_NAVIO_INCLUDE_SENSORS_MPU_MPU9250_HPP_
 #define HARDWARE_NAVIO_INCLUDE_SENSORS_MPU_MPU9250_HPP_
 
-#include <stdint.h>
 #include <unistd.h>
 
 #include <array>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <utility>
@@ -51,8 +51,6 @@ class Mpu9250 : public cu::ImuSensorModule {
  public:
   Mpu9250(const Config& config, std::unique_ptr<navio::SPI> comm,
           std::unique_ptr<core::utils::Node> node);
-
-  void fake();
 
   /**
    * @implement Initialize function
@@ -140,7 +138,7 @@ class Mpu9250 : public cu::ImuSensorModule {
   AccelData ExtractAccelerometer(const SensorFullBits& full_bits) const;
   GyroData ExtractGyroscope(const SensorFullBits& full_bits) const;
   MagData ExtractMagnetometer(const SensorFullBits& full_bits,
-                              const bool over_flow) const;
+                              bool over_flow) const;
   static cu::Vec3 EstimateRPY(const cu::ImuData& imu);
 
   AccelBandWidthHz ReadAccelBandWidth() const;
@@ -158,27 +156,24 @@ class Mpu9250 : public cu::ImuSensorModule {
    */
   void ExtractMagnetometerSensitivityAdjustmentValues();
 
-  uint8_t ReadRegister(const uint8_t reg) const;
-  std::vector<uint8_t> ReadRegisters(const uint8_t reg,
-                                     const uint8_t count) const;
-  uint8_t ReadAK8963Register(const uint8_t reg) const;
-  void RequestReadAK8963Registers(const uint8_t reg, const uint8_t count) const;
-  std::vector<uint8_t> ReadAK8963Registers(const uint8_t reg,
-                                           const uint8_t count) const;
-  void SetRegisterByte(const uint8_t reg, const uint8_t byte,
-                       const uint8_t mask) const;
-  void WriteRegister(const uint8_t reg, const uint8_t data) const;
-  void WriteAK8963Register(const uint8_t reg, const uint8_t data) const;
+  uint8_t ReadRegister(uint8_t reg) const;
+  std::vector<uint8_t> ReadRegisters(uint8_t reg, uint8_t count) const;
+  uint8_t ReadAK8963Register(uint8_t reg) const;
+  void RequestReadAK8963Registers(uint8_t reg, uint8_t count) const;
+  std::vector<uint8_t> ReadAK8963Registers(uint8_t reg, uint8_t count) const;
+  void SetRegisterByte(uint8_t reg, uint8_t byte, uint8_t mask) const;
+  void WriteRegister(uint8_t reg, uint8_t data) const;
+  void WriteAK8963Register(uint8_t reg, uint8_t data) const;
 
  private:
   Config config_;
   std::unique_ptr<navio::SPI> comm_;
   std::unique_ptr<core::utils::Node> node_;
   mutable std::map<core::sensors::SensorModuleType, cu::SensorSpecs>
-    sensor_specs_map;
+    sensor_specs_map_;
 
-  std::array<float, 3> mag_sensitivity_calibration_ = {
-    1.0F, 1.0F, 1.0F};  // factory calibration
+  cu::Vec3 mag_sensitivity_calibration_{1.0F, 1.0F,
+                                        1.0F};  // factory calibration
 };
 }  // namespace sensors::mpu
 #endif  // HARDWARE_NAVIO_INCLUDE_SENSORS_MPU_MPU9250_HPP_

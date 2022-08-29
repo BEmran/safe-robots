@@ -34,7 +34,7 @@ class Cash {
    */
   void Set(const T& data) {
     std::unique_lock lock(mutex_);
-    *data_ptr_.get() = data;
+    *data_ptr_ = data;
   }
 
   /**
@@ -45,7 +45,7 @@ class Cash {
    */
   T Get() const {
     std::shared_lock lock(mutex_);
-    return *data_ptr_.get();
+    return *data_ptr_;
   }
 
   /**

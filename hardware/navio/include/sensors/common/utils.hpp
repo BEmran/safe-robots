@@ -3,10 +3,10 @@
 #ifndef HARDWARE_NAVIO_INCLUDE_SENSORS_COMMON_UTILS_HPP_
 #define HARDWARE_NAVIO_INCLUDE_SENSORS_COMMON_UTILS_HPP_
 
-#include <stdint.h>
 #include <unistd.h>
 
 #include <array>
+#include <cstdint>
 #include <map>
 #include <string>
 #include <vector>
@@ -21,6 +21,7 @@ using core::utils::ImuData;
 using core::utils::Mat3;
 using core::utils::MATH_TYPE;
 using core::utils::PI;
+using core::utils::RAD_TO_DEG;
 using core::utils::Vec3;
 using ImuSensorModule = core::sensors::SensorModuleAbs<ImuData>;
 
@@ -45,21 +46,21 @@ struct SpecInfo {
   std::string name;
   SpecInfo() : SpecInfo(0, 0_uc, "") {
   }
-  SpecInfo(const T value_, const uint8_t byte_, const std::string& name_)
+  SpecInfo(const T value_, uint8_t byte_, const std::string& name_)
     : value(value_), byte(byte_), name(name_) {
   }
 };
 
 template <typename E, typename T>
 class SpecInfoMap {
-  typedef std::map<E, SpecInfo<T>> Map;
+  using Map = std::map<E, SpecInfo<T>>;
   using Iterator = typename Map::iterator;
 
  public:
   explicit SpecInfoMap(const Map& map) : map_(map) {
   }
 
-  E Find(const uint8_t byte) {
+  E Find(uint8_t byte) {
     auto ptr = std::find_if(map_.begin(), map_.end(), [byte](auto ele) {
       return byte == ele.second.byte;
     });
@@ -105,7 +106,7 @@ struct SensorSpecs {
    * @param sen sensitivity value
    * @param unit unit conversion row -> iso unit
    */
-  SensorSpecs(const MATH_TYPE sen, const MATH_TYPE unit)
+  SensorSpecs(MATH_TYPE sen, MATH_TYPE unit)
     : sensitivity(sen), unit_conversion(unit) {
   }
 
@@ -115,7 +116,7 @@ struct SensorSpecs {
    * @param sen sensitivity value
    * @param unit unit conversion row -> iso unit
    */
-  SensorSpecs(const MATH_TYPE sen, const MATH_TYPE unit, const Vec3& bias_,
+  SensorSpecs(MATH_TYPE sen, MATH_TYPE unit, const Vec3& bias_,
               const Vec3& offset_)
     : sensitivity(sen), unit_conversion(unit), bias(bias_), offset(offset_) {
     UpdateEquation();
@@ -127,7 +128,7 @@ struct SensorSpecs {
    * @param raw raw data
    * @return MATH_TYPE the post proceeded data
    */
-  MATH_TYPE Apply(const MATH_TYPE raw) const {
+  MATH_TYPE Apply(MATH_TYPE raw) const {
     // return (raw - bias[0]) * (unit_conversion / sensitivity) + offset[0];
     return A(0) * raw + b[0];
   }
@@ -163,7 +164,7 @@ struct SensorSpecs {
  * @param scale measurement scale
  * @param unit unit conversion row -> iso unit
  */
-SensorSpecs CreateSensorSpecs(const MATH_TYPE scale, const MATH_TYPE unit);
+SensorSpecs CreateSensorSpecs(MATH_TYPE scale, MATH_TYPE unit);
 
 /**
  * @brief Turn the MSB and LSB into a signed 16-bit value
@@ -172,7 +173,7 @@ SensorSpecs CreateSensorSpecs(const MATH_TYPE scale, const MATH_TYPE unit);
  * @param lsb least significant bits (Low 8-bits)
  * @return int16_t full number
  */
-int16_t To16Bit(const uint8_t msb, const uint8_t lsb);
+int16_t To16Bit(uint8_t msb, uint8_t lsb);
 
 /**
  * @brief Convert a std::array data to Vec3
@@ -182,9 +183,9 @@ int16_t To16Bit(const uint8_t msb, const uint8_t lsb);
  */
 Vec3 ArrayToVec3(const std::array<MATH_TYPE, 3>& array);
 
-Vec3 Vec3From16BitsVector(const std::vector<int16_t>::const_iterator begin);
+Vec3 Vec3From16BitsVector(std::vector<int16_t>::const_iterator begin);
 
-uint8_t SetFlags(const uint8_t byte, const uint8_t mask, const uint8_t flag);
+uint8_t SetFlags(uint8_t byte, uint8_t mask, uint8_t flag);
 
 /**
  * @brief Estimate roll and pitch angles from accelerometer

@@ -7,7 +7,7 @@ using namespace std::literals::string_literals;  // NOLINT
                                                  // [build/namespaces_literals]
                                                  // TODO(Bara)
 
-std::string SensorModuleTypeToString(const SensorModuleType type) {
+std::string SensorModuleTypeToString(SensorModuleType type) {
   switch (type) {
     case SensorModuleType::ADC:
       return "ADC"s;

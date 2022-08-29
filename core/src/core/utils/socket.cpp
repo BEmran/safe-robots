@@ -13,7 +13,7 @@ constexpr auto kMaxConnection = 5;
 }  // namespace
 
 namespace core::utils {
-Socket::Socket() : sock_(-1) {
+Socket::Socket() {
   memset(&address_, 0, sizeof(address_));
 }
 
@@ -40,7 +40,7 @@ bool Socket::SetSocketOpt() const {
   return res != -1;
 }
 
-bool Socket::Bind(const uint16_t port) {
+bool Socket::Bind(uint16_t port) {
   if (!IsValid()) {
     return false;
   }
@@ -71,13 +71,13 @@ std::pair<bool, int> Socket::Accept() {
   return {sock_ > 0, new_sock};
 }
 
-bool Socket::Send(const int client_sock, const std::string& msg) {
+bool Socket::Send(int client_sock, const std::string& msg) {
   const auto status =
     ::send(client_sock, msg.c_str(), msg.size(), MSG_NOSIGNAL);
   return status != -1;
 }
 
-int Socket::Recv(const int client_sock, std::string* msg) {
+int Socket::Recv(int client_sock, std::string* msg) {
   constexpr size_t kBufSize = 512;
   char buf[kBufSize];
   memset(buf, 0, kBufSize);
@@ -91,7 +91,7 @@ int Socket::Recv(const int client_sock, std::string* msg) {
   return static_cast<int>(status);
 }
 
-// bool Socket::Connect(const std::string& host, const int port)
+// bool Socket::Connect(const std::string& host, int port)
 // {
 //   if (!IsValid())
 //   {
@@ -113,7 +113,7 @@ int Socket::Recv(const int client_sock, std::string* msg) {
 //   return status == 0;
 // }
 
-// void Socket::SetNonBlocking(const bool block)
+// void Socket::SetNonBlocking(bool block)
 // {
 //   int opts = fcntl(sock_, F_GETFL);
 

@@ -14,8 +14,7 @@ constexpr int HALF_PRECISION = 4;
 
 struct Data {
  public:
-  virtual ~Data() {
-  }
+  virtual ~Data() = default;
   virtual void Clear() = 0;
 };
 
@@ -58,8 +57,7 @@ struct Vec3Data : public Data {
   }
   explicit Vec3Data(const Vec3& vec) : data(vec) {
   }
-  Vec3Data(const MATH_TYPE x, const MATH_TYPE y, const MATH_TYPE z)
-    : data{x, y, z} {
+  Vec3Data(MATH_TYPE x, MATH_TYPE y, MATH_TYPE z) : data{x, y, z} {
   }
   void Clear() override {
     data.setZero();

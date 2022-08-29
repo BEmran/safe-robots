@@ -8,15 +8,15 @@
 #include <mutex>  // NOLINT [build/c++11] TODO(Bara)
 #include <string>
 
-#include "core/utils/writter.hpp"
+#include "core/utils/writer.hpp"
 
 namespace core::utils {
 /**
- * @brief A concreate class of Writter used to log data to a file using oftream
+ * @brief A concreate class of Writer used to log data to a file using oftream
  * object.
  *
  */
-class FileWritter : public Writter {
+class FileWriter : public Writer {
  public:
   /**
    * @brief Construct a new File Logger object with a specific file name
@@ -25,16 +25,16 @@ class FileWritter : public Writter {
    *
    * TODO: create a robust way to create a file with date tag or without
    */
-  explicit FileWritter(const std::string& filename);
+  explicit FileWriter(const std::string& filename);
 
   /**
-   * @brief Destroy the File Writter object
+   * @brief Destroy the File Writer object
    *
    */
-  ~FileWritter();
+  ~FileWriter() override;
 
-  /* Writter Interface */
-  void dump(const std::string& str) override;
+  /* Writer Interface */
+  void Dump(const std::string& str) override;
 
  private:
   /**

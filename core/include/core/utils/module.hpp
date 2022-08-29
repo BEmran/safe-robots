@@ -18,10 +18,10 @@ enum class ModuleType { UNDEFINED, SENSOR };
  * @param type module type to be converted
  * @return std::string name of module type
  */
-std::string ModuleTypeToString(const ModuleType type);
+std::string ModuleTypeToString(ModuleType type);
 
 /**
- * @brief Abstracts class used to define main object of beaglebone hardware
+ * @brief Abstracts class used to define main object of hardware
  *
  */
 class ModuleAbs {
@@ -33,7 +33,7 @@ class ModuleAbs {
    * @param name module's name
    * @param debug enable/disable debug
    */
-  ModuleAbs(const ModuleType type, const std::string& name, const bool debug);
+  ModuleAbs(ModuleType type, const std::string& name, bool debug);
 
   /**
    * @brief Destroy the Module Abs object

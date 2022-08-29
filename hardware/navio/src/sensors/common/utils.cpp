@@ -7,17 +7,18 @@
 #include <iostream>
 
 namespace sensors::common::utils {
-int16_t To16Bit(const uint8_t msb, const uint8_t lsb) {
+int16_t To16Bit(uint8_t msb, uint8_t lsb) {
   const auto high = static_cast<int>(msb);
   const auto low = static_cast<int>(lsb);
-  return static_cast<int16_t>(high << 8 | low);
+  constexpr auto bit_shift = 8;
+  return static_cast<int16_t>(high << bit_shift | low);
 }
 
 Vec3 ArrayToVec3(const std::array<MATH_TYPE, 3>& array) {
   return Vec3{array[0], array[1], array[2]};
 }
 
-Vec3 Vec3From16BitsVector(const std::vector<int16_t>::const_iterator begin) {
+Vec3 Vec3From16BitsVector(std::vector<int16_t>::const_iterator begin) {
   Vec3 vec;
   for (auto i = 0; i < vec.size(); i++) {
     vec[i] = static_cast<float>(*(begin + i));
@@ -42,7 +43,7 @@ std::array<MATH_TYPE, 3> ApplySensorSpecs(const std::array<int16_t, 3>& raw,
   return data;
 }
 
-uint8_t SetFlags(const uint8_t byte, const uint8_t mask, const uint8_t flag) {
+uint8_t SetFlags(uint8_t byte, uint8_t mask, uint8_t flag) {
   const auto updated = (byte & mask) | flag;
   return static_cast<uint8_t>(updated);
 }

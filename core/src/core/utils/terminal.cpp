@@ -13,8 +13,7 @@ std::string SingleOptionToString(int option) {
 }
 }  // namespace
 
-Modifier::Modifier(const FG fg, const BG bg, const FMT fmt)
-  : fg_(fg), bg_(bg), fmt_(fmt) {
+Modifier::Modifier(FG fg, BG bg, FMT fmt) : fg_(fg), bg_(bg), fmt_(fmt) {
 }
 
 std::string Modifier::ToString() const {

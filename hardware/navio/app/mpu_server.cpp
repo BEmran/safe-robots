@@ -8,7 +8,7 @@
 
 #include "core/utils/date_time.hpp"
 #include "core/utils/server_socket.hpp"
-#include "core/utils/writter_file.hpp"
+#include "core/utils/writer_file.hpp"
 #include "navio/hardware_utils.hpp"
 #include "sensors/mpu/mpu9250.hpp"
 
@@ -21,7 +21,7 @@ constexpr sensors::mpu::GyroBandWidthHz GBW =
 constexpr sensors::mpu::MagMode MMODE = sensors::mpu::MagMode::CONTINUES_100HZ;
 constexpr sensors::mpu::MagScale MSCALE = sensors::mpu::MagScale::FS_16BITS;
 constexpr uint8_t SAMPLE_RATE_DIVISOR = 4;
-
+constexpr auto MaximumClientTries = 5;
 //=============================================================================
 int main(int argc, char* argv[]) {
   auto app = core::utils::CreateDefaultNode("app");
@@ -64,14 +64,15 @@ int main(int argc, char* argv[]) {
   sensor->Initialize();
   app.LogDebug("MPU is initialized successfully");
 
-  core::utils::FileWritter file("imu.txt");
+  core::utils::FileWriter file("imu.txt");
   //-------------------------------------------------------------------------
   // Create the socket
   core::utils::ServerSocket server(static_cast<uint16_t>(port));
 
   const auto begin = core::utils::TimeInMilliSec();
-  auto tries = 5;
 
+  auto tries = MaximumClientTries;
+  constexpr auto send_delay = 10;
   while (--tries > 0) {
     server.Accept();
     while (server.IsReady()) {
@@ -87,7 +88,7 @@ int main(int argc, char* argv[]) {
          << raw.mag_over_flow << ";";
 
       server << ss.str();
-      navio::hardware_utils::Delay(10);
+      navio::hardware_utils::Delay(send_delay);
     }
     app.LogWarn("Lost connection");
   }

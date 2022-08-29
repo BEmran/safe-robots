@@ -17,14 +17,13 @@ class ServerSocket {
    *
    * @param port port number
    */
-  explicit ServerSocket(const uint16_t port);
+  explicit ServerSocket(uint16_t port);
 
   /**
    * @brief Destroy the Server Socket object
    *
    */
-  virtual ~ServerSocket() {
-  }
+  virtual ~ServerSocket() = default;
 
   // Data Transmission
   const ServerSocket& operator<<(const std::string& msg) const;
@@ -44,7 +43,7 @@ class ServerSocket {
    * @return false
    */
   inline bool IsReady() const {
-    return ready;
+    return ready_;
   }
 
  private:
@@ -67,7 +66,7 @@ class ServerSocket {
    */
   void Listen();
 
-  mutable bool ready;           // ready to send and receive
+  mutable bool ready_;          // ready to send and receive
   uint16_t port_;               // port number
   int client_sock_;             // client socket number set when call Accept()
   std::unique_ptr<Node> node_;  // node object

@@ -6,16 +6,15 @@
 #include <string>
 
 namespace core::utils {
-class Writter {
+class Writer {
  public:
   /**
-   * @brief Destroy the Writter object
+   * @brief Destroy the Writer object
    *
    */
-  virtual ~Writter() {
-  }
+  virtual ~Writer() = default;
 
-  virtual void dump(const std::string& str) = 0;
+  virtual void Dump(const std::string& str) = 0;
 };
 
 }  // namespace core::utils

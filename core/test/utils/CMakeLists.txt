@@ -22,8 +22,8 @@ set(UTEST_FORMATTER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_formatter.cpp)
 package_add_test_with_libraries(utest_formatter "${UTEST_FORMATTER_FILES}"
                                 ${CORE_LIBRARY} "")
 
-set(UTEST_WRITTER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_writter.cpp)
-package_add_test_with_libraries(utest_writter "${UTEST_WRITTER_FILES}"
+set(UTEST_WRITTER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_writer.cpp)
+package_add_test_with_libraries(utest_writer "${UTEST_WRITTER_FILES}"
                                 ${CORE_LIBRARY} "")
 
 set(UTEST_LOGGER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_logger.cpp)

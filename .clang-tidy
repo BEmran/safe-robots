@@ -6,15 +6,18 @@ Checks: >
   cppcoreguidelines-*
   google-*,
   misc-*,
+  -misc-non-private-member-variables-in-classes,
   modernize-*,
   -modernize-use-auto,
   -modernize-avoid-c-arrays,
   -modernize-use-trailing-return-type,
   -modernize-pass-by-value,
+  -modernize-use-nodiscard,
   performance-*,
   portability-*,
   readability-*,
-  -readability-magic-numbers,
+  readability-magic-numbers,
+  -fuchsia-default-arguments-calls,
   llvm-namespace-comment
 
 # Turn all the warnings from the checks above into errors.
@@ -50,9 +53,9 @@ CheckOptions:
   - { key: readability-identifier-naming.ProtectedMemberSuffix,  value: _          }
   - { key: readability-identifier-naming.StructMemberCase,       value: lower_case }
   # enummerators, global and static variables are CamelCase with k as prefix
-  - { key: readability-identifier-naming.EnumConstantCase,         value: CamelCase }
-  - { key: readability-identifier-naming.EnumConstantPrefix,       value: k         }
-  - { key: readability-identifier-naming.ConstexprVariableCase,    value: aNy_CasE } #CamelCase
+  - { key: readability-identifier-naming.EnumConstantCase,         value: upper_case }
+  # - { key: readability-identifier-naming.EnumConstantPrefix,       value: k         }
+  - { key: readability-identifier-naming.ConstexprVariableCase,    value: aNy_CasE  } #CamelCase
   - { key: readability-identifier-naming.GlobalConstantCase,       value: CamelCase }
   - { key: readability-identifier-naming.GlobalConstantPrefix,     value: k         }
   - { key: readability-identifier-naming.MemberConstantCase,       value: CamelCase }

@@ -25,21 +25,21 @@ std::string EventLevelToString(const EventLevel::event_level_t event) {
   return it->second;
 }
 
-LabeledModifier::LabeledModifier(const EventLevel::event_level_t event)
+LabeledModifier::LabeledModifier(EventLevel::event_level_t event)
   : LabeledModifier(event, EventLevelToString(event)) {
 }
 
-LabeledModifier::LabeledModifier(const EventLevel::event_level_t event,
+LabeledModifier::LabeledModifier(EventLevel::event_level_t event,
                                  const std::string& label)
   : LabeledModifier(event, label, DefaultModifier()) {
 }
 
-LabeledModifier::LabeledModifier(const EventLevel::event_level_t event,
+LabeledModifier::LabeledModifier(EventLevel::event_level_t event,
                                  const Modifier& modifier)
   : LabeledModifier(event, EventLevelToString(event), modifier) {
 }
 
-LabeledModifier::LabeledModifier(const EventLevel::event_level_t event,
+LabeledModifier::LabeledModifier(EventLevel::event_level_t event,
                                  const std::string& label,
                                  const Modifier& modifier)
   : event_(event), label_(label), modifier_(modifier) {

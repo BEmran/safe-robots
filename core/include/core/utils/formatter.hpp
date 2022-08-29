@@ -16,27 +16,26 @@ namespace core::utils {
  */
 class FormatterInterface {
  public:
-  virtual ~FormatterInterface() {
-  }
-  virtual std::string format(const LabeledModifier& lm,
+  virtual ~FormatterInterface() = default;
+
+  virtual std::string Format(const LabeledModifier& lm,
                              const std::string& msg) const = 0;
 };
 
 class NullFormatter : public FormatterInterface {
  public:
-  ~NullFormatter() {
-  }
-  std::string format(const LabeledModifier& lm,
+  ~NullFormatter() = default;
+
+  std::string Format(const LabeledModifier& lm,
                      const std::string& msg) const override;
 };
 
 class DefaultFormater : public FormatterInterface {
  public:
-  explicit DefaultFormater(const bool use_modifier = false);
-  ~DefaultFormater() {
-  }
+  explicit DefaultFormater(bool use_modifier = false);
+  ~DefaultFormater() = default;
 
-  std::string format(const LabeledModifier& lm,
+  std::string Format(const LabeledModifier& lm,
                      const std::string& msg) const override;
 
   std::string AddLabeledModifier(const LabeledModifier& lm) const;

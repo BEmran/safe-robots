@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_INCLUDE_CORE_UTILS_DATE_TIME_HPP_
-#define CORE_INCLUDE_CORE_UTILS_DATE_TIME_HPP_
+#ifndef CORE_UTILS_DATE_TIME_HPP
+#define CORE_UTILS_DATE_TIME_HPP
 
 #include <chrono>  // NOLINT [build/c++11] TODO(Bara)
 #include <ctime>
@@ -65,21 +65,21 @@ class DateTime {
    *
    * @return tm time structure
    */
-  tm GetTimeStruct() const;
+  [[nodiscard]] tm GetTimeStruct() const;
 
   /**
    * @brief returns the abbreviated month name
    *
    * @return std::string 3 chars represent the abbreviated month name
    */
-  std::string AbbreviatedMonthName() const;
+  [[nodiscard]] std::string AbbreviatedMonthName() const;
 
   /**
    * @brief returns the abbreviated weekday name
    *
    * @return std::string 3 chars represent the weekday month name
    */
-  std::string AbbreviatedWeekdayName() const;
+  [[nodiscard]] std::string AbbreviatedWeekdayName() const;
 
  private:
   tm time_info_;  // Structure containing a calendar date and time broken down
@@ -108,7 +108,6 @@ int64_t TimeInSeconds();
  *
  * @return int64_t time in milliseconds
  */
-int64_t TimeInMilliSec();
 
 /**
  * @brief returns the current time since the start of its clock in seconds as
@@ -124,7 +123,7 @@ std::string TimeInSecondsString();
  * @param dt use the passed DateTime object or using current DateTime
  * @return std::string a standard filename
  */
-std::string GenerateFileName(const DateTime dt = DateTime());
+std::string GenerateFileName(DateTime dt);
 
 }  // namespace core::utils
-#endif  // CORE_INCLUDE_CORE_UTILS_DATE_TIME_HPP_
+#endif  // CORE_UTILS_DATE_TIME_HPP

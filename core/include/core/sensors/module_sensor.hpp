@@ -31,7 +31,7 @@ enum class SensorModuleType {
  * @param type sensor module type to be converted
  * @return std::string name of module type
  */
-std::string SensorModuleTypeToString(const SensorModuleType type);
+std::string SensorModuleTypeToString(SensorModuleType type);
 
 /**
  * @brief Abstracts class used to define sensor module hardware
@@ -48,7 +48,7 @@ class SensorModuleAbs : public utils::ModuleAbs {
    * @param debug enable/disable debug
    */
   SensorModuleAbs(const SensorModuleType sensor_type, const std::string& name,
-                  const bool debug)
+                  bool debug)
     : ModuleAbs(utils::ModuleType::SENSOR, name, debug)
     , sensor_type_(sensor_type) {
   }

@@ -6,7 +6,7 @@
 #include <string>
 
 #include "core/utils/date_time.hpp"
-#include "core/utils/writter_file.hpp"
+#include "core/utils/writer_file.hpp"
 #include "navio/hardware_utils.hpp"
 #include "sensors/mpu/mpu9250.hpp"
 
@@ -52,12 +52,12 @@ int main(int /*argc*/, char** /*argv[]*/) {
     return EXIT_FAILURE;
   }
   sensor->Initialize();
-  sensor->Calibrate();
-
+  // sensor->Calibrate();
+  constexpr auto display_delay = 500;
   while (true) {
     sensor->Update();
     std::cout << sensor->GetData();
-    navio::hardware_utils::Delay(500);
+    navio::hardware_utils::Delay(display_delay);
   }
   return EXIT_SUCCESS;
 }

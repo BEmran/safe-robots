@@ -15,12 +15,12 @@
 #include "core/utils/terminal.hpp"
 #include "gtest/gtest.h"
 
-typedef core::utils::Modifier Modifier;
-typedef core::utils::LabeledModifier LabeledModifier;
-typedef core::utils::EventLevel EventLevel;
-typedef core::utils::terminal::FG FG;
-typedef core::utils::terminal::BG BG;
-typedef core::utils::terminal::FMT FMT;
+using Modifier = core::utils::Modifier;
+using LabeledModifier = core::utils::LabeledModifier;
+using EventLevel = core::utils::EventLevel;
+using FG = core::utils::terminal::FG;
+using BG = core::utils::terminal::BG;
+using FMT = core::utils::terminal::FMT;
 
 // carate list of available variables
 const char* LABELS[] = {"INFO", "DEBUG", "WARN", "ERROR"};
@@ -88,7 +88,7 @@ void ExpectEqModifier(const Modifier& expect, const Modifier& actual) {
 }
 
 // check if the passed labeled-modifier has the same expected configuration
-void ExpectEqLabeledModifier(const EventLevel::event_level_t expect_event,
+void ExpectEqLabeledModifier(EventLevel::event_level_t expect_event,
                              const std::string& expect_label,
                              const Modifier& expect_modifier,
                              const LabeledModifier& actual) {

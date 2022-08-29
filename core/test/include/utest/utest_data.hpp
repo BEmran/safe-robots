@@ -15,7 +15,7 @@ using core::utils::QuatData;
 using core::utils::Vec3;
 using core::utils::Vec3Data;
 
-void ExpectEq(const MATH_TYPE actual, const MATH_TYPE expect) {
+void ExpectEq(MATH_TYPE actual, MATH_TYPE expect) {
   if constexpr (std::is_same<MATH_TYPE, float>::value) {
     EXPECT_FLOAT_EQ(actual, expect);
   } else {

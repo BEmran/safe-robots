@@ -5,8 +5,8 @@
 #include "core/utils/terminal.hpp"
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#include "core/utils/writter_console.hpp"
-#include "core/utils/writter_file.hpp"
+#include "core/utils/writer_console.hpp"
+#include "core/utils/writer_file.hpp"
 #include "utest/utils.hpp"
 
 using core::utils::Exception;

@@ -5,17 +5,17 @@
 #include <sstream>
 
 namespace core::utils {
-std::string NullFormatter::format(const LabeledModifier& lm,
+std::string NullFormatter::Format(const LabeledModifier& lm,
                                   const std::string& msg) const {
   (void)lm;
   return msg;
 }
 
-DefaultFormater::DefaultFormater(const bool use_modifier)
+DefaultFormater::DefaultFormater(bool use_modifier)
   : use_modifier_(use_modifier) {
 }
 
-std::string DefaultFormater::format(const LabeledModifier& lm,
+std::string DefaultFormater::Format(const LabeledModifier& lm,
                                     const std::string& msg) const {
   std::stringstream ss;
   ss << "[" << DateTime().TimeToString() << "]";

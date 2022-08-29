@@ -3,8 +3,8 @@
 #include "core/utils/server_socket.hpp"
 
 namespace core::utils {
-ServerSocket::ServerSocket(const uint16_t port)
-  : ready(false)
+ServerSocket::ServerSocket(uint16_t port)
+  : ready_(false)
   , port_(port)
   , client_sock_(-1)
   , node_(std::make_unique<Node>(CreateDefaultNode("Socket")))
@@ -40,11 +40,11 @@ void ServerSocket::Listen() {
 }
 
 void ServerSocket::Accept() {
-  if (!ready) {
-    std::tie<bool, int>(ready, client_sock_) = socket_->Accept();
+  if (!ready_) {
+    std::tie<bool, int>(ready_, client_sock_) = socket_->Accept();
   }
 
-  if (!ready) {
+  if (!ready_) {
     node_->LogWarn("Could not accept socket.");
     return;
   }
@@ -53,22 +53,22 @@ void ServerSocket::Accept() {
 }
 
 const ServerSocket& ServerSocket::operator<<(const std::string& msg) const {
-  if (!ready) {
+  if (!ready_) {
     node_->LogWarn("Cannot write to socket. Server is not ready.");
   } else if (!socket_->Send(client_sock_, msg)) {
     node_->LogWarn("Failed writing to socket.");
-    ready = false;
+    ready_ = false;
   }
 
   return *this;
 }
 
 const ServerSocket& ServerSocket::operator>>(std::string& msg) const {
-  if (!ready) {
+  if (!ready_) {
     node_->LogWarn("Cannot read from socket. Server is not ready.");
   } else if (!socket_->Recv(client_sock_, &msg)) {
     node_->LogWarn("Failed reading from socket.");
-    ready = false;
+    ready_ = false;
   }
 
   return *this;

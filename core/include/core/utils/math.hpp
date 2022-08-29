@@ -11,15 +11,15 @@ namespace core::utils {
 constexpr float GRAVITY = 9.80665F;
 constexpr float PI = 3.14159F;
 constexpr float PI_2 = 1.570796F;
-
+constexpr float RAD_TO_DEG = PI / 180.F;
 typedef float MATH_TYPE;
 
-typedef Eigen::Matrix<MATH_TYPE, 3, 1> Vec3;
-typedef Eigen::Transpose<const Vec3> Transpose;
-typedef Eigen::Matrix<MATH_TYPE, 3, 3> Mat3;
-typedef Eigen::Rotation2D<MATH_TYPE> Rot2;
-typedef Eigen::Quaternion<MATH_TYPE> Quat;
-typedef Eigen::Transform<MATH_TYPE, 3, Eigen::Affine> Transform;
+using Vec3 = Eigen::Matrix<MATH_TYPE, 3, 1>;
+using Transpose = Eigen::Transpose<const Vec3>;
+using Mat3 = Eigen::Matrix<MATH_TYPE, 3, 3>;
+using Rot2 = Eigen::Rotation2D<MATH_TYPE>;
+using Quat = Eigen::Quaternion<MATH_TYPE>;
+using Transform = Eigen::Transform<MATH_TYPE, 3, Eigen::Affine>;
 
 }  // namespace core::utils
 

@@ -3,10 +3,11 @@
 #ifndef HARDWARE_NAVIO_INCLUDE_NAVIO_HARDWARE_UTILS_HPP_
 #define HARDWARE_NAVIO_INCLUDE_NAVIO_HARDWARE_UTILS_HPP_
 
-#include <stdint.h>
 #include <unistd.h>
 
-#define ARRAY_SIZE(a) sizeof(a) / sizeof(a[0])
+#include <cstdint>
+
+#define ARRAY_SIZE(a) sizeof(a) / sizeof(a[0])  // NOLINT
 
 namespace navio::hardware_utils {
 /**

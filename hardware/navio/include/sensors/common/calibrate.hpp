@@ -9,7 +9,7 @@
 #include "sensors/common/utils.hpp"
 
 namespace sensors::common::calibrate {
-typedef std::function<utils::Vec3(void)> ReadFunc;
+using ReadFunc = std::function<utils::Vec3(void)>;
 using utils::SensorSpecs;
 // Function which accumulates gyro and accelerometer data after device
 // initialization. It calculates the average of the at-rest readings and then

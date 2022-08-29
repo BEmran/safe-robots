@@ -6,15 +6,17 @@
 
 namespace sensors::common::calibrate {
 constexpr size_t kNumSamples = 1000;
+constexpr auto ShortDelay = 5;
 
 utils::Vec3 GetAverage(const ReadFunc& cb) {
   utils::Vec3 bias = utils::Vec3::Zero();
   std::cout << "collecting data";
+  constexpr auto packet_size = 10;
   for (size_t i = 0; i < kNumSamples; i++) {
     const auto data = cb();
     bias += data;
-    navio::hardware_utils::Delay(5);
-    if (i % 10 == 0) {
+    navio::hardware_utils::Delay(ShortDelay);
+    if (i % packet_size == 0) {
       std::cout << "." << std::flush;
     }
   }
@@ -24,23 +26,23 @@ utils::Vec3 GetAverage(const ReadFunc& cb) {
 
 SensorSpecs CalibrateAccelerometer(const ReadFunc& cb,
                                    const SensorSpecs& spec) {
-  Eigen::Matrix<utils::MATH_TYPE, 6, 3> y;
-  y(0, 3) = +1.F;  // face up, z+
-  y(1, 1) = -1.F;  // right side, x-
-  y(2, 1) = +1.F;  // left side, x+
-  y(3, 2) = -1.F;  // nose down, y-
-  y(4, 2) = +1.F;  // nose up, y+
-  y(5, 3) = -1.F;  // face down, z-
-  Eigen::Matrix<utils::MATH_TYPE, 6, 4> x;
+  Eigen::Matrix<utils::MATH_TYPE, 6, 3> y;  // NOLINT
+  y(0, 3) = +1.F;                           // NOLINT face up, z+
+  y(1, 1) = -1.F;                           // NOLINT right side, x-
+  y(2, 1) = +1.F;                           // NOLINT left side, x+
+  y(3, 2) = -1.F;                           // NOLINT nose down, y-
+  y(4, 2) = +1.F;                           // NOLINT nose up, y+
+  y(5, 3) = -1.F;                           // NOLINT face down, z-
+  Eigen::Matrix<utils::MATH_TYPE, 6, 4> x;  // NOLINT
   x.setZero();
-  Eigen::Matrix<utils::MATH_TYPE, 4, 3> miss;
+  Eigen::Matrix<utils::MATH_TYPE, 4, 3> miss;  // NOLINT
   miss.setIdentity();
   std::cout << "Y = \n" << y << std::endl;
   std::cout << "x = \n" << x << std::endl;
   std::cout << "miss = \n" << miss << std::endl;
   const char* msg[] = {"face up",   "right side", "left side",
                        "nose down", "nose up",    "face down"};
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < sizeof(msg); i++) {
     std::cout << msg[i] << " and press enter.....";
     getchar();
     auto xn = GetAverage(cb) / spec.sensitivity;
@@ -79,13 +81,14 @@ SensorSpecs CalibrateMagnetometer(const ReadFunc& cb, const SensorSpecs& spec) {
 
   // collect sampled data
   std::cout << "collecting data";
+  constexpr auto packet_size = 10;
   for (size_t i = 0; i < kNumSamples; i++) {
     const auto mag = cb();
     data[0][i] = mag.x();
     data[1][i] = mag.y();
     data[2][i] = mag.z();
-    navio::hardware_utils::Delay(5);
-    if (i % 10 == 0) {
+    navio::hardware_utils::Delay(ShortDelay);
+    if (i % packet_size == 0) {
       std::cout << "." << std::flush;
     }
   }

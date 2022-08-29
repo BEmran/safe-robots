@@ -3,10 +3,9 @@
 #ifndef CORE_INCLUDE_CORE_UTILS_EXCEPTION_HPP_
 #define CORE_INCLUDE_CORE_UTILS_EXCEPTION_HPP_
 
-#include <string.h>
-
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace core::utils {
 class Exception : public std::runtime_error {
@@ -20,8 +19,7 @@ class ExceptionFactory {
   explicit ExceptionFactory(const std::string& header) : header_(header) {
   }
 
-  virtual ~ExceptionFactory() {
-  }
+  virtual ~ExceptionFactory() = default;
 
   virtual void Throw(const std::string& msg) const {
     if (header_.empty()) {
@@ -37,9 +35,6 @@ class ExceptionFactory {
 class NullExceptionFactory : public ExceptionFactory {
  public:
   NullExceptionFactory() : ExceptionFactory("") {
-  }
-
-  ~NullExceptionFactory() {
   }
 
   void Throw(const std::string& msg) const final {

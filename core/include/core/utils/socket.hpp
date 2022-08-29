@@ -48,7 +48,7 @@ class Socket {
    * @return true if success.
    * @return false otherwise.
    */
-  bool Bind(const uint16_t port);
+  bool Bind(uint16_t port);
 
   /**
    * @brief tells the socket to listen to the incoming connections. It places
@@ -71,7 +71,7 @@ class Socket {
   std::pair<bool, int> Accept();
 
   // // Client initialization
-  // bool Connect(const std::string& host, const int port);
+  // bool Connect(const std::string& host, int port);
 
   /**
    * @brief Send a string message to socket FD.
@@ -81,7 +81,7 @@ class Socket {
    * @return true if msg is sent successfully
    * @return false otherwise
    */
-  static bool Send(const int client_sock, const std::string& msg);
+  static bool Send(int client_sock, const std::string& msg);
 
   /**
    * @brief Read a msg from socket FD.
@@ -90,9 +90,9 @@ class Socket {
    * @param msg received message
    * @return int
    */
-  static int Recv(const int client_sock, std::string* msg);
+  static int Recv(int client_sock, std::string* msg);
 
-  // void SetNonBlocking(const bool block);
+  // void SetNonBlocking(bool block);
 
   /**
    * @brief Check if socket is valid to be used
@@ -112,7 +112,7 @@ class Socket {
   bool SetSocketOpt() const;
 
  private:
-  int sock_;
+  int sock_{-1};
   sockaddr_in address_;
 };
 }  // namespace core::utils

@@ -26,18 +26,18 @@ Logger::Logger(const std::string& filename,
                std::shared_ptr<FormatterInterface> file_formater,
                std::shared_ptr<FormatterInterface> console_formater,
                std::shared_ptr<ExceptionFactory> expectation_factory)
-  : file_writter_(new FileWritter(filename))
-  , console_writter_(new ConsoleWritter())
+  : file_writer_(new FileWriter(filename))
+  , console_writer_(new ConsoleWriter())
   , file_formater_(std::move(file_formater))
   , console_formater_(std::move(console_formater))
   , expectation_factory_(std::move(expectation_factory)) {
 }
 
 void Logger::Log(const LabeledModifier& lm, const std::string& msg) {
-  const auto file_str = file_formater_->format(lm, msg);
-  file_writter_->dump(file_str);
-  const auto console_str = console_formater_->format(lm, msg);
-  console_writter_->dump(console_str);
+  const auto file_str = file_formater_->Format(lm, msg);
+  file_writer_->Dump(file_str);
+  const auto console_str = console_formater_->Format(lm, msg);
+  console_writer_->Dump(console_str);
   /* TODO: Instead of the logger Associate exception to LabeledModifier, so user
    * can select what kind of excpetion they want to throw when it is used/called
    */

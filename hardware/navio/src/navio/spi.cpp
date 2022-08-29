@@ -43,7 +43,7 @@ void PrintVec(const char* header, const std::vector<uint8_t>& vec) {
 }
 }  // namespace
 
-SPI::SPI(const std::string& path, const bool debug)
+SPI::SPI(const std::string& path, bool debug)
   : CommunicationAbs(debug), path_(path) {
 }
 
@@ -70,7 +70,7 @@ int SPI::Transfer(const std::vector<uint8_t>& buff) const {
   return status;
 }
 
-void SPI::WriteRegister(const uint8_t reg, const uint8_t data) const {
+void SPI::WriteRegister(uint8_t reg, uint8_t data) const {
   Transfer({reg, data});
 }
 
@@ -82,12 +82,11 @@ void SPI::WriteRegisters(
                 });
 }
 
-uint8_t SPI::ReadRegister(const uint8_t reg) const {
+uint8_t SPI::ReadRegister(uint8_t reg) const {
   return ReadRegisters(reg, 1)[0];
 }
 
-std::vector<uint8_t> SPI::ReadRegisters(const uint8_t reg,
-                                        const uint8_t count) const {
+std::vector<uint8_t> SPI::ReadRegisters(uint8_t reg, uint8_t count) const {
   std::vector<uint8_t> buf(count + 1, 0);
   buf[0] = reg | 0x80;
   Transfer(buf);
@@ -105,7 +104,7 @@ int SPI::Open() const {
   return fd;
 }
 
-void SPI::Close(const int fd) {
+void SPI::Close(int fd) {
   if (fd < 0) {
     printf("Warning: spi already closed\n");
     return;

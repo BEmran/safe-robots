@@ -3,8 +3,7 @@
 #ifndef HARDWARE_NAVIO_INCLUDE_SENSORS_MPU_MPU9250_REGISTER_MAP_HPP_
 #define HARDWARE_NAVIO_INCLUDE_SENSORS_MPU_MPU9250_REGISTER_MAP_HPP_
 
-#include <stdint.h>
-
+#include <cstdint>
 #include <map>
 
 #include "sensors/common/utils.hpp"
@@ -50,7 +49,7 @@ enum class MagScale : uint8_t { FS_14BITS, FS_16BITS };
 
 enum class MagMode : uint8_t {
   POWER_DOWN,
-  SINGLE_MEASUREMENT,
+  SINGLE_MEASURE,
   CONTINUES_8HZ,
   EXTERNAL_TRIGGER,
   CONTINUES_100HZ,
@@ -62,55 +61,55 @@ using namespace common::utils::literals;  // NOLINT [build/namespaces_literals]
                                           // TODO(Bara)
 
 cu::SpecInfoMap<AccelBandWidthHz, uint8_t> accel_bw_map({
-  {AccelBandWidthHz::BW_218HZ, {0, 0x01_uc, "218 HZ"}},  //
-  {AccelBandWidthHz::BW_99HZ, {0, 0x02_uc, "99 HZ"}},    //
-  {AccelBandWidthHz::BW_44HZ, {0, 0x03_uc, "44 HZ"}},    //
-  {AccelBandWidthHz::BW_21HZ, {0, 0x04_uc, "21 HZ"}},    //
-  {AccelBandWidthHz::BW_10HZ, {0, 0x05_uc, "10 HZ"}},    //
-  {AccelBandWidthHz::BW_5HZ, {0, 0x06_uc, "5 HZ"}}       //
+  {AccelBandWidthHz::BW_218HZ, {0, 0x01_uc, "218 HZ"}},  // NOLINT
+  {AccelBandWidthHz::BW_99HZ, {0, 0x02_uc, "99 HZ"}},    // NOLINT
+  {AccelBandWidthHz::BW_44HZ, {0, 0x03_uc, "44 HZ"}},    // NOLINT
+  {AccelBandWidthHz::BW_21HZ, {0, 0x04_uc, "21 HZ"}},    // NOLINT
+  {AccelBandWidthHz::BW_10HZ, {0, 0x05_uc, "10 HZ"}},    // NOLINT
+  {AccelBandWidthHz::BW_5HZ, {0, 0x06_uc, "5 HZ"}}       // NOLINT
 });
 
 cu::SpecInfoMap<AccelScale, float> accel_scale_map({
-  {AccelScale::FS_2G, {2.F, 0x00_uc, "2G"}},    //
-  {AccelScale::FS_4G, {4.F, 0x08_uc, "4G"}},    //
-  {AccelScale::FS_8G, {8.F, 0x10_uc, "8G"}},    //
-  {AccelScale::FS_16G, {16.F, 0x18_uc, "16G"}}  //
+  {AccelScale::FS_2G, {2.F, 0x00_uc, "2G"}},    // NOLINT
+  {AccelScale::FS_4G, {4.F, 0x08_uc, "4G"}},    // NOLINT
+  {AccelScale::FS_8G, {8.F, 0x10_uc, "8G"}},    // NOLINT
+  {AccelScale::FS_16G, {16.F, 0x18_uc, "16G"}}  // NOLINT
 });
 
 cu::SpecInfoMap<GyroBandWidthHz, uint8_t> gyro_bw_map({
-  {GyroBandWidthHz::BW_250HZ, {0, 0x00_uc, "250 HZ"}},   //
-  {GyroBandWidthHz::BW_184HZ, {0, 0x01_uc, "184 HZ"}},   //
-  {GyroBandWidthHz::BW_92HZ, {0, 0x02_uc, "92 HZ"}},     //
-  {GyroBandWidthHz::BW_41HZ, {0, 0x03_uc, "41 HZ"}},     //
-  {GyroBandWidthHz::BW_20HZ, {0, 0x04_uc, "20 HZ"}},     //
-  {GyroBandWidthHz::BW_10HZ, {0, 0x05_uc, "10 HZ"}},     //
-  {GyroBandWidthHz::BW_5HZ, {0, 0x06_uc, "5 HZ"}},       //
-  {GyroBandWidthHz::BW_3600HZ, {0, 0x07_uc, "3600 HZ"}}  //
+  {GyroBandWidthHz::BW_250HZ, {0, 0x00_uc, "250 HZ"}},   // NOLINT
+  {GyroBandWidthHz::BW_184HZ, {0, 0x01_uc, "184 HZ"}},   // NOLINT
+  {GyroBandWidthHz::BW_92HZ, {0, 0x02_uc, "92 HZ"}},     // NOLINT
+  {GyroBandWidthHz::BW_41HZ, {0, 0x03_uc, "41 HZ"}},     // NOLINT
+  {GyroBandWidthHz::BW_20HZ, {0, 0x04_uc, "20 HZ"}},     // NOLINT
+  {GyroBandWidthHz::BW_10HZ, {0, 0x05_uc, "10 HZ"}},     // NOLINT
+  {GyroBandWidthHz::BW_5HZ, {0, 0x06_uc, "5 HZ"}},       // NOLINT
+  {GyroBandWidthHz::BW_3600HZ, {0, 0x07_uc, "3600 HZ"}}  // NOLINT
 });
 
 cu::SpecInfoMap<GyroScale, float>
   gyro_scale_map(std::map<GyroScale, cu::SpecInfo<float>>{
-    {GyroScale::FS_250DPS, {250.F, 0x00_uc, "250 DPS"}},     //
-    {GyroScale::FS_500DPS, {500.F, 0x08_uc, "500 DPS"}},     //
-    {GyroScale::FS_1000DPS, {1000.F, 0x10_uc, "1000 DPS"}},  //
-    {GyroScale::FS_2000DPS, {2000.F, 0x18_uc, "2000 DPS"}}   //
+    {GyroScale::FS_250DPS, {250.F, 0x00_uc, "250 DPS"}},     // NOLINT
+    {GyroScale::FS_500DPS, {500.F, 0x08_uc, "500 DPS"}},     // NOLINT
+    {GyroScale::FS_1000DPS, {1000.F, 0x10_uc, "1000 DPS"}},  // NOLINT
+    {GyroScale::FS_2000DPS, {2000.F, 0x18_uc, "2000 DPS"}}   // NOLINT
   });
 
 cu::SpecInfoMap<MagScale, float>
   mag_scale_map(std::map<MagScale, cu::SpecInfo<float>>{
-    {MagScale::FS_14BITS, {0.25F * kMaxUTesla, 0x00_uc, "14 BITS"}},  //
-    {MagScale::FS_16BITS, {1.00F * kMaxUTesla, 0x10_uc, "16 BITS"}}   //
+    {MagScale::FS_14BITS, {0.25F * kMaxUTesla, 0x00_uc, "14 BITS"}},  // NOLINT
+    {MagScale::FS_16BITS, {1.00F * kMaxUTesla, 0x10_uc, "16 BITS"}}   // NOLINT
   });
 
 cu::SpecInfoMap<MagMode, uint8_t>
   mag_mode_map(std::map<MagMode, cu::SpecInfo<uint8_t>>{
-    {MagMode::POWER_DOWN, {0, 0x00_uc, "POWER DOWN"}},                  //
-    {MagMode::SINGLE_MEASUREMENT, {0, 0x01_uc, "SINGLE MEASUREMENT"}},  //
-    {MagMode::CONTINUES_8HZ, {0, 0x02_uc, "CONTINUES 8HZ"}},            //
-    {MagMode::EXTERNAL_TRIGGER, {0, 0x04_uc, "EXTERNAL TRIGGER"}},      //
-    {MagMode::CONTINUES_100HZ, {0, 0x06_uc, "CONTINUES 100HZ"}},        //
-    {MagMode::SELF_TEST, {0, 0x08_uc, "SELF TEST"}},                    //
-    {MagMode::FUSE_ROM_ACCESS, {0, 0x0F_uc, "FUSE ROM ACCESS"}}         //
+    {MagMode::POWER_DOWN, {0, 0x00_uc, "POWER DOWN"}},              // NOLINT
+    {MagMode::SINGLE_MEASURE, {0, 0x01_uc, "SINGLE MEASUREMENT"}},  // NOLINT
+    {MagMode::CONTINUES_8HZ, {0, 0x02_uc, "CONTINUES 8HZ"}},        // NOLINT
+    {MagMode::EXTERNAL_TRIGGER, {0, 0x04_uc, "EXTERNAL TRIGGER"}},  // NOLINT
+    {MagMode::CONTINUES_100HZ, {0, 0x06_uc, "CONTINUES 100HZ"}},    // NOLINT
+    {MagMode::SELF_TEST, {0, 0x08_uc, "SELF TEST"}},                // NOLINT
+    {MagMode::FUSE_ROM_ACCESS, {0, 0x0F_uc, "FUSE ROM ACCESS"}}     // NOLINT
   });
 
 // mpu9250 register map

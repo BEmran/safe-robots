@@ -1,6 +1,6 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#include "core/utils/writter_console.hpp"
+#include "core/utils/writer_console.hpp"
 
 #include <iostream>
 
@@ -16,7 +16,7 @@ void DumpToConsole(const std::string& str) {
 }  // namespace
 
 namespace core::utils {
-void ConsoleWritter::dump(const std::string& str) {
+void ConsoleWriter::Dump(const std::string& str) {
   DumpToConsole(str);
 }
 

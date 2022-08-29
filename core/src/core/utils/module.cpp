@@ -16,8 +16,7 @@ std::string ModuleTypeToString(const ModuleType type) {
   }
 }
 
-ModuleAbs::ModuleAbs(const ModuleType type, const std::string& name,
-                     const bool debug)
+ModuleAbs::ModuleAbs(const ModuleType type, const std::string& name, bool debug)
   : type_{type}, name_{name}, debug_{debug} {
 }
 
