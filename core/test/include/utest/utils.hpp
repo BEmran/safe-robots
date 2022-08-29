@@ -24,7 +24,7 @@ using FMT = core::utils::terminal::FMT;
 
 // carate list of available variables
 constexpr const char* kLabels[] = {"INFO", "DEBUG", "WARN", "ERROR"};
-const std::vector<EventLevel::event_level_t> kEvents = {
+const std::vector<EventLevel> kEvents = {
   EventLevel::EL_INFO, EventLevel::EL_DEBUG, EventLevel::EL_WARN,
   EventLevel::EL_ERROR};
 
@@ -64,7 +64,7 @@ void ExpectEqModifier(FG expect_fg, BG expect_bg, FMT expect_fmt,
 void ExpectEqModifier(const Modifier& expect, const Modifier& actual);
 
 // check if the passed labeled-modifier has the same expected configuration
-void ExpectEqLabeledModifier(EventLevel::event_level_t expect_event,
+void ExpectEqLabeledModifier(EventLevel expect_event,
                              const std::string& expect_label,
                              const Modifier& expect_modifier,
                              const LabeledModifier& actual);
@@ -101,7 +101,7 @@ class ConsoleBuffer {
 
   std::string file_name_;
   std::ofstream file_;
-  std::streambuf *psbuf, *backup;
+  std::streambuf *file_buf_, *backup;
 };
 
 #endif  // UTEST_UTILS_HPP_

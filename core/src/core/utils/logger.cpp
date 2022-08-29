@@ -44,7 +44,7 @@ void Logger::Log(const LabeledModifier& lm, const std::string& msg) {
   ThrowExceptionForErrorEvent(lm.GetEventLevel(), msg);
 }
 
-void Logger::ThrowExceptionForErrorEvent(const EventLevel::event_level_t event,
+void Logger::ThrowExceptionForErrorEvent(const EventLevel event,
                                          const std::string& msg) {
   if (event != EventLevel::EL_ERROR) {
     return;

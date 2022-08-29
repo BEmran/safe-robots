@@ -13,28 +13,26 @@ namespace core::utils {
  * @brief Defines the level of an event to be deal with
  *
  */
-struct EventLevel {
-  typedef enum {
-    EL_INFO = 0,  // basic level of information
-    EL_DEBUG,     // only for information used in debug mode
-    EL_WARN,      // when system behaviour is not desirable but not fatal
-    EL_ERROR,     // when system is fatal and system should treat it
-  } event_level_t;
+enum class EventLevel {
+  EL_INFO = 0,  // basic level of information
+  EL_DEBUG,     // only for information used in debug mode
+  EL_WARN,      // when system behaviour is not desirable but not fatal
+  EL_ERROR,     // when system is fatal and system should treat it
 };
 
 class LabeledModifier {
  public:
-  explicit LabeledModifier(EventLevel::event_level_t event);
+  explicit LabeledModifier(EventLevel event);
 
-  LabeledModifier(EventLevel::event_level_t event, const std::string& label);
+  LabeledModifier(EventLevel event, const std::string& label);
 
-  LabeledModifier(EventLevel::event_level_t event, const Modifier& modifier);
+  LabeledModifier(EventLevel event, const Modifier& modifier);
 
-  LabeledModifier(EventLevel::event_level_t event, const std::string& label,
+  LabeledModifier(EventLevel event, const std::string& label,
                   const Modifier& modifier);
   ~LabeledModifier() = default;
 
-  EventLevel::event_level_t GetEventLevel() const;
+  EventLevel GetEventLevel() const;
 
   /**
    * @brief Returns the Modifier associated to an EventLevel
@@ -53,7 +51,7 @@ class LabeledModifier {
   std::string GetLabel() const;
 
  private:
-  EventLevel::event_level_t event_;
+  EventLevel event_;
   std::string label_;
   Modifier modifier_;
 };
@@ -64,7 +62,7 @@ class LabeledModifier {
  * @param event event level
  * @return std::string name of the event
  */
-std::string EventLevelToString(EventLevel::event_level_t event);
+std::string EventLevelToString(EventLevel event);
 
 /**
  * @brief override the << operator which writes the label using the modifier

@@ -10,14 +10,14 @@
 
 namespace core::utils {
 namespace {
-const std::map<EventLevel::event_level_t, std::string> kEventLevelNameMap = {
+const std::map<EventLevel, std::string> kEventLevelNameMap = {
   {EventLevel::EL_INFO, "INFO"},
   {EventLevel::EL_DEBUG, "DEBUG"},
   {EventLevel::EL_WARN, "WARN"},
   {EventLevel::EL_ERROR, "ERROR"}};
 }  // namespace
 
-std::string EventLevelToString(const EventLevel::event_level_t event) {
+std::string EventLevelToString(const EventLevel event) {
   auto it = kEventLevelNameMap.find(event);
   if (it == kEventLevelNameMap.end()) {
     throw Exception("Undefined event level.");
@@ -25,27 +25,24 @@ std::string EventLevelToString(const EventLevel::event_level_t event) {
   return it->second;
 }
 
-LabeledModifier::LabeledModifier(EventLevel::event_level_t event)
+LabeledModifier::LabeledModifier(EventLevel event)
   : LabeledModifier(event, EventLevelToString(event)) {
 }
 
-LabeledModifier::LabeledModifier(EventLevel::event_level_t event,
-                                 const std::string& label)
+LabeledModifier::LabeledModifier(EventLevel event, const std::string& label)
   : LabeledModifier(event, label, DefaultModifier()) {
 }
 
-LabeledModifier::LabeledModifier(EventLevel::event_level_t event,
-                                 const Modifier& modifier)
+LabeledModifier::LabeledModifier(EventLevel event, const Modifier& modifier)
   : LabeledModifier(event, EventLevelToString(event), modifier) {
 }
 
-LabeledModifier::LabeledModifier(EventLevel::event_level_t event,
-                                 const std::string& label,
+LabeledModifier::LabeledModifier(EventLevel event, const std::string& label,
                                  const Modifier& modifier)
   : event_(event), label_(label), modifier_(modifier) {
 }
 
-EventLevel::event_level_t LabeledModifier::GetEventLevel() const {
+EventLevel LabeledModifier::GetEventLevel() const {
   return event_;
 }
 

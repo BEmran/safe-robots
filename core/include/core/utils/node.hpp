@@ -16,7 +16,6 @@ namespace core::utils {
  *
  */
 struct NodeLabeledModifiers {
-  using event_level_t = EventLevel::event_level_t;
   LabeledModifier debug;
   LabeledModifier error;
   LabeledModifier info;

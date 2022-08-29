@@ -109,8 +109,7 @@ class Logger {
   virtual void Log(const LabeledModifier& lm, const std::string& msg);
 
  protected:
-  void ThrowExceptionForErrorEvent(EventLevel::event_level_t event,
-                                   const std::string& msg);
+  void ThrowExceptionForErrorEvent(EventLevel event, const std::string& msg);
 
  private:
   std::shared_ptr<FileWriter> file_writer_;
