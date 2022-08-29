@@ -57,7 +57,7 @@ class SensorModuleAbs : public utils::ModuleAbs {
    * @brief Destroy the Sensor Module Abs object
    *
    */
-  virtual ~SensorModuleAbs() = default;
+  ~SensorModuleAbs() override = default;
 
   /**
    * @brief returns the type of the Sensor Module Abs object

@@ -82,7 +82,7 @@ TEST(LoggerInformation, ToString) {
 TEST(Logger, ConstructingUsingFilename) {
   auto* logger = new Logger(g_filename);
   TestLogger test_logger(logger);
-  for (const auto& event : EVENTS) {
+  for (const auto& event : kEvents) {
     LabeledModifier lm(event);
     test_logger.ExpectEqLogNoException(lm, g_message);
   }
@@ -92,7 +92,7 @@ TEST(Logger, ConstructingUsingFormatter) {
   auto formatter = std::make_shared<NullFormatter>();
   Logger logger(g_filename, formatter, formatter);
   TestLogger test_logger(&logger);
-  for (const auto& event : EVENTS) {
+  for (const auto& event : kEvents) {
     LabeledModifier lm(event);
     test_logger.ExpectEqLogNoException(lm, g_message);
   }
@@ -102,7 +102,7 @@ TEST(Logger, ConstructingUsingException) {
   auto exception = std::make_shared<ExceptionFactory>("");
   auto* logger = new Logger(g_filename, exception);
   TestLogger test_logger(logger);
-  for (const auto& event : EVENTS) {
+  for (const auto& event : kEvents) {
     LabeledModifier lm(event);
     if (event == EventLevel::EL_ERROR) {
       test_logger.ExpectEqLogWithException(lm, g_message);
@@ -118,9 +118,9 @@ TEST(Logger, ConstructingUsingException) {
 //   std::string msg = "message";
 //   auto logger = CreateDefaultLogger(name, filename);
 //   TestLogger test_logger(logger.get());
-//   for (size_t i = 0; i < EVENTS.size(); ++i) {
-//     LabeledModifier lm(EVENTS[i]);
-//     if (EVENTS[i] == EL_ERROR) {
+//   for (size_t i = 0; i < kEvents.size(); ++i) {
+//     LabeledModifier lm(kEvents[i]);
+//     if (kEvents[i] == EL_ERROR) {
 //       test_logger.ExpectEqLogWithException(lm, g_message);
 //     } else {
 //       test_logger.ExpectEqLogNoException(lm, g_message);

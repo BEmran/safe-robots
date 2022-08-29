@@ -27,12 +27,12 @@ int64_t TimeSinceEpochInSec() {
 }
 
 testing::AssertionResult IsEqualDateTime(const tm& expect, const tm& actual) {
-  return AssertEqWithLabel<int>(expect.tm_year, actual.tm_year, "Year") &&
-         AssertEqWithLabel<int>(expect.tm_mon, actual.tm_mon, "Month") &&
-         AssertEqWithLabel<int>(expect.tm_mday, actual.tm_mday, "Day") &&
-         AssertEqWithLabel<int>(expect.tm_hour, actual.tm_hour, "Hour") &&
-         AssertEqWithLabel<int>(expect.tm_min, actual.tm_min, "Minute") &&
-         AssertEqWithLabel<int>(expect.tm_sec, actual.tm_sec, "Seconds");
+  return AssertEqWithLabel(expect.tm_year, actual.tm_year, "Year") &&
+         AssertEqWithLabel(expect.tm_mon, actual.tm_mon, "Month") &&
+         AssertEqWithLabel(expect.tm_mday, actual.tm_mday, "Day") &&
+         AssertEqWithLabel(expect.tm_hour, actual.tm_hour, "Hour") &&
+         AssertEqWithLabel(expect.tm_min, actual.tm_min, "Minute") &&
+         AssertEqWithLabel(expect.tm_sec, actual.tm_sec, "Seconds");
 }
 
 // check time_in_seconds function

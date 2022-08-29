@@ -17,23 +17,23 @@ using core::utils::WarnModifier;
 
 // test converting an event level to string
 TEST(EventLevelToString, AllLevels) {
-  for (size_t i = 0; i < EVENTS.size(); i++) {
-    EXPECT_EQ(LABELS[i], EventLevelToString(EVENTS[i]));
+  for (size_t i = 0; i < kEvents.size(); i++) {
+    EXPECT_EQ(kLabels[i], EventLevelToString(kEvents[i]));
   }
 }
 
 // test constructing LabeledModifier with only event
 TEST(LabeledModifier, ConstructWithEvent) {
-  for (size_t i = 0; i < EVENTS.size(); i++) {
-    const LabeledModifier labeled(EVENTS[i]);
-    ExpectEqLabeledModifier(EVENTS[i], LABELS[i], DefaultModifier(), labeled);
+  for (size_t i = 0; i < kEvents.size(); i++) {
+    const LabeledModifier labeled(kEvents[i]);
+    ExpectEqLabeledModifier(kEvents[i], kLabels[i], DefaultModifier(), labeled);
   }
 }
 
 // test constructing LabeledModifier with different events and a label
 TEST(LabeledModifier, ConstructWithEventAndLabel) {
   const char* label = "label";
-  for (const auto& event : EVENTS) {
+  for (const auto& event : kEvents) {
     const LabeledModifier labeled(event, label);
     ExpectEqLabeledModifier(event, label, DefaultModifier(), labeled);
   }
@@ -42,9 +42,9 @@ TEST(LabeledModifier, ConstructWithEventAndLabel) {
 // test constructing LabeledModifier with different events and a modifier
 TEST(LabeledModifier, ConstructWithEventAndModifier) {
   Modifier modifier(FG::FG_LIGHT_BLUE, BG::BG_LIGHT_CYAN, FMT::FMT_HIDDEN);
-  for (size_t i = 0; i < EVENTS.size(); i++) {
-    const LabeledModifier labeled(EVENTS[i], modifier);
-    ExpectEqLabeledModifier(EVENTS[i], LABELS[i], modifier, labeled);
+  for (size_t i = 0; i < kEvents.size(); i++) {
+    const LabeledModifier labeled(kEvents[i], modifier);
+    ExpectEqLabeledModifier(kEvents[i], kLabels[i], modifier, labeled);
   }
 }
 
@@ -53,7 +53,7 @@ TEST(LabeledModifier, ConstructWithEventAndModifier) {
 TEST(LabeledModifier, ConstructWithEventAndLabelAndModifier) {
   Modifier modifier(FG::FG_LIGHT_BLUE, BG::BG_LIGHT_CYAN, FMT::FMT_HIDDEN);
   const char* label = "label";
-  for (const auto& event : EVENTS) {
+  for (const auto& event : kEvents) {
     const LabeledModifier labeled(event, label, modifier);
     ExpectEqLabeledModifier(event, label, modifier, labeled);
   }

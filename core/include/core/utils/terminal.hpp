@@ -79,6 +79,7 @@ class Modifier {
    * @param fmt font format
    */
   Modifier(terminal::FG fg, terminal::BG bg, terminal::FMT fmt);
+  ~Modifier() = default;
   std::string ToString() const;
 
  private:

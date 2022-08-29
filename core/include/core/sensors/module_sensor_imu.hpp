@@ -27,7 +27,7 @@ class ImuSensorModule : public SensorModuleAbs<utils::ImuData> {
    * @brief Destroy the Imu Sensor Module object
    *
    */
-  ~ImuSensorModule() = default;
+  ~ImuSensorModule() override = default;
 
   void Initialize() override;
   bool Probe() override;

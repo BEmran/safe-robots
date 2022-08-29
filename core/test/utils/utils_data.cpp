@@ -1,19 +1,6 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_TEST_INCLUDE_UTEST_UTEST_DATA_HPP_
-#define CORE_TEST_INCLUDE_UTEST_UTEST_DATA_HPP_
-
-#include "core/utils/data.hpp"
-#include "gtest/gtest.h"
-
-using core::utils::DoubleData;
-using core::utils::GpsData;
-using core::utils::ImuData;
-using core::utils::MATH_TYPE;
-using core::utils::Quat;
-using core::utils::QuatData;
-using core::utils::Vec3;
-using core::utils::Vec3Data;
+#include "utest/utils_data.hpp"
 
 void ExpectEq(MATH_TYPE actual, MATH_TYPE expect) {
   if constexpr (std::is_same<MATH_TYPE, float>::value) {
@@ -56,10 +43,8 @@ void ExpectImuData(const ImuData& d1, const ImuData& d2) {
   ExpectQuatDataEq(d1.quat, d2.quat);
 }
 
-void ExpectGPSData(const double lat, const double lon, const double alt,
-                   const GpsData& gps) {
+void ExpectGPSData(double lat, double lon, double alt, const GpsData& gps) {
   EXPECT_DOUBLE_EQ(lat, gps.lat);
   EXPECT_DOUBLE_EQ(lon, gps.lon);
   EXPECT_DOUBLE_EQ(alt, gps.alt);
 }
-#endif  // CORE_TEST_INCLUDE_UTEST_UTEST_DATA_HPP_

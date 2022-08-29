@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  const int port = atoi(argv[1]);
+  const auto port = static_cast<uint16_t>(atoi(argv[1]));
 
   // Create the socket
   core::utils::ServerSocket server(port);

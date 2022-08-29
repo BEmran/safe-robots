@@ -72,5 +72,5 @@ TEST(Terminal, PrintOutModifier) {
   const Modifier modifier(fg, bg, fmt);
   std::stringstream ss;
   ss << modifier;
-  EXPECT_EQ(modifier_to_string(fg, bg, fmt), ss.str());
+  EXPECT_EQ(ModifierToString(fg, bg, fmt), ss.str());
 }

@@ -1,10 +1,10 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#include "utest/utest_data.hpp"
-
 #include <gtest/gtest.h>
 
 #include <sstream>
+
+#include "utest/utils_data.hpp"
 
 using core::utils::AccelData;
 using core::utils::AdcData;

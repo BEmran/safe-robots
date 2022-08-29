@@ -66,11 +66,13 @@ Mpu9250::Mpu9250(const Config& config, std::unique_ptr<navio::SPI> comm,
 void Mpu9250::ReadCalibrationFile() {
   // TODO(Bara) read from config file instead
   cu::Mat3 accel_misalignment;
-  accel_misalignment << 0.998122F, 0.00794836F, 0.000548448F,  // NOLINT
-    -0.00552448F, 0.998181F, -0.00669443F,                     // NOLINT
-    0.0189156F, 0.00407755F, 0.993244F;                        // NOLINT
-  cu::Vec3 accel_bias{-0.00387028F, -0.0128085F, 0.0108167F};  // NOLINT
-  cu::Vec3 gyro_bias{12.629F, 7.572F, -9.618F};                // NOLINT
+
+  accel_misalignment << (cu::Mat3() << 0.998122F, 0.00794836F, 0.000548448F,
+                         -0.00552448F, 0.998181F, -0.00669443F, 0.0189156F,
+                         0.00407755F, 0.993244F)
+                          .finished();
+  cu::Vec3 accel_bias(-0.00387028F, -0.0128085F, 0.0108167F);
+  cu::Vec3 gyro_bias(12.629F, 7.572F, -9.618F);
 
   sensor_specs_map_[AccelType].SetCalibration(accel_misalignment, accel_bias,
                                               cu::Vec3::Zero());  //
@@ -198,7 +200,7 @@ void Mpu9250::ExtractMagnetometerSensitivityAdjustmentValues() {
   constexpr auto reg_size = 3;
   const auto asa_values = ReadAK8963Registers(ak8963::ASAX, reg_size);
   for (size_t i = 0; i < asa_values.size(); i++) {
-    mag_sensitivity_calibration_[i] =
+    mag_sensitivity_calibration_(i) =
       static_cast<float>(asa_values[i] - 128) / 256.0F + 1.0F;  // NOLINT
   }
   std::stringstream msg;

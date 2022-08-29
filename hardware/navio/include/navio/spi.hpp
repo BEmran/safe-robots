@@ -16,7 +16,7 @@ namespace navio {
 class SPI : CommunicationAbs {
  public:
   SPI(const std::string& path, bool debug);
-  ~SPI() = default;
+  ~SPI() override = default;
 
   int Transfer(const std::vector<uint8_t>& buff) const;
 

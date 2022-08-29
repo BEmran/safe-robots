@@ -42,13 +42,14 @@ SensorSpecs CalibrateAccelerometer(const ReadFunc& cb,
   std::cout << "miss = \n" << miss << std::endl;
   const char* msg[] = {"face up",   "right side", "left side",
                        "nose down", "nose up",    "face down"};
-  for (int i = 0; i < sizeof(msg); i++) {
+  for (size_t i = 0; i < sizeof(msg); i++) {
     std::cout << msg[i] << " and press enter.....";
     getchar();
     auto xn = GetAverage(cb) / spec.sensitivity;
     std::cout << "xn[" << i << "] = " << xn.transpose() << ",  y[" << i
               << "] = " << y.row(i) << std::endl;
-    x.row(i) << xn[0], xn[1], xn[2], 1.F;
+
+    x.row(i) << (Eigen::MatrixXf(1, 4) << xn[0], xn[1], xn[2], 1.F).finished();
   }
 
   miss = (x.transpose() * x).ldlt().solve(x.transpose() * y);

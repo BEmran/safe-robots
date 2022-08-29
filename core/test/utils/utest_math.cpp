@@ -7,7 +7,7 @@
 
 #include "core/utils/math.hpp"
 #include "gtest/gtest.h"
-#include "utest/utest_data.hpp"
+#include "utest/utils_data.hpp"
 
 using core::utils::Quat;
 using core::utils::Vec3;

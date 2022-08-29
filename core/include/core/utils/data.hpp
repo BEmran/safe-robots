@@ -21,14 +21,14 @@ struct Data {
 struct AdcData : public Data {
   Vec3 values = Vec3::Zero();
 
-  void Clear() override {
+  inline void Clear() override {
     values.setZero();
   }
 };
 
 struct DoubleData : public Data {
   double value = 0.0;
-  void Clear() override {
+  inline void Clear() override {
     value = 0.0;
   }
 };
@@ -44,7 +44,7 @@ struct GpsData : public Data {
   double lon = 0.0;
   double alt = 0.0;
 
-  void Clear() override {
+  inline void Clear() override {
     lat = 0.0;
     lon = 0.0;
     alt = 0.0;
@@ -59,7 +59,7 @@ struct Vec3Data : public Data {
   }
   Vec3Data(MATH_TYPE x, MATH_TYPE y, MATH_TYPE z) : data{x, y, z} {
   }
-  void Clear() override {
+  inline void Clear() override {
     data.setZero();
   }
 };
@@ -74,8 +74,8 @@ struct RPYData : public Vec3Data {};
 
 struct QuatData : public Data {
   Quat data = Quat::Identity();
-  void Clear() override {
-    data.Identity();
+  inline void Clear() override {
+    data.setIdentity();
   }
 };
 
@@ -93,7 +93,7 @@ struct ImuData : public Data {
   QuatData quat;         ///< normalized quaternion
   RPYData tait_bryan;    ///< Tait-Bryan angles (roll pitch yaw) in radians
 
-  void Clear() override {
+  inline void Clear() override {
     temp.Clear();
     heading.Clear();
     accel.Clear();

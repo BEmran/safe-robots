@@ -34,7 +34,7 @@ std::string FormatFuncWithModifierEnabled(const LabeledModifier& lm,
 TEST(NullFormatter, Format) {
   std::string msg = "message";
   FormatterInterface* formatter = new NullFormatter();
-  for (const auto& event : EVENTS) {
+  for (const auto& event : kEvents) {
     EXPECT_EQ(msg, formatter->Format(LabeledModifier(event), msg));
   }
 }
@@ -44,8 +44,8 @@ TEST(NullFormatter, Format) {
 TEST(DefaultFormater, FormatWithoutModifier) {
   std::string msg = "message";
   DefaultFormater formatter(false);
-  for (size_t i = 0; i < EVENTS.size(); i++) {
-    LabeledModifier lm(EVENTS[i], LABELS[i]);
+  for (size_t i = 0; i < kEvents.size(); i++) {
+    LabeledModifier lm(kEvents[i], kLabels[i]);
     std::string expect = FormatFuncWithModifierDisabled(lm, msg);
     EXPECT_EQ(expect, formatter.Format(lm, msg));
   }
@@ -56,8 +56,8 @@ TEST(DefaultFormater, FormatWithoutModifier) {
 TEST(DefaultFormater, FormatWithModifier) {
   std::string msg = "message";
   DefaultFormater formatter(true);
-  for (size_t i = 0; i < EVENTS.size(); i++) {
-    LabeledModifier lm(EVENTS[i], LABELS[i]);
+  for (size_t i = 0; i < kEvents.size(); i++) {
+    LabeledModifier lm(kEvents[i], kLabels[i]);
     std::string expect = FormatFuncWithModifierEnabled(lm, msg);
     EXPECT_EQ(expect, formatter.Format(lm, msg));
   }

@@ -32,6 +32,7 @@ class LabeledModifier {
 
   LabeledModifier(EventLevel::event_level_t event, const std::string& label,
                   const Modifier& modifier);
+  ~LabeledModifier() = default;
 
   EventLevel::event_level_t GetEventLevel() const;
 

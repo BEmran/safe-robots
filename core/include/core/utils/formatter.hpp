@@ -24,7 +24,7 @@ class FormatterInterface {
 
 class NullFormatter : public FormatterInterface {
  public:
-  ~NullFormatter() = default;
+  ~NullFormatter() override = default;
 
   std::string Format(const LabeledModifier& lm,
                      const std::string& msg) const override;
@@ -33,7 +33,7 @@ class NullFormatter : public FormatterInterface {
 class DefaultFormater : public FormatterInterface {
  public:
   explicit DefaultFormater(bool use_modifier = false);
-  ~DefaultFormater() = default;
+  ~DefaultFormater() override = default;
 
   std::string Format(const LabeledModifier& lm,
                      const std::string& msg) const override;

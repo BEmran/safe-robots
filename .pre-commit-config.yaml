@@ -41,17 +41,20 @@ repos:
         require_serial: true
         pass_filenames: false
 
-      # - id: clang-tidy
-      #   name: clang-tidy
-      #   description: Find warnings/errors in C and C++ code
-      #   entry: clang-tidy
-      #   language: system
-      #   files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
-      #   args:
-      #     [
-      #       --format-style=file,
-      #       --extra-arg=-Wno-unknown-warning-option,
-      #     ]
+      - id: clang-tidy
+        name: clang-tidy
+        description: Find warnings/errors in C and C++ code
+        entry: clang-tidy
+        language: system
+        files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
+        args:
+          [
+            --format-style=file,
+            --extra-arg=-Wno-unknown-warning-option,
+            --config=,
+            -p=./build,
+            --header-filter=.*
+          ]
 
       - id: cppcheck
         name: cppcheck
@@ -94,5 +97,5 @@ repos:
         files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
         args:
           [
-            "--filter= +build, +legal, +readability, +runtime, +whitespace"
+            "--filter= +build, -build/header_guard,+legal, +readability, +runtime, +whitespace"
           ]

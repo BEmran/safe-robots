@@ -25,7 +25,7 @@ class ConsoleWriter : public Writer {
    * @brief Destroy the Console Writer object
    *
    */
-  ~ConsoleWriter() = default;
+  ~ConsoleWriter() override = default;
 
   /* Writer Interface */
   void Dump(const std::string& str) override;
