@@ -79,7 +79,7 @@ TEST(DateTime, CrateUsingATimeStruct) {
   EXPECT_TRUE(IsEqualDateTime(local_tm, dt.GetTimeStruct()));
 }
 
-// check constracting time format
+// check constructing time format
 TEST(DateTime, TimeToString) {
   tm local_tm = GetLocalTime();
   local_tm.tm_hour = 1;
@@ -89,7 +89,7 @@ TEST(DateTime, TimeToString) {
   EXPECT_EQ("01:02:03", DateTime(local_tm).TimeToString());
 }
 
-// check constracting time format
+// check constructing time format
 TEST(DateTime, DateToString) {
   tm local_tm = GetLocalTime();
   local_tm.tm_year = 1;  // years starts from 1900

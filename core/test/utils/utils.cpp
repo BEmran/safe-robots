@@ -26,10 +26,10 @@ std::string FormatLabeledModifier(const Modifier& modifier,
 
 std::string ModifierToString(FG fg, BG bg, FMT fmt) {
   constexpr auto buff_size = 25;
-  std::string buffer;
-  buffer.resize(buff_size);
-  snprintf(buffer.data(), buffer.size(), "\x1B[%dm\x1B[%dm\x1B[%dm", fmt, fg,
-           bg);
+  std::string buffer(buff_size, ' ', std::allocator<char>());
+  const auto actual_size = snprintf(buffer.data(), buffer.size(),
+                                    "\x1B[%dm\x1B[%dm\x1B[%dm", fmt, fg, bg);
+  buffer.resize(static_cast<size_t>(actual_size));
   return buffer;
 }
 
@@ -43,7 +43,7 @@ void ExpectEqModifier(const Modifier& expect, const Modifier& actual) {
   EXPECT_EQ(expect.ToString(), actual.ToString());
 }
 
-void ExpectEqLabeledModifier(EventLevel::event_level_t expect_event,
+void ExpectEqLabeledModifier(EventLevel expect_event,
                              const std::string& expect_label,
                              const Modifier& expect_modifier,
                              const LabeledModifier& actual) {
@@ -79,8 +79,8 @@ ConsoleBuffer::ConsoleBuffer(const std::string& file_name)
   : file_name_(file_name) {
   file_.open(file_name_, std::ios_base::out);
   backup = std::cout.rdbuf();  // back up cout's streambuf
-  psbuf = file_.rdbuf();       // get file's streambuf
-  std::cout.rdbuf(psbuf);      // assign streambuf to cout
+  file_buf_ = file_.rdbuf();   // get file's streambuf
+  std::cout.rdbuf(file_buf_);  // assign streambuf to cout
 }
 
 ConsoleBuffer::~ConsoleBuffer() {
