@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_INCLUDE_CORE_UTILS_WRITTER_FILE_HPP_
-#define CORE_INCLUDE_CORE_UTILS_WRITTER_FILE_HPP_
+#ifndef CORE_UTILS_WRITTER_FILE_HPP_
+#define CORE_UTILS_WRITTER_FILE_HPP_
 
 #include <fstream>
 #include <memory>
@@ -51,4 +51,4 @@ class FileWriter : public Writer {
 
 }  // namespace core::utils
 
-#endif  // CORE_INCLUDE_CORE_UTILS_WRITTER_FILE_HPP_
+#endif  // CORE_UTILS_WRITTER_FILE_HPP_

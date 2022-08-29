@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef HARDWARE_NAVIO_INCLUDE_NAVIO_COMMUNICATION_ABS_HPP_
-#define HARDWARE_NAVIO_INCLUDE_NAVIO_COMMUNICATION_ABS_HPP_
+#ifndef NAVIO_COMMUNICATION_ABS_HPP_
+#define NAVIO_COMMUNICATION_ABS_HPP_
 
 #include <cstdint>
 #include <utility>
@@ -33,4 +33,4 @@ class CommunicationAbs {
   bool debug_;
 };
 }  // namespace navio
-#endif  // HARDWARE_NAVIO_INCLUDE_NAVIO_COMMUNICATION_ABS_HPP_
+#endif  // NAVIO_COMMUNICATION_ABS_HPP_

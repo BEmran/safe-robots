@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_INCLUDE_CORE_UTILS_WRITTER_CONSOLE_HPP_
-#define CORE_INCLUDE_CORE_UTILS_WRITTER_CONSOLE_HPP_
+#ifndef CORE_UTILS_WRITTER_CONSOLE_HPP_
+#define CORE_UTILS_WRITTER_CONSOLE_HPP_
 
 #include <string>
 
@@ -33,4 +33,4 @@ class ConsoleWriter : public Writer {
 
 }  // namespace core::utils
 
-#endif  // CORE_INCLUDE_CORE_UTILS_WRITTER_CONSOLE_HPP_
+#endif  // CORE_UTILS_WRITTER_CONSOLE_HPP_

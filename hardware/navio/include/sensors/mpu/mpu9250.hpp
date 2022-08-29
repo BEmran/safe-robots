@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef HARDWARE_NAVIO_INCLUDE_SENSORS_MPU_MPU9250_HPP_
-#define HARDWARE_NAVIO_INCLUDE_SENSORS_MPU_MPU9250_HPP_
+#ifndef SENSORS_MPU_MPU9250_HPP_
+#define SENSORS_MPU_MPU9250_HPP_
 
 #include <unistd.h>
 
@@ -176,4 +176,4 @@ class Mpu9250 : public cu::ImuSensorModule {
                                         1.0F};  // factory calibration
 };
 }  // namespace sensors::mpu
-#endif  // HARDWARE_NAVIO_INCLUDE_SENSORS_MPU_MPU9250_HPP_
+#endif  // SENSORS_MPU_MPU9250_HPP_

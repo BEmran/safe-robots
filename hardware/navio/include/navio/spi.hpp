@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef HARDWARE_NAVIO_INCLUDE_NAVIO_SPI_HPP_
-#define HARDWARE_NAVIO_INCLUDE_NAVIO_SPI_HPP_
+#ifndef NAVIO_SPI_HPP_
+#define NAVIO_SPI_HPP_
 
 #include <linux/spi/spidev.h>
 
@@ -39,4 +39,4 @@ class SPI : CommunicationAbs {
 };
 
 }  // namespace navio
-#endif  // HARDWARE_NAVIO_INCLUDE_NAVIO_SPI_HPP_
+#endif  // NAVIO_SPI_HPP_

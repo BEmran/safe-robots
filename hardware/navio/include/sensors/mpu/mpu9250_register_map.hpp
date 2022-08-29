@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef HARDWARE_NAVIO_INCLUDE_SENSORS_MPU_MPU9250_REGISTER_MAP_HPP_
-#define HARDWARE_NAVIO_INCLUDE_SENSORS_MPU_MPU9250_REGISTER_MAP_HPP_
+#ifndef SENSORS_MPU_MPU9250_REGISTER_MAP_HPP_
+#define SENSORS_MPU_MPU9250_REGISTER_MAP_HPP_
 
 #include <cstdint>
 #include <map>
@@ -251,4 +251,4 @@ constexpr uint8_t ASAY = 0x11;
 constexpr uint8_t ASAZ = 0x12;
 }  // namespace ak8963
 }  // namespace sensors::mpu
-#endif  // HARDWARE_NAVIO_INCLUDE_SENSORS_MPU_MPU9250_REGISTER_MAP_HPP_
+#endif  // SENSORS_MPU_MPU9250_REGISTER_MAP_HPP_

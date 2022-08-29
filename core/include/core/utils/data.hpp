@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_INCLUDE_CORE_UTILS_DATA_HPP_
-#define CORE_INCLUDE_CORE_UTILS_DATA_HPP_
+#ifndef CORE_UTILS_DATA_HPP_
+#define CORE_UTILS_DATA_HPP_
 
 #include <iomanip>
 #include <iostream>
@@ -122,4 +122,4 @@ std::ostream& operator<<(std::ostream& os, const cu::MagData& mag);
 std::ostream& operator<<(std::ostream& os, const cu::RPYData& rpy);
 std::ostream& operator<<(std::ostream& os, const cu::ImuData& imu);
 
-#endif  // CORE_INCLUDE_CORE_UTILS_DATA_HPP_
+#endif  // CORE_UTILS_DATA_HPP_

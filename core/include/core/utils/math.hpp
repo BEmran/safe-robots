@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_INCLUDE_CORE_UTILS_MATH_HPP_
-#define CORE_INCLUDE_CORE_UTILS_MATH_HPP_
+#ifndef CORE_UTILS_MATH_HPP_
+#define CORE_UTILS_MATH_HPP_
 
 #include <eigen3/Eigen/Dense>
 #include <iomanip>
@@ -29,4 +29,4 @@ std::ostream& operator<<(std::ostream& os, const core::utils::Vec3& vec);
 std::ostream& operator<<(std::ostream& os, const core::utils::Transpose& vec);
 std::ostream& operator<<(std::ostream& os, const core::utils::Quat& quat);
 
-#endif  // CORE_INCLUDE_CORE_UTILS_MATH_HPP_
+#endif  // CORE_UTILS_MATH_HPP_

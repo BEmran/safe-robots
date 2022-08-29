@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_INCLUDE_CORE_UTILS_SERVER_SOCKET_HPP_
-#define CORE_INCLUDE_CORE_UTILS_SERVER_SOCKET_HPP_
+#ifndef CORE_UTILS_SERVER_SOCKET_HPP_
+#define CORE_UTILS_SERVER_SOCKET_HPP_
 
 #include <memory>
 #include <string>
@@ -73,4 +73,4 @@ class ServerSocket {
   std::unique_ptr<Socket> socket_;  // socket object
 };
 }  // namespace core::utils
-#endif  // CORE_INCLUDE_CORE_UTILS_SERVER_SOCKET_HPP_
+#endif  // CORE_UTILS_SERVER_SOCKET_HPP_

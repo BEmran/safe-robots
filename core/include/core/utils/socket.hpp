@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_INCLUDE_CORE_UTILS_SOCKET_HPP_
-#define CORE_INCLUDE_CORE_UTILS_SOCKET_HPP_
+#ifndef CORE_UTILS_SOCKET_HPP_
+#define CORE_UTILS_SOCKET_HPP_
 
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -116,4 +116,4 @@ class Socket {
   sockaddr_in address_;
 };
 }  // namespace core::utils
-#endif  // CORE_INCLUDE_CORE_UTILS_SOCKET_HPP_
+#endif  // CORE_UTILS_SOCKET_HPP_

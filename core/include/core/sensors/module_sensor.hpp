@@ -1,5 +1,5 @@
-#ifndef CORE_INCLUDE_CORE_SENSORS_MODULE_SENSOR_HPP_
-#define CORE_INCLUDE_CORE_SENSORS_MODULE_SENSOR_HPP_
+#ifndef CORE_SENSORS_MODULE_SENSOR_HPP_
+#define CORE_SENSORS_MODULE_SENSOR_HPP_
 
 #include <string>
 
@@ -111,4 +111,4 @@ class SensorModuleAbs : public utils::ModuleAbs {
 };
 
 }  // namespace core::sensors
-#endif  // CORE_INCLUDE_CORE_SENSORS_MODULE_SENSOR_HPP_
+#endif  // CORE_SENSORS_MODULE_SENSOR_HPP_

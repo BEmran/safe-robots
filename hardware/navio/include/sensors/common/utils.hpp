@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef HARDWARE_NAVIO_INCLUDE_SENSORS_COMMON_UTILS_HPP_
-#define HARDWARE_NAVIO_INCLUDE_SENSORS_COMMON_UTILS_HPP_
+#ifndef SENSORS_COMMON_UTILS_HPP_
+#define SENSORS_COMMON_UTILS_HPP_
 
 #include <unistd.h>
 
@@ -197,4 +197,4 @@ Vec3 EstimateRPY(const Vec3& accel);
 
 }  // namespace sensors::common::utils
 
-#endif  // HARDWARE_NAVIO_INCLUDE_SENSORS_COMMON_UTILS_HPP_
+#endif  // SENSORS_COMMON_UTILS_HPP_

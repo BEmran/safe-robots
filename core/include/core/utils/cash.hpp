@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_INCLUDE_CORE_UTILS_CASH_HPP_
-#define CORE_INCLUDE_CORE_UTILS_CASH_HPP_
+#ifndef CORE_UTILS_CASH_HPP_
+#define CORE_UTILS_CASH_HPP_
 
 #include <memory>
 #include <shared_mutex>
@@ -63,4 +63,4 @@ class Cash {
 };
 
 }  // namespace core::utils
-#endif  // CORE_INCLUDE_CORE_UTILS_CASH_HPP_
+#endif  // CORE_UTILS_CASH_HPP_
