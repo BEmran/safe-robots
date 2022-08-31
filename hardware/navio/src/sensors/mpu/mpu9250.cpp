@@ -25,10 +25,10 @@ constexpr auto LongDelay = 100;
  * @param scale measurement scale
  * @param unit unit conversion row -> iso unit
  */
-cu::SensorSpecs CreateSensorSpecs(const cu::MATH_TYPE scale,
-                                  const cu::MATH_TYPE unit) {
+cu::SensorSpecs<3> CreateSensorSpecs(const cu::MATH_TYPE scale,
+                                     const cu::MATH_TYPE unit) {
   const auto sen = kMaxBitVal / scale;
-  return cu::SensorSpecs(sen, unit);
+  return cu::SensorSpecs<3>(sen, unit);
 }
 
 std::string ConfigToString(const Config& cfg) {
@@ -55,17 +55,14 @@ Mpu9250::Mpu9250(const Config& config, std::unique_ptr<navio::SPI> comm,
   , config_(config)
   , comm_{std::move(comm)}
   , node_{std::move(node)}
-
-{
-  sensor_specs_map_[AccelType] =
-    CreateSensorSpecs(AccelScaleMap()[config.accel_scale].value, cu::GRAVITY);
-  sensor_specs_map_[GyroType] =
-    CreateSensorSpecs(GyroScaleMap()[config.gyro_scale].value, cu::RAD_TO_DEG);
-  sensor_specs_map_[MagType] =
-    CreateSensorSpecs(MagScaleMap()[config.mag_scale].value, 1.0F);
-  sensor_specs_map_[TempType] =
-    cu::SensorSpecs(TempScale, 1.0F, kTempBias, kTempOffset);
-
+  , mag_spec_{CreateSensorSpecs(MagScaleMap()[config.mag_scale].value, 1.0F)}
+  , gyro_spec_{CreateSensorSpecs(GyroScaleMap()[config.gyro_scale].value,
+                                 cu::RAD_TO_DEG)}
+  , accel_spec_{CreateSensorSpecs(AccelScaleMap()[config.accel_scale].value,
+                                  cu::GRAVITY)}
+  , temp_spec_{cu::SensorSpecs<1>(TempScale, 1.0F)} {
+  temp_spec_.SetCalibration(cu::CreateScalar(1), cu::CreateScalar(kTempBias),
+                            cu::CreateScalar(kTempOffset));
   ReadCalibrationFile();
 }
 
@@ -80,10 +77,10 @@ void Mpu9250::ReadCalibrationFile() {
   cu::Vec3 accel_bias(-0.00387028F, -0.0128085F, 0.0108167F);
   cu::Vec3 gyro_bias(12.629F, 7.572F, -9.618F);
 
-  sensor_specs_map_[AccelType].SetCalibration(accel_misalignment, accel_bias,
-                                              cu::Vec3::Zero());  //
-  sensor_specs_map_[GyroType].SetCalibration(cu::Mat3::Identity(), gyro_bias,
-                                             cu::Vec3::Zero());  //
+  accel_spec_.SetCalibration(accel_misalignment, accel_bias,
+                             cu::Vec3::Zero());  //
+  gyro_spec_.SetCalibration(cu::Mat3::Identity(), gyro_bias,
+                            cu::Vec3::Zero());  //
 }
 
 bool Mpu9250::ProbeMpu() const {
@@ -308,12 +305,12 @@ void Mpu9250::Calibrate() {
   auto read_accel_data = [this]() { return ReadRawData().accel; };
   auto read_mag_data = [this]() { return ReadRawData().mag; };
 
-  sensor_specs_map_[GyroType] = common::calibrate::CalibrateGyroscope(
-    read_gyro_data, sensor_specs_map_[GyroType]);
-  sensor_specs_map_[AccelType] = common::calibrate::CalibrateAccelerometer(
-    read_accel_data, sensor_specs_map_[AccelType]);
-  sensor_specs_map_[MagType] = common::calibrate::CalibrateMagnetometer(
-    read_mag_data, sensor_specs_map_[MagType]);
+  gyro_spec_ =
+    common::calibrate::CalibrateGyroscope(read_gyro_data, gyro_spec_);
+  accel_spec_ =
+    common::calibrate::CalibrateAccelerometer(read_accel_data, accel_spec_);
+  mag_spec_ =
+    common::calibrate::CalibrateMagnetometer(read_mag_data, mag_spec_);
 }
 
 void Mpu9250::Update() {
@@ -373,10 +370,10 @@ Mpu9250::FullBitsToRawData(const std::vector<int16_t>& full_bits) {
 
 cu::ImuData Mpu9250::ApplySensorSpecs(const SensorRawData& raw) const {
   cu::ImuData imu;
-  imu.accel.data = sensor_specs_map_[AccelType].Apply(raw.accel);
-  imu.gyro.data = sensor_specs_map_[GyroType].Apply(raw.gyro);
-  imu.mag.data = sensor_specs_map_[MagType].Apply(raw.mag);
-  imu.temp.value = sensor_specs_map_[TempType].Apply(raw.temp);
+  imu.accel.data = accel_spec_.Apply(raw.accel);
+  imu.gyro.data = gyro_spec_.Apply(raw.gyro);
+  imu.mag.data = mag_spec_.Apply(raw.mag);
+  imu.temp.value = temp_spec_.Apply(raw.temp);
   if (raw.mag_over_flow) {
     node_->LogDebug("detect over flow");
     // imu.mag.data = cu::Vec3::Zero();

@@ -18,8 +18,8 @@ constexpr int kMaxUTesla = 10 * 4912;  // Magnetic flux density in milliGauss
 constexpr auto TempScale = 333.87F;
 
 // TODO(Bara): change to single value instead of vector
-const auto kTempBias = cu::Vec3::Ones() * 21.F;
-const auto kTempOffset = cu::Vec3::Ones() * 21.F;
+const auto kTempBias = 21.F;
+const auto kTempOffset = 21.F;
 
 using namespace common::utils::literals;  // NOLINT [build/namespaces_literals]
                                           // TODO(Bara)

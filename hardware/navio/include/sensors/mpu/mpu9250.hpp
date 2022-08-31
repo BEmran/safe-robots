@@ -169,8 +169,10 @@ class Mpu9250 : public cu::ImuSensorModule {
   Config config_;
   std::unique_ptr<navio::SPI> comm_;
   std::unique_ptr<core::utils::Node> node_;
-  mutable std::map<core::sensors::SensorModuleType, cu::SensorSpecs>
-    sensor_specs_map_;
+  cu::SensorSpecs<3> mag_spec_;
+  cu::SensorSpecs<3> gyro_spec_;
+  cu::SensorSpecs<3> accel_spec_;
+  cu::SensorSpecs<1> temp_spec_;
 
   cu::Vec3 mag_sensitivity_calibration_{1.0F, 1.0F,
                                         1.0F};  // factory calibration

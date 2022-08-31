@@ -15,11 +15,14 @@ using utils::SensorSpecs;
 // initialization. It calculates the average of the at-rest readings and then
 // loads the resulting offsets into accelerometer and gyro bias registers.
 
-SensorSpecs CalibrateAccelerometer(const ReadFunc& cb, const SensorSpecs& spec);
+SensorSpecs<3> CalibrateAccelerometer(const ReadFunc& cb,
+                                      const SensorSpecs<3>& spec);
 
-SensorSpecs CalibrateGyroscope(const ReadFunc& cb, const SensorSpecs& spec);
+SensorSpecs<3> CalibrateGyroscope(const ReadFunc& cb,
+                                  const SensorSpecs<3>& spec);
 
-SensorSpecs CalibrateMagnetometer(const ReadFunc& cb, const SensorSpecs& spec);
+SensorSpecs<3> CalibrateMagnetometer(const ReadFunc& cb,
+                                     const SensorSpecs<3>& spec);
 
 }  // namespace sensors::common::calibrate
 #endif  // SENSORS_COMMON_CALIBRATE_HPP_

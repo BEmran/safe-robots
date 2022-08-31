@@ -46,8 +46,8 @@ utils::Vec3 GetAverage(const ReadFunc& cb) {
   return bias / kNumSamples;
 }
 
-SensorSpecs CalibrateAccelerometer(const ReadFunc& cb,
-                                   const SensorSpecs& spec) {
+SensorSpecs<3> CalibrateAccelerometer(const ReadFunc& cb,
+                                      const SensorSpecs<3>& spec) {
   Eigen::Matrix<utils::MATH_TYPE, 6, 3> y;  // NOLINT
   y.setZero();
   y(0, 2) = +1.F;                           // NOLINT face up, z+
@@ -89,22 +89,24 @@ SensorSpecs CalibrateAccelerometer(const ReadFunc& cb,
   std::cout << "misalignment:\n" << misalignment << std::endl;
   std::cout << "bias:\n" << bias << std::endl;
 
-  SensorSpecs calib_spec(spec);
+  SensorSpecs<3> calib_spec(spec);
   calib_spec.SetCalibration(misalignment, bias, utils::Vec3::Zero());
   return calib_spec;
 }
 
-SensorSpecs CalibrateGyroscope(const ReadFunc& cb, const SensorSpecs& spec) {
+SensorSpecs<3> CalibrateGyroscope(const ReadFunc& cb,
+                                  const SensorSpecs<3>& spec) {
   const utils::Vec3 bias = GetAverage(cb);
   std::cout << "Gyro Bias: " << bias.transpose() / spec.sensitivity
             << std::endl;
 
-  SensorSpecs calib_spec(spec);
+  SensorSpecs<3> calib_spec(spec);
   calib_spec.SetCalibration(utils::Mat3::Identity(), bias, utils::Vec3::Zero());
   return calib_spec;
 }
 
-SensorSpecs CalibrateMagnetometer(const ReadFunc& cb, const SensorSpecs& spec) {
+SensorSpecs<3> CalibrateMagnetometer(const ReadFunc& cb,
+                                     const SensorSpecs<3>& spec) {
   std::cout << "Mag Calibration: Wave device in a figure eight until done!"
             << std::endl;
   // std::array<std::array<utils::MATH_TYPE, kNumSamples>, 3> data;

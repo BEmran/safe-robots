@@ -26,23 +26,6 @@ Vec3 Vec3From16BitsVector(std::vector<int16_t>::const_iterator begin) {
   return vec;
 }
 
-Vec3 ApplySensorSpecs(const Vec3& raw, const SensorSpecs& spec) {
-  Vec3 vec;
-  for (int i = 0; i < raw.size(); i++) {
-    vec[i] = spec.Apply(static_cast<MATH_TYPE>(raw[i]));
-  }
-  return vec;
-}
-
-std::array<MATH_TYPE, 3> ApplySensorSpecs(const std::array<int16_t, 3>& raw,
-                                          const SensorSpecs& spec) {
-  std::array<MATH_TYPE, 3> data;
-  std::transform(raw.begin(), raw.end(), data.begin(), [&spec](const auto r) {
-    return spec.Apply(static_cast<MATH_TYPE>(r));
-  });
-  return data;
-}
-
 uint8_t SetFlags(uint8_t byte, uint8_t mask, uint8_t flag) {
   const auto updated = (byte & mask) | flag;
   return static_cast<uint8_t>(updated);

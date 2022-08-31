@@ -24,6 +24,7 @@ using core::utils::PI;
 using core::utils::RAD_TO_DEG;
 using core::utils::Vec3;
 using ImuSensorModule = core::sensors::SensorModuleAbs<ImuData>;
+using core::utils::CreateScalar;
 
 namespace literals {
 /**
@@ -82,18 +83,23 @@ class SpecInfoMap {
 /**
  * @brief Hold sensor measurement specifications used to convert sensor raw
  * reading to usable data (scalded and in iso unit)
- *
+ * @details apply the equation
+ * Res = ((misalignment * (raw - bias) / sensitivity) + offset) *
+ * unit_conversion; Res = A * raw + b; A = (misalignment / sensitivity *
+ * unit_conversion; b = (- misalignment * bias / sensitivity + offset) *
+ * unit_conversion;
  */
+template <int Size>
 struct SensorSpecs {
   MATH_TYPE sensitivity;  // the smallest absolute amount of change that can be
                           // detected by a measurement = max_bit_count / scale
   MATH_TYPE unit_conversion;  // convert a raw value into iso unit
 
-  Vec3 bias = Vec3::Zero();
-  Vec3 offset = Vec3::Zero();
-  Mat3 misalignment = Mat3::Identity();
-  Mat3 A = Mat3::Identity();
-  Vec3 b = Vec3::Zero();
+  core::utils::Vector<Size> bias;
+  core::utils::Vector<Size> offset;
+  core::utils::Matrix<Size, Size> misalignment;
+  core::utils::Matrix<Size, Size> A;
+  core::utils::Vector<Size> b;
   /**
    * @brief Construct a new Sensor Specs object
    *
@@ -109,17 +115,9 @@ struct SensorSpecs {
    */
   SensorSpecs(MATH_TYPE sen, MATH_TYPE unit)
     : sensitivity(sen), unit_conversion(unit) {
-  }
-
-  /**
-   * @brief Construct a new Sensor Specs object
-   *
-   * @param sen sensitivity value
-   * @param unit unit conversion row -> iso unit
-   */
-  SensorSpecs(MATH_TYPE sen, MATH_TYPE unit, const Vec3& bias_,
-              const Vec3& offset_)
-    : sensitivity(sen), unit_conversion(unit), bias(bias_), offset(offset_) {
+    misalignment.setIdentity();
+    offset.setZero();
+    bias.setZero();
     UpdateEquation();
   }
 
@@ -130,21 +128,21 @@ struct SensorSpecs {
    * @return MATH_TYPE the post proceeded data
    */
   inline MATH_TYPE Apply(MATH_TYPE raw) const {
-    // return (raw - bias[0]) * (unit_conversion / sensitivity) + offset[0];
     return A(0) * raw + b[0];
   }
 
-  inline void SetCalibration(const Mat3& m, const Vec3& bias_,
-                             const Vec3& offset_) {
-    misalignment = m;
-    bias = bias_;
-    offset = offset_;
+  inline void SetCalibration(core::utils::InputMat m,
+                             core::utils::InputMat bias_,
+                             core::utils::InputMat offset_) {
+    misalignment << m;
+    bias << bias_;
+    offset << offset_;
     UpdateEquation();
   }
 
   inline void UpdateEquation() {
-    A = misalignment * unit_conversion / sensitivity;
-    b = misalignment * (offset - bias / sensitivity) * unit_conversion;
+    A << misalignment * unit_conversion / sensitivity;
+    b << (offset - misalignment * bias / sensitivity) * unit_conversion;
   }
 
   /**
@@ -153,9 +151,7 @@ struct SensorSpecs {
    * @param raw raw data vector
    * @return Vec3 the post proceeded data
    */
-  inline Vec3 Apply(const Vec3& raw) const {
-    // return ((misalignment * (raw - bias) / sensitivity) + offset) *
-    // unit_conversion;
+  inline Vec3 Apply(core::utils::InputMat raw) const {
     return A * raw + b;
   }
 };
