@@ -49,9 +49,9 @@ repos:
         files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
         args:
           [
-            --format-style=file,
-            --extra-arg=-Wno-unknown-warning-option,
-            --config=,
+            # --format-style=file,
+            # --extra-arg=-Wno-unknown-warning-option,
+            # --config=,
             # -p=./build,
           ]
 
