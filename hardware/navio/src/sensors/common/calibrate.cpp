@@ -2,6 +2,8 @@
 
 #include "sensors/common/calibrate.hpp"
 
+#include <string>
+
 #include "navio/hardware_utils.hpp"
 
 namespace sensors::common::calibrate {
@@ -9,18 +11,21 @@ constexpr size_t kNumSamples = 1000;
 constexpr auto ShortDelay = 5;
 constexpr auto kEscKey = 'q';
 constexpr auto kEpsilon = 0.025F;
-
+constexpr const char* msg_request = " and press enter or q to quit .....";
 constexpr const char* kFaceMsg[] = {"face up",   "right side", "left side",
                                     "nose down", "nose up",    "face down"};
 bool GetUserApproval(const char* msg) {
-  std::cout << msg << " and press enter or q to quit .....";
+  std::cout << msg << msg_request;
   const auto ch = getchar();
-  return ch != kEscKey;
+  if (ch == kEscKey) {
+    std::cout << "User canceled the process" << std::endl;
+    return false;
+  }
+  return true;
 }
 
-bool CheckCollectedDataIsNearExpectation(const utils::Vec3& v1,
-                                         const utils::Vec3& v2) {
-  utils::Vec3 error = v1 - v2;
+bool ExpectNear(const utils::Vec3& v1, const utils::Vec3& v2) {
+  const auto error = v1 - v2;
   const auto norm = error.norm();
   if (norm > kEpsilon) {
     std::cout << "error vector = " << error.transpose() << " norm = " << norm
@@ -48,6 +53,7 @@ utils::Vec3 GetAverage(const ReadFunc& cb) {
 
 SensorSpecs<3> CalibrateAccelerometer(const ReadFunc& cb,
                                       const SensorSpecs<3>& spec) {
+  std::cout << "Process of calibrating accelerometer" << std::endl;
   Eigen::Matrix<utils::MATH_TYPE, 6, 3> y;  // NOLINT
   y.setZero();
   y(0, 2) = +1.F;                           // NOLINT face up, z+
@@ -60,10 +66,8 @@ SensorSpecs<3> CalibrateAccelerometer(const ReadFunc& cb,
   x.setZero();
   Eigen::Matrix<utils::MATH_TYPE, 4, 3> miss;  // NOLINT
   miss.setIdentity();
-
   for (Eigen::Index idx = 0; idx < y.rows(); idx++) {
     if (!GetUserApproval(kFaceMsg[idx])) {
-      std::cout << "user canceled the process" << std::endl;
       return spec;
     }
     auto xn = GetAverage(cb) / spec.sensitivity;
@@ -71,21 +75,21 @@ SensorSpecs<3> CalibrateAccelerometer(const ReadFunc& cb,
     std::cout << "xn[" << idx << "] = " << xn.transpose() << ",  y[" << idx
               << "] = " << y.row(idx) << std::endl;
 
-    if (!CheckCollectedDataIsNearExpectation(xn, y.row(idx))) {
+    if (ExpectNear(xn, y.row(idx))) {
+      x.row(idx) << xn.transpose(), 1.F;
+    } else {
+      --idx;
       std::cout << "Data is not what is expected. Please try again"
                 << std::endl;
-      --idx;
-    } else {
-      x.row(idx) << xn.transpose(), 1.F;
     }
   }
 
   miss = (x.transpose() * x).ldlt().solve(x.transpose() * y);
-  std::cout << "x = \n" << x << std::endl;
-  std::cout << "The solution using normal equations is:\n" << miss << std::endl;
-
   const utils::Mat3 misalignment = miss.block(0, 0, 3, 3).transpose();
   const utils::Vec3 bias = miss.block(3, 0, 1, 3).transpose();
+
+  std::cout << "x = \n" << x << std::endl;
+  std::cout << "The solution using normal equations is:\n" << miss << std::endl;
   std::cout << "misalignment:\n" << misalignment << std::endl;
   std::cout << "bias:\n" << bias << std::endl;
 
@@ -96,9 +100,12 @@ SensorSpecs<3> CalibrateAccelerometer(const ReadFunc& cb,
 
 SensorSpecs<3> CalibrateGyroscope(const ReadFunc& cb,
                                   const SensorSpecs<3>& spec) {
+  std::cout << "Process of calibrating gyroscope" << std::endl;
+  if (!GetUserApproval("Sit the sensor still")) {
+    return spec;
+  }
   const utils::Vec3 bias = GetAverage(cb);
-  std::cout << "Gyro Bias: " << bias.transpose() / spec.sensitivity
-            << std::endl;
+  std::cout << "Gyro Bias: " << bias.transpose() << std::endl;
 
   SensorSpecs<3> calib_spec(spec);
   calib_spec.SetCalibration(utils::Mat3::Identity(), bias, utils::Vec3::Zero());
@@ -107,9 +114,10 @@ SensorSpecs<3> CalibrateGyroscope(const ReadFunc& cb,
 
 SensorSpecs<3> CalibrateMagnetometer(const ReadFunc& cb,
                                      const SensorSpecs<3>& spec) {
-  std::cout << "Mag Calibration: Wave device in a figure eight until done!"
-            << std::endl;
-  // std::array<std::array<utils::MATH_TYPE, kNumSamples>, 3> data;
+  std::cout << "Process of calibrating accelerometer" << std::endl;
+  if (!GetUserApproval("Wave device in a figure eight until done! To start")) {
+    return spec;
+  }
   Eigen::Matrix<utils::MATH_TYPE, kNumSamples, 3> data;
   data.setZero();
   // collect sampled data
@@ -128,7 +136,7 @@ SensorSpecs<3> CalibrateMagnetometer(const ReadFunc& cb,
   utils::Vec3 max;
   max << data.colwise().maxCoeff();
   utils::Vec3 min;
-  min << data.colwise().maxCoeff();
+  min << data.colwise().minCoeff();
 
   // get average bias in counts
   const utils::Vec3 bias = (max + min) / 2.F;
@@ -140,7 +148,7 @@ SensorSpecs<3> CalibrateMagnetometer(const ReadFunc& cb,
 
   utils::Mat3 scale_mat = utils::Mat3::Zero();
   scale_mat.diagonal() = scale.array();
-  SensorSpecs calib_spec(spec);
+  SensorSpecs<3> calib_spec(spec);
   calib_spec.SetCalibration(scale_mat, bias, utils::Vec3::Zero());
 
   std::cout << "Mag scale:\n" << scale_mat << std::endl;
