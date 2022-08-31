@@ -41,41 +41,6 @@ repos:
         require_serial: true
         pass_filenames: false
 
-      - id: clang-tidy
-        name: clang-tidy
-        description: Find warnings/errors in C and C++ code
-        entry: clang-tidy
-        language: system
-        files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
-        args:
-          [
-            # --format-style=file,
-            # --extra-arg=-Wno-unknown-warning-option,
-            # --config=,
-            # -p=./build,
-          ]
-
-      - id: cppcheck
-        name: cppcheck
-        description: Run `cppcheck` against C/C++ source files
-        entry: cppcheck
-        language: system
-        files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
-
-      - id: clang-format
-        name: clang-format
-        description: Run `clang-format` against C/C++ header and source files
-        entry: clang-format
-        language: system
-        files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
-        args:
-          [
-            -i,
-            -style=file,
-            --sort-includes,
-            --verbose,
-          ]
-
       - id: cmake-format
         name: cmake-format
         description: Run `cmake-format` against CMakefiles files
@@ -83,18 +48,68 @@ repos:
         language: system
         files: CMakeLists.txt
         args:
-          [
-            -i,
-            -c=.cmake-format,
-          ]
+          [ -i, -c=.cmake-format]
 
+  - repo: https://github.com/pocc/pre-commit-hooks
+    rev: master
+    hooks:
+      - id: clang-format
+        args:
+          [ -i, -style=file, --sort-includes, --verbose]
+      - id: clang-tidy
+      - id: oclint
+      # - id: uncrustify
+      - id: cppcheck
       - id: cpplint
-        name: cpplint
-        description: Run `cpplint` against C/C++ header and source files
-        entry: cpplint
-        language: python
-        files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
         args:
           [
             "--filter= +build, -build/header_guard,+legal, +readability, +runtime, +whitespace"
           ]
+      - id: include-what-you-use
+
+      # - id: clang-tidy
+      #   name: clang-tidy
+      #   description: Find warnings/errors in C and C++ code
+      #   entry: clang-tidy
+      #   language: system
+      #   files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
+      #   args:
+      #     [
+      #       # --format-style=file,
+      #       # --extra-arg=-Wno-unknown-warning-option,
+      #       # --config=,
+      #       # -p=./build,
+      #     ]
+
+      # - id: cppcheck
+      #   name: cppcheck
+      #   description: Run `cppcheck` against C/C++ source files
+      #   entry: cppcheck
+      #   language: system
+      #   files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
+
+      # - id: clang-format
+      #   name: clang-format
+      #   description: Run `clang-format` against C/C++ header and source files
+      #   entry: clang-format
+      #   language: system
+      #   files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
+      #   args:
+      #     [
+      #       -i,
+      #       -style=file,
+      #       --sort-includes,
+      #       --verbose,
+      #     ]
+
+
+      # - id: cpplint
+      #   name: cpplint
+      #   description: Run `cpplint` against C/C++ header and source files
+      #   entry: cpplint
+      #   language: python
+      #   files: \.(h|hxx|hpp|c|cpp|c\+\+|cxx)$
+      #   args:
+      #     [
+      #       "--filter= +build, -build/header_guard,+legal, +readability, +runtime, +whitespace"
+      #     ]
