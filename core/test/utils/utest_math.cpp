@@ -66,11 +66,17 @@ TEST(CreateVector, Vec4) {
   EXPECT_TRUE(std::equal(arr, arr + size, vec.data(), Equal));
 }
 
-TEST(CreateMatrix, Scalar) {
+TEST(Scalar, Scalar) {
   Scalar scalar;
   scalar(0) = 1;
   ASSERT_EQ(1, scalar.size());
   ExpectEq(1, scalar(0));
+}
+
+TEST(Scalar, CreateScalar) {
+  const auto scalar = core::utils::CreateScalar(3);
+  ASSERT_EQ(1, scalar.size());
+  ExpectEq(3, scalar(0));
 }
 
 TEST(CreateMatrix, Mat22) {
