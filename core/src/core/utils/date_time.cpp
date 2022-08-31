@@ -33,8 +33,8 @@ constexpr int64_t TimeNow() {
  * @return std::string the formatted string
  */
 std::string FormatTimeInfo(const char* format, const tm time_info) {
-  constexpr auto max_size = 50;
-  std::string buffer(max_size, ' ', std::allocator<char>());
+  constexpr auto kMaxSize = 50;
+  std::string buffer(kMaxSize, ' ', std::allocator<char>());
   const auto actual_size =
     strftime(buffer.data(), buffer.size(), format, &time_info);
   if (actual_size > 0) {
@@ -56,8 +56,8 @@ int64_t TimeInSeconds() {
 }
 
 std::string TimeInSecondsString() {
-  constexpr auto max_size = 15;
-  std::string buffer(max_size, ' ', std::allocator<char>());
+  constexpr auto kMaxSize = 15;
+  std::string buffer(kMaxSize, ' ', std::allocator<char>());
   const auto size =
     snprintf(buffer.data(), buffer.size(), "%ld", TimeInSeconds());  // NOLINT
   buffer.resize(size);

@@ -46,6 +46,7 @@ CheckOptions:
   - { key: readability-identifier-naming.FunctionCase,           value: CamelCase  }
   - { key: readability-identifier-naming.MethodCase,             value: CamelCase  }
   # variable, class data member are lower_case
+  - { key: readability-identifier-naming.LocalVariableCase,      value: lower_case }
   - { key: readability-identifier-naming.VariableCase,           value: lower_case }
   - { key: readability-identifier-naming.ClassMemberCase,        value: lower_case }
   - { key: readability-identifier-naming.ClassMemberSuffix,      value: _          }
@@ -55,7 +56,8 @@ CheckOptions:
   # enummerators, global and static variables are CamelCase with k as prefix
   - { key: readability-identifier-naming.EnumConstantCase,         value: upper_case }
   # - { key: readability-identifier-naming.EnumConstantPrefix,       value: k         }
-  - { key: readability-identifier-naming.ConstexprVariableCase,    value: aNy_CasE  } #CamelCase
+  - { key: readability-identifier-naming.ConstexprVariableCase,    value: CamelCase }
+  - { key: readability-identifier-naming.ConstexprVariablePrefix,  value: a         }
   - { key: readability-identifier-naming.GlobalConstantCase,       value: CamelCase }
   - { key: readability-identifier-naming.GlobalConstantPrefix,     value: k         }
   - { key: readability-identifier-naming.MemberConstantCase,       value: CamelCase }
