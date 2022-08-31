@@ -7,6 +7,23 @@ static const Eigen::IOFormat kMatFmt(Eigen::FullPrecision, 0, ", ", ";\n", "[",
                                      "]", "[", "]");
 static const Eigen::IOFormat kVecFmt(Eigen::FullPrecision, 0, ", ", ";\n", "",
                                      "", "[", "]");
+
+// MatrixX CreateMatrix(int r, int c) {
+//   MatrixX mat;
+//   mat.resize(r, c);
+//   return mat;
+// }
+
+// MatrixX CreateVector(int size) {
+//   return CreateMatrix(size, 1);
+// }
+
+Scalar CreateScalar(MATH_TYPE val) {
+  Scalar s;
+  s << val;
+  return s;
+}
+
 }  // namespace core::utils
 
 std::ostream& operator<<(std::ostream& os, const core::utils::Vec3& vec) {

@@ -52,7 +52,7 @@ repos:
             --format-style=file,
             --extra-arg=-Wno-unknown-warning-option,
             --config=,
-            -p=./build,
+            # -p=./build,
           ]
 
       - id: cppcheck

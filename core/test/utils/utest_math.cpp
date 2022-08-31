@@ -9,9 +9,79 @@
 #include "gtest/gtest.h"
 #include "utest/utils_data.hpp"
 
-using core::utils::Quat;
-using core::utils::Vec3;
+using core::utils::InputMat;
+using core::utils::Matrix;
+using core::utils::MatrixX;
+using core::utils::OutputMat;
+using core::utils::Scalar;
+using core::utils::Vector;
 
+float Sum(InputMat mat) {
+  return mat.sum();
+}
+
+void Initialize(int size, MATH_TYPE* arr, OutputMat mat) {
+  std::copy(arr, arr + size, mat.data());
+}
+// General --------------------------------------------------------------------
+
+TEST(InputMat, PassingVectorToFuncAsInput) {
+  constexpr auto size = 5;
+  Vector<size> vec;
+  MATH_TYPE arr[size] = {1, 2, 3, 1, 4};
+  std::copy(arr, arr + size, vec.data());
+
+  ASSERT_EQ(size, vec.size());
+  EXPECT_EQ(Sum(vec), vec.sum());
+}
+
+TEST(InputMat, PassingMatrixToFuncAsInput) {
+  constexpr auto size = 3;
+  Matrix<size, size> mat;
+  mat.setZero();
+  MATH_TYPE arr[3] = {1, 2, 3};
+  std::copy(arr, arr + size, mat.data());
+
+  ASSERT_EQ(size * size, mat.size());
+  EXPECT_EQ(Sum(mat), mat.sum());
+}
+
+TEST(InputMat, PassingMatrixToFuncAsOutput) {
+  constexpr auto size = 2;
+  MATH_TYPE arr[size * size] = {1, 2, 3, 1};
+
+  Matrix<size, size> mat;
+  ASSERT_EQ(size * size, mat.size());
+  Initialize(size, arr, mat);
+  EXPECT_TRUE(std::equal(arr, arr + size, mat.data(), Equal));
+}
+
+TEST(CreateVector, Vec4) {
+  constexpr auto size = 4;
+  Vector<size> vec;
+  MATH_TYPE arr[size] = {1, 2, 3, 1};
+  std::copy(arr, arr + size, vec.data());
+
+  ASSERT_EQ(size, vec.size());
+  EXPECT_TRUE(std::equal(arr, arr + size, vec.data(), Equal));
+}
+
+TEST(CreateMatrix, Scalar) {
+  Scalar scalar;
+  scalar(0) = 1;
+  ASSERT_EQ(1, scalar.size());
+  ExpectEq(1, scalar(0));
+}
+
+TEST(CreateMatrix, Mat22) {
+  Matrix<2, 2> mat;
+  mat.setIdentity();
+  constexpr auto size = 4;
+  MATH_TYPE arr[size] = {1, 0, 0, 1};
+
+  ASSERT_EQ(size, mat.size());
+  EXPECT_TRUE(std::equal(arr, arr + size, mat.data(), Equal));
+}
 // Vec3 -----------------------------------------------------------------------
 TEST(Vec3, DefaultValuesUsingBrackets) {
   Vec3 vec = Vec3::Zero();

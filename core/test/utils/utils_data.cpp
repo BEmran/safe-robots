@@ -2,6 +2,15 @@
 
 #include "utest/utils_data.hpp"
 
+#include "cmath"
+#include "gtest/gtest.h"
+
+constexpr auto kEpsilon = 0.001F;
+
+bool Equal(MATH_TYPE actual, MATH_TYPE expect) {
+  return std::fabs(actual - expect) < kEpsilon;
+}
+
 void ExpectEq(MATH_TYPE actual, MATH_TYPE expect) {
   if constexpr (std::is_same<MATH_TYPE, float>::value) {
     EXPECT_FLOAT_EQ(actual, expect);

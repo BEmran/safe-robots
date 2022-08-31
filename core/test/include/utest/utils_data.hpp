@@ -4,16 +4,18 @@
 #define UTEST_UTEST_DATA_HPP_
 
 #include "core/utils/data.hpp"
-#include "gtest/gtest.h"
 
 using core::utils::DoubleData;
 using core::utils::GpsData;
 using core::utils::ImuData;
+using core::utils::Mat3;
 using core::utils::MATH_TYPE;
 using core::utils::Quat;
 using core::utils::QuatData;
 using core::utils::Vec3;
 using core::utils::Vec3Data;
+
+bool Equal(MATH_TYPE actual, MATH_TYPE expect);
 
 void ExpectEq(MATH_TYPE actual, MATH_TYPE expect);
 
