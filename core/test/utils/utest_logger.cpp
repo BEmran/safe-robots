@@ -1,10 +1,10 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include <gtest/gtest.h>
 
 #include "core/utils/exception.hpp"
 #include "core/utils/logger.hpp"
 #include "core/utils/terminal.hpp"
-// Copyright (C) 2022 Bara Emran - All Rights Reserved
-
 #include "core/utils/writer_console.hpp"
 #include "core/utils/writer_file.hpp"
 #include "utest/utils.hpp"
@@ -15,8 +15,10 @@ using core::utils::Logger;
 using core::utils::LogLocation;
 using core::utils::NullFormatter;
 
-const char* g_message = "message";
-const char* g_filename = "log.txt";
+constexpr const char* kMessage = "message";
+constexpr const char* kFilename = "log.txt";
+const auto kDebugLM = core::utils::DebugLabeledModifier();
+const auto kErrorLM = core::utils::ErrorLabeledModifier();
 
 class TestLogger {
  public:
@@ -58,7 +60,7 @@ class TestLogger {
 
   void GetLoggedData() {
     logs_console_ = buf_->RestoreCoutBuffer();
-    logs_file_ = ReadAllLinesFromFile(g_filename);
+    logs_file_ = ReadAllLinesFromFile(kFilename);
   }
 
   Logger* logger_;
@@ -80,36 +82,24 @@ TEST(LoggerInformation, ToString) {
 }
 
 TEST(Logger, ConstructingUsingFilename) {
-  auto* logger = new Logger(g_filename);
+  const auto logger = new Logger(kFilename);
   TestLogger test_logger(logger);
-  for (const auto& event : kEvents) {
-    LabeledModifier lm(event);
-    test_logger.ExpectEqLogNoException(lm, g_message);
-  }
+  test_logger.ExpectEqLogNoException(kDebugLM, kMessage);
 }
 
 TEST(Logger, ConstructingUsingFormatter) {
   auto formatter = std::make_shared<NullFormatter>();
-  Logger logger(g_filename, formatter, formatter);
-  TestLogger test_logger(&logger);
-  for (const auto& event : kEvents) {
-    LabeledModifier lm(event);
-    test_logger.ExpectEqLogNoException(lm, g_message);
-  }
+  const auto logger = new Logger(kFilename, formatter, formatter);
+  TestLogger test_logger(logger);
+  test_logger.ExpectEqLogNoException(kDebugLM, kMessage);
 }
 
 TEST(Logger, ConstructingUsingException) {
   auto exception = std::make_shared<ExceptionFactory>("");
-  auto* logger = new Logger(g_filename, exception);
+  const auto logger = new Logger(kFilename, exception);
   TestLogger test_logger(logger);
-  for (const auto& event : kEvents) {
-    LabeledModifier lm(event);
-    if (event == EventLevel::EL_ERROR) {
-      test_logger.ExpectEqLogWithException(lm, g_message);
-    } else {
-      test_logger.ExpectEqLogNoException(lm, g_message);
-    }
-  }
+  test_logger.ExpectEqLogNoException(kDebugLM, kMessage);
+  test_logger.ExpectEqLogWithException(kErrorLM, kMessage);
 }
 
 // TEST(Logger, CreateDefaultLogger) {
@@ -121,9 +111,9 @@ TEST(Logger, ConstructingUsingException) {
 //   for (size_t i = 0; i < kEvents.size(); ++i) {
 //     LabeledModifier lm(kEvents[i]);
 //     if (kEvents[i] == EL_ERROR) {
-//       test_logger.ExpectEqLogWithException(lm, g_message);
+//       test_logger.ExpectEqLogWithException(lm, kMessage);
 //     } else {
-//       test_logger.ExpectEqLogNoException(lm, g_message);
+//       test_logger.ExpectEqLogNoException(lm, kMessage);
 //     }
 //   }
 // }

@@ -69,8 +69,8 @@ std::string EventLevelToString(EventLevel event);
  * configuration
  *
  * @param os output stream
- * @param lm labeled modifer
- * @return std::ostream& reference to the output stredam
+ * @param lm labeled modifier
+ * @return std::ostream& reference to the output stream
  */
 std::ostream& operator<<(std::ostream& os, const LabeledModifier& lm);
 
