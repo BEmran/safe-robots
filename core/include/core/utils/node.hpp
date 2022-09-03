@@ -42,15 +42,6 @@ class Node {
    */
   std::shared_ptr<const NodeLogger> GetLogger() const;
 
-  /**
-   * @brief Logs a message with specific LabeledModifier
-   * @details this function is also called internally by all log_* functions
-   *
-   * @param lm labeled modifier which defines event and its label
-   * @param msg message to be logged
-   */
-  void Log(const LabeledModifier& lm, const std::string& msg) const;
-
  protected:
   std::string name_;
   std::shared_ptr<NodeLogger> n_logger_;
