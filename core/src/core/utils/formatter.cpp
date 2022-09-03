@@ -5,34 +5,45 @@
 #include <sstream>
 
 namespace core::utils {
-std::string NullFormatter::Format(const LabeledModifier& lm,
-                                  const std::string& msg) const {
-  (void)lm;
+
+Formatter::Formatter(const FormatFunc& func) : format_func_{func} {
+}
+
+std::string Formatter::Format(const LabeledModifier& lm,
+                              const std::string& msg) const {
+  return format_func_(lm, msg);
+}
+
+std::string NullFormatter(const LabeledModifier& /*lm*/,
+                          const std::string& msg) {
   return msg;
 }
 
-DefaultFormater::DefaultFormater(bool use_modifier)
-  : use_modifier_(use_modifier) {
-}
-
-std::string DefaultFormater::Format(const LabeledModifier& lm,
-                                    const std::string& msg) const {
+std::string TimeLabelFormatter(const LabeledModifier& lm,
+                               const std::string& msg) {
   std::stringstream ss;
-  ss << "[" << DateTime().TimeToString() << "]";
-  ss << AddLabeledModifier(lm);
-  ss << ": " << msg;
+  ss << "[" << DateTime().TimeToString() << "][" << lm.GetLabel()
+     << "]: " << msg;
   return ss.str();
 }
 
-std::string
-DefaultFormater::AddLabeledModifier(const LabeledModifier& lm) const {
+std::string TimeLabelModifierFormatter(const LabeledModifier& lm,
+                                       const std::string& msg) {
   std::stringstream ss;
-  if (use_modifier_) {
-    ss << lm;
-  } else {
-    ss << "[" << lm.GetLabel() << "]";
-  }
+  ss << "[" << DateTime().TimeToString() << "]" << lm << ": " << msg;
   return ss.str();
+}
+
+std::shared_ptr<Formatter> CreateNullFormatter() {
+  return std::make_shared<Formatter>(NullFormatter);
+}
+
+std::shared_ptr<Formatter> CreateTimeLabelFormatter() {
+  return std::make_shared<Formatter>(TimeLabelFormatter);
+}
+
+std::shared_ptr<Formatter> CreateTimeLabelModifierFormatter() {
+  return std::make_shared<Formatter>(TimeLabelModifierFormatter);
 }
 
 }  // namespace core::utils

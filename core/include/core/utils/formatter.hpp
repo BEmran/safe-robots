@@ -3,6 +3,8 @@
 #ifndef CORE_UTILS_FORMATTER_HPP_
 #define CORE_UTILS_FORMATTER_HPP_
 
+#include <functional>
+#include <memory>
 #include <string>
 
 #include "core/utils/date_time.hpp"
@@ -10,39 +12,40 @@
 #include "core/utils/terminal.hpp"
 
 namespace core::utils {
+
+using FormatFunc =
+  std::function<std::string(const LabeledModifier& lm, const std::string& msg)>;
+
+std::string NullFormatter(const LabeledModifier& lm, const std::string& msg);
+
+std::string TimeLabelFormatter(const LabeledModifier& lm,
+                               const std::string& msg);
+
+std::string TimeLabelModifierFormatter(const LabeledModifier& lm,
+                                       const std::string& msg);
+
 /**
- * @brief Interface class used to present message in certain format (style)
+ * @brief Simple class used to present message in different format (style) by
+ * calling the passed formater function.
  *
  */
-class FormatterInterface {
+class Formatter {
  public:
-  virtual ~FormatterInterface() = default;
+  explicit Formatter(const FormatFunc& func = NullFormatter);
 
-  virtual std::string Format(const LabeledModifier& lm,
-                             const std::string& msg) const = 0;
+  ~Formatter() = default;
+
+  std::string Format(const LabeledModifier& lm, const std::string& msg) const;
+
+ private:
+  FormatFunc format_func_;
 };
 
-class NullFormatter : public FormatterInterface {
- public:
-  ~NullFormatter() override = default;
+std::shared_ptr<Formatter> CreateNullFormatter();
 
-  std::string Format(const LabeledModifier& lm,
-                     const std::string& msg) const override;
-};
+std::shared_ptr<Formatter> CreateTimeLabelFormatter();
 
-class DefaultFormater : public FormatterInterface {
- public:
-  explicit DefaultFormater(bool use_modifier = false);
-  ~DefaultFormater() override = default;
-
-  std::string Format(const LabeledModifier& lm,
-                     const std::string& msg) const override;
-
-  std::string AddLabeledModifier(const LabeledModifier& lm) const;
-
- protected:
-  bool use_modifier_;
-};
+std::shared_ptr<Formatter> CreateTimeLabelModifierFormatter();
 
 }  // namespace core::utils
 
