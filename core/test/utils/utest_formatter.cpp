@@ -14,8 +14,6 @@ using core::utils::Formatter;
 using core::utils::NullFormatter;
 using core::utils::TimeLabelFormatter;
 using core::utils::TimeLabelModifierFormatter;
-using std::placeholders::_1;
-using std::placeholders::_2;
 
 constexpr const char* kMsg = "message";
 
@@ -31,7 +29,7 @@ std::string MockTimeLabelFormatter(const LabeledModifier& lm,
   std::stringstream ss;
   ss << "[" << DateTime().TimeToString() << "]"
      << "[" << lm.GetLabel() << "]"
-     << ": " << msg;
+     << " " << msg;
   return ss.str();
 }
 
@@ -39,7 +37,7 @@ std::string MockTimeLabelFormatter(const LabeledModifier& lm,
 std::string MockTimeLabelModifierFormatter(const LabeledModifier& lm,
                                            const std::string& msg) {
   std::stringstream ss;
-  ss << "[" << DateTime().TimeToString() << "]" << lm << ": " << msg;
+  ss << "[" << DateTime().TimeToString() << "]" << lm << " " << msg;
   return ss.str();
 }
 
@@ -57,6 +55,15 @@ testing::AssertionResult AssertFormatter(const FormatFunc& expect_func,
   return testing::AssertionSuccess();
 }
 
+// run different Events against the passed function and formatter
+testing::AssertionResult AssertFormatter(const FormatFunc& expect_func,
+                                         const Formatter& actual_formater) {
+  const auto actual_func = [&actual_formater](auto lm, auto msg) {
+    return actual_formater.Format(lm, msg);
+  };
+  return AssertFormatter(expect_func, actual_func);
+}
+
 // test Null formatter
 TEST(NullFormatter, Format) {
   EXPECT_TRUE(AssertFormatter(MockNullFormatter, NullFormatter));
@@ -65,8 +72,7 @@ TEST(NullFormatter, Format) {
 // test Create Null formatter
 TEST(NullFormatter, CreateFormatter) {
   const auto formatter = CreateNullFormatter();
-  const auto actual_func = std::bind(&Formatter::Format, formatter, _1, _2);
-  EXPECT_TRUE(AssertFormatter(MockNullFormatter, actual_func));
+  EXPECT_TRUE(AssertFormatter(MockNullFormatter, formatter));
 }
 
 // test Time Label formatter
@@ -77,8 +83,7 @@ TEST(TimeLabelFormatter, Format) {
 // test Create Time Label formatter
 TEST(TimeLabelFormatter, CreateFormatter) {
   const auto formatter = CreateTimeLabelFormatter();
-  const auto actual_func = std::bind(&Formatter::Format, formatter, _1, _2);
-  EXPECT_TRUE(AssertFormatter(MockTimeLabelFormatter, actual_func));
+  EXPECT_TRUE(AssertFormatter(MockTimeLabelFormatter, formatter));
 }
 
 // test Time Label Modifier formatter
@@ -90,24 +95,20 @@ TEST(TimeLabelModifierFormatter, Format) {
 // test Create Time Label Modifier formatter
 TEST(TimeLabelModifierFormatter, CreateFormatter) {
   const auto formatter = CreateTimeLabelModifierFormatter();
-  const auto actual_func = std::bind(&Formatter::Format, formatter, _1, _2);
-  EXPECT_TRUE(AssertFormatter(MockTimeLabelModifierFormatter, actual_func));
+  EXPECT_TRUE(AssertFormatter(MockTimeLabelModifierFormatter, formatter));
 }
 
 // test Formatter with default Format function
 TEST(Formatter, DefaultFormat) {
   const Formatter formatter;
-  const auto actual_func = std::bind(&Formatter::Format, formatter, _1, _2);
-  EXPECT_TRUE(AssertFormatter(NullFormatter, actual_func));
+  EXPECT_TRUE(AssertFormatter(NullFormatter, formatter));
 }
 
 // test Formatter with lambda callback function
 TEST(Formatter, MockFormatter) {
-  auto mock_format_func = [](const LabeledModifier& lm,
-                             const std::string& msg) -> std::string {
+  auto mock_format_func = [](auto lm, auto msg) {
     return lm.GetLabel() + ": " + msg;
   };
-  const auto formatter = std::make_shared<Formatter>(mock_format_func);
-  const auto actual_func = std::bind(&Formatter::Format, formatter, _1, _2);
-  EXPECT_TRUE(AssertFormatter(mock_format_func, actual_func));
+  const Formatter formatter(mock_format_func);
+  EXPECT_TRUE(AssertFormatter(mock_format_func, formatter));
 }

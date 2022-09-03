@@ -22,15 +22,15 @@ std::string NullFormatter(const LabeledModifier& /*lm*/,
 std::string TimeLabelFormatter(const LabeledModifier& lm,
                                const std::string& msg) {
   std::stringstream ss;
-  ss << "[" << DateTime().TimeToString() << "][" << lm.GetLabel()
-     << "]: " << msg;
+  ss << "[" << DateTime().TimeToString() << "][" << lm.GetLabel() << "] "
+     << msg;
   return ss.str();
 }
 
 std::string TimeLabelModifierFormatter(const LabeledModifier& lm,
                                        const std::string& msg) {
   std::stringstream ss;
-  ss << "[" << DateTime().TimeToString() << "]" << lm << ": " << msg;
+  ss << "[" << DateTime().TimeToString() << "]" << lm << " " << msg;
   return ss.str();
 }
 
