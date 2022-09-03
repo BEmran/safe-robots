@@ -24,24 +24,24 @@ constexpr uint8_t SAMPLE_RATE_DIVISOR = 4;
 constexpr auto MaximumClientTries = 5;
 //=============================================================================
 int main(int argc, char* argv[]) {
-  auto app = core::utils::CreateDefaultNode("app");
-  app.LogDebug("running....");
+  auto app = core::utils::CreateSystemNode("app");
+  app.GetLogger()->LogDebug("running....");
 
   if (argc < 2) {
-    app.LogError("no port provided");
+    app.GetLogger()->LogError("no port provided");
     return EXIT_FAILURE;
   }
 
   const auto port = atoi(argv[1]);
 
   if (navio::hardware_utils::CheckApm()) {
-    app.LogError("APM is busy. Can't launch the app");
+    app.GetLogger()->LogError("APM is busy. Can't launch the app");
     return EXIT_FAILURE;
   }
 
   auto node =
-    std::make_unique<core::utils::Node>(core::utils::CreateDefaultNode("im"
-                                                                       "u"));
+    std::make_unique<core::utils::Node>(core::utils::CreateSystemNode("im"
+                                                                      "u"));
 
   sensors::mpu::Config config;
   config.accel_bw = ABW;
@@ -57,12 +57,12 @@ int main(int argc, char* argv[]) {
                                                         std::move(node));
 
   if (!sensor->Probe()) {
-    app.LogError("MPU sensor can't be probed");
+    app.GetLogger()->LogError("MPU sensor can't be probed");
     return EXIT_FAILURE;
   }
 
   sensor->Initialize();
-  app.LogDebug("MPU is initialized successfully");
+  app.GetLogger()->LogDebug("MPU is initialized successfully");
 
   core::utils::FileWriter file("imu.txt");
   //-------------------------------------------------------------------------
@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) {
       server << ss.str();
       navio::hardware_utils::Delay(send_delay);
     }
-    app.LogWarn("Lost connection");
+    app.GetLogger()->LogWarn("Lost connection");
   }
 
   return EXIT_SUCCESS;

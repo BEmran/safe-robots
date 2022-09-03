@@ -4,24 +4,23 @@
 
 #include "core/utils/node.hpp"
 
-using core::utils::CreateNode;
 using core::utils::Node;
 
 int main() {
   std::string name1 = "colorful";
   std::string name2 = "default";
 
-  core::utils::Node node1 = CreateNode(name1);
-  core::utils::Node node2(name2);
+  Node node1(name1);
+  Node node2(name2);
 
-  node1.LogDebug("this is a debug message");
-  node1.LogInfo("this is a info message");
-  node1.LogWarn("this is a warn message");
+  node1.GetLogger()->LogDebug("this is a debug message");
+  node1.GetLogger()->LogInfo("this is a info message");
+  node1.GetLogger()->LogWarn("this is a warn message");
   // node1.LogError("this is a error message");
-  LOG_ERROR(node1, "this is a error message");
-  node2.LogDebug("this is a debug message");
-  node2.LogInfo("this is a info message");
-  node2.LogWarn("this is a warn message");
+  // LOG_ERROR(node1, "this is a error message");
+  node2.GetLogger()->LogDebug("this is a debug message");
+  node2.GetLogger()->LogInfo("this is a info message");
+  node2.GetLogger()->LogWarn("this is a warn message");
   // node2.LogError("this is a error message");
 
   return 0;

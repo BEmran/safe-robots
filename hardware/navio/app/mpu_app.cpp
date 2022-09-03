@@ -22,17 +22,17 @@ constexpr uint8_t SAMPLE_RATE_DIVISOR = 4;
 
 //=============================================================================
 int main(int /*argc*/, char** /*argv[]*/) {
-  auto app = core::utils::CreateDefaultNode("app");
-  app.LogDebug("running....");
+  auto app = core::utils::CreateSystemNode("app");
+  app.GetLogger()->LogDebug("running....");
 
   if (navio::hardware_utils::CheckApm()) {
-    app.LogError("APM is busy. Can't launch the app");
+    app.GetLogger()->LogError("APM is busy. Can't launch the app");
     return EXIT_FAILURE;
   }
 
   auto node =
-    std::make_unique<core::utils::Node>(core::utils::CreateDefaultNode("im"
-                                                                       "u"));
+    std::make_unique<core::utils::Node>(core::utils::CreateSystemNode("im"
+                                                                      "u"));
 
   sensors::mpu::Config config;
   config.accel_bw = ABW;
@@ -48,7 +48,7 @@ int main(int /*argc*/, char** /*argv[]*/) {
                                                         std::move(node));
 
   if (!sensor->Probe()) {
-    app.LogError("Can't launch the app");
+    app.GetLogger()->LogError("Can't launch the app");
     return EXIT_FAILURE;
   }
 
