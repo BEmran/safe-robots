@@ -25,8 +25,8 @@ std::string FormatLabeledModifier(const Modifier& modifier,
 }
 
 std::string ModifierToString(FG fg, BG bg, FMT fmt) {
-  constexpr auto buff_size = 25;
-  std::string buffer(buff_size, ' ', std::allocator<char>());
+  constexpr auto kBuffSize = 25;
+  std::string buffer(kBuffSize, ' ', std::allocator<char>());
   const auto actual_size = snprintf(buffer.data(), buffer.size(),
                                     "\x1B[%dm\x1B[%dm\x1B[%dm", fmt, fg, bg);
   buffer.resize(static_cast<size_t>(actual_size));

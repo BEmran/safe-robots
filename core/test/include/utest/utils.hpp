@@ -15,12 +15,12 @@
 #include "core/utils/terminal.hpp"
 #include "gtest/gtest.h"
 
-using Modifier = core::utils::Modifier;
-using LabeledModifier = core::utils::LabeledModifier;
-using EventLevel = core::utils::EventLevel;
-using FG = core::utils::terminal::FG;
-using BG = core::utils::terminal::BG;
-using FMT = core::utils::terminal::FMT;
+using core::utils::EventLevel;
+using core::utils::LabeledModifier;
+using core::utils::Modifier;
+using core::utils::terminal::BG;
+using core::utils::terminal::FG;
+using core::utils::terminal::FMT;
 
 // carate list of available variables
 constexpr const char* kLabels[] = {"INFO", "DEBUG", "WARN", "ERROR"};
