@@ -18,55 +18,6 @@ constexpr const char* kMessage = "message";
 const auto kDebugLM = core::utils::DebugLabeledModifier();
 const auto kErrorLM = core::utils::ErrorLabeledModifier();
 
-// class TestLogger {
-//  public:
-//   explicit TestLogger(Logger* logger) : logger_(logger), buf_(nullptr) {
-//   }
-
-//   ~TestLogger() {
-//     delete buf_;
-//   }
-
-//   void ExpectEqLogNoException(const LabeledModifier& lm,
-//                               const std::string& msg) {
-//     Clear();
-//     logger_->Log(lm, msg);
-//     GetLoggedData();
-//     ExpectEqLog(msg);
-//   }
-
-//   void ExpectEqLogWithException(const LabeledModifier& lm,
-//                                 const std::string& msg) {
-//     try {
-//       Clear();
-//       logger_->Log(lm, msg);
-//     } catch (Exception& e) {
-//       GetLoggedData();
-//     }
-//     ExpectEqLog(msg);
-//   }
-
-//  private:
-//   void Clear() {
-//     buf_ = new ConsoleBuffer;
-//   }
-
-//   void ExpectEqLog(const std::string& msg) {
-//     EXPECT_EQ(msg, logs_console_.front());
-//     EXPECT_EQ(msg, logs_file_.back());
-//   }
-
-//   void GetLoggedData() {
-//     logs_console_ = buf_->RestoreCoutBuffer();
-//     logs_file_ = ReadAllLinesFromFile(kFilename);
-//   }
-
-//   Logger* logger_;
-//   ConsoleBuffer* buf_;
-//   std::list<std::string> logs_console_;
-//   std::list<std::string> logs_file_;
-// };
-
 TEST(LoggerInformation, Construction) {
   auto info = LOG_INFORMATION;
   EXPECT_EQ("utest_logger.cpp", info.file);
@@ -81,17 +32,15 @@ TEST(LoggerInformation, ToString) {
 
 class MockWriter : public core::utils::Writer {
  public:
-  MockWriter() = default;
-  ~MockWriter() override = default;
   void Dump(const std::string& str) const override {
-    msg = str;
+    msg_ = str;
   }
   std::string Msg() const {
-    return msg;
+    return msg_;
   }
 
  private:
-  mutable std::string msg;
+  mutable std::string msg_;
 };
 
 auto writer1 = std::make_shared<MockWriter>();
@@ -122,18 +71,12 @@ TEST(Logger, WithException) {
   EXPECT_EQ(kMessage, writer1->Msg());
 }
 
-// TEST(Logger, CreateFileAndConsoleLogger) {
-//   std::string name = "name";
-//   std::string filename = "log.txt";
-//   std::string msg = "message";
-//   auto logger = CreateFileAndConsoleLogger(name, filename);
-//   TestLogger test_logger(logger.get());
-//   for (size_t i = 0; i < kEvents.size(); ++i) {
-//     LabeledModifier lm(kEvents[i]);
-//     if (kEvents[i] == EL_ERROR) {
-//       test_logger.ExpectEqLogWithException(lm, kMessage);
-//     } else {
-//       test_logger.ExpectEqLogNoException(lm, kMessage);
-//     }
-//   }
-// }
+TEST(CreateFileAndConsoleLogger, CheckInitializedWriters) {
+  constexpr auto kName = "name";
+  constexpr auto kFilename = "name_logger.txt";
+  auto logger = core::utils::CreateFileAndConsoleLogger(kName);
+
+  ConsoleBuffer c_buf;
+  logger->Log(kDebugLM, kMessage);
+  EXPECT_TRUE(AssertFileAndConsole(kFilename, c_buf, kDebugLM, kMessage));
+}
