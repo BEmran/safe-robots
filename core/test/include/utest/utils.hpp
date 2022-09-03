@@ -104,4 +104,11 @@ class ConsoleBuffer {
   std::streambuf *file_buf_, *backup;
 };
 
+testing::AssertionResult AssertStringVector(
+  const std::list<std::string>& expect, const std::list<std::string>& actual);
+
+testing::AssertionResult AssertFileAndConsole(const std::string& filename,
+                                              const ConsoleBuffer& c_buffer,
+                                              const LabeledModifier& lm,
+                                              const std::string& msg);
 #endif  // UTEST_UTILS_HPP_

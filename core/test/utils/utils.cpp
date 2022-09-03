@@ -2,6 +2,11 @@
 
 #include "utest/utils.hpp"
 
+#include "core/utils/formatter.hpp"
+
+using core::utils::TimeLabelFormatter;
+using core::utils::TimeLabelModifierFormatter;
+
 testing::AssertionResult operator&&(const testing::AssertionResult& lhs,
                                     const testing::AssertionResult& rhs) {
   return lhs ? rhs : lhs;
@@ -93,4 +98,32 @@ std::list<std::string> ConsoleBuffer::RestoreCoutBuffer() const {
   // restore cout's original buffer
   std::cout.rdbuf(backup);
   return ReadAllLinesFromFile(file_name_);
+}
+
+testing::AssertionResult AssertStringList(
+  const std::list<std::string>& expect, const std::list<std::string>& actual) {
+  if (expect.size() != actual.size()) {
+    return testing::AssertionFailure() << "Size mismatch";
+  }
+
+  if (!std::equal(expect.begin(), expect.end(), actual.begin())) {
+    return testing::AssertionFailure() << "Data mismatch";
+  }
+
+  return testing::AssertionSuccess();
+}
+
+testing::AssertionResult AssertFileAndConsole(const std::string& filename,
+                                              const ConsoleBuffer& c_buffer,
+                                              const LabeledModifier& lm,
+                                              const std::string& msg) {
+  const auto f_logged_data = ReadAllLinesFromFile(filename);
+  const auto f_expect = TimeLabelFormatter(lm, msg);
+  const auto res1 = AssertStringList({f_expect}, f_logged_data);
+
+  const auto c_logged_data = c_buffer.RestoreCoutBuffer();
+  const auto c_expect = TimeLabelModifierFormatter(lm, msg);
+  const auto res2 = AssertStringList({c_expect}, c_logged_data);
+
+  return res1 && res2;
 }
