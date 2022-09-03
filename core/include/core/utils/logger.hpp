@@ -67,7 +67,7 @@ class Logger {
    * @param filename writer file name
    * @param expectation_factory shared ptr to exception factory
    */
-  Logger(const std::string& filename,  //
+  Logger(const std::string& filename,
          std::shared_ptr<ExceptionFactory> expectation_factory);
 
   /**

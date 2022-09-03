@@ -39,17 +39,16 @@ void Logger::Log(const LabeledModifier& lm, const std::string& msg) {
   const auto console_str = console_formater_->Format(lm, msg);
   console_writer_->Dump(console_str);
   /* TODO: Instead of the logger Associate exception to LabeledModifier, so user
-   * can select what kind of excpetion they want to throw when it is used/called
+   * can select what kind of exception they want to throw when it is used/called
    */
   ThrowExceptionForErrorEvent(lm.GetEventLevel(), msg);
 }
 
 void Logger::ThrowExceptionForErrorEvent(const EventLevel event,
                                          const std::string& msg) {
-  if (event != EventLevel::EL_ERROR) {
-    return;
+  if (event == EventLevel::EL_ERROR) {
+    expectation_factory_->Throw(msg);
   }
-  expectation_factory_->Throw(msg);
 }
 
 std::shared_ptr<Logger> CreateDefaultLogger(const std::string& name,
