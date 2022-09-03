@@ -13,7 +13,6 @@ using core::utils::Exception;
 using core::utils::ExceptionFactory;
 using core::utils::Logger;
 using core::utils::LogLocation;
-using core::utils::NullFormatter;
 
 constexpr const char* kMessage = "message";
 constexpr const char* kFilename = "log.txt";
@@ -82,21 +81,21 @@ TEST(LoggerInformation, ToString) {
 }
 
 TEST(Logger, ConstructingUsingFilename) {
-  const auto logger = new Logger(kFilename);
+  auto* logger = new Logger(kFilename);
   TestLogger test_logger(logger);
   test_logger.ExpectEqLogNoException(kDebugLM, kMessage);
 }
 
 TEST(Logger, ConstructingUsingFormatter) {
-  auto formatter = std::make_shared<NullFormatter>();
-  const auto logger = new Logger(kFilename, formatter, formatter);
+  auto formatter = core::utils::CreateNullFormatter();
+  auto* logger = new Logger(kFilename, formatter, formatter);
   TestLogger test_logger(logger);
   test_logger.ExpectEqLogNoException(kDebugLM, kMessage);
 }
 
 TEST(Logger, ConstructingUsingException) {
   auto exception = std::make_shared<ExceptionFactory>("");
-  const auto logger = new Logger(kFilename, exception);
+  auto* logger = new Logger(kFilename, exception);
   TestLogger test_logger(logger);
   test_logger.ExpectEqLogNoException(kDebugLM, kMessage);
   test_logger.ExpectEqLogWithException(kErrorLM, kMessage);

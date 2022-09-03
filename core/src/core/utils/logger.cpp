@@ -11,20 +11,20 @@ Logger::Logger(const std::string& filename)
 
 Logger::Logger(const std::string& filename,
                std::shared_ptr<ExceptionFactory> expectation_factory)
-  : Logger(filename, std::make_shared<NullFormatter>(),
-           std::make_shared<NullFormatter>(), std::move(expectation_factory)) {
+  : Logger(filename, CreateNullFormatter(), CreateNullFormatter(),
+           std::move(expectation_factory)) {
 }
 
 Logger::Logger(const std::string& filename,
-               std::shared_ptr<FormatterInterface> file_formater,
-               std::shared_ptr<FormatterInterface> console_formater)
+               std::shared_ptr<Formatter> file_formater,
+               std::shared_ptr<Formatter> console_formater)
   : Logger(filename, std::move(file_formater), std::move(console_formater),
            std::make_shared<NullExceptionFactory>()) {
 }
 
 Logger::Logger(const std::string& filename,
-               std::shared_ptr<FormatterInterface> file_formater,
-               std::shared_ptr<FormatterInterface> console_formater,
+               std::shared_ptr<Formatter> file_formater,
+               std::shared_ptr<Formatter> console_formater,
                std::shared_ptr<ExceptionFactory> expectation_factory)
   : file_writer_(new FileWriter(filename))
   , console_writer_(new ConsoleWriter())
@@ -53,8 +53,8 @@ void Logger::ThrowExceptionForErrorEvent(const EventLevel event,
 
 std::shared_ptr<Logger> CreateDefaultLogger(const std::string& name,
                                             const std::string& filename) {
-  const auto file_fmt = std::make_shared<DefaultFormater>(false);
-  const auto console_fmt = std::make_shared<DefaultFormater>(true);
+  const auto file_fmt = CreateTimeLabelFormatter();
+  const auto console_fmt = CreateTimeLabelModifierFormatter();
   const auto except_fact = std::make_shared<ExceptionFactory>(name);
   return std::make_shared<Logger>(filename, file_fmt, console_fmt, except_fact);
 }

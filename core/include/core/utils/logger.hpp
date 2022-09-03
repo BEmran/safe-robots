@@ -77,9 +77,8 @@ class Logger {
    * @param file_formater file formatter to use with file writer
    * @param console_formater console formatter to use with file writer
    */
-  Logger(const std::string& filename,
-         std::shared_ptr<FormatterInterface> file_formater,
-         std::shared_ptr<FormatterInterface> console_formater);
+  Logger(const std::string& filename, std::shared_ptr<Formatter> file_formater,
+         std::shared_ptr<Formatter> console_formater);
 
   /**
    * @brief Construct the Logger object using filename
@@ -89,9 +88,8 @@ class Logger {
    * @param console_formater console formatter to use with file writer
    * @param expectation_factory shared ptr to exception factory
    */
-  Logger(const std::string& filename,
-         std::shared_ptr<FormatterInterface> file_formater,
-         std::shared_ptr<FormatterInterface> console_formater,
+  Logger(const std::string& filename, std::shared_ptr<Formatter> file_formater,
+         std::shared_ptr<Formatter> console_formater,
          std::shared_ptr<ExceptionFactory> expectation_factory);
 
   /**
@@ -114,8 +112,8 @@ class Logger {
  private:
   std::shared_ptr<FileWriter> file_writer_;
   std::shared_ptr<ConsoleWriter> console_writer_;
-  std::shared_ptr<FormatterInterface> file_formater_;
-  std::shared_ptr<FormatterInterface> console_formater_;
+  std::shared_ptr<Formatter> file_formater_;
+  std::shared_ptr<Formatter> console_formater_;
   std::shared_ptr<ExceptionFactory> expectation_factory_;
 };
 
