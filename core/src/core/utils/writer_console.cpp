@@ -4,20 +4,9 @@
 
 #include <iostream>
 
-namespace {
-/**
- * @brief the actual function that logs string to console
- *
- * @param str string to be logged
- */
-void DumpToConsole(const std::string& str) {
-  std::cout << str << std::endl;
-}
-}  // namespace
-
 namespace core::utils {
-void ConsoleWriter::Dump(const std::string& str) {
-  DumpToConsole(str);
+void ConsoleWriter::Dump(const std::string& str) const {
+  std::cout << str << std::endl;
 }
 
 }  // namespace core::utils

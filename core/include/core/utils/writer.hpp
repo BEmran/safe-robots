@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_UTILS_WRITTER_HPP_
-#define CORE_UTILS_WRITTER_HPP_
+#ifndef CORE_UTILS_WRITER_HPP_
+#define CORE_UTILS_WRITER_HPP_
 
 #include <string>
 
@@ -14,9 +14,9 @@ class Writer {
    */
   virtual ~Writer() = default;
 
-  virtual void Dump(const std::string& str) = 0;
+  virtual void Dump(const std::string& str) const = 0;
 };
 
 }  // namespace core::utils
 
-#endif  // CORE_UTILS_WRITTER_HPP_
+#endif  // CORE_UTILS_WRITER_HPP_

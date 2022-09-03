@@ -20,11 +20,7 @@ FileWriter::~FileWriter() {
   dump_mutex_.unlock();
 }
 
-void FileWriter::Dump(const std::string& str) {
-  DumpToFile(str);
-}
-
-void FileWriter::DumpToFile(const std::string& str) {
+void FileWriter::Dump(const std::string& str) const {
   dump_mutex_.lock();
   if (!file_->is_open()) {
     throw Exception("FileWriter Can't open a file: " + filename_);
@@ -32,5 +28,4 @@ void FileWriter::DumpToFile(const std::string& str) {
   *file_ << str << std::endl;
   dump_mutex_.unlock();
 }
-
 }  // namespace core::utils

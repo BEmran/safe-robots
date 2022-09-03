@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_UTILS_WRITTER_CONSOLE_HPP_
-#define CORE_UTILS_WRITTER_CONSOLE_HPP_
+#ifndef CORE_UTILS_WRITER_CONSOLE_HPP_
+#define CORE_UTILS_WRITER_CONSOLE_HPP_
 
 #include <string>
 
@@ -9,7 +9,7 @@
 
 namespace core::utils {
 /**
- * @brief A concreate class of Writer used to log data to the console
+ * @brief A concrete class of Writer used to writer data to the console
  * using ostream object.
  *
  */
@@ -28,9 +28,9 @@ class ConsoleWriter : public Writer {
   ~ConsoleWriter() override = default;
 
   /* Writer Interface */
-  void Dump(const std::string& str) override;
+  void Dump(const std::string& str) const override;
 };
 
 }  // namespace core::utils
 
-#endif  // CORE_UTILS_WRITTER_CONSOLE_HPP_
+#endif  // CORE_UTILS_WRITER_CONSOLE_HPP_

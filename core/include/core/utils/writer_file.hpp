@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_UTILS_WRITTER_FILE_HPP_
-#define CORE_UTILS_WRITTER_FILE_HPP_
+#ifndef CORE_UTILS_WRITER_FILE_HPP_
+#define CORE_UTILS_WRITER_FILE_HPP_
 
 #include <fstream>
 #include <memory>
@@ -12,14 +12,14 @@
 
 namespace core::utils {
 /**
- * @brief A concreate class of Writer used to log data to a file using oftream
+ * @brief A concrete class of Writer used to log data to a file using ofstream
  * object.
  *
  */
 class FileWriter : public Writer {
  public:
   /**
-   * @brief Construct a new File Logger object with a specific file name
+   * @brief Construct a new File Writer object with a specific file name
    *
    * @param filename name of the file to be created
    *
@@ -34,21 +34,14 @@ class FileWriter : public Writer {
   ~FileWriter() override;
 
   /* Writer Interface */
-  void Dump(const std::string& str) override;
+  void Dump(const std::string& str) const override;
 
  private:
-  /**
-   * @brief the actual function that logs a string to a file
-   *
-   * @param str string to be logged
-   */
-  void DumpToFile(const std::string& str);
-
   std::string filename_;
   std::shared_ptr<std::ofstream> file_;
-  std::mutex dump_mutex_;
+  mutable std::mutex dump_mutex_;
 };
 
 }  // namespace core::utils
 
-#endif  // CORE_UTILS_WRITTER_FILE_HPP_
+#endif  // CORE_UTILS_WRITER_FILE_HPP_
