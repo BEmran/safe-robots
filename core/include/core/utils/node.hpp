@@ -6,33 +6,9 @@
 #include <memory>
 #include <string>
 
-#include "core/utils/event_level.hpp"
-#include "core/utils/logger.hpp"
+#include "core/utils/node_logger.hpp"
 
 namespace core::utils {
-/**
- * @brief holds various LabeledModifier objects to be used inside the node when
- * logging messages
- *
- */
-struct NodeLabeledModifiers {
-  LabeledModifier debug;
-  LabeledModifier error;
-  LabeledModifier info;
-  LabeledModifier warn;
-
-  NodeLabeledModifiers(const LabeledModifier& debug_,
-                       const LabeledModifier& error_,
-                       const LabeledModifier& info_,
-                       const LabeledModifier& warn_)
-    : debug(debug_), error(error_), info(info_), warn(warn_) {
-  }
-
-  NodeLabeledModifiers()
-    : NodeLabeledModifiers(DebugLabeledModifier(), ErrorLabeledModifier(),
-                           InfoLabeledModifier(), WarnLabeledModifier()) {
-  }
-};
 
 class Node {
  public:
@@ -49,46 +25,7 @@ class Node {
    * @param name node name
    * @param logger shared ptr to a logger object
    */
-  Node(const std::string& name, std::shared_ptr<Logger> logger);
-
-  /**
-   * @brief Construct a new Node object using its name, logger with specific
-   * labeled modifiers
-   *
-   * @param name node name
-   * @param logger shared ptr to a logger object
-   * @param labeled_modifiers
-   */
-  Node(const std::string& name, std::shared_ptr<Logger> logger,
-       NodeLabeledModifiers labeled_modifiers);
-
-  /**
-   * @brief log the passed message using the Debug LabeledModifier
-   *
-   * @param msg msg to log
-   */
-  void LogDebug(const std::string& msg) const;
-
-  /**
-   * @brief log the passed message using the Error LabeledModifier
-   *
-   * @param msg msg to log
-   */
-  void LogError(const std::string& msg) const;
-
-  /**
-   * @brief log the passed message using the Info LabeledModifier
-   *
-   * @param msg msg to log
-   */
-  void LogInfo(const std::string& msg) const;
-
-  /**
-   * @brief log the passed message using the Warn LabeledModifier
-   *
-   * @param msg msg to log
-   */
-  void LogWarn(const std::string& msg) const;
+  Node(const std::string& name, std::shared_ptr<NodeLogger> n_logger);
 
   /**
    * @brief Get the node's Name
@@ -99,11 +36,11 @@ class Node {
   std::string GetName() const;
 
   /**
-   * @brief Get a shared ptr to the node logger
+   * @brief Get a shared ptr to the NodeLogger
    *
-   * @return std::shared_ptr<const Logger>
+   * @return std::shared_ptr<const NodeLogger>
    */
-  std::shared_ptr<const Logger> GetLogger() const;
+  std::shared_ptr<const NodeLogger> GetLogger() const;
 
   /**
    * @brief Logs a message with specific LabeledModifier
@@ -116,8 +53,7 @@ class Node {
 
  protected:
   std::string name_;
-  std::shared_ptr<Logger> logger_;
-  NodeLabeledModifiers labeled_modifiers_;
+  std::shared_ptr<NodeLogger> n_logger_;
 };
 
 /**
@@ -125,23 +61,15 @@ class Node {
  *
  */
 #define LOG_ERROR(node, msg)                                                   \
-  node.LogError(LOG_INFORMATION_STRING + ": " + (msg))
+  node.GetLogger().LogError(LOG_INFORMATION_STRING + ": " + (msg))
 
 /**
- * @brief Create a Node with labeled modifier
+ * @brief Create a Node with a same NodeLogger but with different node name
  *
  * @param node_name node name
  * @return Node object
  */
-Node CreateNode(const std::string& node_name);
-
-/**
- * @brief Create a Node with a same logger
- *
- * @param node_name node name
- * @return Node object
- */
-Node CreateDefaultNode(const std::string& node_name);
+Node CreateSystemNode(const std::string& node_name);
 
 }  // namespace core::utils
 

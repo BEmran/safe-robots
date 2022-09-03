@@ -6,6 +6,8 @@
 
 namespace core::utils {
 
+constexpr const char* kFilenameExten = "_logger.txt";
+
 Logger::Logger(const std::vector<WriterFormatterPair>& writer_formatter)
   : Logger(writer_formatter, std::make_shared<NullExceptionFactory>()) {
 }
@@ -43,7 +45,7 @@ void Logger::ThrowExceptionForErrorEvent(const EventLevel event,
 }
 
 std::shared_ptr<Logger> CreateFileAndConsoleLogger(const std::string& name) {
-  const auto filename = name + "_logger.txt";
+  const auto filename = name + kFilenameExten;
   const auto writer_formatter_vec = {
     WriterFormatterPair{std::make_shared<FileWriter>(filename),
                         CreateTimeLabelFormatter()},

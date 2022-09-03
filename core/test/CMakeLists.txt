@@ -58,6 +58,12 @@ set(UTEST_NODE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utils/utest_node.cpp
 package_add_test_with_libraries(utest_node "${UTEST_NODE_FILES}"
                                 "${CORE_LIBRARY}" "")
 
+set(UTEST_NODE_LOGGER_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils/utest_node_logger.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils/utils.cpp)
+package_add_test_with_libraries(utest_node_logger "${UTEST_NODE_LOGGER_FILES}"
+                                "${CORE_LIBRARY}" "")
+
 set(UTEST_MODULE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utils/utest_module.cpp)
 package_add_test_with_libraries(utest_module "${UTEST_MODULE_FILES}"
                                 "${CORE_LIBRARY}" "")

@@ -14,6 +14,7 @@ set(CORE_HEADER_LIST
     ${CORE_INCLUDE_DIR}/utils/logger.hpp
     ${CORE_INCLUDE_DIR}/utils/math.hpp
     ${CORE_INCLUDE_DIR}/utils/module.hpp
+    ${CORE_INCLUDE_DIR}/utils/node_logger.hpp
     ${CORE_INCLUDE_DIR}/utils/node.hpp
     ${CORE_INCLUDE_DIR}/utils/writer_console.hpp
     ${CORE_INCLUDE_DIR}/utils/writer_file.hpp
@@ -38,6 +39,7 @@ set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/utils/logger.cpp
     ${CORE_SOURCE_DIR}/utils/math.cpp
     ${CORE_SOURCE_DIR}/utils/module.cpp
+    ${CORE_SOURCE_DIR}/utils/node_logger.cpp
     ${CORE_SOURCE_DIR}/utils/node.cpp
     ${CORE_SOURCE_DIR}/utils/writer_console.cpp
     ${CORE_SOURCE_DIR}/utils/writer_file.cpp
