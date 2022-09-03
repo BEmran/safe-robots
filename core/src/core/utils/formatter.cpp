@@ -34,16 +34,16 @@ std::string TimeLabelModifierFormatter(const LabeledModifier& lm,
   return ss.str();
 }
 
-std::shared_ptr<Formatter> CreateNullFormatter() {
-  return std::make_shared<Formatter>(NullFormatter);
+Formatter CreateNullFormatter() {
+  return Formatter(NullFormatter);
 }
 
-std::shared_ptr<Formatter> CreateTimeLabelFormatter() {
-  return std::make_shared<Formatter>(TimeLabelFormatter);
+Formatter CreateTimeLabelFormatter() {
+  return Formatter(TimeLabelFormatter);
 }
 
-std::shared_ptr<Formatter> CreateTimeLabelModifierFormatter() {
-  return std::make_shared<Formatter>(TimeLabelModifierFormatter);
+Formatter CreateTimeLabelModifierFormatter() {
+  return Formatter(TimeLabelModifierFormatter);
 }
 
 }  // namespace core::utils

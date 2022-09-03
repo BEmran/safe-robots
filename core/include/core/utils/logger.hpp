@@ -8,6 +8,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "core/utils/event_level.hpp"
 #include "core/utils/exception.hpp"
@@ -48,6 +49,11 @@ struct LogLocation {
   core::utils::LogLocation(__FILENAME__, __func__, __LINE__)
 #define LOG_INFORMATION_STRING LOG_INFORMATION.ToString()
 
+struct WriterFormatterPair {
+  std::shared_ptr<Writer> writer;
+  Formatter formatter;
+};
+
 /**
  * @brief A simple class used to mimic a stream to record all sort of
  * information
@@ -55,41 +61,19 @@ struct LogLocation {
 class Logger {
  public:
   /**
-   * @brief Construct the Logger object using filename
+   * @brief Construct the Logger object
    *
-   * @param filename writer file name
+   * @param writer_formatter vector of WriterFormatter pairs
    */
-  explicit Logger(const std::string& filename);
+  explicit Logger(const std::vector<WriterFormatterPair>& writer_formatter);
 
   /**
-   * @brief Construct the Logger object using filename
+   * @brief Construct the Logger object
    *
-   * @param filename writer file name
+   * @param writer_formatter vector of WriterFormatter pairs
    * @param expectation_factory shared ptr to exception factory
    */
-  Logger(const std::string& filename,
-         std::shared_ptr<ExceptionFactory> expectation_factory);
-
-  /**
-   * @brief Construct the Logger object using filename
-   *
-   * @param filename writer file name
-   * @param file_formater file formatter to use with file writer
-   * @param console_formater console formatter to use with file writer
-   */
-  Logger(const std::string& filename, std::shared_ptr<Formatter> file_formater,
-         std::shared_ptr<Formatter> console_formater);
-
-  /**
-   * @brief Construct the Logger object using filename
-   *
-   * @param filename writer file name
-   * @param file_formater file formatter to use with file writer
-   * @param console_formater console formatter to use with file writer
-   * @param expectation_factory shared ptr to exception factory
-   */
-  Logger(const std::string& filename, std::shared_ptr<Formatter> file_formater,
-         std::shared_ptr<Formatter> console_formater,
+  Logger(const std::vector<WriterFormatterPair>& writer_formatter,
          std::shared_ptr<ExceptionFactory> expectation_factory);
 
   /**
@@ -107,18 +91,25 @@ class Logger {
   virtual void Log(const LabeledModifier& lm, const std::string& msg);
 
  protected:
+  static void Dump(const WriterFormatterPair& wf, const LabeledModifier& lm,
+                   const std::string& msg);
+
   void ThrowExceptionForErrorEvent(EventLevel event, const std::string& msg);
 
  private:
-  std::shared_ptr<FileWriter> file_writer_;
-  std::shared_ptr<ConsoleWriter> console_writer_;
-  std::shared_ptr<Formatter> file_formater_;
-  std::shared_ptr<Formatter> console_formater_;
+  std::vector<WriterFormatterPair> writer_formatter_vec_;
   std::shared_ptr<ExceptionFactory> expectation_factory_;
 };
 
-std::shared_ptr<Logger> CreateDefaultLogger(const std::string& name,
-                                            const std::string& filename);
+/**
+ * @brief Create a new Logger object with typical console and file
+ * Formatters and ExceptionFactory
+ *
+ * @param name name of Exception factory header, also used to create logger
+ * filename as "<name>_logger.txt"
+ * @return std::shared_ptr<Logger> logger object
+ */
+std::shared_ptr<Logger> CreateFileAndConsoleLogger(const std::string& name);
 
 }  // namespace core::utils
 

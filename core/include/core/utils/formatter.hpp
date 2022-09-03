@@ -41,11 +41,11 @@ class Formatter {
   FormatFunc format_func_;
 };
 
-std::shared_ptr<Formatter> CreateNullFormatter();
+Formatter CreateNullFormatter();
 
-std::shared_ptr<Formatter> CreateTimeLabelFormatter();
+Formatter CreateTimeLabelFormatter();
 
-std::shared_ptr<Formatter> CreateTimeLabelModifierFormatter();
+Formatter CreateTimeLabelModifierFormatter();
 
 }  // namespace core::utils
 
