@@ -37,9 +37,9 @@ Vec3 EstimateRPY(const Vec3& accel) {
   const auto az2 = accel_normalized.z() * accel_normalized.z();
 
   const auto rx =
-    std::atan2(accel_normalized.y(), accel_normalized.z()) / cu::RAD_TO_DEG;
+    std::atan2(accel_normalized.y(), accel_normalized.z()) / cu::DEG_TO_RAD;
   const auto ry =
-    std::atan2(-accel_normalized.x(), std::sqrt(ay2 + az2)) / cu::RAD_TO_DEG;
+    std::atan2(-accel_normalized.x(), std::sqrt(ay2 + az2)) / cu::DEG_TO_RAD;
   const auto rz = 0.F;
   return Vec3(rx, ry, rz);
 }

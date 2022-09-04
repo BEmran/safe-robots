@@ -57,7 +57,7 @@ Mpu9250::Mpu9250(const Config& config, std::unique_ptr<navio::SPI> comm,
   , node_{std::move(node)}
   , mag_spec_{CreateSensorSpecs(MagScaleMap()[config.mag_scale].value, 1.0F)}
   , gyro_spec_{CreateSensorSpecs(GyroScaleMap()[config.gyro_scale].value,
-                                 cu::RAD_TO_DEG)}
+                                 cu::DEG_TO_RAD)}
   , accel_spec_{CreateSensorSpecs(AccelScaleMap()[config.accel_scale].value,
                                   cu::GRAVITY)}
   , temp_spec_{cu::SensorSpecs<1>(TempScale, 1.0F)} {

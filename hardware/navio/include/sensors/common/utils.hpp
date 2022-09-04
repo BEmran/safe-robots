@@ -16,12 +16,12 @@
 #include "core/utils/math.hpp"
 
 namespace sensors::common::utils {
+using core::utils::DEG_TO_RAD;
 using core::utils::GRAVITY;
 using core::utils::ImuData;
 using core::utils::Mat3;
 using core::utils::MATH_TYPE;
 using core::utils::PI;
-using core::utils::RAD_TO_DEG;
 using core::utils::Vec3;
 using ImuSensorModule = core::sensors::SensorModuleAbs<ImuData>;
 using core::utils::CreateScalar;
