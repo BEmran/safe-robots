@@ -15,7 +15,7 @@ using MATH_TYPE = float;
 constexpr MATH_TYPE GRAVITY = 9.80665F;
 constexpr MATH_TYPE PI = 3.14159F;
 constexpr MATH_TYPE PI_2 = 1.570796F;
-constexpr MATH_TYPE RAD_TO_DEG = PI / 180.F;
+constexpr MATH_TYPE DEG_TO_RAD = PI / 180.F;
 
 using Vec3 = Eigen::Matrix<MATH_TYPE, 3, 1>;
 using Mat3 = Eigen::Matrix<MATH_TYPE, 3, 3>;
