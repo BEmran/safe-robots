@@ -8,6 +8,8 @@ set(NAVIO_HEADER_LIST
     ${NAVIO_INCLUDE_DIR}/navio/spi.hpp
     ${NAVIO_INCLUDE_DIR}/sensors/common/calibrate.hpp
     ${NAVIO_INCLUDE_DIR}/sensors/common/utils.hpp
+    ${NAVIO_INCLUDE_DIR}/sensors/lsm/lsm9ds1_register_map.hpp
+    ${NAVIO_INCLUDE_DIR}/sensors/lsm/lsm9ds1.hpp
     ${NAVIO_INCLUDE_DIR}/sensors/mpu/mpu9250_register_map.hpp
     ${NAVIO_INCLUDE_DIR}/sensors/mpu/mpu9250.hpp)
 
@@ -20,6 +22,7 @@ set(NAVIO_SOURCE_LIST
     ${NAVIO_SOURCE_DIR}/navio/spi.cpp
     ${NAVIO_SOURCE_DIR}/sensors/common/calibrate.cpp
     ${NAVIO_SOURCE_DIR}/sensors/common/utils.cpp
+    ${NAVIO_SOURCE_DIR}/sensors/lsm/lsm9ds1.cpp
     ${NAVIO_SOURCE_DIR}/sensors/mpu/mpu9250.cpp)
 
 # ##############################################################################
