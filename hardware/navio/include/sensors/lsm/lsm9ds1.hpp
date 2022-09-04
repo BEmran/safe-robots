@@ -46,6 +46,8 @@ struct Config {
   MagZMode mag_z_mode = MagZMode::ULTRA_HIGH;
   MagOperatingMode mag_operating_mode = MagOperatingMode::CONTINUOUS;
   MagTempCompensation mag_temp_compensation = MagTempCompensation::DISABLED;
+
+  bool align_sensor_axis = true;
 };
 
 class Lsm9ds1 : public cu::ImuSensorModule {
@@ -133,9 +135,8 @@ class Lsm9ds1 : public cu::ImuSensorModule {
   cu::Vec3 ReadRawGyroData() const;
   cu::Vec3 ReadRawMagData() const;
   cu::MATH_TYPE ReadRawTemperatureData() const;
-
   static std::vector<int16_t> ExtractFullBits(const std::vector<uint8_t>& data);
-
+  static SensorRawData AlignAxis(const SensorRawData& raw);
   /**
    * @brief Apply sensor specs on the passed raw data
    *
@@ -148,8 +149,8 @@ class Lsm9ds1 : public cu::ImuSensorModule {
 
   AccelScale ReadAccelScale() const;
   AccelODR ReadAccelODR() const;
-  AccelAntiAliasingBW ReadAccelAccelAntiAlias() const;
-  AccelHighResolutionBW ReadAccelHighResBW() const;
+  std::pair<bool, AccelAntiAliasingBW> ReadAccelAccelAntiAlias() const;
+  std::pair<bool, AccelHighResolutionBW> ReadAccelHighResBW() const;
   GyroODR ReadGyroODR() const;
   GyroScale ReadGyroScale() const;
   MagODR ReadMagODR() const;
@@ -157,24 +158,17 @@ class Lsm9ds1 : public cu::ImuSensorModule {
   MagZMode ReadMagZMode() const;
   MagOperatingMode ReadMagOperationMode() const;
   MagScale ReadMagScale() const;
-
   std::pair<bool, Config> ValidateConfiguration() const;
-
-  // /**
-  //  * @brief Extract magnetometer manufacture sensitivity adjustment values
-  //  * @details calculate xyz-axis sensitivity using manufacture formula
-  //  */
-  // void ExtractMagnetometerSensitivityAdjustmentValues();
 
   uint8_t ReadAGRegister(uint8_t reg) const;
   std::vector<uint8_t> ReadAGRegisters(uint8_t reg, uint8_t count) const;
   uint8_t ReadMagRegister(uint8_t reg) const;
   std::vector<uint8_t> ReadMagRegisters(uint8_t reg, uint8_t count) const;
+
   void WriteAGRegister(uint8_t reg, uint8_t data) const;
   void WriteMagRegister(uint8_t reg, uint8_t data) const;
   void SetAGRegisterByte(uint8_t reg, uint8_t byte, uint8_t mask) const;
   void SetMagRegisterByte(uint8_t reg, uint8_t byte, uint8_t mask) const;
-  // void RequestReadMagRegisters(uint8_t reg, uint8_t count) const;
 
  private:
   Config config_;

@@ -33,20 +33,21 @@ cu::SensorSpecs<3> CreateSensorSpecs(const cu::MATH_TYPE scale,
 
 std::string ConfigToString(const Config& cfg) {
   std::stringstream ss;
-  ss << "\tAccelerometer:"                                           //
-     << "Scale" << AccelScaleMap()[cfg.accel_scale].name             //
-     << "sampling rate" << AccelODRMap()[cfg.accel_odr]              //
-     << "anti_alias" << AccelAntiAliasMap()[cfg.accel_anti_alias]    //
-     << "high_res_bw" << AccelHighResBWMap()[cfg.accel_high_res_bw]  //
-     << "\n\tGyroscope:"                                             //
-     << "sampling rate" << GyroODRMap()[cfg.gyro_odr]                //
-     << "Scale" << GyroScaleMap()[cfg.gyro_scale].name               //
-     << "\n\tMagnetometer:"                                          //
-     << "sampling rate" << MagODRMap()[cfg.mag_odr]                  //
-     << "XY mode" << MagXYModeMap()[cfg.mag_xy_mode]                 //
-     << "Z mode" << MagZModeMap()[cfg.mag_z_mode]                    //
-     << "Operating mode" << MagOperatingModeMap()[cfg.mag_operating_mode]
-     << "Scale" << MagScaleMap()[cfg.mag_scale].name;  //
+  ss << "\tAccelerometer:"                                             //
+     << " Scale: " << AccelScaleMap()[cfg.accel_scale].name            //
+     << ", Sampling rate: " << AccelODRMap()[cfg.accel_odr]            //
+     << ", Anti alias: " << AccelAntiAliasMap()[cfg.accel_anti_alias]  //
+     << ", High resolution bw: "
+     << AccelHighResBWMap()[cfg.accel_high_res_bw]          //
+     << "\n\tGyroscope:"                                    //
+     << " Sampling rate: " << GyroODRMap()[cfg.gyro_odr]    //
+     << ", Scale: " << GyroScaleMap()[cfg.gyro_scale].name  //
+     << "\n\tMagnetometer:"                                 //
+     << " Sampling rate: " << MagODRMap()[cfg.mag_odr]      //
+     << ", XY mode: " << MagXYModeMap()[cfg.mag_xy_mode]    //
+     << ", Z mode: " << MagZModeMap()[cfg.mag_z_mode]       //
+     << ", Operating mode: " << MagOperatingModeMap()[cfg.mag_operating_mode]
+     << ", Scale: " << MagScaleMap()[cfg.mag_scale].name;  //
   return ss.str();
 }
 
@@ -60,12 +61,13 @@ Lsm9ds1::Lsm9ds1(const Config& config, std::unique_ptr<navio::SPI> comm_ag,
   , comm_ag_{std::move(comm_ag)}
   , comm_mag_{std::move(comm_mag)}
   , node_{std::move(node)}
-  , mag_spec_{CreateSensorSpecs(MagScaleMap()[config.mag_scale].value, 1.0F)}
+  , mag_spec_{CreateSensorSpecs(MagScaleMap()[config.mag_scale].value,
+                                kMagUnit)}
   , gyro_spec_{CreateSensorSpecs(GyroScaleMap()[config.gyro_scale].value,
-                                 cu::RAD_TO_DEG)}
+                                 cu::DEG_TO_RAD)}
   , accel_spec_{CreateSensorSpecs(AccelScaleMap()[config.accel_scale].value,
                                   cu::GRAVITY)}
-  , temp_spec_{cu::SensorSpecs<1>(1.0F, 1.0F)} {
+  , temp_spec_{cu::SensorSpecs<1>(kTempSensitivity, 1.F)} {
   temp_spec_.SetCalibration(cu::CreateScalar(1), cu::CreateScalar(kTempBias),
                             cu::CreateScalar(kTempOffset));
   // ReadCalibrationFile();
@@ -89,6 +91,8 @@ void Lsm9ds1::ReadCalibrationFile() {
 }
 
 bool Lsm9ds1::ProbeAG() const {
+  auto a = ReadAGRegister(xg::WHO_AM_I);
+  std::cout << a << "\t" << int(a) << std::endl;
   if (ReadAGRegister(xg::WHO_AM_I) != xg::WHO_AM_I_RESPONSE) {
     node_->GetLogger()->LogWarn("Bad IMU device ID");
     return false;
@@ -97,9 +101,9 @@ bool Lsm9ds1::ProbeAG() const {
 }
 
 bool Lsm9ds1::ProbeMag() const {
-  auto a = ReadMagRegister(xg::WHO_AM_I);
+  auto a = ReadMagRegister(mag::WHO_AM_I);
   std::cout << a << "\t" << int(a) << std::endl;
-  if (ReadMagRegister(xg::WHO_AM_I) != mag::WHO_AM_I_RESPONSE) {
+  if (ReadMagRegister(mag::WHO_AM_I) != mag::WHO_AM_I_RESPONSE) {
     node_->GetLogger()->LogWarn("Bad Magnetometer device ID");
     return false;
   }
@@ -146,21 +150,24 @@ void Lsm9ds1::InitializeAccel() const {
   // Configure Output data rate, scale and bw
   const auto odr = cu::ToByte(config_.accel_odr);      // bits[7:5]
   const auto scale = cu::ToByte(config_.accel_scale);  // bits[4:3]
-  const auto bw_select = 0x00_uc;  // determine bw selection bit[2]
-  const auto bw_aa =
-    bw_select ? cu::ToByte(config_.accel_anti_alias) : 0x00_uc;  // bit[1:0]
+  const auto bw_select = config_.accel_bw_selection ?
+                           0x04_uc :
+                           0x00_uc;  // determine bw selection bit[2]
+  const auto bw_aa = config_.accel_bw_selection ?
+                       cu::ToByte(config_.accel_anti_alias) :
+                       0x00_uc;  // bit[1:0]
   const auto byte1 = static_cast<uint8_t>(odr | scale | bw_select | bw_aa);
   WriteAGRegister(xg::CTRL_REG6_XL, byte1);
 
-  // // configure high resolution band width
-  // const auto hr_enabled =
-  //   config_.accel_high_res_enabled ? 0x01_uc : 0x00_uc;  // bit[7]
-  // const auto hr_bw =
-  //   hr_enabled ? cu::ToByte(config_.accel_high_res_bw) : 0x00_uc;  //
-  //   bits[6:5]
-  // const auto byte2 = static_cast<uint8_t>(hr_enabled | hr_bw);
-  // constexpr auto mask_hr_bw = 0xE0_uc;
-  // SetAGRegisterByte(xg::CTRL_REG7_XL, byte2, mask_hr_bw);
+  // configure high resolution band width
+  const auto hr_enabled =
+    config_.accel_high_res_enabled ? 0x80_uc : 0x00_uc;  // bit[7]
+  const auto hr_bw = config_.accel_high_res_enabled ?
+                       cu::ToByte(config_.accel_high_res_bw) :
+                       0x00_uc;  // bits[6:5]
+  const auto byte2 = static_cast<uint8_t>(hr_enabled | hr_bw);
+  constexpr auto mask_hr_bw = 0xE0_uc;
+  SetAGRegisterByte(xg::CTRL_REG7_XL, byte2, mask_hr_bw);
 
   // enable all axis
   const auto enable = 0x38_uc;  // enable all axis bits[5:3]
@@ -176,16 +183,16 @@ void Lsm9ds1::InitializeGyro() const {
   const auto byte1 = static_cast<uint8_t>(odr | scale | bw);
   WriteAGRegister(xg::CTRL_REG1_G, byte1);
 
-  // // Configure interrupt
-  // const auto byte2 = 0x00_uc;  // disabled
-  // WriteAGRegister(xg::CTRL_REG2_G, byte2);
+  // Configure interrupt
+  const auto byte2 = 0x00_uc;  // disabled
+  WriteAGRegister(xg::CTRL_REG2_G, byte2);
 
-  // // Configure mode and HPF cutoff frequency
-  // const auto lp_mode = 0x00_uc;      // disabled bit[7]
-  // const auto hp_enable = 0x00_uc;    // disabled bit[6]
-  // const auto hpf_cut_off = 0x00_uc;  // disabled bits[3:0]
-  // const auto byte3 = static_cast<uint8_t>(lp_mode | hp_enable | hpf_cut_off);
-  // WriteAGRegister(xg::CTRL_REG3_G, byte3);
+  // Configure mode and HPF cutoff frequency
+  const auto lp_mode = 0x00_uc;      // disabled bit[7]
+  const auto hp_enable = 0x00_uc;    // disabled bit[6]
+  const auto hpf_cut_off = 0x00_uc;  // disabled bits[3:0]
+  const auto byte3 = static_cast<uint8_t>(lp_mode | hp_enable | hpf_cut_off);
+  WriteAGRegister(xg::CTRL_REG3_G, byte3);
 
   // enable all axis
   const auto enable = 0x38_uc;  // enable all axis bits[5:3]
@@ -193,9 +200,9 @@ void Lsm9ds1::InitializeGyro() const {
   const auto byte4 = static_cast<uint8_t>(enable | latch);
   WriteAGRegister(xg::CTRL_REG4, byte4);
 
-  // // Configure directional user orientation selection
-  // const auto ori = 0x00_uc;  // all positive no flip
-  // WriteAGRegister(xg::ORIENT_CFG_G, ori);
+  // Configure directional user orientation selection
+  const auto ori = 0x00_uc;  // all positive no flip
+  WriteAGRegister(xg::ORIENT_CFG_G, ori);
 }
 
 void Lsm9ds1::InitializeMag() const {
@@ -243,18 +250,23 @@ AccelODR Lsm9ds1::ReadAccelODR() const {
   return cu::Find(AccelODRMap(), odr);
 }
 
-AccelAntiAliasingBW Lsm9ds1::ReadAccelAccelAntiAlias() const {
+std::pair<bool, AccelAntiAliasingBW> Lsm9ds1::ReadAccelAccelAntiAlias() const {
   const auto data = ReadAGRegister(xg::CTRL_REG6_XL);
   constexpr auto mask = 0x03_uc;  // mask bits [1:0]
   const auto aa = static_cast<uint8_t>(data & mask);
-  return cu::Find(AccelAntiAliasMap(), aa);
+  constexpr auto mask_select = 0x04_uc;  // mask bit [2]
+  const auto bw_select = static_cast<bool>(data & mask_select);
+  return {bw_select, cu::Find(AccelAntiAliasMap(), aa)};
 }
 
-AccelHighResolutionBW Lsm9ds1::ReadAccelHighResBW() const {
+std::pair<bool, AccelHighResolutionBW> Lsm9ds1::ReadAccelHighResBW() const {
   const auto data = ReadAGRegister(xg::CTRL_REG7_XL);
   constexpr auto mask = 0x60_uc;  // mask bits [6:5]
   const auto bw = static_cast<uint8_t>(data & mask);
-  return cu::Find(AccelHighResBWMap(), bw);
+  constexpr auto hr_mask = 0x80_uc;
+  const auto hr_enabled = static_cast<bool>(data & hr_mask);
+
+  return {hr_enabled, cu::Find(AccelHighResBWMap(), bw)};
 }
 
 GyroODR Lsm9ds1::ReadGyroODR() const {
@@ -301,7 +313,7 @@ MagOperatingMode Lsm9ds1::ReadMagOperationMode() const {
 
 MagScale Lsm9ds1::ReadMagScale() const {
   const auto data = ReadMagRegister(mag::CTRL_REG2_M);
-  constexpr auto mask = 0x6_uc;  // mask bit[6:5]
+  constexpr auto mask = 0x60_uc;  // mask bit[6:5]
   const auto scale = static_cast<uint8_t>(data & mask);
   return Find(MagScaleMap(), scale);
 }
@@ -310,8 +322,10 @@ std::pair<bool, Config> Lsm9ds1::ValidateConfiguration() const {
   Config actual_cfg;
   actual_cfg.accel_scale = ReadAccelScale();
   actual_cfg.accel_odr = ReadAccelODR();
-  actual_cfg.accel_anti_alias = ReadAccelAccelAntiAlias();
-  actual_cfg.accel_high_res_bw = ReadAccelHighResBW();
+  std::tie(actual_cfg.accel_bw_selection, actual_cfg.accel_anti_alias) =
+    ReadAccelAccelAntiAlias();
+  std::tie(actual_cfg.accel_high_res_enabled, actual_cfg.accel_high_res_bw) =
+    ReadAccelHighResBW();
   actual_cfg.gyro_odr = ReadGyroODR();
   actual_cfg.gyro_scale = ReadGyroScale();
   actual_cfg.mag_odr = ReadMagODR();
@@ -323,8 +337,6 @@ std::pair<bool, Config> Lsm9ds1::ValidateConfiguration() const {
   bool valid = true;
   valid &= actual_cfg.accel_scale == config_.accel_scale;
   valid &= actual_cfg.accel_odr == config_.accel_odr;
-  valid &= actual_cfg.accel_anti_alias == config_.accel_anti_alias;
-  valid &= actual_cfg.accel_high_res_bw == config_.accel_high_res_bw;
   valid &= actual_cfg.gyro_odr == config_.gyro_odr;
   valid &= actual_cfg.gyro_scale == config_.gyro_scale;
   valid &= actual_cfg.mag_odr == config_.mag_odr;
@@ -333,16 +345,23 @@ std::pair<bool, Config> Lsm9ds1::ValidateConfiguration() const {
   valid &= actual_cfg.mag_operating_mode == config_.mag_operating_mode;
   valid &= actual_cfg.mag_scale == config_.mag_scale;
 
+  valid &= actual_cfg.accel_bw_selection == config_.accel_bw_selection;
+  if (valid && config_.accel_bw_selection) {
+    valid &= actual_cfg.accel_anti_alias == config_.accel_anti_alias;
+  }
+
+  valid &= actual_cfg.accel_high_res_enabled == config_.accel_high_res_enabled;
+  if (valid && config_.accel_high_res_enabled) {
+    valid &= actual_cfg.accel_high_res_bw == config_.accel_high_res_bw;
+  }
+
   const auto config_str = ConfigToString(actual_cfg);
   const std::string valid_str = valid ? "successfully" : "failed to";
-  const std::string msg = "MPU9250 " + valid_str +
+  const std::string msg = "LSM9DS1 " + valid_str +
                           " initialized! Actual configuration is set to:\n" +
                           config_str;
-  if (valid) {
-    node_->GetLogger()->LogDebug(msg);
-  } else {
-    node_->GetLogger()->LogWarn(msg);
-  }
+  valid ? node_->GetLogger()->LogDebug(msg) : node_->GetLogger()->LogWarn(msg);
+
   return {valid, actual_cfg};
 }
 
@@ -372,7 +391,7 @@ SensorRawData Lsm9ds1::ReadRawData() const {
   raw.gyro = ReadRawGyroData();
   raw.mag = ReadRawMagData();
   raw.temp = ReadRawTemperatureData();
-  return raw;
+  return AlignAxis(raw);
 }
 
 cu::Vec3 Lsm9ds1::ReadRawAccelData() const {
@@ -412,6 +431,19 @@ Lsm9ds1::ExtractFullBits(const std::vector<uint8_t>& data) {
   return full_bits;
 }
 
+SensorRawData Lsm9ds1::AlignAxis(const SensorRawData& raw) {
+  SensorRawData aligned = raw;
+  std::swap(aligned.accel.x(), aligned.accel.y());
+  std::swap(aligned.gyro.x(), aligned.gyro.y());
+  aligned.accel.x() *= -1;
+  aligned.accel.y() *= -1;
+  aligned.gyro.x() *= -1;
+  aligned.gyro.y() *= -1;
+  aligned.mag.y() *= -1;
+  aligned.mag.z() *= -1;
+  return aligned;
+}
+
 cu::ImuData Lsm9ds1::ApplySensorSpecs(const SensorRawData& raw) const {
   cu::ImuData imu;
   imu.accel.data = accel_spec_.Apply(raw.accel);
@@ -436,7 +468,8 @@ uint8_t Lsm9ds1::ReadMagRegister(uint8_t reg) const {
 
 std::vector<uint8_t> Lsm9ds1::ReadMagRegisters(uint8_t reg,
                                                uint8_t count) const {
-  return comm_mag_->ReadRegisters(reg, count);
+  reg |= count > 1 ? 0x40_uc : 0x00_uc;
+  return comm_mag_->ReadRegisters(reg | 0x40_uc, count);
 }
 
 void Lsm9ds1::WriteAGRegister(uint8_t reg, uint8_t data) const {

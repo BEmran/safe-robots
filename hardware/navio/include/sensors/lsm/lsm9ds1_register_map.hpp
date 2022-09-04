@@ -12,12 +12,11 @@ namespace sensors::lsm {
 namespace cu = common::utils;
 
 constexpr int kMaxBitVal = 32767;  // Measurement range is from -32767 ~
-//                                        // +32767 decimal in 16-bit output.
-// constexpr int kMaxUTesla = 10 * 4912;  // Magnetic flux density in milliGauss
+                                   // +32767 decimal in 16-bit output.
+constexpr auto kMagUnit = 100.0F;  // Magnetic flux density in uTesla
 
-// constexpr auto TempScale = 333.87F;
-
-// // TODO(Bara): change to single value instead of vector
+// TODO(Bara): change to single value instead of vector
+const auto kTempSensitivity = 16.F;
 const auto kTempBias = 0.F;
 const auto kTempOffset = 25.F;
 
@@ -140,7 +139,7 @@ inline auto AccelScaleMap() {
     {{AccelScale::SCALE_2G, {2.F, "2G"}},
      {AccelScale::SCALE_4G, {4.F, "4G"}},
      {AccelScale::SCALE_8G, {8.F, "8G"}},
-     {AccelScale::SCALE_16G, {16.F, "16G"}}});
+     {AccelScale::SCALE_16G, {24.F, "16G"}}});  // DON"T CHANGE 0.000732
   return map;
 }
 
@@ -174,9 +173,9 @@ inline auto GyroODRMap() {
 
 inline auto GyroScaleMap() {
   static std::map<GyroScale, cu::SpecInfo> map(
-    {{GyroScale::SCALE_245DPS, {245.F, "245 DPS"}},
-     {GyroScale::SCALE_500DPS, {500.F, "500 DPS"}},
-     {GyroScale::SCALE_2000DPS, {2000.F, "2000 DPS"}}});
+    {{GyroScale::SCALE_245DPS, {287.F, "245 DPS"}},  // DON"T CHANGE 0.000875
+     {GyroScale::SCALE_500DPS, {574.F, "500 DPS"}},  // DON"T CHANGE 0.001750
+     {GyroScale::SCALE_2000DPS, {2295.F, "2000 DPS"}}});  // DON"T CHANGE 0.0070
   return map;
 }
 
@@ -194,10 +193,10 @@ inline auto MagODRMap() {
 
 inline auto MagScaleMap() {
   static std::map<MagScale, cu::SpecInfo> map(
-    {{MagScale::SCALE_4GS, {4.F, "4 GS"}},
-     {MagScale::SCALE_8GS, {8.F, "8 GS"}},
-     {MagScale::SCALE_12GS, {12.F, "12 GS"}},
-     {MagScale::SCALE_16GS, {16.F, "16 GS"}}});
+    {{MagScale::SCALE_4GS, {4.6F, "4 GS"}},      // DON"T CHANGE 0.00014
+     {MagScale::SCALE_8GS, {9.5F, "8 GS"}},      // DON"T CHANGE 0.00029
+     {MagScale::SCALE_12GS, {14.F, "12 GS"}},    // DON"T CHANGE 0.00043
+     {MagScale::SCALE_16GS, {19.F, "16 GS"}}});  // DON"T CHANGE 0.00058
   return map;
 }
 
