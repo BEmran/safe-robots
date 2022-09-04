@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <map>
+#include <string>
 
 #include "sensors/common/utils.hpp"
 
@@ -70,65 +71,65 @@ enum class MagMode : uint8_t {
   FUSE_ROM_ACCESS = 0x0F_uc
 };
 
-inline cu::SpecInfoMap<AccelBandWidthHz> AccelBWMap() {
-  static cu::SpecInfoMap<AccelBandWidthHz> accel_bw_map(
-    {{AccelBandWidthHz::BW_218HZ, {0, "218 HZ"}},
-     {AccelBandWidthHz::BW_99HZ, {0, "99 HZ"}},
-     {AccelBandWidthHz::BW_44HZ, {0, "44 HZ"}},
-     {AccelBandWidthHz::BW_21HZ, {0, "21 HZ"}},
-     {AccelBandWidthHz::BW_10HZ, {0, "10 HZ"}},
-     {AccelBandWidthHz::BW_5HZ, {0, "5 HZ"}}});
-  return accel_bw_map;
+inline auto AccelBWMap() {
+  static std::map<AccelBandWidthHz, std::string> map(
+    {{AccelBandWidthHz::BW_218HZ, "218 HZ"},
+     {AccelBandWidthHz::BW_99HZ, "99 HZ"},
+     {AccelBandWidthHz::BW_44HZ, "44 HZ"},
+     {AccelBandWidthHz::BW_21HZ, "21 HZ"},
+     {AccelBandWidthHz::BW_10HZ, "10 HZ"},
+     {AccelBandWidthHz::BW_5HZ, "5 HZ"}});
+  return map;
 }
 
-inline cu::SpecInfoMap<AccelScale> AccelScaleMap() {
-  static cu::SpecInfoMap<AccelScale> accel_scale_map(
+inline auto AccelScaleMap() {
+  static std::map<AccelScale, cu::SpecInfo> map(
     {{AccelScale::FS_2G, {2.F, "2G"}},
      {AccelScale::FS_4G, {4.F, "4G"}},
      {AccelScale::FS_8G, {8.F, "8G"}},
      {AccelScale::FS_16G, {16.F, "16G"}}});
-  return accel_scale_map;
+  return map;
 }
 
-inline cu::SpecInfoMap<GyroBandWidthHz> GyroBWMap() {
-  static cu::SpecInfoMap<GyroBandWidthHz> gyro_bw_map(
-    {{GyroBandWidthHz::BW_250HZ, {0, "250 HZ"}},
-     {GyroBandWidthHz::BW_184HZ, {0, "184 HZ"}},
-     {GyroBandWidthHz::BW_92HZ, {0, "92 HZ"}},
-     {GyroBandWidthHz::BW_41HZ, {0, "41 HZ"}},
-     {GyroBandWidthHz::BW_20HZ, {0, "20 HZ"}},
-     {GyroBandWidthHz::BW_10HZ, {0, "10 HZ"}},
-     {GyroBandWidthHz::BW_5HZ, {0, "5 HZ"}},
-     {GyroBandWidthHz::BW_3600HZ, {0, "3600 HZ"}}});
-  return gyro_bw_map;
+inline auto GyroBWMap() {
+  static std::map<GyroBandWidthHz, std::string> map(
+    {{GyroBandWidthHz::BW_250HZ, "250 HZ"},
+     {GyroBandWidthHz::BW_184HZ, "184 HZ"},
+     {GyroBandWidthHz::BW_92HZ, "92 HZ"},
+     {GyroBandWidthHz::BW_41HZ, "41 HZ"},
+     {GyroBandWidthHz::BW_20HZ, "20 HZ"},
+     {GyroBandWidthHz::BW_10HZ, "10 HZ"},
+     {GyroBandWidthHz::BW_5HZ, "5 HZ"},
+     {GyroBandWidthHz::BW_3600HZ, "3600 HZ"}});
+  return map;
 }
 
-inline cu::SpecInfoMap<GyroScale> GyroScaleMap() {
-  static cu::SpecInfoMap<GyroScale> gyro_scale_map(
+inline auto GyroScaleMap() {
+  std::map<GyroScale, cu::SpecInfo> map(
     {{GyroScale::FS_250DPS, {250.F, "250 DPS"}},
      {GyroScale::FS_500DPS, {500.F, "500 DPS"}},
      {GyroScale::FS_1000DPS, {1000.F, "1000 DPS"}},
      {GyroScale::FS_2000DPS, {2000.F, "2000 DPS"}}});
-  return gyro_scale_map;
+  return map;
 }
 
-inline cu::SpecInfoMap<MagScale> MagScaleMap() {
-  static cu::SpecInfoMap<MagScale> mag_scale_map(
+inline auto MagScaleMap() {
+  std::map<MagScale, cu::SpecInfo> map(
     {{MagScale::FS_14BITS, {0.25F * kMaxUTesla, "14 BITS"}},
      {MagScale::FS_16BITS, {1.00F * kMaxUTesla, "16 BITS"}}});
-  return mag_scale_map;
+  return map;
 }
 
-inline cu::SpecInfoMap<MagMode> MagModeMap() {
-  static cu::SpecInfoMap<MagMode> mag_mode_map(
-    {{MagMode::POWER_DOWN, {0, "POWER DOWN"}},
-     {MagMode::SINGLE_MEASURE, {0, "SINGLE MEASUREMENT"}},
-     {MagMode::CONTINUES_8HZ, {0, "CONTINUES 8HZ"}},
-     {MagMode::EXTERNAL_TRIGGER, {0, "EXTERNAL TRIGGER"}},
-     {MagMode::CONTINUES_100HZ, {0, "CONTINUES 100HZ"}},
-     {MagMode::SELF_TEST, {0, "SELF TEST"}},
-     {MagMode::FUSE_ROM_ACCESS, {0, "FUSE ROM ACCESS"}}});
-  return mag_mode_map;
+inline auto MagModeMap() {
+  static std::map<MagMode, std::string> map(
+    {{MagMode::POWER_DOWN, "POWER DOWN"},
+     {MagMode::SINGLE_MEASURE, "SINGLE MEASUREMENT"},
+     {MagMode::CONTINUES_8HZ, "CONTINUES 8HZ"},
+     {MagMode::EXTERNAL_TRIGGER, "EXTERNAL TRIGGER"},
+     {MagMode::CONTINUES_100HZ, "CONTINUES 100HZ"},
+     {MagMode::SELF_TEST, "SELF TEST"},
+     {MagMode::FUSE_ROM_ACCESS, "FUSE ROM ACCESS"}});
+  return map;
 }
 
 // NOLINTBEGIN(misc-definitions-in-headers)

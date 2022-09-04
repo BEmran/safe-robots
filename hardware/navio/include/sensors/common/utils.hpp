@@ -49,36 +49,20 @@ struct SpecInfo {
   }
 };
 
-template <typename E>
-class SpecInfoMap {
-  using Map = std::map<E, SpecInfo>;
-  using Iterator = typename Map::iterator;
-
- public:
-  explicit SpecInfoMap(const Map& map) : map_(map) {
+template <typename T, typename N>
+inline T Find(const std::map<T, N>& map, uint8_t byte) {
+  const auto key = static_cast<T>(byte);
+  auto it = map.find(key);
+  if (it == map.end()) {
+    throw std::runtime_error("undefined specification");
   }
+  return it->first;
+}
 
-  inline E FindByByte(uint8_t byte) {
-    auto it = std::find_if(map_.begin(), map_.end(), [byte](auto ele) {
-      return byte == static_cast<uint8_t>(ele.first);
-    });
-    if (it == map_.end()) {
-      throw std::runtime_error("undefined specification");
-    }
-    return it->first;
-  }
-
-  inline SpecInfo operator[](E key) {
-    return map_[key];
-  }
-
-  inline uint8_t Byte(E key) {
-    return static_cast<uint8_t>(key);
-  }
-
- private:
-  Map map_;
-};
+template <typename T>
+inline auto ToByte(T t) {
+  return static_cast<uint8_t>(t);
+}
 
 /**
  * @brief Hold sensor measurement specifications used to convert sensor raw

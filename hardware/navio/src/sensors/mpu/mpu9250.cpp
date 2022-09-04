@@ -34,13 +34,13 @@ cu::SensorSpecs<3> CreateSensorSpecs(const cu::MATH_TYPE scale,
 std::string ConfigToString(const Config& cfg) {
   std::stringstream ss;
   ss << "\tAccelerometer:"
-     << " Bandwidth " << AccelBWMap()[cfg.accel_bw].name
+     << " Bandwidth " << AccelBWMap()[cfg.accel_bw]
      << ", Full Scale: " << AccelScaleMap()[cfg.accel_scale].name
      << "\n\tGyroscope:"
-     << " Bandwidth " << GyroBWMap()[cfg.gyro_bw].name
+     << " Bandwidth " << GyroBWMap()[cfg.gyro_bw]
      << ", Full Scale: " << GyroScaleMap()[cfg.gyro_scale].name
      << "\n\tMagnetometer:"
-     << " Mode " << MagModeMap()[cfg.mag_mode].name
+     << " Mode " << MagModeMap()[cfg.mag_mode]
      << ", Full Scale: " << MagScaleMap()[cfg.mag_scale].name
      << "\n\tSample rate devisor: "
      << static_cast<int>(cfg.sample_rate_divisor);
@@ -161,31 +161,31 @@ bool Mpu9250::Test() {
 
 void Mpu9250::InitializeAccel() const {
   // Set accelerometer full-scale range configuration
-  const auto scale = AccelScaleMap().Byte(config_.accel_scale);
+  const auto scale = cu::ToByte(config_.accel_scale);
   constexpr auto mask1 = 0xE7_uc;
   SetRegisterByte(mpu9250::ACCEL_CONFIG, scale, mask1);
 
   // Set accelerometer sample rate configuration
-  const auto bw = AccelBWMap().Byte(config_.accel_bw);
+  const auto bw = cu::ToByte(config_.accel_bw);
   constexpr auto mask2 = 0xF0_uc;
   SetRegisterByte(mpu9250::ACCEL_CONFIG2, bw, mask2);
 }
 
 void Mpu9250::InitializeGyro() const {
   // Configure Gyro and Thermometer bandwidth
-  const auto bw = GyroBWMap().Byte(config_.gyro_bw);
+  const auto bw = cu::ToByte(config_.gyro_bw);
   constexpr auto cmask = 0xF8_uc;
   SetRegisterByte(mpu9250::CONFIG, bw, cmask);
 
   // Set gyroscope full scale range
-  const auto scale = GyroScaleMap().Byte(config_.gyro_scale);
+  const auto scale = cu::ToByte(config_.gyro_scale);
   constexpr auto gmask = 0xE4_uc;
   SetRegisterByte(mpu9250::GYRO_CONFIG, scale, gmask);
 }
 
 void Mpu9250::InitializeMag() const {
-  const auto scale = MagScaleMap().Byte(config_.mag_scale);
-  const auto mode = MagModeMap().Byte(config_.mag_mode);
+  const auto scale = cu::ToByte(config_.mag_scale);
+  const auto mode = cu::ToByte(config_.mag_mode);
   node_->GetLogger()->LogInfo(std::to_string(mode));
   const auto res = static_cast<uint8_t>(scale | mode);
   WriteAK8963Register(ak8963::CNTL, res);
@@ -193,11 +193,10 @@ void Mpu9250::InitializeMag() const {
 }
 
 void Mpu9250::ExtractMagnetometerSensitivityAdjustmentValues() {
-  WriteAK8963Register(ak8963::CNTL, MagModeMap().Byte(MagMode::POWER_DOWN));
+  WriteAK8963Register(ak8963::CNTL, cu::ToByte(MagMode::POWER_DOWN));
   navio::hardware_utils::Delay(ShortDelay);
 
-  WriteAK8963Register(ak8963::CNTL,
-                      MagModeMap().Byte(MagMode::FUSE_ROM_ACCESS));
+  WriteAK8963Register(ak8963::CNTL, cu::ToByte(MagMode::FUSE_ROM_ACCESS));
   navio::hardware_utils::Delay(ShortDelay);
 
   constexpr auto reg_size = 3;
@@ -219,7 +218,7 @@ AccelScale Mpu9250::ReadAccelScale() const {
   const auto data = ReadRegister(mpu9250::ACCEL_CONFIG);
   constexpr auto mask = 0x18_uc;  // mask bits [4:3]
   const auto fs = static_cast<uint8_t>(data & mask);
-  return AccelScaleMap().FindByByte(fs);
+  return cu::Find(AccelScaleMap(), fs);
 }
 
 AccelBandWidthHz Mpu9250::ReadAccelBandWidth() const {
@@ -231,14 +230,14 @@ AccelBandWidthHz Mpu9250::ReadAccelBandWidth() const {
   if (f_inv != 0) {
     node_->GetLogger()->LogError("Accelerometer fChoice is disabled");
   }
-  return AccelBWMap().FindByByte(bw);
+  return cu::Find(AccelBWMap(), bw);
 }
 
 GyroBandWidthHz Mpu9250::ReadGyroBandWidth() const {
   const auto data = ReadRegister(mpu9250::CONFIG);
   constexpr auto mask_bw = 0x07_uc;  // mask bits [2:0]
   const auto bw = static_cast<uint8_t>(data & mask_bw);
-  return GyroBWMap().FindByByte(bw);
+  return cu::Find(GyroBWMap(), bw);
 }
 
 GyroScale Mpu9250::ReadGyroScale() const {
@@ -250,21 +249,21 @@ GyroScale Mpu9250::ReadGyroScale() const {
   if (f_inv != 0) {
     node_->GetLogger()->LogError("Gyroscope fChoice is disabled");
   }
-  return GyroScaleMap().FindByByte(fs);
+  return cu::Find(GyroScaleMap(), fs);
 }
 
 MagMode Mpu9250::ReadMagMode() const {
   const auto data = ReadAK8963Register(ak8963::CNTL);
   constexpr auto mask = 0x0F_uc;  // mask bits[3:0]
   const auto mode = static_cast<uint8_t>(data & mask);
-  return MagModeMap().FindByByte(mode);
+  return cu::Find(MagModeMap(), mode);
 }
 
 MagScale Mpu9250::ReadMagScale() const {
   const auto data = ReadAK8963Register(ak8963::CNTL);
   constexpr auto mask = 0x10_uc;  // mask res bit[4]
   const auto res = static_cast<uint8_t>(data & mask);
-  return MagScaleMap().FindByByte(res);
+  return cu::Find(MagScaleMap(), res);
 }
 
 std::pair<bool, Config> Mpu9250::ValidateConfiguration() const {
