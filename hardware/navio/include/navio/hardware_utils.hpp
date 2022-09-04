@@ -18,6 +18,9 @@ namespace navio::hardware_utils {
 void Delay(uint32_t msec);
 
 constexpr const char* MPU_SPI_PATH = "/dev/spidev0.1";
+constexpr const char* LSM_A_G_PATH = "/dev/spidev0.3";
+constexpr const char* LSM_MAG_PATH = "/dev/spidev0.2";
+
 constexpr auto NAVIO = 1;
 constexpr auto NAVIO2 = 3;
 
