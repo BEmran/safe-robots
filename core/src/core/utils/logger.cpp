@@ -46,12 +46,9 @@ void Logger::ThrowExceptionForErrorEvent(const EventLevel event,
 
 std::shared_ptr<Logger> CreateFileAndConsoleLogger(const std::string& name) {
   const auto filename = name + kFilenameExten;
-  const auto writer_formatter_vec = {
-    WriterFormatterPair{std::make_shared<FileWriter>(filename),
-                        CreateTimeLabelFormatter()},
-    WriterFormatterPair{std::make_shared<ConsoleWriter>(),
-                        CreateTimeLabelModifierFormatter()},
-  };
+  const std::vector<WriterFormatterPair> writer_formatter_vec{
+    {std::make_shared<FileWriter>(filename), CreateTimeLabelFormatter()},
+    {std::make_shared<ConsoleWriter>(), CreateTimeLabelModifierFormatter()}};
   const auto except_fact = std::make_shared<ExceptionFactory>(name);
   return std::make_shared<Logger>(writer_formatter_vec, except_fact);
 }
