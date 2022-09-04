@@ -32,7 +32,7 @@ void SelectSensor(const std::string& option) {
       std::make_unique<navio::SPI>(navio::hardware_utils::LSM_A_G_PATH, false);
     auto spi_mag =
       std::make_unique<navio::SPI>(navio::hardware_utils::LSM_MAG_PATH, false);
-    sensor = std::make_unique<sensors::lsm::Lsm94s1>(
+    sensor = std::make_unique<sensors::lsm::Lsm9ds1>(
       config, std::move(spi_a_g), std::move(spi_mag), std::move(node));
 
   } else {

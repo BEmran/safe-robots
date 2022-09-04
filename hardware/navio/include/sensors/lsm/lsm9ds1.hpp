@@ -48,7 +48,7 @@ struct Config {
   MagTempCompensation mag_temp_compensation = MagTempCompensation::DISABLED;
 };
 
-class Lsm94s1 : public cu::ImuSensorModule {
+class Lsm9ds1 : public cu::ImuSensorModule {
   using AccelData = core::utils::AccelData;
   using GyroData = core::utils::GyroData;
   using MagData = core::utils::MagData;
@@ -57,7 +57,7 @@ class Lsm94s1 : public cu::ImuSensorModule {
   static constexpr const char* SensorName = "lsm9ds1";
 
  public:
-  Lsm94s1(const Config& config, std::unique_ptr<navio::SPI> comm_ag,
+  Lsm9ds1(const Config& config, std::unique_ptr<navio::SPI> comm_ag,
           std::unique_ptr<navio::SPI> comm_mag,
           std::unique_ptr<core::utils::Node> node);
 
