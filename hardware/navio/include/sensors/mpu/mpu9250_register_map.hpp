@@ -12,13 +12,10 @@
 namespace sensors::mpu {
 namespace cu = common::utils;
 
-constexpr int kMaxBitVal = 32767;  // Measurement range is from -32760 ~ +32760
+constexpr int kMaxBitVal = 32760;  // Measurement range is from -32760 ~ +32760
                                    // decimal in 16-bit output.
-constexpr int kMaxUTesla = 10 * 4912;  // Magnetic flux density in milliGauss
-
-constexpr auto TempScale = 333.87F;
-
-// TODO(Bara): change to single value instead of vector
+constexpr int kMaxUTesla = 4912 * 10;  // Magnetic flux density in micro Tesla
+constexpr auto TempSensitivity = 333.87F;
 const auto kTempBias = 21.F;
 const auto kTempOffset = 21.F;
 

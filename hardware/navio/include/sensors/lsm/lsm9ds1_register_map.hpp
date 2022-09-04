@@ -13,9 +13,7 @@ namespace cu = common::utils;
 
 constexpr int kMaxBitVal = 32767;  // Measurement range is from -32767 ~
                                    // +32767 decimal in 16-bit output.
-constexpr auto kMagUnit = 100.0F;  // Magnetic flux density in uTesla
-
-// TODO(Bara): change to single value instead of vector
+constexpr auto kMagUnit = 100.0F;  // Magnetic flux density in micro Tesla.
 const auto kTempSensitivity = 16.F;
 const auto kTempBias = 0.F;
 const auto kTempOffset = 25.F;

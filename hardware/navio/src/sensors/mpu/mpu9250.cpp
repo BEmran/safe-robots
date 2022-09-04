@@ -60,7 +60,7 @@ Mpu9250::Mpu9250(const Config& config, std::unique_ptr<navio::SPI> comm,
                                  cu::DEG_TO_RAD)}
   , accel_spec_{CreateSensorSpecs(AccelScaleMap()[config.accel_scale].value,
                                   cu::GRAVITY)}
-  , temp_spec_{cu::SensorSpecs<1>(TempScale, 1.0F)} {
+  , temp_spec_{cu::SensorSpecs<1>(TempSensitivity, 1.0F)} {
   temp_spec_.SetCalibration(cu::CreateScalar(1), cu::CreateScalar(kTempBias),
                             cu::CreateScalar(kTempOffset));
   ReadCalibrationFile();
