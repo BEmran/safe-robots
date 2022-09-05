@@ -5,6 +5,8 @@
 
 #include <iomanip>
 #include <iostream>
+#include <string>
+#include <vector>
 
 #include "core/utils/math.hpp"
 
@@ -16,13 +18,26 @@ struct Data {
  public:
   virtual ~Data() = default;
   virtual void Clear() = 0;
+  virtual std::string Header() const = 0;
+  virtual std::string ToString() const = 0;
 };
+
+std::string Header(std::vector<const Data*> vec);
+std::string ToString(std::vector<const Data*> vec);
 
 struct AdcData : public Data {
   Vec3 values = Vec3::Zero();
 
   inline void Clear() override {
     values.setZero();
+  }
+  inline std::string Header() const override {
+    return "adc:0, adc:1, adc:2";
+  }
+  inline std::string ToString() const override {
+    std::stringstream ss;
+    ss << values.format(kVecFmtSimple);
+    return ss.str();
   }
 };
 
@@ -31,13 +46,31 @@ struct DoubleData : public Data {
   inline void Clear() override {
     value = 0.0;
   }
+  inline std::string Header() const override {
+    return "value";
+  }
+  inline std::string ToString() const override {
+    return std::to_string(value);
+  }
 };
 
-struct BarData : public DoubleData {};
+struct BarData : public DoubleData {
+  inline std::string Header() const override {
+    return "bar";
+  }
+};
 
-struct TemperatureData : public DoubleData {};
+struct TemperatureData : public DoubleData {
+  inline std::string Header() const override {
+    return "temp";
+  }
+};
 
-struct HeadingData : public DoubleData {};
+struct HeadingData : public DoubleData {
+  inline std::string Header() const override {
+    return "heading";
+  }
+};
 
 struct GpsData : public Data {
   double lat = 0.0;
@@ -48,6 +81,15 @@ struct GpsData : public Data {
     lat = 0.0;
     lon = 0.0;
     alt = 0.0;
+  }
+  inline std::string Header() const override {
+    return "gps:lat, gps:long, gps:alt";
+  }
+  inline std::string ToString() const override {
+    std::stringstream ss;
+    ss << std::to_string(lat) << ", " << std::to_string(lon) << ", "
+       << std::to_string(alt);
+    return ss.str();
   }
 };
 
@@ -62,20 +104,52 @@ struct Vec3Data : public Data {
   inline void Clear() override {
     data.setZero();
   }
+  inline std::string Header() const override {
+    return "data:x, data:y, data:z";
+  }
+  inline std::string ToString() const override {
+    std::stringstream ss;
+    ss << data.format(kVecFmtSimple);
+    return ss.str();
+  }
 };
 
-struct AccelData : public Vec3Data {};
+struct AccelData : public Vec3Data {
+  inline std::string Header() const override {
+    return "accel:x, accel:y, accel:z";
+  }
+};
 
-struct GyroData : public Vec3Data {};
+struct GyroData : public Vec3Data {
+  inline std::string Header() const override {
+    return "gyro:x, gyro:y, gyro:z";
+  }
+};
 
-struct MagData : public Vec3Data {};
+struct MagData : public Vec3Data {
+  inline std::string Header() const override {
+    return "mag:x, mag:y, mag:z";
+  }
+};
 
-struct RPYData : public Vec3Data {};
+struct RPYData : public Vec3Data {
+  inline std::string Header() const override {
+    return "roll, pitch, yaw";
+  }
+};
 
 struct QuatData : public Data {
   Quat data = Quat::Identity();
   inline void Clear() override {
     data.setIdentity();
+  }
+  inline std::string Header() const override {
+    return "quat:w, quat:x, quat:y, quat:z";
+  }
+  inline std::string ToString() const override {
+    std::stringstream ss;
+    ss << data.w() << ", " << data.vec().format(kVecFmtSimple);
+    return ss.str();
   }
 };
 
@@ -84,6 +158,8 @@ struct QuatData : public Data {
  *
  */
 struct ImuData : public Data {
+  ImuData() {
+  }
   TemperatureData temp;  ///< thermometer, in units of degrees Celsius
   HeadingData heading;   ///< fused heading filtered with gyro and accel data,
                          ///< same as Tait-Bryan yaw in radians
@@ -92,6 +168,8 @@ struct ImuData : public Data {
   MagData mag;           ///< magnetometer (XYZ) in units of uT
   QuatData quat;         ///< normalized quaternion
   RPYData tait_bryan;    ///< Tait-Bryan angles (roll pitch yaw) in radians
+  std::vector<const Data*> vec{&accel,      &gyro,    &mag, &quat,
+                               &tait_bryan, &heading, &temp};
 
   inline void Clear() override {
     temp.Clear();
@@ -101,6 +179,12 @@ struct ImuData : public Data {
     mag.Clear();
     tait_bryan.Clear();
     quat.Clear();
+  }
+  inline std::string Header() const override {
+    return core::utils::Header(vec);
+  }
+  inline std::string ToString() const override {
+    return core::utils::ToString(vec);
   }
 };
 

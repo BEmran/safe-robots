@@ -2,6 +2,22 @@
 
 #include "core/utils/data.hpp"
 
+namespace core::utils {
+std::string Header(std::vector<const Data*> vec) {
+  std::string header;
+  std::for_each(vec.begin(), vec.end(),
+                [&header](auto ele) { header += ele->Header() + ", "; });
+  return header;
+}
+
+std::string ToString(std::vector<const Data*> vec) {
+  std::string str;
+  std::for_each(vec.begin(), vec.end(),
+                [&str](auto ele) { str += ele->ToString() + ", "; });
+  return str;
+}
+}  // namespace core::utils
+
 namespace cu = core::utils;
 
 std::ostream& operator<<(std::ostream& os, const cu::BarData& bar) {

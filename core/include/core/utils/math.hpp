@@ -33,6 +33,9 @@ using Scalar = Eigen::Matrix<MATH_TYPE, 1, 1>;
 using InputMat = const Eigen::Ref<const MatrixX>&;
 using OutputMat = Eigen::Ref<MatrixX>;
 
+static const Eigen::IOFormat kVecFmtSimple(Eigen::FullPrecision, 0, ", ", ", ",
+                                           "", "", "", "");
+
 Scalar CreateScalar(MATH_TYPE val);
 
 }  // namespace core::utils
