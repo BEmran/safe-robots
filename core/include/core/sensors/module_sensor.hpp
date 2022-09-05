@@ -97,6 +97,7 @@ class SensorModuleAbs : public utils::ModuleAbs {
 
  protected:
   void SetData(const T& data) {
+    data_ = data;
     return cashed_data_.Set(data);
   }
 
@@ -106,7 +107,7 @@ class SensorModuleAbs : public utils::ModuleAbs {
 
  private:
   T data_;
-  core::utils::Cash<T> cashed_data_;
+  utils::Cash<T> cashed_data_;
   SensorModuleType sensor_type_{SensorModuleType::UNDEFINED};
 };
 
