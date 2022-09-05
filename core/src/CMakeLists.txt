@@ -9,19 +9,19 @@ set(CORE_HEADER_LIST
     ${CORE_INCLUDE_DIR}/utils/event_level.hpp
     ${CORE_INCLUDE_DIR}/utils/exception.hpp
     ${CORE_INCLUDE_DIR}/utils/formatter.hpp
-    ${CORE_INCLUDE_DIR}/utils/system.hpp
-    ${CORE_INCLUDE_DIR}/utils/terminal.hpp
     ${CORE_INCLUDE_DIR}/utils/logger.hpp
     ${CORE_INCLUDE_DIR}/utils/math.hpp
     ${CORE_INCLUDE_DIR}/utils/module.hpp
     ${CORE_INCLUDE_DIR}/utils/node_logger.hpp
     ${CORE_INCLUDE_DIR}/utils/node.hpp
+    ${CORE_INCLUDE_DIR}/utils/socket_exception.hpp
+    ${CORE_INCLUDE_DIR}/utils/socket.hpp
+    ${CORE_INCLUDE_DIR}/utils/subject.hpp
+    ${CORE_INCLUDE_DIR}/utils/system.hpp
+    ${CORE_INCLUDE_DIR}/utils/terminal.hpp
     ${CORE_INCLUDE_DIR}/utils/writer_console.hpp
     ${CORE_INCLUDE_DIR}/utils/writer_file.hpp
     ${CORE_INCLUDE_DIR}/utils/writer.hpp
-    ${CORE_INCLUDE_DIR}/utils/socket.hpp
-    ${CORE_INCLUDE_DIR}/utils/socket.hpp
-    ${CORE_INCLUDE_DIR}/utils/socket_exception.hpp
     ${CORE_INCLUDE_DIR}/sensors/module_sensor_imu.hpp
     ${CORE_INCLUDE_DIR}/sensors/module_sensor.hpp)
 
@@ -34,17 +34,17 @@ set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/utils/data.cpp
     ${CORE_SOURCE_DIR}/utils/event_level.cpp
     ${CORE_SOURCE_DIR}/utils/formatter.cpp
-    ${CORE_SOURCE_DIR}/utils/system.cpp
     ${CORE_SOURCE_DIR}/utils/terminal.cpp
     ${CORE_SOURCE_DIR}/utils/logger.cpp
     ${CORE_SOURCE_DIR}/utils/math.cpp
     ${CORE_SOURCE_DIR}/utils/module.cpp
     ${CORE_SOURCE_DIR}/utils/node_logger.cpp
     ${CORE_SOURCE_DIR}/utils/node.cpp
+    ${CORE_SOURCE_DIR}/utils/server_socket.cpp
+    ${CORE_SOURCE_DIR}/utils/socket.cpp
+    ${CORE_SOURCE_DIR}/utils/system.cpp
     ${CORE_SOURCE_DIR}/utils/writer_console.cpp
     ${CORE_SOURCE_DIR}/utils/writer_file.cpp
-    ${CORE_SOURCE_DIR}/utils/socket.cpp
-    ${CORE_SOURCE_DIR}/utils/server_socket.cpp
     ${CORE_SOURCE_DIR}/sensors/module_sensor_imu.cpp
     ${CORE_SOURCE_DIR}/sensors/module_sensor.cpp)
 
