@@ -17,7 +17,7 @@ Modifier::Modifier(FG fg, BG bg, FMT fmt) : fg_(fg), bg_(bg), fmt_(fmt) {
 }
 
 std::string Modifier::ToString() const {
-  return SingleOptionToString(fmt_)    // change baground
+  return SingleOptionToString(fmt_)    // change background
          + SingleOptionToString(fg_)   // change font format
          + SingleOptionToString(bg_);  // change foreground
 }

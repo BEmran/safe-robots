@@ -26,7 +26,7 @@ class Subject {
 
   void Register(std::shared_ptr<ObserverCallback<T>> cb) {
     auto it = observers_.find(cb);
-
+    // TODO(Bara): not needed for Set container
     if (it != observers_.end()) {
       node_->GetLogger()->LogWarn("This observer has been registered before.");
       return;

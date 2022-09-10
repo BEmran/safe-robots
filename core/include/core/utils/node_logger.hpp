@@ -37,15 +37,15 @@ struct NodeLabeledModifiers {
 class NodeLogger {
  public:
   /**
-   * @brief Construct a new Node object using a logger
+   * @brief Construct a new Node Logger object using a logger
    *
    * @param logger shared ptr to a logger object
    */
   explicit NodeLogger(std::shared_ptr<Logger> logger);
 
   /**
-   * @brief Construct a new Node object using a logger with specific labeled
-   * modifiers
+   * @brief Construct a new Node Logger object using a logger with specific
+   * labeled modifiers
    *
    * @param logger shared ptr to a logger object
    * @param labeled_modifiers labeled modifier struct
