@@ -4,6 +4,7 @@
 set(CORE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/core/include/core)
 set(CORE_HEADER_LIST
     ${CORE_INCLUDE_DIR}/utils/cash.hpp
+    ${CORE_INCLUDE_DIR}/utils/data_logger.hpp
     ${CORE_INCLUDE_DIR}/utils/data.hpp
     ${CORE_INCLUDE_DIR}/utils/date_time.hpp
     ${CORE_INCLUDE_DIR}/utils/event_level.hpp

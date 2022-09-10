@@ -88,6 +88,11 @@ set(UTEST_SUBJECT_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utils/utest_subject.cpp
 package_add_test_with_libraries(utest_subject "${UTEST_SUBJECT_FILES}"
                                 "${CORE_LIBRARY}" "")
 
+set(UTEST_DATA_LOGGER_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils/utest_data_logger.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils/utils.cpp)
+package_add_test_with_libraries(utest_data_logger "${UTEST_DATA_LOGGER_FILES}"
+                                "${CORE_LIBRARY}" "")
 # ##############################################################################
 set(UTEST_MODULE_SENSOR_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/sensors/utest_module_sensor.cpp)
