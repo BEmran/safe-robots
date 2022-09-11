@@ -5,6 +5,7 @@ set(CORE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/core/include/core)
 set(CORE_HEADER_LIST
     ${CORE_INCLUDE_DIR}/utils/cash.hpp
     ${CORE_INCLUDE_DIR}/utils/data_logger.hpp
+    ${CORE_INCLUDE_DIR}/utils/data_struct.hpp
     ${CORE_INCLUDE_DIR}/utils/data.hpp
     ${CORE_INCLUDE_DIR}/utils/date_time.hpp
     ${CORE_INCLUDE_DIR}/utils/event_level.hpp
@@ -32,6 +33,7 @@ set(CORE_HEADER_LIST
 set(CORE_SOURCE_DIR ${PROJECT_SOURCE_DIR}/core/src/core)
 set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/utils/date_time.cpp
+    ${CORE_SOURCE_DIR}/utils/data_struct.cpp
     ${CORE_SOURCE_DIR}/utils/data.cpp
     ${CORE_SOURCE_DIR}/utils/event_level.cpp
     ${CORE_SOURCE_DIR}/utils/formatter.cpp
