@@ -23,16 +23,16 @@ using core::utils::Vec3;
 using core::utils::Vec3DataStruct;
 
 void EXPECT_GPS(Gps gps1, Gps gps2) {
-  ExpectEq(gps1.lat, gps2.lat);
-  ExpectEq(gps1.lon, gps2.lon);
-  ExpectEq(gps1.alt, gps2.alt);
+  EXPECT_DOUBLE_EQ(gps1.lat, gps2.lat);
+  EXPECT_DOUBLE_EQ(gps1.lon, gps2.lon);
+  EXPECT_DOUBLE_EQ(gps1.alt, gps2.alt);
 }
 // MathTypeDataStruct
 // ------------------------------------------------------------
 TEST(MathTypeDataStruct, Print) {
   MathTypeDataStruct mt;
   mt.Set(11.2F);
-  const std::string msg = "[]: 11.2";
+  const std::string msg = "[]: 11.200000";
   std::stringstream ss;
   ss << mt;
   EXPECT_EQ(msg, ss.str());
@@ -75,21 +75,21 @@ TEST(HeadingDataStruct, Header) {
 // -------------------------------------------------------------------
 TEST(Vec3DataStruct, Print) {
   Vec3DataStruct vec;
-  vec.Set(Vec3(1.4F, 2.5F, 3.6F));
-  const std::string msg = "[x, y, z]: 1.4, 2.5, 3.6";
+  vec.Set({1.4F, 2.5F, 3.6F});
+  const std::string msg = "[.x, .y, .z]: 1.4, 2.5, 3.6";
   std::stringstream ss;
   ss << vec;
   EXPECT_EQ(msg, ss.str());
 }
 
 TEST(Vec3DataStruct, Header) {
-  const std::string msg = "x, y, z";
+  const std::string msg = ".x, .y, .z";
   EXPECT_EQ(msg, Vec3DataStruct().Header());
 }
 
 TEST(Vec3DataStruct, HeaderWithLabel) {
   const auto label = "data";
-  const std::string msg = "data:x, data:y, data:z";
+  const std::string msg = "data.x, data.y, data.z";
   EXPECT_EQ(msg, Vec3DataStruct(label).Header());
 }
 
@@ -117,19 +117,19 @@ TEST(Vec3DataStruct, Clear) {
 
 // AccelData -------------------------------------------------------------------
 TEST(AccelDataStruct, Header) {
-  const std::string msg = "accel:x, accel:y, accel:z";
+  const std::string msg = "accel.x, accel.y, accel.z";
   EXPECT_EQ(msg, AccelDataStruct().Header());
 }
 
 // GyroData -------------------------------------------------------------------
 TEST(GyroDataStruct, Header) {
-  const std::string msg = "gyro:x, gyro:y, gyro:z";
+  const std::string msg = "gyro.x, gyro.y, gyro.z";
   EXPECT_EQ(msg, GyroDataStruct().Header());
 }
 
 // MagData -------------------------------------------------------------------
 TEST(MagDataStruct, Header) {
-  const std::string msg = "mag:x, mag:y, mag:z";
+  const std::string msg = "mag.x, mag.y, mag.z";
   EXPECT_EQ(msg, MagDataStruct().Header());
 }
 
@@ -139,7 +139,7 @@ TEST(QuatDataStruct, Print) {
   QuatDataStruct quat;
   quat.Set(Quat(4.7F, 1.4F, 2.5F, 3.6F));
   const std::string msg =
-    "[quat:w, quat:x, quat:y, quat:z]: 4.7, 1.4, 2.5, "
+    "[quat.w, quat.x, quat.y, quat.z]: 4.7, 1.4, 2.5, "
     "3.6";
   std::stringstream ss;
   ss << quat;
@@ -147,7 +147,7 @@ TEST(QuatDataStruct, Print) {
 }
 
 TEST(QuatDataStruct, Header) {
-  const std::string msg = "quat:w, quat:x, quat:y, quat:z";
+  const std::string msg = "quat.w, quat.x, quat.y, quat.z";
   EXPECT_EQ(msg, QuatDataStruct().Header());
 }
 
@@ -162,43 +162,45 @@ TEST(QuatDataStruct, ToString) {
 TEST(RPYDataStruct, Print) {
   RPYDataStruct rpy;
   rpy.Set({7.4F, 8.5F, 9.6F});
-  const std::string msg = "[roll, pitch, yaw]: [7.4, 8.5, 9.6]";
+  const std::string msg =
+    "[rpy.roll, rpy.pitch, rpy.yaw]: 7.400000, 8.500000, 9.600000";
   std::stringstream ss;
   ss << rpy;
   EXPECT_EQ(msg, ss.str());
 }
 
 TEST(RPYDataStruct, Header) {
-  const std::string msg = "roll, pitch, yaw";
+  const std::string msg = "rpy.roll, rpy.pitch, rpy.yaw";
   EXPECT_EQ(msg, RPYDataStruct().Header());
 }
 
 TEST(RPYDataStruct, ToString) {
   RPYDataStruct rpy;
   rpy.Set({7.4F, 8.5F, 9.6F});
-  const std::string msg = "7.4, 8.5, 9.6";
+  const std::string msg = "7.400000, 8.500000, 9.600000";
   EXPECT_EQ(msg, rpy.ToString());
 }
 
 // GpsData --------------------------------------------------------------------
 TEST(GpsDataStruct, Print) {
   GpsDataStruct gps;
-  gps.Set(Gps{7.4F, 8.5F, 9.6F});
-  const std::string msg = "[gps:lat, gps:long, gps:alt] = 7.4, 8.5, 9.6";
+  gps.Set(Gps{7.4, 8.5, 9.6});
+  const std::string msg =
+    "[gps.lat, gps.long, gps.alt]: 7.400000, 8.500000, 9.600000";
   std::stringstream ss;
   ss << gps;
   EXPECT_EQ(msg, ss.str());
 }
 
 TEST(GpsDataStruct, Header) {
-  const std::string msg = "gps:lat, gps:long, gps:alt";
+  const std::string msg = "gps.lat, gps.long, gps.alt";
   EXPECT_EQ(msg, GpsDataStruct().Header());
 }
 
 TEST(GpsDataStruct, ToString) {
   GpsDataStruct gps;
-  gps.Set(Gps{7.4F, 8.5F, 9.6F});
-  const std::string msg = "[gps:lat, gps:long, gps:alt] = 7.4, 8.5, 9.6";
+  gps.Set(Gps{7.4, 8.5, 9.6});
+  const std::string msg = "7.400000, 8.500000, 9.600000";
   EXPECT_EQ(msg, gps.ToString());
 }
 
@@ -208,9 +210,9 @@ TEST(GpsDataStruct, Construct) {
 }
 
 TEST(GpsDataStruct, Clear) {
-  GpsDataStruct gps;
-  gps.Set(Gps{7.4F, 8.5F, 9.6F});
-  EXPECT_GPS(Gps{7.4F, 8.5F, 9.6F}, gps.Get());
+  GpsDataStruct gps("");
+  gps.Set(Gps{7.4, 8.5, 9.6});
+  EXPECT_GPS(Gps{7.4, 8.5, 9.6}, gps.Get());
   gps.Clear();
   EXPECT_GPS(Gps(), gps.Get());
 }
