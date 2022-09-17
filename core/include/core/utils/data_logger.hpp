@@ -4,7 +4,9 @@
 #define CORE_UTILS_DATA_LOGGER_HPP_
 
 #include <memory>
+#include <numeric>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "core/utils/data.hpp"
@@ -30,11 +32,12 @@ class DataLogger {
    *
    */
   void Log() const {
-    std::string str;
-    for (const auto d : data_vec_) {
-      str += d->ToString();
-    }
-    logger_->Log(lm_, str);
+    auto msg =
+      std::accumulate(data_vec_.begin(), data_vec_.end(), std::string(),
+                      [](std::string str, const auto& data) {
+                        return std::move(str) + data->ToString();
+                      });
+    logger_->Log(lm_, msg);
   }
 
   template <typename T>
@@ -42,7 +45,7 @@ class DataLogger {
     const auto size = data_vec_.size();
     data_vec_.push_back(new T(subject->Get()));
     auto lambda = [this, size](const T& d) {
-      std::cout << "lmabda call back for " << d.ToString() << std::endl;
+      std::cout << "lambda call back for " << d.ToString() << std::endl;
       data_vec_[size] = new T(d);
     };
     auto cb = std::make_shared<ObserverCallback<T>>(lambda);
