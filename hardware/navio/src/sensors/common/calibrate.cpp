@@ -76,7 +76,8 @@ SensorSpecs<3> CalibrateAccelerometer(const ReadFunc& cb,
               << "] = " << y.row(idx) << std::endl;
 
     if (ExpectNear(xn, y.row(idx))) {
-      x.row(idx) << xn.transpose(), 1.F;
+      x.block(idx, 0, 0, 2) << xn.transpose();
+      x(idx, 3) = 1.F;
     } else {
       --idx;
       std::cout << "Data is not what is expected. Please try again"
