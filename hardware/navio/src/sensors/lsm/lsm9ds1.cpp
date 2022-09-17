@@ -12,10 +12,10 @@ using namespace cu::literals;  // NOLINT [build/namespaces_literals] TODO(Bara)
 namespace {
 using SensorModuleType = core::sensors::SensorModuleType;
 constexpr auto ImuType = SensorModuleType::IMU;
-constexpr auto GyroType = SensorModuleType::GYROSCOPE;
-constexpr auto MagType = SensorModuleType::MAGNETOMETER;
-constexpr auto AccelType = SensorModuleType::ACCELEROMETER;
-constexpr auto TempType = SensorModuleType::TEMPERATURE;
+// constexpr auto GyroType = SensorModuleType::GYROSCOPE;
+// constexpr auto MagType = SensorModuleType::MAGNETOMETER;
+// constexpr auto AccelType = SensorModuleType::ACCELEROMETER;
+// constexpr auto TempType = SensorModuleType::TEMPERATURE;
 constexpr auto ShortDelay = 10;
 constexpr auto LongDelay = 100;
 
@@ -468,7 +468,9 @@ uint8_t Lsm9ds1::ReadMagRegister(uint8_t reg) const {
 
 std::vector<uint8_t> Lsm9ds1::ReadMagRegisters(uint8_t reg,
                                                uint8_t count) const {
-  reg |= count > 1 ? 0x40_uc : 0x00_uc;
+  if (count > 1) {
+    reg = static_cast<uint8_t>(reg | 0x40_uc);
+  }
   return comm_mag_->ReadRegisters(reg | 0x40_uc, count);
 }
 
