@@ -60,7 +60,7 @@ std::string TimeInSecondsString() {
   std::string buffer(kMaxSize, ' ', std::allocator<char>());
   const auto size =
     snprintf(buffer.data(), buffer.size(), "%ld", TimeInSeconds());  // NOLINT
-  buffer.resize(size);
+  buffer.resize(static_cast<size_t>(size));
   return buffer;
 }
 
