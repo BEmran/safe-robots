@@ -22,18 +22,9 @@ macro (package_add_test_with_libraries TESTNAME FILES LIBRARIES
     target_link_libraries(${TESTNAME} PUBLIC "${LIBRARIES}" ${GOOGLE_LIBRARIES}
                                              pthread)
 
-    # # gtest_discover_tests replaces gtest_add_tests, # see
-    # https://cmake.org/cmake/help/v3.10/module/GoogleTest.html for more options
-    # to pass to it gtest_discover_tests(${TESTNAME} # set a working directory
-    # so your project root so that you can find test data via paths relative to
-    # the project root WORKING_DIRECTORY ${TEST_WORKING_DIRECTORY} PROPERTIES
-    # VS_TRACEGER_WORKING_DIRECTORY "${TEST_WORKING_DIRECTORY}" )
-
     # All users of this library will need at least C++17
     target_compile_features(${TESTNAME} PUBLIC cxx_std_17)
     set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
     add_test(NAME ${TESTNAME}_test COMMAND ${TESTNAME})
 
 endmacro ()
-# example of using the macro package_add_test_with_libraries(test1 test1.cpp
-# lib_to_test "${PROJECT_DIR}/test-data/")
