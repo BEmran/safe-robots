@@ -2,10 +2,11 @@
 
 #include <unistd.h>
 
-#include <hardware/navio/app/app.hpp>
 #include <iostream>
 #include <memory>
 #include <string>
+
+#include "app.hpp"
 
 int main(int argc, char* argv[]) {
   App app;
