@@ -3,7 +3,7 @@
 namespace yaml {
 
 Map LoadFile(const std::string& filename) {
-  YAML::Node node = YAML::LoadFile(filename);
+  const YAML::Node node = YAML::LoadFile(filename);
   return LoadNode(node);
 }
 
