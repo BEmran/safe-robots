@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <shared_mutex>
+#include <mutex>
 
 namespace core::utils {
 /**
