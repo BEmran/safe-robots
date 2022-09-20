@@ -15,7 +15,7 @@ namespace yaml {
 using Map = std::map<std::string, std::string>;
 
 Map LoadFile(const std::string& filename);
-Map LoadNode(const YAML::Node& node);
+void LoadNode(const YAML::Node& node);
 void DumpFile(const std::string& filename, Map map);
 
 }  // namespace yaml
