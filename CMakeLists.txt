@@ -115,11 +115,33 @@ foreach (p LIB BIN INCLUDE)
 endforeach ()
 
 # ##############################################################################
+# Dependencies
+# ##############################################################################
+include(ExternalProject)
+
+ExternalProject_Add(
+	yaml_cpp_project
+	SOURCE_DIR "${CMAKE_SOURCE_DIR}/dependencies/yaml-cpp/"
+	INSTALL_DIR "${CMAKE_BINARY_DIR}/prefix"
+	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+)
+ExternalProject_Get_Property(yaml_cpp_project BINARY_DIR)
+ExternalProject_Get_Property(yaml_cpp_project SOURCE_DIR)
+
+# add_library(yaml-cpp UNKNOWN IMPORTED)
+add_library(yaml-cpp STATIC IMPORTED)
+
+set_target_properties(yaml-cpp PROPERTIES IMPORTED_LOCATION ${BINARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}yaml-cpp${CMAKE_STATIC_LIBRARY_SUFFIX})
+include_directories(${SOURCE_DIR}/include/)
+
+# ##############################################################################
 # Library
 # ##############################################################################
 # define library name
 set(CORE_LIBRARY core)
 set(NAVIO_LIBRARY navio)
+set(DEPEN_LIBRARY dependencies)
+
 # define library name
 set(CORE ON)
 if (CORE)
