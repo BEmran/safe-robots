@@ -8,7 +8,8 @@
 
 TEST(Cash, SetAndGet) {
   auto map = yaml::LoadFile("config_in.yaml");
-  yaml::DumpFile("config_out.yaml", map);
+  std::cout << map->ToString() << std::endl;
+  // yaml::DumpFile("config_out.yaml", map);
   // YAML::Node node1;
   // node1["file1"] = "file name one";
   // node1["file2"] = "file name two";

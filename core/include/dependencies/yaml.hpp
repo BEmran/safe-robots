@@ -10,12 +10,14 @@
 #include <map>
 #include <string>
 
+#include "entree.hpp"
+
 namespace yaml {
 
 using Map = std::map<std::string, std::string>;
 
-Map LoadFile(const std::string& filename);
-void LoadNode(const YAML::Node& node);
+Tree* LoadFile(const std::string& filename);
+Tree* LoadNode(const YAML::Node& node);
 void DumpFile(const std::string& filename, Map map);
 
 }  // namespace yaml
