@@ -7,6 +7,7 @@ message(STATUS "------> include: ${PROJECT_SOURCE_DIR}/dependencies/yaml-cpp/inc
 # ##############################################################################
 set(DEPEN_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/core/include/dependencies)
 set(DEPEN_HEADER_LIST
+    ${DEPEN_INCLUDE_DIR}/entree.hpp
     ${DEPEN_INCLUDE_DIR}/yaml.hpp)
 
 # ##############################################################################
@@ -14,6 +15,7 @@ set(DEPEN_HEADER_LIST
 # ##############################################################################
 set(DEPEN_SOURCE_DIR ${PROJECT_SOURCE_DIR}/core/src/dependencies)
 set(DEPEN_SOURCE_LIST
+    ${DEPEN_SOURCE_DIR}/entree.cpp
     ${DEPEN_SOURCE_DIR}/yaml.cpp)
 
 # ##############################################################################

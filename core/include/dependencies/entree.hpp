@@ -24,9 +24,11 @@ std::string NodeTypeToString(NodeType type);
 
 class Node {
  public:
-  Node(const std::string& key, NodeType type) : m_key(key), m_type(type) {
+  Node(const std::string& key, const NodeType type,
+       const EntreeType entree_type)
+    : m_key(key), m_type(type), m_entree_type(entree_type) {
   }
-  ~Node() = default;
+  virtual ~Node() = default;
 
   std::string Key() const {
     return m_key;
@@ -36,23 +38,35 @@ class Node {
     return m_type;
   }
 
+  inline std::string Info() const {
+    return "[" + NodeTypeToString(m_type) + ":" +
+           EntreeTypeToString(m_entree_type) + "]: ";
+    // return ": ";
+  }
+
   virtual std::string ToString() const = 0;
+
+  virtual std::string ToString(const std::string& header) const {
+    return header + ToString();
+  };
+
+  inline EntreeType GetEntreeType() const {
+    return m_entree_type;
+  }
 
  private:
   std::string m_key;
   NodeType m_type = NodeType::UNDEFINED;
+  EntreeType m_entree_type = EntreeType::UNDEFINED;
 };
 
 class Single : public Node {
  public:
   Single(const std::string& key, const EntreeType& entree_type,
          const std::string& value)
-    : Node(key, NodeType::SINGLE), m_entree_type(entree_type), m_value(value) {
+    : Node(key, NodeType::SINGLE, entree_type), m_value(value) {
   }
-
-  inline EntreeType GetEntreeType() const {
-    return m_entree_type;
-  }
+  ~Single() = default;
 
   inline std::string GetEntreeValue() const {
     return m_value;
@@ -61,22 +75,16 @@ class Single : public Node {
   std::string ToString() const override;
 
  private:
-  EntreeType m_entree_type = EntreeType::UNDEFINED;
   std::string m_value;
 };
 
 class List : public Node {
  public:
   List(const std::string& key, const EntreeType& entree_type,
-       std::vector<std::string> values)
-    : Node(key, NodeType::SINGLE)
-    , m_entree_type(entree_type)
-    , m_values(values) {
+       const std::vector<std::string>& values)
+    : Node(key, NodeType::LIST, entree_type), m_values(values) {
   }
-
-  inline EntreeType GetEntreeType() const {
-    return m_entree_type;
-  }
+  ~List() = default;
 
   inline std::vector<std::string> GetEntreeValues() const {
     return m_values;
@@ -85,22 +93,40 @@ class List : public Node {
   std::string ToString() const override;
 
  private:
-  EntreeType m_entree_type = EntreeType::UNDEFINED;
   std::vector<std::string> m_values;
 };
 
 class Structure : public Node {
  public:
-  Structure(const std::string& key, const EntreeType& entree_type,
-            std::vector<Node*> nodes)
-    : Node(key, NodeType::SINGLE), m_nodes(nodes) {
+  Structure(const std::string& key, const std::vector<Node*>& nodes)
+    : Node(key, NodeType::STRUCT, EntreeType::UNDEFINED), m_nodes(nodes) {
   }
+  ~Structure() = default;
 
   inline std::vector<Node*> GetEntreeValues() const {
     return m_nodes;
   }
 
   std::string ToString() const override;
+  std::string ToString(const std::string& header) const override;
+
+ private:
+  std::vector<Node*> m_nodes;
+};
+
+class Tree : public Node {
+ public:
+  Tree(const std::vector<Node*>& nodes)
+    : Node("", NodeType::STRUCT, EntreeType::UNDEFINED), m_nodes(nodes) {
+  }
+  ~Tree() = default;
+
+  inline std::vector<Node*> GetEntreeValues() const {
+    return m_nodes;
+  }
+
+  std::string ToString() const override;
+  std::string ToString(const std::string& header) const override;
 
  private:
   std::vector<Node*> m_nodes;
