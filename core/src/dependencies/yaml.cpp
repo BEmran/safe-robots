@@ -33,13 +33,30 @@ const char* ValueToString(YAML::NodeType::value value) {
   }
 }
 
-Tree* LoadNode(const YAML::Node& node) {
-  std::cout << "size: " << node.size() << std::endl;
+Node* ExtractSequence(const std::string key, const YAML::Node& second) {
+  if (second.size() == 1) {
+    return new Sequence(key, EntreeType::STRING,
+                        split(second[0].Scalar(), ' '));
+  }
   std::vector<Node*> vector;
+  for (const auto node : second) {
+    if (node.IsMap()) {
+      vector.push_back(LoadNode(node));
+    } else {
+      std::cerr << "ERRRRRROR" << std::endl;
+    }
+  }
+  return new List(key, vector);
+}
+
+Structure* LoadNode(const YAML::Node& node) {
+  std::vector<Node*> vector{};
   for (auto it = node.begin(); it != node.end(); ++it) {
     if (it->first.IsNull()) {
-      return nullptr;
+      std::cerr << "IsNull" << std::endl;
+      continue;
     }
+
     auto first = it->first;
     const auto key = first.as<std::string>();
     auto second = it->second;
@@ -51,20 +68,7 @@ Tree* LoadNode(const YAML::Node& node) {
         break;
 
       case (YAML::NodeType::value::Sequence):
-        vec = std::vector<Node*>{};
-        for (const auto node : second) {
-          if (node.IsScalar()) {
-            vector.push_back(
-              new List(key, EntreeType::STRING, split(node.Scalar(), ' ')));
-          } else if (node.IsMap()) {
-            vec.push_back(LoadNode(node));
-          } else {
-            std::cerr << "ERRRRRROR" << std::endl;
-          }
-        }
-        if (!vec.empty()) {
-          vector.push_back(new Structure(key, vec));
-        }
+        vector.push_back(ExtractSequence(key, second));
         break;
 
       case (YAML::NodeType::value::Map):
@@ -74,15 +78,16 @@ Tree* LoadNode(const YAML::Node& node) {
 
       case (YAML::NodeType::value::Undefined):
         std::cerr << "Undefined" << std::endl;
+        break;
 
       case (YAML::NodeType::value::Null):
         std::cerr << "Null" << std::endl;
     }
   }
-  return new Tree(vector);
+  return new Structure("", vector);
 }
 
-Tree* LoadFile(const std::string& filename) {
+Structure* LoadFile(const std::string& filename) {
   const YAML::Node node = YAML::LoadFile(filename);
   return LoadNode(node);
 }

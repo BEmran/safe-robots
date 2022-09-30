@@ -1,17 +1,22 @@
+#include <algorithm>
 #include <dependencies/entree.hpp>
+#include <iostream>
 
 namespace yaml {
+constexpr char TAP[] = "    ";
+constexpr char HALF_TAP[] = "  ";
 
 std::map<EntreeType, std::string> EntreeTypeStringMap{
-  {EntreeType::DECIMAL, "DECIMAL"},
-  {EntreeType::REAL, "REAL"},
+  {EntreeType::INTEGER, "INTEGER"},
+  {EntreeType::FLOAT, "FLOAT"},
   {EntreeType::STRING, "STRING"},
   {EntreeType::UNDEFINED, "UNDEFINED"}};
 
 std::map<NodeType, std::string> NodeTypeStringMap{
-  {NodeType::STRUCT, "STRUCT"},
-  {NodeType::SINGLE, "SINGLE"},
-  {NodeType::LIST, "LIST"},
+  {NodeType::SEQUENCE, "SEQUENCE"},  //
+  {NodeType::SINGLE, "SINGLE"},      //
+  {NodeType::LIST, "LIST"},          //
+  {NodeType::STRUCT, "STRUCT"},      //
   {NodeType::UNDEFINED, "UNDEFINED"}};
 
 std::string EntreeTypeToString(const EntreeType type) {
@@ -22,53 +27,42 @@ std::string NodeTypeToString(const NodeType type) {
   return NodeTypeStringMap[type];
 }
 
-std::string Single::ToString() const {
-  return Key() + Info() + m_value;
+std::string Single::Print(const std::string& offset) const {
+  return offset + Key() + Info() + m_value;
 }
 
-std::string List::ToString() const {
-  std::string str = Key() + Info() + "[";
-  for (size_t i = 0; i < m_values.size(); i++) {
-    str += m_values[i];
-    if (i < m_values.size() - 1) {
-      str += ", ";
-    }
-  }
-  str += "]";
+std::string Sequence::Print(const std::string& offset) const {
+  std::string str = offset + Key() + Info() + "[";
+  std::for_each(m_value.begin(), m_value.end(),
+                [&str](const std::string& value) { str += value + " "; });
+  str.back() = ']';
   return str;
 }
 
-std::string Structure::ToString() const {
-  return ToString("");
-}
-
-std::string Structure::ToString(const std::string& header) const {
-  std::string str = header + Key() + Info() + "\n";
-  for (size_t i = 0; i < m_nodes.size(); i++) {
-    str += m_nodes[i]->ToString(header + "  ");
-    if (i < m_nodes.size() - 1) {
-      str += '\n';
-    }
-  }
-  return str;
-}
-
-std::string Tree::ToString() const {
-  return ToString("");
-}
-
-std::string Tree::ToString(const std::string& header) const {
+std::string Structure::Print(const std::string& offset) const {
   std::string str;
-  for (size_t i = 0; i < m_nodes.size(); i++) {
-    if (header.empty()) {
-      str += m_nodes[i]->ToString("");
-    } else {
-      str += m_nodes[i]->ToString(header + "  ");
-    }
-    if (i < m_nodes.size() - 1) {
-      str += '\n';
-    }
+  std::string new_offset = offset;
+  if (!Key().empty()) {
+    str = offset + Key() + Info() + "\n";
+    new_offset += TAP;
   }
+  std::for_each(m_nodes.begin(), m_nodes.end(), [&str, new_offset](Node* node) {
+    str += node->Print(new_offset) + '\n';
+  });
+  str.back() = ' ';
+
+  return str;
+}
+
+std::string List::Print(const std::string& offset) const {
+  std::string str = offset + Key() + Info() + "\n";
+  const std::string new_offset = offset + TAP + HALF_TAP;
+  for (size_t i = 0; i < m_nodes.size(); i++) {
+    auto tmp = m_nodes[i]->Print(new_offset) + '\n';
+    tmp[4] = '-';
+    str += tmp;
+  }
+  str.back() = ' ';
   return str;
 }
 
