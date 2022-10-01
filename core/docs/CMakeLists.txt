@@ -8,7 +8,7 @@ if (Doxygen_FOUND)
 
     doxygen_add_docs(
         docs ${PROJECT_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/main_page.md"
-        WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/include")
+        WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/core/include ${PROJECT_SOURCE_DIR}/hardware/navio/include")
     message(STATUS "Doxygen has been setup and documentation is now available.")
 else ()
     message(STATUS "Doxygen not found, not building docs")

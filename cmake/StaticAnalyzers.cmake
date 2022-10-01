@@ -50,6 +50,7 @@ if (ENABLE_CPPCHECK)
             --enable=all
             --inline-suppr
             --inconclusive
+            --output-file=${CMAKE_BINARY_DIR}/cppcheck-report.txt
             --template='{file}:{line},{severity},{id}:{message}'
             -I ${CMAKE_CURRENT_SOURCE_DIR}/core/include
             -I ${CMAKE_CURRENT_SOURCE_DIR}/core/test/include
