@@ -117,22 +117,10 @@ endforeach ()
 # ##############################################################################
 # Dependencies
 # ##############################################################################
-include(ExternalProject)
-
-ExternalProject_Add(
-	yaml_cpp_project
-	SOURCE_DIR "${CMAKE_SOURCE_DIR}/dependencies/yaml-cpp/"
-	INSTALL_DIR "${CMAKE_BINARY_DIR}/prefix"
-	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-)
-ExternalProject_Get_Property(yaml_cpp_project BINARY_DIR)
-ExternalProject_Get_Property(yaml_cpp_project SOURCE_DIR)
-
-# add_library(yaml-cpp UNKNOWN IMPORTED)
-add_library(yaml-cpp STATIC IMPORTED)
-
-set_target_properties(yaml-cpp PROPERTIES IMPORTED_LOCATION ${BINARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}yaml-cpp${CMAKE_STATIC_LIBRARY_SUFFIX})
-include_directories(${SOURCE_DIR}/include/)
+find_package (yaml-cpp REQUIRED PATHS ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/install/yaml-cpp)
+if(yaml-cpp_FOUND)
+    message(STATUS "Found yaml-cpp of version ${yaml-cpp_VERSION}")
+endif()
 
 # ##############################################################################
 # Library

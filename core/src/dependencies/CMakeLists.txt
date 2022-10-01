@@ -1,7 +1,3 @@
-# find_package(yaml-cpp REQUIRED)  # here to ensure library exists
-message(STATUS "------> YAML_CPP_INCLUDE_DIR: ${YAML_CPP_INCLUDE_DIR}")
-message(STATUS "------> YAML_CPP_LIBRARIES: ${YAML_CPP_LIBRARIES}")
-message(STATUS "------> include: ${PROJECT_SOURCE_DIR}/dependencies/yaml-cpp/include")
 # ##############################################################################
 # Create header file list for core library
 # ##############################################################################
@@ -29,16 +25,16 @@ add_library(${DEPEN_LIBRARY} ${DEPEN_SOURCE_LIST}) # ${DEPEN_HEADER_LIST}
 target_include_directories(
     ${DEPEN_LIBRARY} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/core/include>
                             $<INSTALL_INTERFACE:${ABSOLUTE_INSTALL_INCLUDEDIR}>
-                            ${PROJECT_SOURCE_DIR}/dependencies/yaml-cpp/include)
+                            ${YAML_CPP_INCLUDE_DIR})
 
 # Link required library
-target_link_libraries(${DEPEN_LIBRARY} PRIVATE pthread stdc++fs yaml-cpp)
+target_link_libraries(${DEPEN_LIBRARY} PRIVATE pthread stdc++fs ${YAML_CPP_LIBRARIES})
 
 # All users of this library will need at least C++17
 target_compile_features(${DEPEN_LIBRARY} PUBLIC cxx_std_17)
 
 target_compile_options(${DEPEN_LIBRARY} PRIVATE ${PROJECT_WARNINGS})
-add_dependencies(${DEPEN_LIBRARY} yaml_cpp_project)
+# add_dependencies(${DEPEN_LIBRARY} yaml_cpp_project)
 # IDEs should put the headers in a nice place
 source_group(
     TREE "${PROJECT_SOURCE_DIR}/core/include"

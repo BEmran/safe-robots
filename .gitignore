@@ -2,6 +2,8 @@
 [Bb]uild/*
 */CMakeCache.*
 */CMakeFiles/*
+dependencies/[Bb]uild/*
+dependencies/[Ii]nstall/*
 
 ### pre-commit generated files ###
 compile_commands.json

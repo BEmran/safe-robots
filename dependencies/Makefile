@@ -3,9 +3,10 @@ SHELL := /bin/bash
 #############################################
 ## .PHONY: install coverage test docs help
 #############################################
-.PHONY: build-all build-dependencies test-all clang-format-all cmake-format-all help
+.PHONY: build-all clean help
 .DEFAULT_GOAL := help
 
+YAML_CPP = yaml-cpp
 ################################
 ## Display option information
 ################################
@@ -27,32 +28,18 @@ help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
 build-all: ## build target
-	@if [ ! -d "./build" ]; then	\
-		mkdir build;				\
+	@if [ ! -d "./build/yaml-cpp" ]; then	\
+		mkdir -p ./build/yaml-cpp;				\
+		mkdir -p ./install/yaml-cpp;				\
 	fi
-	@cmake -S . -B build
-	@cd build; \
-	make -j8
-
-build-dependencies: ## build project dependencies
-	@cd dependencies; \
-	make build-all -j2
+	@cmake -S ${YAML_CPP} -B ./build/yaml-cpp -DCMAKE_INSTALL_PREFIX=./install/yaml-cpp -DYAML_BUILD_SHARED_LIBS=OFF
+	@cd ./build/yaml-cpp; \
+	make -j8 && make install
 
 clean: ## clean build file
 	@if [ -d "./build" ]; then	\
-		rm -rf build;			\
+		rm -rf ./build;			\
 	fi
-
-clang-format-all: ## clang format all source and header files
-	utils/clang-format
-
-cmake-format-all: ## cmake format all CMakeList.txt files
-	utils/cmake-format
-
-test-all: ## run tests with ctest
-	@if [ ! -d "./build" ]; then    								\
-		echo "Please build the project first using: make build";	\
-	else															\
-	cd build;														\
-		ctest -VV;													\
+	@if [ -d "./install" ]; then	\
+		rm -rf ./install;			\
 	fi
