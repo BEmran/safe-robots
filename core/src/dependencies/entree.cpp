@@ -3,8 +3,9 @@
 #include <iostream>
 
 namespace yaml {
-constexpr char TAP[] = "    ";
-constexpr char HALF_TAP[] = "  ";
+constexpr std::string_view TAP{"    "};
+constexpr std::string_view HALF_TAP{"  "};
+constexpr std::string_view SEPERATOR{": "};
 
 std::map<EntreeType, std::string> EntreeTypeStringMap{
   {EntreeType::INTEGER, "INTEGER"},
@@ -28,11 +29,11 @@ std::string NodeTypeToString(const NodeType type) {
 }
 
 std::string Single::Print(const std::string& offset) const {
-  return offset + Key() + Info() + m_value;
+  return offset + Key() + SEPERATOR.data() + m_value;
 }
 
 std::string Sequence::Print(const std::string& offset) const {
-  std::string str = offset + Key() + Info() + "[";
+  std::string str = offset + Key() + SEPERATOR.data() + "[";
   std::for_each(m_value.begin(), m_value.end(),
                 [&str](const std::string& value) { str += value + " "; });
   str.back() = ']';
@@ -43,26 +44,38 @@ std::string Structure::Print(const std::string& offset) const {
   std::string str;
   std::string new_offset = offset;
   if (!Key().empty()) {
-    str = offset + Key() + Info() + "\n";
-    new_offset += TAP;
+    str = offset + Key() + SEPERATOR.data() + "\n";
+    new_offset += TAP.data();
   }
-  std::for_each(m_nodes.begin(), m_nodes.end(), [&str, new_offset](Node* node) {
-    str += node->Print(new_offset) + '\n';
-  });
-  str.back() = ' ';
+  str += PrintInternalNodes(new_offset);
 
   return str;
 }
 
+std::string Structure::PrintInternalNodes(const std::string& offset) const {
+  std::string str;
+  std::for_each(m_nodes.begin(), m_nodes.end(), [&str, offset](Node* node) {
+    str += node->Print(offset) + '\n';
+  });
+  str.pop_back();  // remove last '\n'
+  return str;
+}
+
 std::string List::Print(const std::string& offset) const {
-  std::string str = offset + Key() + Info() + "\n";
-  const std::string new_offset = offset + TAP + HALF_TAP;
-  for (size_t i = 0; i < m_nodes.size(); i++) {
-    auto tmp = m_nodes[i]->Print(new_offset) + '\n';
-    tmp[4] = '-';
+  std::string str = offset + Key() + SEPERATOR.data() + "\n";
+  std::string new_offset = offset + TAP.data() + HALF_TAP.data();
+  str += PrintInternalNodes(new_offset);
+  return str;
+}
+
+std::string List::PrintInternalNodes(const std::string& offset) const {
+  std::string str;
+  std::for_each(m_nodes.begin(), m_nodes.end(), [&str, offset](Node* node) {
+    auto tmp = node->Print(offset) + '\n';
+    tmp[4] = '-';  // place '-' at the beginning of each list item
     str += tmp;
-  }
-  str.back() = ' ';
+  });
+  str.pop_back();  // remove last '\n'
   return str;
 }
 

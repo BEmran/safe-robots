@@ -2,7 +2,6 @@
 
 #ifndef DEPENDENCIES_YAML_HPP_
 #define DEPENDENCIES_YAML_HPP_
-#include <yaml-cpp/yaml.h>
 
 #include <fstream>
 #include <iomanip>
@@ -17,8 +16,10 @@ namespace yaml {
 using Map = std::map<std::string, std::string>;
 
 Structure* LoadFile(const std::string& filename);
-Structure* LoadNode(const YAML::Node& node);
-void DumpFile(const std::string& filename, Map map);
+Structure* LoadConfig(const std::string& config);
+void DumpFile(const std::string& filename, const Map& map);
+
+std::vector<std::string> Split(const std::string& s, char delim);
 
 }  // namespace yaml
 #endif  // DEPENDENCIES_YAML_HPP_

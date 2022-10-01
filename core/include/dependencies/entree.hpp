@@ -5,6 +5,7 @@
 
 #include <map>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace yaml {
@@ -38,7 +39,7 @@ std::string NodeTypeToString(NodeType type);
  */
 class Node {
  public:
-  Node(const std::string& key, const NodeType type) : m_key(key), m_type(type) {
+  Node(std::string_view key, const NodeType type) : m_key(key), m_type(type) {
   }
   virtual ~Node() = default;
 
@@ -50,23 +51,23 @@ class Node {
     return m_type;
   }
 
-  inline std::string Info() const {
-    // return "[" + NodeTypeToString(m_type) + "]: ";
-    return ": ";
-  }
+  // inline std::string Info() const {
+  //   // return "[" + NodeTypeToString(m_type) + "]: ";
+  //   return ": ";
+  // }
 
   // to recursively print node with offset
   virtual std::string Print(const std::string& offset = "") const = 0;
 
  private:
-  std::string m_key{};
+  std::string m_key;
   NodeType m_type = NodeType::UNDEFINED;
 };
 
 class Single : public Node {
  public:
-  Single(const std::string& key, const EntreeType& entree_type,
-         const std::string& value)
+  Single(std::string_view key, const EntreeType& entree_type,
+         std::string_view value)
     : Node(key, NodeType::SINGLE), m_value(value), m_entree_type(entree_type) {
   }
 
@@ -87,7 +88,7 @@ class Single : public Node {
 
 class Sequence : public Node {
  public:
-  Sequence(const std::string& key, const EntreeType& entree_type,
+  Sequence(std::string_view key, const EntreeType& entree_type,
            const std::vector<std::string>& value)
     : Node(key, NodeType::SEQUENCE)
     , m_value(value)
@@ -113,7 +114,7 @@ class Structure : public Node {
  public:
   explicit Structure(const std::vector<Node*>& nodes) : Structure("", nodes) {
   }
-  Structure(const std::string& key, const std::vector<Node*>& nodes)
+  Structure(std::string_view key, const std::vector<Node*>& nodes)
     : Node(key, NodeType::STRUCT), m_nodes(nodes) {
   }
   ~Structure() = default;
@@ -124,13 +125,16 @@ class Structure : public Node {
 
   std::string Print(const std::string& offset = "") const override;
 
+ protected:
+  std::string PrintInternalNodes(const std::string& offset) const;
+
  private:
   std::vector<Node*> m_nodes;
 };
 
 class List : public Node {
  public:
-  List(const std::string& key, const std::vector<Node*>& nodes)
+  List(std::string_view key, const std::vector<Node*>& nodes)
     : Node(key, NodeType::LIST), m_nodes(nodes) {
   }
   ~List() = default;
@@ -140,6 +144,9 @@ class List : public Node {
   }
 
   std::string Print(const std::string& offset = "") const override;
+
+ protected:
+  std::string PrintInternalNodes(const std::string& offset) const;
 
  private:
   std::vector<Node*> m_nodes;

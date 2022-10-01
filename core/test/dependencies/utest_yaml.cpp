@@ -101,9 +101,8 @@ void ExpectEqStructure(yaml::Node* node1, yaml::Node* node2) {
 }
 
 TEST(Cash, ExtractSingle) {
-  std::string str = "{key1: 123}";
-  auto node = YAML::Load(str);
-  auto actual = yaml::LoadNode(node);
+  std::string config = "{key1: 123}";
+  auto actual = yaml::LoadConfig(config);
   std::cout << actual->Print() << std::endl;
 
   yaml::Single single("key1", yaml::EntreeType::STRING, "123");
@@ -114,9 +113,8 @@ TEST(Cash, ExtractSingle) {
 }
 
 TEST(Cash, Extract2Singles) {
-  std::string str = "{key1: 123, key2: str}";
-  auto node = YAML::Load(str);
-  auto actual = yaml::LoadNode(node);
+  std::string config = "{key1: 123, key2: str}";
+  auto actual = yaml::LoadConfig(config);
   std::cout << actual->Print() << std::endl;
 
   yaml::Single single1("key1", yaml::EntreeType::STRING, "123");
@@ -128,9 +126,8 @@ TEST(Cash, Extract2Singles) {
 }
 
 TEST(Cash, ExtractSequence) {
-  std::string str = "{key1: [1 2 3]}";
-  auto node = YAML::Load(str);
-  auto actual = yaml::LoadNode(node);
+  std::string config = "{key1: [1 2 3]}";
+  auto actual = yaml::LoadConfig(config);
   std::cout << actual->Print() << std::endl;
 
   yaml::Sequence seq("key1", yaml::EntreeType::STRING, {"1", "2", "3"});
@@ -141,9 +138,8 @@ TEST(Cash, ExtractSequence) {
 }
 
 TEST(Cash, ExtractStruct) {
-  std::string str = "{key1: {key2: str, key3: 123}}";
-  auto node = YAML::Load(str);
-  auto actual = yaml::LoadNode(node);
+  std::string config = "{key1: {key2: str, key3: 123}}";
+  auto actual = yaml::LoadConfig(config);
   std::cout << actual->Print() << std::endl;
 
   yaml::Single single1("key2", yaml::EntreeType::STRING, "str");
@@ -156,10 +152,9 @@ TEST(Cash, ExtractStruct) {
 }
 
 TEST(Cash, ExtractNestedStruct) {
-  std::string str =
+  std::string config =
     "{key1: {key2: str, key3: 123, key4: {key5: char, key6: 456}}}";
-  auto node = YAML::Load(str);
-  auto actual = yaml::LoadNode(node);
+  auto actual = yaml::LoadConfig(config);
   std::cout << actual->Print() << std::endl;
 
   yaml::Single single1("key2", yaml::EntreeType::STRING, "str");
@@ -176,14 +171,12 @@ TEST(Cash, ExtractNestedStruct) {
 }
 
 TEST(Cash, ExtractList) {
-  std::string str =
+  std::string config =
     "{key1: ["
     "{key2: abc, key3: 123},"
     "{key2: def, key3: 456}"
     "]}";
-  auto node = YAML::Load(str);
-  std::cout << YAML::Dump(node) << "\n" << std::endl;
-  auto actual = yaml::LoadNode(node);
+  auto actual = yaml::LoadConfig(config);
   std::cout << actual->Print() << "\n" << std::endl;
 
   yaml::Single single1("key2", yaml::EntreeType::STRING, "abc");
@@ -203,13 +196,12 @@ TEST(Cash, ExtractList) {
 }
 
 TEST(Cash, ExtractNestedList) {
-  std::string str =
+  std::string config =
     "{key1: ["
     "{key2: [a b c], key3: [{key4: a, key5: 1}, {key4: b, key5: 2}]},"
     "{key2: [e f g], key3: [{key4: x, key5: 3}, {key4: y, key5: 4}]}"
     "]}";
-  auto node = YAML::Load(str);
-  auto actual = yaml::LoadNode(node);
+  auto actual = yaml::LoadConfig(config);
   std::cout << actual->Print() << "\n" << std::endl;
 
   yaml::Single single111("key4", yaml::EntreeType::STRING, "a");
