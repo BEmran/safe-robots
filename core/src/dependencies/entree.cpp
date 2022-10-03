@@ -39,8 +39,44 @@ std::string Sequence::PrintImpl() const {
   return str;
 }
 
-template <NodeType TYPE>
-std::string Structure<TYPE>::Print(const std::string& offset) const {
+void Map::InitializeNodeMap() {
+  for (const auto node : m_nodes) {
+    if (m_node_map.find(node->Key()) != m_node_map.end()) {
+      std::cerr << "found duplicated entree key: \'" << node->Key()
+                << "\'. Cannot create a valid NodeMap. Keeping first one"
+                << std::endl;
+    } else {
+      m_node_map.insert({node->Key(), node});
+    }
+  }
+}
+
+std::optional<const Node*> Map::FindParent(const std::string& key) const {
+  if (m_node_map.find(key) != m_node_map.end()) {
+    return this;
+  }
+
+  for (const auto node : m_nodes) {
+    if (node->Type() != NodeType::MAP) {
+      continue;
+    }
+    auto result = dynamic_cast<const Map*>(node)->FindParent(key);
+    if (result) {
+      return result;
+    }
+  }
+  return {};
+}
+
+std::optional<Node*> Map::operator[](const std::string& key) const {
+  auto it = m_node_map.find(key);
+  if (it != m_node_map.end()) {
+    return it->second;
+  }
+  return {};
+}
+
+std::string Structure::Print(const std::string& offset) const {
   if (Key().empty()) {
     return PrintImpl(offset);
   } else {

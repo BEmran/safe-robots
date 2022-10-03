@@ -4,14 +4,17 @@
 #define DEPENDENCIES_ENTREE_HPP_
 
 #include <functional>
+#include <iostream>
 #include <map>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
 namespace yaml {
 
-// using Map = std::map<std::string, std::string>;
+class Node;
+using NodeMap = std::map<std::string, Node*>;
 
 namespace {
 constexpr std::string_view SEPERATOR{": "};
@@ -121,11 +124,11 @@ class Sequence : public Leaf<std::vector<std::string>> {
   std::string PrintImpl() const override;
 };
 
-template <NodeType TYPE>
 class Structure : public Node {
  public:
-  Structure(std::string_view key, const std::vector<Node*>& nodes)
-    : Node(key, TYPE), m_nodes{nodes} {
+  Structure(std::string_view key, const NodeType type,
+            const std::vector<Node*>& nodes)
+    : Node(key, type), m_nodes{nodes} {
   }
   virtual ~Structure() = default;
 
@@ -140,23 +143,40 @@ class Structure : public Node {
   std::vector<Node*> m_nodes;
 };
 
-class Map : public Structure<NodeType::MAP> {
+class Map : public Structure {
  public:
   explicit Map(const std::vector<Node*>& nodes) : Map("", nodes) {
   }
   Map(std::string_view key, const std::vector<Node*>& nodes)
-    : Structure<NodeType::MAP>(key, nodes) {
+    : Structure(key, NodeType::MAP, nodes) {
+    InitializeNodeMap();
   }
   ~Map() = default;
 
+  std::optional<const Node*> FindParent(const std::string& key) const;
+
+  std::optional<Node*> operator[](const std::string& key) const;
+
+  inline bool IsNodeMapValid() const {
+    return m_node_map.size() == m_nodes.size();
+  }
+
+  inline NodeMap GetNodeMap() const {
+    return m_node_map;
+  }
+
  protected:
+  void InitializeNodeMap();
   std::string PrintImpl(const std::string& offset) const override;
+
+ private:
+  NodeMap m_node_map;
 };
 
-class List : public Structure<NodeType::LIST> {
+class List : public Structure {
  public:
   List(std::string_view key, const std::vector<Node*>& nodes)
-    : Structure<NodeType::LIST>(key, nodes) {
+    : Structure(key, NodeType::LIST, nodes) {
   }
   ~List() = default;
 
