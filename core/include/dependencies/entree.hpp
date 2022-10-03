@@ -3,6 +3,7 @@
 #ifndef DEPENDENCIES_ENTREE_HPP_
 #define DEPENDENCIES_ENTREE_HPP_
 
+#include <functional>
 #include <map>
 #include <string>
 #include <string_view>
@@ -10,7 +11,11 @@
 
 namespace yaml {
 
-using Map = std::map<std::string, std::string>;
+// using Map = std::map<std::string, std::string>;
+
+namespace {
+constexpr std::string_view SEPERATOR{": "};
+}
 
 enum class EntreeType {
   INTEGER,   // hole number
@@ -20,10 +25,10 @@ enum class EntreeType {
 };
 
 enum class NodeType {
+  LIST,      // a node hold a vector of values
+  MAP,       // a node hold a single value
   SINGLE,    // a node hold a single value
   SEQUENCE,  // a node hold a vector of values
-  LIST,      // a node hold a vector of repeated nodes
-  STRUCT,    // a node hold a sub nodes
   UNDEFINED  // nodes should not have this
 };
 
@@ -51,11 +56,6 @@ class Node {
     return m_type;
   }
 
-  // inline std::string Info() const {
-  //   // return "[" + NodeTypeToString(m_type) + "]: ";
-  //   return ": ";
-  // }
-
   // to recursively print node with offset
   virtual std::string Print(const std::string& offset = "") const = 0;
 
@@ -64,92 +64,104 @@ class Node {
   NodeType m_type = NodeType::UNDEFINED;
 };
 
-class Single : public Node {
+template <typename T>
+class Leaf : public Node {
  public:
-  Single(std::string_view key, const EntreeType& entree_type,
-         std::string_view value)
-    : Node(key, NodeType::SINGLE), m_value(value), m_entree_type(entree_type) {
+  // using PrintCB = std::function<std::string(const T&)>;
+  Leaf(std::string_view key, NodeType type, const EntreeType entree_type,
+       const T& value)
+    : Node(key, type), m_value{value}, m_entree_type{entree_type} {
   }
+  virtual ~Leaf() = default;
 
   inline EntreeType GetEntreeType() const {
     return m_entree_type;
   }
 
-  inline std::string GetEntreeValue() const {
+  inline T GetEntreeValue() const {
     return m_value;
   }
 
-  std::string Print(const std::string& offset = "") const override;
+  inline void SetEntreeValue(const T& value) {
+    m_value = value;
+  }
+
+  std::string Print(const std::string& offset = "") const override {
+    return offset + Key() + SEPERATOR.data() + PrintImpl();
+  }
+
+ protected:
+  virtual std::string PrintImpl() const = 0;
+  T m_value;
 
  private:
-  std::string m_value;
   EntreeType m_entree_type = EntreeType::UNDEFINED;  // make it only for leaf
 };
 
-class Sequence : public Node {
+class Single : public Leaf<std::string> {
  public:
-  Sequence(std::string_view key, const EntreeType& entree_type,
+  Single(std::string_view key, const EntreeType entree_type,
+         const std::string& value)
+    : Leaf<std::string>(key, NodeType::SINGLE, entree_type, value){};
+  ~Single() = default;
+
+ protected:
+  std::string PrintImpl() const override;
+};
+
+class Sequence : public Leaf<std::vector<std::string>> {
+ public:
+  Sequence(std::string_view key, const EntreeType entree_type,
            const std::vector<std::string>& value)
-    : Node(key, NodeType::SEQUENCE)
-    , m_value(value)
-    , m_entree_type(entree_type) {
-  }
+    : Leaf<std::vector<std::string>>(key, NodeType::SEQUENCE, entree_type,
+                                     value){};
+  ~Sequence() = default;
 
-  inline EntreeType GetEntreeType() const {
-    return m_entree_type;
-  }
-
-  inline std::vector<std::string> GetEntreeValue() const {
-    return m_value;
-  }
-
-  std::string Print(const std::string& offset = "") const override;
-
- private:
-  std::vector<std::string> m_value;
-  EntreeType m_entree_type = EntreeType::UNDEFINED;  // make it only for leaf
+ protected:
+  std::string PrintImpl() const override;
 };
 
+template <NodeType TYPE>
 class Structure : public Node {
  public:
-  explicit Structure(const std::vector<Node*>& nodes) : Structure("", nodes) {
-  }
   Structure(std::string_view key, const std::vector<Node*>& nodes)
-    : Node(key, NodeType::STRUCT), m_nodes(nodes) {
+    : Node(key, TYPE), m_nodes{nodes} {
   }
-  ~Structure() = default;
+  virtual ~Structure() = default;
 
-  inline std::vector<Node*> GetEntreeValues() const {
+  inline std::vector<Node*> GetEntreeValue() const {
     return m_nodes;
   }
 
   std::string Print(const std::string& offset = "") const override;
 
  protected:
-  std::string PrintInternalNodes(const std::string& offset) const;
-
- private:
+  virtual std::string PrintImpl(const std::string& offset) const = 0;
   std::vector<Node*> m_nodes;
 };
 
-class List : public Node {
+class Map : public Structure<NodeType::MAP> {
+ public:
+  explicit Map(const std::vector<Node*>& nodes) : Map("", nodes) {
+  }
+  Map(std::string_view key, const std::vector<Node*>& nodes)
+    : Structure<NodeType::MAP>(key, nodes) {
+  }
+  ~Map() = default;
+
+ protected:
+  std::string PrintImpl(const std::string& offset) const override;
+};
+
+class List : public Structure<NodeType::LIST> {
  public:
   List(std::string_view key, const std::vector<Node*>& nodes)
-    : Node(key, NodeType::LIST), m_nodes(nodes) {
+    : Structure<NodeType::LIST>(key, nodes) {
   }
   ~List() = default;
 
-  inline std::vector<Node*> GetEntreeValues() const {
-    return m_nodes;
-  }
-
-  std::string Print(const std::string& offset = "") const override;
-
  protected:
-  std::string PrintInternalNodes(const std::string& offset) const;
-
- private:
-  std::vector<Node*> m_nodes;
+  std::string PrintImpl(const std::string& offset) const override;
 };
 
 }  // namespace yaml

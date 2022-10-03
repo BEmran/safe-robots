@@ -13,11 +13,12 @@
 
 namespace yaml {
 
-using Map = std::map<std::string, std::string>;
+// using Map = std::map<std::string, std::string>;
 
-Structure* LoadFile(const std::string& filename);
-Structure* LoadConfig(const std::string& config);
-void DumpFile(const std::string& filename, const Map& map);
+Node* LoadFile(const std::string& filename);
+Node* LoadConfig(const std::string& config);
+Node* LoadConfig(const std::string& config);
+void DumpFile(const std::string& filename, Node* node);
 
 std::vector<std::string> Split(const std::string& s, char delim);
 

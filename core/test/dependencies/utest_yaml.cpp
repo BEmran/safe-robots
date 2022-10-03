@@ -48,8 +48,8 @@ void ExpectEqList(yaml::Node* node1, yaml::Node* node2) {
   ASSERT_EQ(yaml::NodeType::LIST, node2->Type());
   auto list1 = dynamic_cast<yaml::List*>(node1);
   auto list2 = dynamic_cast<yaml::List*>(node2);
-  auto vec1 = list1->GetEntreeValues();
-  auto vec2 = list2->GetEntreeValues();
+  auto vec1 = list1->GetEntreeValue();
+  auto vec2 = list2->GetEntreeValue();
   ASSERT_EQ(vec1.size(), vec2.size());
   for (size_t idx = 0; idx < vec1.size(); ++idx) {
     EXPECT_EQ(vec1[idx]->Type(), vec2[idx]->Type());
@@ -60,7 +60,7 @@ void ExpectEqList(yaml::Node* node1, yaml::Node* node2) {
       case yaml::NodeType::SEQUENCE:
         ExpectEqSequence(vec1[idx], vec2[idx]);
         break;
-      case yaml::NodeType::STRUCT:
+      case yaml::NodeType::MAP:
         ExpectEqStructure(vec1[idx], vec2[idx]);
         break;
       case yaml::NodeType::LIST:
@@ -71,13 +71,14 @@ void ExpectEqList(yaml::Node* node1, yaml::Node* node2) {
     }
   }
 }
+
 void ExpectEqStructure(yaml::Node* node1, yaml::Node* node2) {
-  ASSERT_EQ(yaml::NodeType::STRUCT, node1->Type());
-  ASSERT_EQ(yaml::NodeType::STRUCT, node2->Type());
-  auto struct1 = dynamic_cast<yaml::Structure*>(node1);
-  auto struct2 = dynamic_cast<yaml::Structure*>(node2);
-  auto vec1 = struct1->GetEntreeValues();
-  auto vec2 = struct2->GetEntreeValues();
+  ASSERT_EQ(yaml::NodeType::MAP, node1->Type());
+  ASSERT_EQ(yaml::NodeType::MAP, node2->Type());
+  auto struct1 = dynamic_cast<yaml::Map*>(node1);
+  auto struct2 = dynamic_cast<yaml::Map*>(node2);
+  auto vec1 = struct1->GetEntreeValue();
+  auto vec2 = struct2->GetEntreeValue();
   ASSERT_EQ(vec1.size(), vec2.size());
   for (size_t idx = 0; idx < vec1.size(); ++idx) {
     EXPECT_EQ(vec1[idx]->Type(), vec2[idx]->Type());
@@ -88,7 +89,7 @@ void ExpectEqStructure(yaml::Node* node1, yaml::Node* node2) {
       case yaml::NodeType::SEQUENCE:
         ExpectEqSequence(vec1[idx], vec2[idx]);
         break;
-      case yaml::NodeType::STRUCT:
+      case yaml::NodeType::MAP:
         ExpectEqStructure(vec1[idx], vec2[idx]);
         break;
       case yaml::NodeType::LIST:
@@ -98,6 +99,7 @@ void ExpectEqStructure(yaml::Node* node1, yaml::Node* node2) {
         std::cerr << "undefined type";
     }
   }
+  EXPECT_EQ(node1->Print(), node2->Print());
 }
 
 TEST(Cash, ExtractSingle) {
@@ -107,7 +109,7 @@ TEST(Cash, ExtractSingle) {
 
   yaml::Single single("key1", yaml::EntreeType::STRING, "123");
   std::vector<yaml::Node*> expect_vec{&single};
-  yaml::Structure expect("", expect_vec);
+  yaml::Map expect("", expect_vec);
 
   ExpectEqStructure(&expect, actual);
 }
@@ -120,7 +122,7 @@ TEST(Cash, Extract2Singles) {
   yaml::Single single1("key1", yaml::EntreeType::STRING, "123");
   yaml::Single single2("key2", yaml::EntreeType::STRING, "str");
   std::vector<yaml::Node*> expect_vec{&single1, &single2};
-  yaml::Structure expect("", expect_vec);
+  yaml::Map expect("", expect_vec);
 
   ExpectEqStructure(&expect, actual);
 }
@@ -132,7 +134,7 @@ TEST(Cash, ExtractSequence) {
 
   yaml::Sequence seq("key1", yaml::EntreeType::STRING, {"1", "2", "3"});
   std::vector<yaml::Node*> expect_vec{&seq};
-  yaml::Structure expect("", expect_vec);
+  yaml::Map expect("", expect_vec);
 
   ExpectEqStructure(&expect, actual);
 }
@@ -145,8 +147,8 @@ TEST(Cash, ExtractStruct) {
   yaml::Single single1("key2", yaml::EntreeType::STRING, "str");
   yaml::Single single2("key3", yaml::EntreeType::STRING, "123");
   std::vector<yaml::Node*> struct_vec{&single1, &single2};
-  yaml::Structure structure("key1", struct_vec);
-  yaml::Structure expect("", {&structure});
+  yaml::Map map("key1", struct_vec);
+  yaml::Map expect("", {&map});
 
   ExpectEqStructure(&expect, actual);
 }
@@ -162,12 +164,23 @@ TEST(Cash, ExtractNestedStruct) {
   yaml::Single single3("key5", yaml::EntreeType::STRING, "char");
   yaml::Single single4("key6", yaml::EntreeType::STRING, "456");
   std::vector<yaml::Node*> inner_struct_vec2{&single3, &single4};
-  yaml::Structure inner_struct("key4", inner_struct_vec2);
+  yaml::Map inner_struct("key4", inner_struct_vec2);
   std::vector<yaml::Node*> outer_struct_vec1{&single1, &single2, &inner_struct};
-  yaml::Structure outer_struct("key1", outer_struct_vec1);
-  yaml::Structure expect("", {&outer_struct});
+  yaml::Map outer_struct("key1", outer_struct_vec1);
+  yaml::Map expect("", {&outer_struct});
 
   ExpectEqStructure(&expect, actual);
+}
+
+TEST(Cash, ReEvaluated) {
+  std::string config =
+    "{key1: ["
+    "{key2: abc, key3: 123},"
+    "{key2: def, key3: 456}"
+    "]}";
+  auto actual = yaml::LoadConfig(config);
+  auto re_evaluated = yaml::LoadConfig(actual->Print());
+  ExpectEqStructure(re_evaluated, actual);
 }
 
 TEST(Cash, ExtractList) {
@@ -185,11 +198,11 @@ TEST(Cash, ExtractList) {
   yaml::Single single4("key3", yaml::EntreeType::STRING, "456");
   std::vector<yaml::Node*> struct_vec1{&single1, &single2};
   std::vector<yaml::Node*> struct_vec2{&single3, &single4};
-  yaml::Structure structure1(struct_vec1);
-  yaml::Structure structure2(struct_vec2);
-  std::vector<yaml::Node*> list_vec{&structure1, &structure2};
+  yaml::Map map1(struct_vec1);
+  yaml::Map map2(struct_vec2);
+  std::vector<yaml::Node*> list_vec{&map1, &map2};
   yaml::List list("key1", list_vec);
-  yaml::Structure expect({&list});
+  yaml::Map expect({&list});
   std::cout << expect.Print() << std::endl;
 
   ExpectEqStructure(&expect, actual);
@@ -206,26 +219,26 @@ TEST(Cash, ExtractNestedList) {
 
   yaml::Single single111("key4", yaml::EntreeType::STRING, "a");
   yaml::Single single112("key5", yaml::EntreeType::STRING, "1");
-  yaml::Structure struct11({&single111, &single112});
+  yaml::Map struct11({&single111, &single112});
   yaml::Single single121("key4", yaml::EntreeType::STRING, "b");
   yaml::Single single122("key5", yaml::EntreeType::STRING, "2");
-  yaml::Structure struct12({&single121, &single122});
+  yaml::Map struct12({&single121, &single122});
   yaml::List list1("key3", {&struct11, &struct12});
   yaml::Sequence seq1("key2", yaml::EntreeType::STRING, {"a", "b", "c"});
-  yaml::Structure struct1({&seq1, &list1});
+  yaml::Map struct1({&seq1, &list1});
 
   yaml::Single single211("key4", yaml::EntreeType::STRING, "x");
   yaml::Single single212("key5", yaml::EntreeType::STRING, "3");
-  yaml::Structure struct21({&single211, &single212});
+  yaml::Map struct21({&single211, &single212});
   yaml::Single single221("key4", yaml::EntreeType::STRING, "y");
   yaml::Single single222("key5", yaml::EntreeType::STRING, "4");
-  yaml::Structure struct22({&single221, &single222});
+  yaml::Map struct22({&single221, &single222});
   yaml::List list2("key3", {&struct21, &struct22});
   yaml::Sequence seq2("key2", yaml::EntreeType::STRING, {"e", "f", "g"});
-  yaml::Structure struct2({&seq2, &list2});
+  yaml::Map struct2({&seq2, &list2});
 
   yaml::List list("key1", {&struct1, &struct2});
-  yaml::Structure expect({&list});
+  yaml::Map expect({&list});
   std::cout << expect.Print() << std::endl;
 
   ExpectEqStructure(&expect, actual);

@@ -18,65 +18,65 @@ TEST(EntreeTypeStringMap, Test) {
 }
 
 TEST(NodeTypeToString, Test) {
-  EXPECT_EQ(NodeTypeToString(NodeType::SEQUENCE), "SEQUENCE");
+  EXPECT_EQ(NodeTypeToString(NodeType::LIST), "LIST");
+  EXPECT_EQ(NodeTypeToString(NodeType::MAP), "MAP");
   EXPECT_EQ(NodeTypeToString(NodeType::SINGLE), "SINGLE");
-  EXPECT_EQ(NodeTypeToString(NodeType::STRUCT), "STRUCT");
+  EXPECT_EQ(NodeTypeToString(NodeType::SEQUENCE), "SEQUENCE");
   EXPECT_EQ(NodeTypeToString(NodeType::UNDEFINED), "UNDEFINED");
 }
 
-const std::string key = "Key";
+const std::string KEY = "Key";
 
 // Single ---------------------------------------------------------------------
 const std::string single_value = "Value";
 
 TEST(Single, Key) {
-  yaml::Single single(key, EntreeType::STRING, single_value);
-  EXPECT_EQ(key, single.Key());
+  yaml::Single single(KEY, EntreeType::STRING, single_value);
+  EXPECT_EQ(KEY, single.Key());
 }
 
 TEST(Single, Type) {
-  yaml::Single single(key, EntreeType::STRING, single_value);
+  yaml::Single single(KEY, EntreeType::STRING, single_value);
   EXPECT_EQ(NodeType::SINGLE, single.Type());
 }
 
 TEST(Single, GetEntreeType) {
-  yaml::Single single(key, EntreeType::STRING, single_value);
+  yaml::Single single(KEY, EntreeType::STRING, single_value);
   EXPECT_EQ(EntreeType::STRING, single.GetEntreeType());
 }
 
 TEST(Single, GetEntreeValue) {
-  yaml::Single single(key, EntreeType::STRING, single_value);
+  yaml::Single single(KEY, EntreeType::STRING, single_value);
   EXPECT_EQ(single_value, single.GetEntreeValue());
 }
 
 TEST(Single, Print) {
-  yaml::Single single(key, yaml::EntreeType::STRING, single_value);
+  yaml::Single single(KEY, yaml::EntreeType::STRING, single_value);
   const std::string actual = single.Print("");
-  // const std::string expect = key + "[SINGLE:STRING]: " + single_value;
-  const std::string expect = key + ": " + single_value;
+  const std::string expect = KEY + ": " + single_value;
   EXPECT_EQ(expect, actual);
 }
 
-// Vector ---------------------------------------------------------------------
+// Sequence -------------------------------------------------------------------
 const std::vector<std::string> list_value{"1", "2", "3", "4"};
 
 TEST(Sequence, Key) {
-  yaml::Sequence list(key, yaml::EntreeType::STRING, list_value);
-  EXPECT_EQ(key, list.Key());
+  yaml::Sequence list(KEY, yaml::EntreeType::STRING, list_value);
+  EXPECT_EQ(KEY, list.Key());
 }
 
 TEST(Sequence, Type) {
-  yaml::Sequence list(key, yaml::EntreeType::STRING, list_value);
+  yaml::Sequence list(KEY, yaml::EntreeType::STRING, list_value);
   EXPECT_EQ(NodeType::SEQUENCE, list.Type());
 }
 
 TEST(Sequence, GetEntreeType) {
-  yaml::Sequence list(key, yaml::EntreeType::STRING, list_value);
+  yaml::Sequence list(KEY, yaml::EntreeType::STRING, list_value);
   EXPECT_EQ(yaml::EntreeType::STRING, list.GetEntreeType());
 }
 
 TEST(Sequence, GetEntreeValues) {
-  yaml::Sequence list(key, yaml::EntreeType::STRING, list_value);
+  yaml::Sequence list(KEY, yaml::EntreeType::STRING, list_value);
   const auto actual = list.GetEntreeValue();
   const auto result =
     std::equal(list_value.begin(), list_value.end(), actual.begin(),
@@ -85,10 +85,9 @@ TEST(Sequence, GetEntreeValues) {
 }
 
 TEST(Sequence, Print) {
-  yaml::Sequence list(key, yaml::EntreeType::STRING, list_value);
+  yaml::Sequence list(KEY, yaml::EntreeType::STRING, list_value);
   const std::string expect = list.Print("");
-  // std::string actual = key + "[SEQUENCE:STRING]: [";
-  std::string actual = key + ": [";
+  std::string actual = KEY + ": [";
   for (size_t i{0}; i < list_value.size(); i++) {
     actual += list_value[i] + " ";
   }
@@ -96,22 +95,24 @@ TEST(Sequence, Print) {
   EXPECT_EQ(expect, actual);
 }
 
-TEST(Structure, Type) {
-  yaml::Single single1(key, EntreeType::STRING, single_value);
-  yaml::Single single2(key, EntreeType::STRING, single_value);
-  yaml::Structure structure(key, {&single1, &single2});
-  EXPECT_EQ(NodeType::STRUCT, structure.Type());
+// Map ------------------------------------------------------------------
+TEST(Map, Type) {
+  yaml::Single single1(KEY, EntreeType::STRING, single_value);
+  yaml::Single single2(KEY, EntreeType::STRING, single_value);
+  yaml::Map map(KEY, {&single1, &single2});
+  EXPECT_EQ(NodeType::MAP, map.Type());
 }
 
-TEST(Structure, Print) {
-  yaml::Single single1(key, EntreeType::STRING, single_value);
-  yaml::Sequence list(key, yaml::EntreeType::STRING, list_value);
-  yaml::Structure structure1(key, {&single1, &list});
-  yaml::Structure structure2(key, {&structure1, &single1, &single1});
-  std::cout << structure2.Print("") << std::endl;
+TEST(Map, Print) {
+  yaml::Single single1(KEY, EntreeType::STRING, single_value);
+  yaml::Sequence list(KEY, yaml::EntreeType::STRING, list_value);
+  yaml::Map map1(KEY, {&single1, &list});
+  yaml::Map map2(KEY, {&map1, &single1, &single1});
+  std::cout << map2.Print("") << std::endl;
   EXPECT_TRUE(true);
 }
 
+// List -----------------------------------------------------------------------
 TEST(List, Type) {
   yaml::Single single1("key1", yaml::EntreeType::STRING, "abc");
   yaml::Single single2("key2", yaml::EntreeType::STRING, "123");
@@ -119,13 +120,13 @@ TEST(List, Type) {
   yaml::Single single4("key2", yaml::EntreeType::STRING, "456");
   std::vector<yaml::Node*> struct_vec1{&single1, &single2};
   std::vector<yaml::Node*> struct_vec2{&single3, &single4};
-  yaml::Structure structure1(struct_vec1);
-  yaml::Structure structure2(struct_vec2);
-  std::vector<yaml::Node*> list_vec{&structure1, &structure2};
+  yaml::Map map1(struct_vec1);
+  yaml::Map map2(struct_vec2);
+  std::vector<yaml::Node*> list_vec{&map1, &map2};
   yaml::List list("key3", list_vec);
   EXPECT_EQ(NodeType::LIST, list.Type());
-  EXPECT_EQ(NodeType::STRUCT, list.GetEntreeValues()[0]->Type());
-  EXPECT_EQ(NodeType::STRUCT, list.GetEntreeValues()[1]->Type());
+  EXPECT_EQ(NodeType::MAP, list.GetEntreeValue()[0]->Type());
+  EXPECT_EQ(NodeType::MAP, list.GetEntreeValue()[1]->Type());
 }
 
 TEST(List, Print) {
@@ -135,9 +136,9 @@ TEST(List, Print) {
   yaml::Single single4("key2", yaml::EntreeType::STRING, "456");
   std::vector<yaml::Node*> struct_vec1{&single1, &single2};
   std::vector<yaml::Node*> struct_vec2{&single3, &single4};
-  yaml::Structure structure1(struct_vec1);
-  yaml::Structure structure2(struct_vec2);
-  std::vector<yaml::Node*> list_vec{&structure1, &structure2};
+  yaml::Map map1(struct_vec1);
+  yaml::Map map2(struct_vec2);
+  std::vector<yaml::Node*> list_vec{&map1, &map2};
   yaml::List list("key3", list_vec);
   std::cout << list.Print("") << std::endl;
   EXPECT_TRUE(true);
