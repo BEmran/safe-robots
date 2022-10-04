@@ -1,6 +1,7 @@
 #include <yaml-cpp/yaml.h>  // cppcheck-suppress
 
 #include <dependencies/entree.hpp>
+#include <dependencies/simple_logger.hpp>
 #include <dependencies/yaml.hpp>
 
 namespace yaml {
@@ -10,25 +11,15 @@ Node* ExtractSequence(const std::string& key, const YAML::Node& second);
 Node* Extract(const YAML::Node& node);
 Structure* LoadNode(const YAML::Node& node);
 
-class ErrorLogger {
- public:
-  ErrorLogger() {
-  }
-  ~ErrorLogger() {
-    std::cerr << ss.str();
-  }
-  ErrorLogger* operator<<(ErrorLogger* logger, std::string str) {
-    logger->ss << str;
-    return logger;
-  }
-  std::stringstream ss;
-};
+void LogError(const std::string& msg) {
+  depend::LogError() << msg;
+}
 
 Structure* LoadNode(const YAML::Node& node) {
   std::vector<Node*> vector{};
   for (auto it = node.begin(); it != node.end(); ++it) {
     if (it->first.IsNull()) {
-      std ::cerr << "IsNull" << std::endl;
+      LogError("IsNull");
       continue;
     }
 
@@ -50,15 +41,15 @@ Structure* LoadNode(const YAML::Node& node) {
         break;
 
       case (YAML::NodeType::value::Undefined):
-        std::cerr << "Node of type Undefined detected" << std::endl;
+        LogError("Node of type Undefined detected");
         break;
 
       case (YAML::NodeType::value::Null):
-        std::cerr << "Node of type Null detected" << std::endl;
+        LogError("Node of type Null detected");
         break;
 
       default:
-        std::cerr << "Undefined Type" << std::endl;
+        LogError("Undefined Type");
     }
   }
   return new Structure(vector);  // create Root node
@@ -78,7 +69,7 @@ Node* ExtractSequence(const std::string& key, const YAML::Node& second) {
     if (node.IsMap()) {
       vector.push_back(LoadNode(node));
     } else {
-      std::cerr << "ERRRRRROR" << std::endl;
+      LogError("Unrecognized type");
     }
   }
   return new List(key, vector);
@@ -88,7 +79,7 @@ Node* Extract(const YAML::Node& node) {
   try {
     return LoadNode(node);
   } catch (const YAML::Exception& e) {
-    std::cerr << e.what() << std::endl;
+    LogError(e.what());
   }
   return new Structure({});
 }
