@@ -6,13 +6,13 @@ namespace yaml {
 constexpr std::string_view TAP{"    "};
 constexpr std::string_view HALF_TAP{"  "};
 
-std::map<EntreeType, std::string> EntreeTypeStringMap{
+std::map<EntreeType, std::string> EntreeTypeStringStructure{
   {EntreeType::INTEGER, "INTEGER"},
   {EntreeType::FLOAT, "FLOAT"},
   {EntreeType::STRING, "STRING"},
   {EntreeType::UNDEFINED, "UNDEFINED"}};
 
-std::map<NodeType, std::string> NodeTypeStringMap{
+std::map<NodeType, std::string> NodeTypeStringStructure{
   {NodeType::SEQUENCE, "SEQUENCE"},  //
   {NodeType::SINGLE, "SINGLE"},      //
   {NodeType::MAP, "MAP"},            //
@@ -20,11 +20,11 @@ std::map<NodeType, std::string> NodeTypeStringMap{
   {NodeType::UNDEFINED, "UNDEFINED"}};
 
 std::string EntreeTypeToString(const EntreeType type) {
-  return EntreeTypeStringMap[type];
+  return EntreeTypeStringStructure[type];
 }
 
 std::string NodeTypeToString(const NodeType type) {
-  return NodeTypeStringMap[type];
+  return NodeTypeStringStructure[type];
 }
 
 std::string Single::PrintImpl() const {
@@ -39,7 +39,7 @@ std::string Sequence::PrintImpl() const {
   return str;
 }
 
-void Map::InitializeNodeMap() {
+void Structure::InitializeNodeMap() {
   for (const auto node : m_nodes) {
     if (m_node_map.find(node->Key()) != m_node_map.end()) {
       std::cerr << "found duplicated entree key: \'" << node->Key()
@@ -51,7 +51,7 @@ void Map::InitializeNodeMap() {
   }
 }
 
-std::optional<const Node*> Map::FindParent(const std::string& key) const {
+std::optional<const Node*> Structure::FindParent(const std::string& key) const {
   if (m_node_map.find(key) != m_node_map.end()) {
     return this;
   }
@@ -60,7 +60,7 @@ std::optional<const Node*> Map::FindParent(const std::string& key) const {
     if (node->Type() != NodeType::MAP) {
       continue;
     }
-    auto result = dynamic_cast<const Map*>(node)->FindParent(key);
+    auto result = dynamic_cast<const Structure*>(node)->FindParent(key);
     if (result) {
       return result;
     }
@@ -68,7 +68,7 @@ std::optional<const Node*> Map::FindParent(const std::string& key) const {
   return {};
 }
 
-std::optional<Node*> Map::operator[](const std::string& key) const {
+std::optional<Node*> Structure::operator[](const std::string& key) const {
   auto it = m_node_map.find(key);
   if (it != m_node_map.end()) {
     return it->second;
@@ -76,7 +76,7 @@ std::optional<Node*> Map::operator[](const std::string& key) const {
   return {};
 }
 
-std::string Structure::Print(const std::string& offset) const {
+std::string CompositeNode::Print(const std::string& offset) const {
   if (Key().empty()) {
     return PrintImpl(offset);
   } else {
@@ -86,7 +86,7 @@ std::string Structure::Print(const std::string& offset) const {
   }
 }
 
-std::string Map::PrintImpl(const std::string& offset) const {
+std::string Structure::PrintImpl(const std::string& offset) const {
   std::string str;
   std::for_each(m_nodes.begin(), m_nodes.end(), [&str, offset](Node* node) {
     str += node->Print(offset) + '\n';

@@ -10,7 +10,7 @@ using yaml::EntreeTypeToString;
 using yaml::NodeType;
 using yaml::NodeTypeToString;
 
-TEST(EntreeTypeStringMap, Test) {
+TEST(EntreeTypeStringStructure, Test) {
   EXPECT_EQ(EntreeTypeToString(EntreeType::INTEGER), "INTEGER");
   EXPECT_EQ(EntreeTypeToString(EntreeType::FLOAT), "FLOAT");
   EXPECT_EQ(EntreeTypeToString(EntreeType::STRING), "STRING");
@@ -95,92 +95,92 @@ TEST(Sequence, Print) {
   EXPECT_EQ(expect, actual);
 }
 
-// Map ------------------------------------------------------------------
-TEST(Map, Type) {
+// Structure ------------------------------------------------------------------
+TEST(Structure, Type) {
   yaml::Single single1(KEY, EntreeType::STRING, single_value);
   yaml::Single single2(KEY, EntreeType::STRING, single_value);
-  yaml::Map map(KEY, {&single1, &single2});
+  yaml::Structure map(KEY, {&single1, &single2});
   EXPECT_EQ(NodeType::MAP, map.Type());
 }
 
-TEST(Map, NotValidNodeMap) {
+TEST(Structure, NotValidNodeMap) {
   yaml::Single single1(KEY, EntreeType::STRING, single_value);
   yaml::Single single2(KEY, EntreeType::STRING, single_value);
-  yaml::Map map(KEY, {&single1, &single2});
+  yaml::Structure map(KEY, {&single1, &single2});
   EXPECT_FALSE(map.IsNodeMapValid());
 }
 
-TEST(Map, ValidNodeMap) {
+TEST(Structure, ValidNodeMap) {
   yaml::Single single1(KEY + "1", EntreeType::STRING, single_value);
   yaml::Single single2(KEY + "2", EntreeType::STRING, single_value);
-  yaml::Map map(KEY, {&single1, &single2});
+  yaml::Structure map(KEY, {&single1, &single2});
   EXPECT_TRUE(map.IsNodeMapValid());
 }
 
-TEST(Map, FailedToFindKey) {
+TEST(Structure, FailedToFindKey) {
   const auto unkown_key = "unknown";
   yaml::Single single1(KEY + "1", EntreeType::STRING, single_value);
   yaml::Single single2(KEY + "2", EntreeType::STRING, single_value);
-  yaml::Map map(KEY, {&single1, &single2});
+  yaml::Structure map(KEY, {&single1, &single2});
   auto result = map[unkown_key];
   EXPECT_FALSE(result);
 }
 
-TEST(Map, FindKey) {
+TEST(Structure, FindKey) {
   yaml::Single single1(KEY + "1", EntreeType::STRING, single_value);
   yaml::Single single2(KEY + "2", EntreeType::STRING, single_value);
-  yaml::Map map(KEY, {&single1, &single2});
+  yaml::Structure map(KEY, {&single1, &single2});
   auto result = map[single1.Key()];
   ASSERT_TRUE(result);
   EXPECT_EQ(map.GetEntreeValue()[0], result.value());
 }
 
-TEST(Map, FindFirstKeyEntree) {
+TEST(Structure, FindFirstKeyEntree) {
   yaml::Single single1(KEY, EntreeType::STRING, single_value);
   yaml::Single single2(KEY, EntreeType::STRING, single_value);
-  yaml::Map map(KEY, {&single1, &single2});
+  yaml::Structure map(KEY, {&single1, &single2});
   auto result = map[single1.Key()];
   ASSERT_TRUE(result);
   ASSERT_FALSE(map.IsNodeMapValid());
   EXPECT_EQ(map.GetEntreeValue()[0], result.value());
 }
 
-TEST(Map, FindParent) {
+TEST(Structure, FindParent) {
   yaml::Single single1(KEY, EntreeType::STRING, single_value);
   yaml::Single single2(KEY, EntreeType::STRING, single_value);
-  yaml::Map map(KEY, {&single1, &single2});
+  yaml::Structure map(KEY, {&single1, &single2});
   auto result = map.FindParent(single1.Key());
   ASSERT_TRUE(result);
   EXPECT_EQ(&map, result.value());
 }
 
-TEST(Map, FailedToFindParent) {
+TEST(Structure, FailedToFindParent) {
   yaml::Single single1(KEY, EntreeType::STRING, single_value);
   yaml::Single single2(KEY, EntreeType::STRING, single_value);
-  yaml::Map map(KEY, {&single1, &single2});
+  yaml::Structure map(KEY, {&single1, &single2});
   auto result = map.FindParent("unknown");
   ASSERT_FALSE(result);
 }
 
-TEST(Cash, FindParentOfNestedMap) {
+TEST(Cash, FindParentOfNestedStructure) {
   yaml::Single single1("key2", yaml::EntreeType::STRING, "str");
   yaml::Single single2("key3", yaml::EntreeType::STRING, "123");
   std::vector<yaml::Node*> inner_struct_vec2{&single1, &single2};
-  yaml::Map inner_map("key4", inner_struct_vec2);
+  yaml::Structure inner_map("key4", inner_struct_vec2);
   yaml::Single single3("key5", yaml::EntreeType::STRING, "char");
   yaml::Single single4("key6", yaml::EntreeType::STRING, "456");
   std::vector<yaml::Node*> outer_struct_vec1{&single3, &single4, &inner_map};
-  yaml::Map outer_map("key1", outer_struct_vec1);
+  yaml::Structure outer_map("key1", outer_struct_vec1);
   auto result = outer_map.FindParent(single1.Key());
   ASSERT_TRUE(result);
   EXPECT_EQ(&inner_map, result.value());
 }
 
-TEST(Map, Print) {
+TEST(Structure, Print) {
   yaml::Single single1(KEY, EntreeType::STRING, single_value);
   yaml::Sequence list(KEY, yaml::EntreeType::STRING, list_value);
-  yaml::Map map1(KEY, {&single1, &list});
-  yaml::Map map2(KEY, {&map1, &single1, &single1});
+  yaml::Structure map1(KEY, {&single1, &list});
+  yaml::Structure map2(KEY, {&map1, &single1, &single1});
   std::cout << map2.Print("") << std::endl;
   EXPECT_TRUE(true);
 }
@@ -193,8 +193,8 @@ TEST(List, Type) {
   yaml::Single single4("key2", yaml::EntreeType::STRING, "456");
   std::vector<yaml::Node*> struct_vec1{&single1, &single2};
   std::vector<yaml::Node*> struct_vec2{&single3, &single4};
-  yaml::Map map1(struct_vec1);
-  yaml::Map map2(struct_vec2);
+  yaml::Structure map1(struct_vec1);
+  yaml::Structure map2(struct_vec2);
   std::vector<yaml::Node*> list_vec{&map1, &map2};
   yaml::List list("key3", list_vec);
   EXPECT_EQ(NodeType::LIST, list.Type());
@@ -209,8 +209,8 @@ TEST(List, Print) {
   yaml::Single single4("key2", yaml::EntreeType::STRING, "456");
   std::vector<yaml::Node*> struct_vec1{&single1, &single2};
   std::vector<yaml::Node*> struct_vec2{&single3, &single4};
-  yaml::Map map1(struct_vec1);
-  yaml::Map map2(struct_vec2);
+  yaml::Structure map1(struct_vec1);
+  yaml::Structure map2(struct_vec2);
   std::vector<yaml::Node*> list_vec{&map1, &map2};
   yaml::List list("key3", list_vec);
   std::cout << list.Print("") << std::endl;

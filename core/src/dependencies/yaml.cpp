@@ -8,9 +8,23 @@ namespace {
 Node* ExtractSingle(const std::string& key, const YAML::Node& second);
 Node* ExtractSequence(const std::string& key, const YAML::Node& second);
 Node* Extract(const YAML::Node& node);
-Map* LoadNode(const YAML::Node& node);
+Structure* LoadNode(const YAML::Node& node);
 
-Map* LoadNode(const YAML::Node& node) {
+class ErrorLogger {
+ public:
+  ErrorLogger() {
+  }
+  ~ErrorLogger() {
+    std::cerr << ss.str();
+  }
+  ErrorLogger* operator<<(ErrorLogger* logger, std::string str) {
+    logger->ss << str;
+    return logger;
+  }
+  std::stringstream ss;
+};
+
+Structure* LoadNode(const YAML::Node& node) {
   std::vector<Node*> vector{};
   for (auto it = node.begin(); it != node.end(); ++it) {
     if (it->first.IsNull()) {
@@ -31,7 +45,8 @@ Map* LoadNode(const YAML::Node& node) {
         break;
 
       case (YAML::NodeType::value::Map):
-        vector.push_back(new Map(key, LoadNode(second)->GetEntreeValue()));
+        vector.push_back(
+          new Structure(key, LoadNode(second)->GetEntreeValue()));
         break;
 
       case (YAML::NodeType::value::Undefined):
@@ -46,7 +61,7 @@ Map* LoadNode(const YAML::Node& node) {
         std::cerr << "Undefined Type" << std::endl;
     }
   }
-  return new Map(vector);  // create Root node
+  return new Structure(vector);  // create Root node
 }
 
 Node* ExtractSingle(const std::string& key, const YAML::Node& second) {
@@ -75,7 +90,7 @@ Node* Extract(const YAML::Node& node) {
   } catch (const YAML::Exception& e) {
     std::cerr << e.what() << std::endl;
   }
-  return new Map({});
+  return new Structure({});
 }
 }  // namespace
 

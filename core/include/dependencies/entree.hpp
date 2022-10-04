@@ -68,14 +68,14 @@ class Node {
 };
 
 template <typename T>
-class Leaf : public Node {
+class LeafNode : public Node {
  public:
   // using PrintCB = std::function<std::string(const T&)>;
-  Leaf(std::string_view key, NodeType type, const EntreeType entree_type,
-       const T& value)
+  LeafNode(std::string_view key, NodeType type, const EntreeType entree_type,
+           const T& value)
     : Node(key, type), m_value{value}, m_entree_type{entree_type} {
   }
-  virtual ~Leaf() = default;
+  virtual ~LeafNode() = default;
 
   inline EntreeType GetEntreeType() const {
     return m_entree_type;
@@ -101,36 +101,36 @@ class Leaf : public Node {
   EntreeType m_entree_type = EntreeType::UNDEFINED;  // make it only for leaf
 };
 
-class Single : public Leaf<std::string> {
+class Single : public LeafNode<std::string> {
  public:
   Single(std::string_view key, const EntreeType entree_type,
          const std::string& value)
-    : Leaf<std::string>(key, NodeType::SINGLE, entree_type, value){};
+    : LeafNode<std::string>(key, NodeType::SINGLE, entree_type, value){};
   ~Single() = default;
 
  protected:
   std::string PrintImpl() const override;
 };
 
-class Sequence : public Leaf<std::vector<std::string>> {
+class Sequence : public LeafNode<std::vector<std::string>> {
  public:
   Sequence(std::string_view key, const EntreeType entree_type,
            const std::vector<std::string>& value)
-    : Leaf<std::vector<std::string>>(key, NodeType::SEQUENCE, entree_type,
-                                     value){};
+    : LeafNode<std::vector<std::string>>(key, NodeType::SEQUENCE, entree_type,
+                                         value){};
   ~Sequence() = default;
 
  protected:
   std::string PrintImpl() const override;
 };
 
-class Structure : public Node {
+class CompositeNode : public Node {
  public:
-  Structure(std::string_view key, const NodeType type,
-            const std::vector<Node*>& nodes)
+  CompositeNode(std::string_view key, const NodeType type,
+                const std::vector<Node*>& nodes)
     : Node(key, type), m_nodes{nodes} {
   }
-  virtual ~Structure() = default;
+  virtual ~CompositeNode() = default;
 
   inline std::vector<Node*> GetEntreeValue() const {
     return m_nodes;
@@ -143,15 +143,15 @@ class Structure : public Node {
   std::vector<Node*> m_nodes;
 };
 
-class Map : public Structure {
+class Structure : public CompositeNode {
  public:
-  explicit Map(const std::vector<Node*>& nodes) : Map("", nodes) {
+  explicit Structure(const std::vector<Node*>& nodes) : Structure("", nodes) {
   }
-  Map(std::string_view key, const std::vector<Node*>& nodes)
-    : Structure(key, NodeType::MAP, nodes) {
+  Structure(std::string_view key, const std::vector<Node*>& nodes)
+    : CompositeNode(key, NodeType::MAP, nodes) {
     InitializeNodeMap();
   }
-  ~Map() = default;
+  ~Structure() = default;
 
   std::optional<const Node*> FindParent(const std::string& key) const;
 
@@ -173,10 +173,10 @@ class Map : public Structure {
   NodeMap m_node_map;
 };
 
-class List : public Structure {
+class List : public CompositeNode {
  public:
   List(std::string_view key, const std::vector<Node*>& nodes)
-    : Structure(key, NodeType::LIST, nodes) {
+    : CompositeNode(key, NodeType::LIST, nodes) {
   }
   ~List() = default;
 
