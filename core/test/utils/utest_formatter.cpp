@@ -19,13 +19,13 @@ constexpr const char* kMsg = "message";
 
 // Mock Null formatter function
 std::string MockNullFormatter(const LabeledModifier& /*lm*/,
-                              const std::string& msg) {
-  return msg;
+                              std::string_view msg) {
+  return msg.data();
 }
 
 // Mock Time Label formatter function
 std::string MockTimeLabelFormatter(const LabeledModifier& lm,
-                                   const std::string& msg) {
+                                   std::string_view msg) {
   std::stringstream ss;
   ss << "[" << DateTime().TimeToString() << "]"
      << "[" << lm.GetLabel() << "]"
@@ -35,7 +35,7 @@ std::string MockTimeLabelFormatter(const LabeledModifier& lm,
 
 // Mock Time Label Modifier formatter function
 std::string MockTimeLabelModifierFormatter(const LabeledModifier& lm,
-                                           const std::string& msg) {
+                                           std::string_view msg) {
   std::stringstream ss;
   ss << "[" << DateTime().TimeToString() << "]" << lm << " " << msg;
   return ss.str();
@@ -106,8 +106,8 @@ TEST(Formatter, DefaultFormat) {
 
 // test Formatter with lambda callback function
 TEST(Formatter, MockFormatter) {
-  auto mock_format_func = [](auto lm, auto msg) {
-    return lm.GetLabel() + ": " + msg;
+  auto mock_format_func = [](const LabeledModifier& lm, std::string_view msg) {
+    return lm.GetLabel() + ": " + msg.data();
   };
   const Formatter formatter(mock_format_func);
   EXPECT_TRUE(AssertFormatter(mock_format_func, formatter));
