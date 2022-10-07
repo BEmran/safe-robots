@@ -5,7 +5,7 @@
 #include "core/utils/exception.hpp"
 #include "core/utils/logger.hpp"
 #include "core/utils/terminal.hpp"
-#include "core/utils/writer_console.hpp"
+#include "core/utils/writer.hpp"
 #include "core/utils/writer_file.hpp"
 #include "utest/utils.hpp"
 
@@ -32,14 +32,16 @@ TEST(LoggerInformation, ToString) {
 
 class MockWriter : public core::utils::Writer {
  public:
-  void Dump(const std::string& str) const override {
-    msg_ = str;
+  MockWriter() : core::utils::Writer(ss) {
   }
   std::string Msg() const {
-    return msg_;
+    std::string str{ss.str()};
+    // ss.str(std::string(""));
+    return str;
   }
 
  private:
+  std::stringstream ss;
   mutable std::string msg_;
 };
 

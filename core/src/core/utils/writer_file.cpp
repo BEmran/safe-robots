@@ -7,25 +7,26 @@
 #include "core/utils/exception.hpp"
 
 namespace core::utils {
-FileWriter::FileWriter(const std::string& filename)
-  : filename_(filename), file_(std::make_shared<std::ofstream>()) {
-  file_->open(filename, std::ios_base::out);
+FileWriter::FileWriter(std::string_view filename)
+  : Writer(file_), filename_{filename} {
+  file_.open(filename_, std::ios_base::out);
+  if (!file_.is_open()) {
+    throw Exception("FileWriter can't open file: " + filename_);
+  }
 }
 
 FileWriter::~FileWriter() {
-  dump_mutex_.lock();
-  if (!file_->is_open()) {
-    file_->close();
+  if (!file_.is_open()) {
+    file_.close();
   }
-  dump_mutex_.unlock();
 }
 
-void FileWriter::Dump(const std::string& str) const {
-  dump_mutex_.lock();
-  if (!file_->is_open()) {
-    throw Exception("FileWriter Can't open a file: " + filename_);
+bool FileWriter::IsReady() const {
+  if (!file_.is_open()) {
+    std::cerr << "FileWriter cannot open file: " << filename_ << std::endl;
+    return false;
   }
-  *file_ << str << std::endl;
-  dump_mutex_.unlock();
+  return true;
 }
+
 }  // namespace core::utils

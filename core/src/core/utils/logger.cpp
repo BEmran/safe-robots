@@ -33,7 +33,7 @@ void Logger::Dump(const WriterFormatterPair& wf, const LabeledModifier& lm,
                   const std::string& msg) {
   if (wf.writer) {
     const auto str = wf.formatter.Format(lm, msg);
-    wf.writer->Dump(str);
+    wf.writer->Write(str);
   }
 }
 
@@ -46,9 +46,11 @@ void Logger::ThrowExceptionForErrorEvent(const EventLevel event,
 
 std::shared_ptr<Logger> CreateFileAndConsoleLogger(const std::string& name) {
   const auto filename = name + kFilenameExten;
+  auto file_writer = std::make_shared<FileWriter>(filename);
+  auto console_writer = std::make_shared<Writer>(std::cout);
   const std::vector<WriterFormatterPair> writer_formatter_vec{
-    {std::make_shared<FileWriter>(filename), CreateTimeLabelFormatter()},
-    {std::make_shared<ConsoleWriter>(), CreateTimeLabelModifierFormatter()}};
+    {file_writer, CreateTimeLabelFormatter()},
+    {console_writer, CreateTimeLabelModifierFormatter()}};
   const auto except_fact = std::make_shared<ExceptionFactory>(name);
   return std::make_shared<Logger>(writer_formatter_vec, except_fact);
 }

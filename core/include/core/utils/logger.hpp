@@ -14,7 +14,7 @@
 #include "core/utils/exception.hpp"
 #include "core/utils/formatter.hpp"
 #include "core/utils/terminal.hpp"
-#include "core/utils/writer_console.hpp"
+#include "core/utils/writer.hpp"
 #include "core/utils/writer_file.hpp"
 
 // extract filename from file's full path

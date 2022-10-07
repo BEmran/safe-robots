@@ -4,42 +4,28 @@
 #define CORE_UTILS_WRITER_FILE_HPP_
 
 #include <fstream>
-#include <memory>
-#include <mutex>  // NOLINT [build/c++11] TODO(Bara)
 #include <string>
+#include <string_view>
 
 #include "core/utils/writer.hpp"
 
 namespace core::utils {
 /**
- * @brief A concrete class of Writer used to log data to a file using ofstream
- * object.
+ * @brief An extention class to Writer used to write on file stream
  *
  */
 class FileWriter : public Writer {
  public:
-  /**
-   * @brief Construct a new File Writer object with a specific file name
-   *
-   * @param filename name of the file to be created
-   *
-   * TODO: create a robust way to create a file with date tag or without
-   */
-  explicit FileWriter(const std::string& filename);
+  FileWriter(std::string_view filename);
 
-  /**
-   * @brief Destroy the File Writer object
-   *
-   */
-  ~FileWriter() override;
+  ~FileWriter();
 
-  /* Writer Interface */
-  void Dump(const std::string& str) const override;
+ protected:
+  bool IsReady() const override;
 
  private:
   std::string filename_;
-  std::shared_ptr<std::ofstream> file_;
-  mutable std::mutex dump_mutex_;
+  std::ofstream file_;
 };
 
 }  // namespace core::utils

@@ -18,7 +18,7 @@ using core::utils::WriterFormatterPair;
 
 class MockWriter : public core::utils::Writer {
  public:
-  void Dump(const std::string& str) const override {
+  void Dump(const std::string& str) const {
     msg_ = str;
     std::cout << "writer: " << msg_ << std::endl;
   }

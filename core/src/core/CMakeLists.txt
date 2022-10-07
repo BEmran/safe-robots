@@ -21,7 +21,6 @@ set(CORE_HEADER_LIST
     ${CORE_INCLUDE_DIR}/utils/subject.hpp
     ${CORE_INCLUDE_DIR}/utils/system.hpp
     ${CORE_INCLUDE_DIR}/utils/terminal.hpp
-    ${CORE_INCLUDE_DIR}/utils/writer_console.hpp
     ${CORE_INCLUDE_DIR}/utils/writer_file.hpp
     ${CORE_INCLUDE_DIR}/utils/writer.hpp
     ${CORE_INCLUDE_DIR}/sensors/module_sensor_imu.hpp
@@ -46,8 +45,8 @@ set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/utils/server_socket.cpp
     ${CORE_SOURCE_DIR}/utils/socket.cpp
     ${CORE_SOURCE_DIR}/utils/system.cpp
-    ${CORE_SOURCE_DIR}/utils/writer_console.cpp
     ${CORE_SOURCE_DIR}/utils/writer_file.cpp
+    ${CORE_SOURCE_DIR}/utils/writer.cpp
     ${CORE_SOURCE_DIR}/sensors/module_sensor_imu.cpp
     ${CORE_SOURCE_DIR}/sensors/module_sensor.cpp)
 
