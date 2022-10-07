@@ -6,21 +6,23 @@
 
 namespace core::utils {
 
+Formatter::Formatter() : format_func_{NullFormatter} {
+}
+
 Formatter::Formatter(const FormatFunc& func) : format_func_{func} {
 }
 
 std::string Formatter::Format(const LabeledModifier& lm,
-                              const std::string& msg) const {
+                              std::string_view msg) const {
   return format_func_(lm, msg);
 }
 
-std::string NullFormatter(const LabeledModifier& /*lm*/,
-                          const std::string& msg) {
-  return msg;
+std::string NullFormatter(const LabeledModifier& /*lm*/, std::string_view msg) {
+  return msg.data();
 }
 
 std::string TimeLabelFormatter(const LabeledModifier& lm,
-                               const std::string& msg) {
+                               std::string_view msg) {
   std::stringstream ss;
   ss << "[" << DateTime().TimeToString() << "][" << lm.GetLabel() << "] "
      << msg;
@@ -28,7 +30,7 @@ std::string TimeLabelFormatter(const LabeledModifier& lm,
 }
 
 std::string TimeLabelModifierFormatter(const LabeledModifier& lm,
-                                       const std::string& msg) {
+                                       std::string_view msg) {
   std::stringstream ss;
   ss << "[" << DateTime().TimeToString() << "]" << lm << " " << msg;
   return ss.str();
