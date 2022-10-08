@@ -144,3 +144,10 @@ if (NAVIO)
 endif ()
 
 message(STATUS "NAVIO project is set ${NAVIO}")
+
+# ##############################################################################
+# Doxygen
+# ##############################################################################
+if (ENABLE_DOXYGEN)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/docs)
+endif ()
