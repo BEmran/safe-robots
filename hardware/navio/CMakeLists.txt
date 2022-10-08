@@ -18,13 +18,6 @@ if (BUILD_EXECTUABLES)
 endif ()
 
 # ##############################################################################
-# Doxygen
-# ##############################################################################
-if (ENABLE_DOXYGEN)
-    # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/docs)
-endif ()
-
-# ##############################################################################
 # testing setup
 # ##############################################################################
 # if (BUILD_TESTING) message( STATUS "Build unit tests for the project. Tests
