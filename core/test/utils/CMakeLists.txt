@@ -16,9 +16,8 @@ set(UTEST_SYSTEM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_system.cpp)
 package_add_test_with_libraries(utest_system "${UTEST_SYSTEM_FILES}"
                                 "${CORE_LIBRARY}" "")
 
-set(UTEST_EVENT_LEVEL_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/utest_event_level.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
+set(UTEST_EVENT_LEVEL_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_event_level.cpp
+                            ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
 package_add_test_with_libraries(utest_event_level "${UTEST_EVENT_LEVEL_FILES}"
                                 "${CORE_LIBRARY}" "")
 
@@ -42,9 +41,8 @@ set(UTEST_NODE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_node.cpp
 package_add_test_with_libraries(utest_node "${UTEST_NODE_FILES}"
                                 "${CORE_LIBRARY}" "")
 
-set(UTEST_NODE_LOGGER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/utest_node_logger.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
+set(UTEST_NODE_LOGGER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_node_logger.cpp
+                            ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
 package_add_test_with_libraries(utest_node_logger "${UTEST_NODE_LOGGER_FILES}"
                                 "${CORE_LIBRARY}" "")
 
@@ -72,14 +70,12 @@ set(UTEST_SUBJECT_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_subject.cpp
 package_add_test_with_libraries(utest_subject "${UTEST_SUBJECT_FILES}"
                                 "${CORE_LIBRARY}" "")
 
-set(UTEST_DATA_LOGGER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/utest_data_logger.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
+set(UTEST_DATA_LOGGER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_data_logger.cpp
+                            ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
 package_add_test_with_libraries(utest_data_logger "${UTEST_DATA_LOGGER_FILES}"
                                 "${CORE_LIBRARY}" "")
 
-set(UTEST_DATA_STRUCT_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/utest_data_struct.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/utils_data.cpp)
+set(UTEST_DATA_STRUCT_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_data_struct.cpp
+                            ${CMAKE_CURRENT_SOURCE_DIR}/utils_data.cpp)
 package_add_test_with_libraries(utest_data_struct "${UTEST_DATA_STRUCT_FILES}"
                                 "${CORE_LIBRARY}" "")

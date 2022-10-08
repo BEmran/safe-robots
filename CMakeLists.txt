@@ -117,10 +117,11 @@ endforeach ()
 # ##############################################################################
 # Dependencies
 # ##############################################################################
-find_package (yaml-cpp REQUIRED PATHS ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/install/yaml-cpp)
-if(yaml-cpp_FOUND)
+find_package(yaml-cpp REQUIRED PATHS
+             ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/install/yaml-cpp)
+if (yaml-cpp_FOUND)
     message(STATUS "Found yaml-cpp of version ${yaml-cpp_VERSION}")
-endif()
+endif ()
 
 # ##############################################################################
 # Library

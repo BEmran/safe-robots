@@ -20,11 +20,8 @@ if (ENABLE_CLANG_TIDY)
         set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
         set(CMAKE_CXX_CLANG_TIDY
             ${CLANG_TIDY_EXE} --extra-arg=-Wno-unknown-warning-option
-            -p=${CMAKE_BINARY_DIR}
-            --format-style=file
-            --config=
-            --header-filter=.*
-            )
+            -p=${CMAKE_BINARY_DIR} --format-style=file --config=
+            --header-filter=.*)
     endif ()
 endif ()
 
@@ -52,13 +49,15 @@ if (ENABLE_CPPCHECK)
             --inconclusive
             --output-file=${CMAKE_BINARY_DIR}/cppcheck-report.txt
             --template='{file}:{line},{severity},{id}:{message}'
-            -I ${CMAKE_CURRENT_SOURCE_DIR}/core/include
-            -I ${CMAKE_CURRENT_SOURCE_DIR}/core/test/include
-            -I ${CMAKE_CURRENT_SOURCE_DIR}/hardware/navio/include
+            -I
+            ${CMAKE_CURRENT_SOURCE_DIR}/core/include
+            -I
+            ${CMAKE_CURRENT_SOURCE_DIR}/core/test/include
+            -I
+            ${CMAKE_CURRENT_SOURCE_DIR}/hardware/navio/include
             ${CMAKE_CURRENT_SOURCE_DIR}/core/src
             ${CMAKE_CURRENT_SOURCE_DIR}/core/app
             ${CMAKE_CURRENT_SOURCE_DIR}/hardware/navio/src
-            ${CMAKE_CURRENT_SOURCE_DIR}/hardware/navio/app
-        )
+            ${CMAKE_CURRENT_SOURCE_DIR}/hardware/navio/app)
     endif ()
 endif ()

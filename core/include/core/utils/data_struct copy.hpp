@@ -14,12 +14,12 @@ namespace {
 constexpr const char QUAT_LABEL[] = "quat";
 constexpr const char GPS_LABEL[] = "gps";
 constexpr const char RPY_LABEL[] = "rpy";
-constexpr const char ACCEL_LABEL[] = "accel"; 
-constexpr const char GYRO_LABEL[] = "gyro"; 
-constexpr const char MAG_LABEL[] = "mag"; 
-constexpr const char HEADING_LABEL[] = "heading"; 
-constexpr const char TEMP_LABEL[] = "temp"; 
-}
+constexpr const char ACCEL_LABEL[] = "accel";
+constexpr const char GYRO_LABEL[] = "gyro";
+constexpr const char MAG_LABEL[] = "mag";
+constexpr const char HEADING_LABEL[] = "heading";
+constexpr const char TEMP_LABEL[] = "temp";
+}  // namespace
 
 namespace core::utils {
 
@@ -57,7 +57,8 @@ struct DataStruct : public DataStructInterface {
  public:
   // explicit DataStruct(const std::string& label = "") : label_(label) {}
   DataStruct() = default;
-  explicit DataStruct(const T& data) : data_(data) {}
+  explicit DataStruct(const T& data) : data_(data) {
+  }
   ~DataStruct() = default;
   T Get() const {
     return data_;
@@ -75,7 +76,8 @@ struct DataStruct : public DataStructInterface {
       throw std::bad_cast();
     }
   }
-  friend std::ostream& operator<<(std::ostream& os, const DataStruct<T, LABEL>& ds) {
+  friend std::ostream& operator<<(std::ostream& os,
+                                  const DataStruct<T, LABEL>& ds) {
     return os << "[" << ds.Header() << "]: " << ds.ToString();
   }
 
@@ -106,11 +108,12 @@ struct DataStruct : public DataStructInterface {
 //   return std::to_string(data_);
 // }
 
-template<const char* LABEL>
+template <const char* LABEL>
 struct MathTypeDataStruct : public DataStruct<MATH_TYPE, LABEL> {
  public:
-  MathTypeDataStruct() : DataStruct<MATH_TYPE, LABEL>() {};
-  explicit MathTypeDataStruct(const MATH_TYPE& data) : DataStruct<MATH_TYPE, LABEL>(data) {};
+  MathTypeDataStruct() : DataStruct<MATH_TYPE, LABEL>(){};
+  explicit MathTypeDataStruct(const MATH_TYPE& data)
+    : DataStruct<MATH_TYPE, LABEL>(data){};
   ~MathTypeDataStruct() = default;
   void Clear() override {
     this->data_ = 0;
@@ -146,11 +149,11 @@ struct MathTypeDataStruct : public DataStruct<MATH_TYPE, LABEL> {
 //   ss << data_.format(kVecFmtSimple);
 //   return ss.str();
 // }
-template<const char* LABEL>
+template <const char* LABEL>
 struct Vec3DataStruct : public DataStruct<Vec3, LABEL> {
  public:
-  Vec3DataStruct() : DataStruct<Vec3, LABEL>() {};
-  explicit Vec3DataStruct(const Vec3& data) : DataStruct<Vec3, LABEL>(data) {};
+  Vec3DataStruct() : DataStruct<Vec3, LABEL>(){};
+  explicit Vec3DataStruct(const Vec3& data) : DataStruct<Vec3, LABEL>(data){};
   ~Vec3DataStruct() = default;
   void Clear() override {
     this->data_.setZero();
@@ -193,8 +196,9 @@ struct Vec3DataStruct : public DataStruct<Vec3, LABEL> {
 // template<const char* LABEL>
 struct QuatDataStruct : public DataStruct<Quat, QUAT_LABEL> {
  public:
-  QuatDataStruct() : DataStruct<Quat, QUAT_LABEL>() {};
-  explicit QuatDataStruct(const Quat& data) : DataStruct<Quat, QUAT_LABEL>(data) {};
+  QuatDataStruct() : DataStruct<Quat, QUAT_LABEL>(){};
+  explicit QuatDataStruct(const Quat& data)
+    : DataStruct<Quat, QUAT_LABEL>(data){};
   ~QuatDataStruct() = default;
   void Clear() override {
     data_.setIdentity();
@@ -209,7 +213,8 @@ struct QuatDataStruct : public DataStruct<Quat, QUAT_LABEL> {
   }
 };
 // using QuatDataStruct = QuatDataStructIF<(char*)"quat">;
-// // Gps ------------------------------------------------------------------------
+// // Gps
+// ------------------------------------------------------------------------
 // // template <>
 // // DataStruct<Gps>::DataStruct(const std::string& label)
 // //   : data_(Gps()), label_("gps") {
@@ -233,10 +238,11 @@ struct QuatDataStruct : public DataStruct<Quat, QUAT_LABEL> {
 //      << std::to_string(data_.alt);
 //   return ss.str();
 // }
-struct GpsDataStruct : public DataStruct<Gps,GPS_LABEL> {
+struct GpsDataStruct : public DataStruct<Gps, GPS_LABEL> {
  public:
-   GpsDataStruct() : DataStruct<Gps, GPS_LABEL>() {}
-  explicit GpsDataStruct(const Gps& data) : DataStruct<Gps, GPS_LABEL>(data) {};
+  GpsDataStruct() : DataStruct<Gps, GPS_LABEL>() {
+  }
+  explicit GpsDataStruct(const Gps& data) : DataStruct<Gps, GPS_LABEL>(data){};
   ~GpsDataStruct() = default;
   void Clear() override {
     data_ = Gps();
@@ -252,7 +258,8 @@ struct GpsDataStruct : public DataStruct<Gps,GPS_LABEL> {
   }
 };
 
-// // RPY ------------------------------------------------------------------------
+// // RPY
+// ------------------------------------------------------------------------
 // // template <>
 // // DataStruct<RPY>::DataStruct(const std::string& label)
 // //   : data_(RPY()), label_("rpy") {
@@ -278,8 +285,9 @@ struct GpsDataStruct : public DataStruct<Gps,GPS_LABEL> {
 
 struct RPYDataStruct : public DataStruct<RPY, RPY_LABEL> {
  public:
-  RPYDataStruct() : DataStruct<RPY, RPY_LABEL>() {}
-  explicit RPYDataStruct(const RPY& data) : DataStruct<RPY, RPY_LABEL>(data) {};
+  RPYDataStruct() : DataStruct<RPY, RPY_LABEL>() {
+  }
+  explicit RPYDataStruct(const RPY& data) : DataStruct<RPY, RPY_LABEL>(data){};
   ~RPYDataStruct() = default;
   void Clear() override {
     data_ = RPY();
@@ -361,18 +369,19 @@ struct Imu {
     tait_bryan.Set(imu.tait_bryan.Get());
   }
 
-  Imu(const Imu& imu) : 
-    temp{imu.temp.Get()},
-    heading{imu.heading.Get()},
-    accel{imu.accel.Get()},
-    gyro{imu.gyro.Get()},
-    mag{imu.mag.Get()},
-    quat{imu.quat.Get()},
-    tait_bryan{imu.tait_bryan.Get()}{
+  Imu(const Imu& imu)
+    : temp{imu.temp.Get()}
+    , heading{imu.heading.Get()}
+    , accel{imu.accel.Get()}
+    , gyro{imu.gyro.Get()}
+    , mag{imu.mag.Get()}
+    , quat{imu.quat.Get()}
+    , tait_bryan{imu.tait_bryan.Get()} {
   }
 };
 
-// // Imu ------------------------------------------------------------------------
+// // Imu
+// ------------------------------------------------------------------------
 // // template <>
 // // DataStruct<Imu>::DataStruct(const std::string& label)
 // //   : data_(Imu()), label_("imu") {
@@ -389,7 +398,8 @@ struct Imu {
 // //   std::stringstream ss;
 // //   std::for_each(
 // //     data_.array.begin(), data_.array.end() - 1,
-// //     [&ss](DataStructInterface* const ptr) { ss << ptr->Header() << ", "; });
+// //     [&ss](DataStructInterface* const ptr) { ss << ptr->Header() << ", ";
+// });
 // //   ss << data_.array.back()->Header();
 // //   return ss.str();
 // // }
@@ -405,10 +415,11 @@ struct Imu {
 // //   return ss.str();
 // // }
 
-constexpr const char IMU_LABEL[] = "imu"; 
+constexpr const char IMU_LABEL[] = "imu";
 struct ImuDataStruct : public DataStruct<Imu, IMU_LABEL> {
  public:
-  explicit ImuDataStruct() : DataStruct<Imu, IMU_LABEL>() {}
+  explicit ImuDataStruct() : DataStruct<Imu, IMU_LABEL>() {
+  }
   ~ImuDataStruct() = default;
   void Clear() override {
     std::for_each(data_.array.begin(), data_.array.end(),
