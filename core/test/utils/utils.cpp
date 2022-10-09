@@ -25,7 +25,7 @@ testing::AssertionResult AssertEqWithLabel(int expect, int actual,
 std::string FormatLabeledModifier(const Modifier& modifier,
                                   const std::string& label) {
   std::stringstream ss;
-  ss << modifier << "[" << label << "]" << core::utils::DefaultModifier();
+  ss << modifier << label << core::utils::DefaultModifier();
   return ss.str();
 }
 

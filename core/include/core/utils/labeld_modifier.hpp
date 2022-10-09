@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include "core/utils/terminal.hpp"
 
@@ -24,11 +25,11 @@ class LabeledModifier {
  public:
   explicit LabeledModifier(EventLevel event);
 
-  LabeledModifier(EventLevel event, const std::string& label);
+  LabeledModifier(EventLevel event, std::string_view label);
 
   LabeledModifier(EventLevel event, const Modifier& modifier);
 
-  LabeledModifier(EventLevel event, const std::string& label,
+  LabeledModifier(EventLevel event, std::string_view label,
                   const Modifier& modifier);
 
   EventLevel GetEventLevel() const;

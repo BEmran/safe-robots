@@ -10,7 +10,7 @@
 
 namespace core::utils {
 namespace {
-const std::map<EventLevel, std::string> kEventLevelNameMap = {
+static const std::map<EventLevel, std::string> kEventLevelNameMap = {
   {EventLevel::INFO, "INFO"},
   {EventLevel::DEBUG, "DEBUG"},
   {EventLevel::WARN, "WARN"},
@@ -29,7 +29,7 @@ LabeledModifier::LabeledModifier(EventLevel event)
   : LabeledModifier(event, EventLevelToString(event)) {
 }
 
-LabeledModifier::LabeledModifier(EventLevel event, const std::string& label)
+LabeledModifier::LabeledModifier(EventLevel event, std::string_view label)
   : LabeledModifier(event, label, DefaultModifier()) {
 }
 
@@ -37,7 +37,7 @@ LabeledModifier::LabeledModifier(EventLevel event, const Modifier& modifier)
   : LabeledModifier(event, EventLevelToString(event), modifier) {
 }
 
-LabeledModifier::LabeledModifier(EventLevel event, const std::string& label,
+LabeledModifier::LabeledModifier(EventLevel event, std::string_view label,
                                  const Modifier& modifier)
   : event_(event), label_(label), modifier_(modifier) {
 }
@@ -55,8 +55,7 @@ Modifier LabeledModifier::GetModifier() const {
 }
 
 std::ostream& operator<<(std::ostream& os, const LabeledModifier& lm) {
-  return os << lm.GetModifier() << "[" << lm.GetLabel() << "]"
-            << DefaultModifier();
+  return os << lm.GetModifier() << lm.GetLabel() << DefaultModifier();
 }
 
 LabeledModifier DebugLabeledModifier() {
