@@ -31,7 +31,18 @@ class LabeledModifier {
 
   LabeledModifier(EventLevel event, std::string_view label,
                   const Modifier& modifier);
+  /**
+   * @brief convert object to string by decoding modifier value and label string
+   *
+   * @return std::string string represent the object string
+   */
+  std::string ToString() const;
 
+  /**
+   * @brief Get the EventLevel value
+   *
+   * @return EventLevel object event level
+   */
   EventLevel GetEventLevel() const;
 
   /**

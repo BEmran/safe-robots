@@ -42,6 +42,10 @@ LabeledModifier::LabeledModifier(EventLevel event, std::string_view label,
   : event_(event), label_(label), modifier_(modifier) {
 }
 
+std::string LabeledModifier::ToString() const {
+  return modifier_.ToString() + label_ + DefaultModifier().ToString();
+}
+
 EventLevel LabeledModifier::GetEventLevel() const {
   return event_;
 }
@@ -55,7 +59,7 @@ Modifier LabeledModifier::GetModifier() const {
 }
 
 std::ostream& operator<<(std::ostream& os, const LabeledModifier& lm) {
-  return os << lm.GetModifier() << lm.GetLabel() << DefaultModifier();
+  return os << lm.ToString();
 }
 
 LabeledModifier DebugLabeledModifier() {
