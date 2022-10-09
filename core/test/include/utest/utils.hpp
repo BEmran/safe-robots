@@ -12,7 +12,7 @@
 #include <vector>
 
 #include "core/utils/labeld_modifier.hpp"
-#include "core/utils/terminal.hpp"
+#include "core/utils/modifier.hpp"
 #include "gtest/gtest.h"
 
 using core::utils::EventLevel;

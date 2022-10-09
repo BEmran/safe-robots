@@ -7,7 +7,7 @@
 #include <string>
 #include <string_view>
 
-#include "core/utils/terminal.hpp"
+#include "core/utils/modifier.hpp"
 
 namespace core::utils {
 /**

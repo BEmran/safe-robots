@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "core/utils/terminal.hpp"
+#include "core/utils/modifier.hpp"
 #include "utest/utils.hpp"
 
 using core::utils::DebugModifier;

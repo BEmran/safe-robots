@@ -10,7 +10,7 @@
 
 #include "core/utils/date_time.hpp"
 #include "core/utils/labeld_modifier.hpp"
-#include "core/utils/terminal.hpp"
+#include "core/utils/modifier.hpp"
 
 namespace core::utils {
 

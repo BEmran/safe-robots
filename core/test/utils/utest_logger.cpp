@@ -4,7 +4,7 @@
 
 #include "core/utils/exception.hpp"
 #include "core/utils/logger.hpp"
-#include "core/utils/terminal.hpp"
+#include "core/utils/modifier.hpp"
 #include "core/utils/writer.hpp"
 #include "core/utils/writer_file.hpp"
 #include "utest/utils.hpp"

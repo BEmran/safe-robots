@@ -6,7 +6,7 @@
 #include <utility>
 
 #include "core/utils/formatter2.hpp"
-#include "core/utils/terminal.hpp"
+#include "core/utils/modifier.hpp"
 #include "utest/utils.hpp"
 
 using core::utils::DateTime;

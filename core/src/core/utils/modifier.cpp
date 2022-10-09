@@ -1,6 +1,6 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#include "core/utils/terminal.hpp"
+#include "core/utils/modifier.hpp"
 
 namespace core::utils {
 using FG = terminal::FG;

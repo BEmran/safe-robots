@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_UTILS_TERMINAL_HPP_
-#define CORE_UTILS_TERMINAL_HPP_
+#ifndef CORE_UTILS_MODIFIER_HPP_
+#define CORE_UTILS_MODIFIER_HPP_
 
 #include <list>
 #include <ostream>
@@ -107,4 +107,4 @@ Modifier WarnModifier();
 
 }  // namespace core::utils
 
-#endif  // CORE_UTILS_TERMINAL_HPP_
+#endif  // CORE_UTILS_MODIFIER_HPP_
