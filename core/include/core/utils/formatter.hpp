@@ -9,7 +9,7 @@
 #include <string_view>
 
 #include "core/utils/date_time.hpp"
-#include "core/utils/event_level.hpp"
+#include "core/utils/labeld_modifier.hpp"
 #include "core/utils/terminal.hpp"
 
 namespace core::utils {

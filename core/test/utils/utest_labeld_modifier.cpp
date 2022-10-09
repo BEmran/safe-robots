@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "core/utils/event_level.hpp"
+#include "core/utils/labeld_modifier.hpp"
 #include "utest/utils.hpp"
 
 using core::utils::DebugLabeledModifier;
@@ -63,7 +63,7 @@ TEST(LabeledModifier, ConstructWithEventAndLabelAndModifier) {
 // function
 TEST(LabeledModifier, DebugLabeledModifier) {
   const auto actual = DebugLabeledModifier();
-  const auto event = EventLevel::EL_DEBUG;
+  const auto event = EventLevel::DEBUG;
   ExpectEqLabeledModifier(event, EventLevelToString(event), DebugModifier(),
                           actual);
 }
@@ -72,7 +72,7 @@ TEST(LabeledModifier, DebugLabeledModifier) {
 // function
 TEST(LabeledModifier, error_labeled_modifier) {
   const auto actual = ErrorLabeledModifier();
-  const auto event = EventLevel::EL_ERROR;
+  const auto event = EventLevel::ERROR;
   ExpectEqLabeledModifier(event, EventLevelToString(event), ErrorModifier(),
                           actual);
 }
@@ -81,7 +81,7 @@ TEST(LabeledModifier, error_labeled_modifier) {
 // function
 TEST(LabeledModifier, info_labeled_modifier) {
   const auto actual = InfoLabeledModifier();
-  const auto event = EventLevel::EL_INFO;
+  const auto event = EventLevel::INFO;
   ExpectEqLabeledModifier(event, EventLevelToString(event), InfoModifier(),
                           actual);
 }
@@ -90,7 +90,7 @@ TEST(LabeledModifier, info_labeled_modifier) {
 // function
 TEST(LabeledModifier, warn_labeled_modifier) {
   const auto actual = WarnLabeledModifier();
-  const auto event = EventLevel::EL_WARN;
+  const auto event = EventLevel::WARN;
   ExpectEqLabeledModifier(event, EventLevelToString(event), WarnModifier(),
                           actual);
 }

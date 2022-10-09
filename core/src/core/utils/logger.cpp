@@ -39,7 +39,7 @@ void Logger::Dump(const WriterFormatterPair& wf, const LabeledModifier& lm,
 
 void Logger::ThrowExceptionForErrorEvent(const EventLevel event,
                                          const std::string& msg) {
-  if (event == EventLevel::EL_ERROR) {
+  if (event == EventLevel::ERROR) {
     expectation_factory_->Throw(msg);
   }
 }

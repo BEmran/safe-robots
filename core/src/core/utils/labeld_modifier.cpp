@@ -1,6 +1,6 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#include "core/utils/event_level.hpp"
+#include "core/utils/labeld_modifier.hpp"
 
 #include <iostream>
 #include <map>
@@ -11,10 +11,10 @@
 namespace core::utils {
 namespace {
 const std::map<EventLevel, std::string> kEventLevelNameMap = {
-  {EventLevel::EL_INFO, "INFO"},
-  {EventLevel::EL_DEBUG, "DEBUG"},
-  {EventLevel::EL_WARN, "WARN"},
-  {EventLevel::EL_ERROR, "ERROR"}};
+  {EventLevel::INFO, "INFO"},
+  {EventLevel::DEBUG, "DEBUG"},
+  {EventLevel::WARN, "WARN"},
+  {EventLevel::ERROR, "ERROR"}};
 }  // namespace
 
 std::string EventLevelToString(const EventLevel event) {
@@ -61,25 +61,25 @@ std::ostream& operator<<(std::ostream& os, const LabeledModifier& lm) {
 
 LabeledModifier DebugLabeledModifier() {
   const Modifier modifier = DebugModifier();
-  const auto event = EventLevel::EL_DEBUG;
+  const auto event = EventLevel::DEBUG;
   return LabeledModifier(event, modifier);
 }
 
 LabeledModifier ErrorLabeledModifier() {
   const Modifier modifier = ErrorModifier();
-  const auto event = EventLevel::EL_ERROR;
+  const auto event = EventLevel::ERROR;
   return LabeledModifier(event, modifier);
 }
 
 LabeledModifier InfoLabeledModifier() {
   const Modifier modifier = InfoModifier();
-  const auto event = EventLevel::EL_INFO;
+  const auto event = EventLevel::INFO;
   return LabeledModifier(event, modifier);
 }
 
 LabeledModifier WarnLabeledModifier() {
   const Modifier modifier = WarnModifier();
-  const auto event = EventLevel::EL_WARN;
+  const auto event = EventLevel::WARN;
   return LabeledModifier(event, modifier);
 }
 

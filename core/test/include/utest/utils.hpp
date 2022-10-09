@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include "core/utils/event_level.hpp"
+#include "core/utils/labeld_modifier.hpp"
 #include "core/utils/terminal.hpp"
 #include "gtest/gtest.h"
 
@@ -24,9 +24,8 @@ using core::utils::terminal::FMT;
 
 // carate list of available variables
 constexpr const char* kLabels[] = {"INFO", "DEBUG", "WARN", "ERROR"};
-const std::vector<EventLevel> kEvents = {
-  EventLevel::EL_INFO, EventLevel::EL_DEBUG, EventLevel::EL_WARN,
-  EventLevel::EL_ERROR};
+const std::vector<EventLevel> kEvents = {EventLevel::INFO, EventLevel::DEBUG,
+                                         EventLevel::WARN, EventLevel::ERROR};
 
 /**
  * @brief apply and operation of two AssertionResult

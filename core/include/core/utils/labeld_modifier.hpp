@@ -14,10 +14,10 @@ namespace core::utils {
  *
  */
 enum class EventLevel {
-  EL_INFO = 0,  // basic level of information
-  EL_DEBUG,     // only for information used in debug mode
-  EL_WARN,      // when system behaviour is not desirable but not fatal
-  EL_ERROR,     // when system is fatal and system should treat it
+  INFO = 0,  // basic level of information
+  DEBUG,     // only for information used in debug mode
+  WARN,      // when system behaviour is not desirable but not fatal
+  ERROR,     // when system is fatal and system should treat it
 };
 
 class LabeledModifier {

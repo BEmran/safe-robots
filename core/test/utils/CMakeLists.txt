@@ -16,9 +16,9 @@ set(UTEST_SYSTEM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_system.cpp)
 package_add_test_with_libraries(utest_system "${UTEST_SYSTEM_FILES}"
                                 "${CORE_LIBRARY}" "")
 
-set(UTEST_EVENT_LEVEL_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_event_level.cpp
+set(UTEST_LABLED_MODIFIER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_labeld_modifier.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
-package_add_test_with_libraries(utest_event_level "${UTEST_EVENT_LEVEL_FILES}"
+package_add_test_with_libraries(utest_labeld_modifier "${UTEST_LABLED_MODIFIER_FILES}"
                                 "${CORE_LIBRARY}" "")
 
 set(UTEST_FORMATTER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_formatter.cpp

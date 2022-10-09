@@ -18,10 +18,10 @@ using core::utils::NodeLogger;
 using core::utils::WarnLabeledModifier;
 using core::utils::WarnModifier;
 
-const LabeledModifier kDebugLm(EventLevel::EL_DEBUG, DebugModifier());
-const LabeledModifier kErrorLm(EventLevel::EL_ERROR, ErrorModifier());
-const LabeledModifier kInfoLm(EventLevel::EL_INFO, InfoModifier());
-const LabeledModifier kWarnLm(EventLevel::EL_WARN, WarnModifier());
+const LabeledModifier kDebugLm(EventLevel::DEBUG, DebugModifier());
+const LabeledModifier kErrorLm(EventLevel::ERROR, ErrorModifier());
+const LabeledModifier kInfoLm(EventLevel::INFO, InfoModifier());
+const LabeledModifier kWarnLm(EventLevel::WARN, WarnModifier());
 const NodeLabeledModifiers kNodeLm(kDebugLm, kErrorLm, kInfoLm, kWarnLm);
 
 constexpr const char* kMessage = "message";
