@@ -23,8 +23,7 @@ std::string Modifier::ToString() const {
 }
 
 std::ostream& operator<<(std::ostream& os, const Modifier& mod) {
-  os << mod.ToString();
-  return os;
+  return os << mod.ToString();
 }
 
 Modifier DefaultModifier() {
