@@ -9,21 +9,6 @@
 #include "core/utils/exception.hpp"
 
 namespace core::utils {
-namespace {
-static const std::map<EventLevel, std::string> kEventLevelNameMap = {
-  {EventLevel::INFO, "INFO"},
-  {EventLevel::DEBUG, "DEBUG"},
-  {EventLevel::WARN, "WARN"},
-  {EventLevel::ERROR, "ERROR"}};
-}  // namespace
-
-std::string EventLevelToString(const EventLevel event) {
-  auto it = kEventLevelNameMap.find(event);
-  if (it == kEventLevelNameMap.end()) {
-    throw Exception("Undefined event level.");
-  }
-  return it->second;
-}
 
 LabeledModifier::LabeledModifier(EventLevel event)
   : LabeledModifier(event, EventLevelToString(event)) {

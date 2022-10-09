@@ -8,6 +8,7 @@ set(CORE_HEADER_LIST
     ${CORE_INCLUDE_DIR}/utils/data_struct.hpp
     ${CORE_INCLUDE_DIR}/utils/data.hpp
     ${CORE_INCLUDE_DIR}/utils/date_time.hpp
+    ${CORE_INCLUDE_DIR}/utils/event_level.hpp
     ${CORE_INCLUDE_DIR}/utils/labeld_modifier.hpp
     ${CORE_INCLUDE_DIR}/utils/exception.hpp
     ${CORE_INCLUDE_DIR}/utils/formatter.hpp
@@ -34,6 +35,7 @@ set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/utils/date_time.cpp
     ${CORE_SOURCE_DIR}/utils/data_struct.cpp
     ${CORE_SOURCE_DIR}/utils/data.cpp
+    ${CORE_SOURCE_DIR}/utils/event_level.cpp
     ${CORE_SOURCE_DIR}/utils/labeld_modifier.cpp
     ${CORE_SOURCE_DIR}/utils/formatter.cpp
     ${CORE_SOURCE_DIR}/utils/modifier.cpp
