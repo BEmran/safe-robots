@@ -58,6 +58,16 @@ TEST(Formater, FormatOneType) {
   EXPECT_TRUE(AssertFormatter(expect_header, &f));
 }
 
+TEST(Formater, FormatOneRefType) {
+  std::string name = "node 1";
+  Formater<std::string&> f(name);
+  const std::string expect_header1 = "[" + name + "]: ";
+  EXPECT_TRUE(AssertFormatter(expect_header1, &f));
+  name = "node 2";
+  const std::string expect_header2 = "[" + name + "]: ";
+  EXPECT_TRUE(AssertFormatter(expect_header2, &f));
+}
+
 TEST(Formater, FormatTwoType) {
   Formater<std::string_view, int> f("Node", 123);
   const std::string expect_header = "[Node][123]: ";
