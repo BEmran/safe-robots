@@ -37,7 +37,7 @@ std::string MockTimeLabelFormatter(const LabeledModifier& lm,
 std::string MockTimeLabelModifierFormatter(const LabeledModifier& lm,
                                            std::string_view msg) {
   std::stringstream ss;
-  ss << "[" << DateTime().TimeToString() << "]" << lm << " " << msg;
+  ss << "[" << DateTime().TimeToString() << "][" << lm << "] " << msg;
   return ss.str();
 }
 

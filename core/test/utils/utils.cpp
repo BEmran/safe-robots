@@ -22,8 +22,8 @@ testing::AssertionResult AssertEqWithLabel(int expect, int actual,
          << "\n\tActual: " << actual << std::endl;
 }
 
-std::string FormatLabeledModifier(const Modifier& modifier,
-                                  const std::string& label) {
+std::string StreamExpectedLabeledModifier(std::string_view label,
+                                          const Modifier& modifier) {
   std::stringstream ss;
   ss << modifier << label << core::utils::DefaultModifier();
   return ss.str();
@@ -55,9 +55,6 @@ void ExpectEqLabeledModifier(EventLevel expect_event,
   EXPECT_EQ(expect_event, actual.GetEventLevel());
   EXPECT_EQ(expect_label, actual.GetLabel());
   ExpectEqModifier(expect_modifier, actual.GetModifier());
-  std::stringstream ss;
-  ss << actual;
-  EXPECT_EQ(FormatLabeledModifier(expect_modifier, expect_label), ss.str());
 }
 
 void ExpectEqLabeledModifier(const LabeledModifier& expect,

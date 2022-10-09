@@ -48,9 +48,9 @@ testing::AssertionResult operator&&(const testing::AssertionResult& lhs,
 testing::AssertionResult AssertEqWithLabel(int expect, int actual,
                                            const char* label);
 
-// generate a string using the passed modifier and its label
-std::string FormatLabeledModifier(const Modifier& modifier,
-                                  const std::string& label);
+// generate a string using stream method of the passed label and modifier
+std::string StreamExpectedLabeledModifier(std::string_view label,
+                                          const Modifier& modifier);
 
 // convert Modifier to a string
 std::string ModifierToString(FG fg, BG bg, FMT fmt);

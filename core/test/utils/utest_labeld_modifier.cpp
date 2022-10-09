@@ -26,9 +26,9 @@ TEST(EventLevelToString, AllLevels) {
 // DefaultModifier as modifier and event's string as label
 TEST(LabeledModifier, ConstructWithEvent) {
   for (size_t i = 0; i < kEvents.size(); i++) {
-    const LabeledModifier labeled(kEvents[i]);
+    const LabeledModifier lm(kEvents[i]);
     ExpectEqLabeledModifier(kEvents[i], EventLevelToString(kEvents[i]),
-                            DefaultModifier(), labeled);
+                            DefaultModifier(), lm);
   }
 }
 
@@ -37,8 +37,8 @@ TEST(LabeledModifier, ConstructWithEvent) {
 TEST(LabeledModifier, ConstructWithEventAndLabel) {
   const char* label = "label";
   for (const auto& event : kEvents) {
-    const LabeledModifier labeled(event, label);
-    ExpectEqLabeledModifier(event, label, DefaultModifier(), labeled);
+    const LabeledModifier lm(event, label);
+    ExpectEqLabeledModifier(event, label, DefaultModifier(), lm);
   }
 }
 
@@ -47,9 +47,9 @@ TEST(LabeledModifier, ConstructWithEventAndLabel) {
 TEST(LabeledModifier, ConstructWithEventAndModifier) {
   Modifier modifier(FG::FG_LIGHT_BLUE, BG::BG_LIGHT_CYAN, FMT::FMT_HIDDEN);
   for (size_t i = 0; i < kEvents.size(); i++) {
-    const LabeledModifier labeled(kEvents[i], modifier);
+    const LabeledModifier lm(kEvents[i], modifier);
     ExpectEqLabeledModifier(kEvents[i], EventLevelToString(kEvents[i]),
-                            modifier, labeled);
+                            modifier, lm);
   }
 }
 
@@ -59,8 +59,32 @@ TEST(LabeledModifier, ConstructWithEventAndLabelAndModifier) {
   Modifier modifier(FG::FG_LIGHT_BLUE, BG::BG_LIGHT_CYAN, FMT::FMT_HIDDEN);
   const char* label = "label";
   for (const auto& event : kEvents) {
-    const LabeledModifier labeled(event, label, modifier);
-    ExpectEqLabeledModifier(event, label, modifier, labeled);
+    const LabeledModifier lm(event, label, modifier);
+    ExpectEqLabeledModifier(event, label, modifier, lm);
+  }
+}
+
+// test streaming LabeledModifier for different events
+TEST(LabeledModifier, TestStream) {
+  Modifier modifier(FG::FG_LIGHT_BLUE, BG::BG_LIGHT_CYAN, FMT::FMT_HIDDEN);
+  const char* label = "label";
+  for (const auto& event : kEvents) {
+    const LabeledModifier lm(event, label, modifier);
+    std::stringstream ss;
+    ss << lm;
+    EXPECT_EQ(StreamExpectedLabeledModifier(label, modifier), ss.str());
+  }
+}
+
+// test streaming LabeledModifier for different events
+TEST(LabeledModifier, TestToString) {
+  Modifier modifier(FG::FG_LIGHT_BLUE, BG::BG_LIGHT_CYAN, FMT::FMT_HIDDEN);
+  const char* label = "label";
+  for (const auto& event : kEvents) {
+    const LabeledModifier lm(event, label, modifier);
+    std::string expect =
+      modifier.ToString() + label + DefaultModifier().ToString();
+    EXPECT_EQ(expect, lm.ToString());
   }
 }
 
