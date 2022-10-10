@@ -2,6 +2,11 @@ set(UTEST_SYSTEM_EXCEPT ${CMAKE_CURRENT_SOURCE_DIR}/utest_exception.cpp)
 package_add_test_with_libraries(utest_exception "${UTEST_SYSTEM_EXCEPT}"
                                 "${CORE_LIBRARY}" "")
 
+set(UTEST_EVENT_LEVEL_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_event_level.cpp
+                         ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
+package_add_test_with_libraries(utest_event_level "${UTEST_EVENT_LEVEL_FILES}"
+                                "${CORE_LIBRARY}" "")
+
 set(UTEST_MODIFIER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_modifier.cpp
                          ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
 package_add_test_with_libraries(utest_modifier "${UTEST_MODIFIER_FILES}"

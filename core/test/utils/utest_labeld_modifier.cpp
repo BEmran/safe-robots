@@ -15,13 +15,6 @@ using core::utils::InfoModifier;
 using core::utils::WarnLabeledModifier;
 using core::utils::WarnModifier;
 
-// test converting an event level to string
-TEST(EventLevelToString, AllLevels) {
-  for (size_t i = 0; i < kEvents.size(); i++) {
-    EXPECT_EQ(kLabels[i], EventLevelToString(kEvents[i]));
-  }
-}
-
 // test constructing LabeledModifier with only event, should have
 // DefaultModifier as modifier and event's string as label
 TEST(LabeledModifier, ConstructWithEvent) {

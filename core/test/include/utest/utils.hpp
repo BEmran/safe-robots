@@ -23,9 +23,12 @@ using core::utils::terminal::FG;
 using core::utils::terminal::FMT;
 
 // carate list of available variables
-constexpr const char* kLabels[] = {"INFO", "DEBUG", "WARN", "ERROR"};
-const std::vector<EventLevel> kEvents = {EventLevel::INFO, EventLevel::DEBUG,
-                                         EventLevel::WARN, EventLevel::ERROR};
+constexpr const char* kLabels[] = {"ALL",   "CRITICAL", "DEBUG", "ERROR",
+                                   "FATAL", "INFO",     "WARN"};
+// should be same order as kLabels
+const std::vector<EventLevel> kEvents = {
+  EventLevel::ALL,   EventLevel::CRITICAL, EventLevel::DEBUG, EventLevel::ERROR,
+  EventLevel::FATAL, EventLevel::INFO,     EventLevel::WARN};
 
 /**
  * @brief apply and operation of two AssertionResult
