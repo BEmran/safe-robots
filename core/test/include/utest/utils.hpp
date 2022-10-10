@@ -18,9 +18,9 @@
 using core::utils::EventLevel;
 using core::utils::LabeledModifier;
 using core::utils::Modifier;
-using core::utils::terminal::BG;
-using core::utils::terminal::FG;
-using core::utils::terminal::FMT;
+namespace BG = core::utils::BG;
+namespace FG = core::utils::FG;
+namespace FMT = core::utils::FMT;
 
 // carate list of available variables
 constexpr const char* kLabels[] = {"ALL",   "CRITICAL", "DEBUG", "ERROR",
@@ -51,19 +51,19 @@ testing::AssertionResult operator&&(const testing::AssertionResult& lhs,
 testing::AssertionResult AssertEqWithLabel(int expect, int actual,
                                            const char* label);
 
-// generate a string using stream method of the passed label and modifier
-std::string StreamExpectedLabeledModifier(std::string_view label,
-                                          const Modifier& modifier);
-
 // convert Modifier to a string
-std::string ModifierToString(FG fg, BG bg, FMT fmt);
+std::string ModifierToString(const std::vector<int>& options);
 
 // check if the passed modifier has the passed configuration
-void ExpectEqModifier(FG expect_fg, BG expect_bg, FMT expect_fmt,
+void ExpectEqModifier(const std::vector<int>& expect_options,
                       const Modifier& actual);
 
 // check if the passed modifiers have the same configuration
 void ExpectEqModifier(const Modifier& expect, const Modifier& actual);
+
+// generate a string using stream method of the passed label and modifier
+std::string StreamExpectedLabeledModifier(std::string_view label,
+                                          const Modifier& modifier);
 
 // check if the passed labeled-modifier has the same expected configuration
 void ExpectEqLabeledModifier(EventLevel expect_event,

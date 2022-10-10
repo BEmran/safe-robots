@@ -5,6 +5,9 @@
 #include "core/utils/labeld_modifier.hpp"
 #include "utest/utils.hpp"
 
+namespace FG = core::utils::FG;
+namespace BG = core::utils::BG;
+namespace FMT = core::utils::FMT;
 using core::utils::DebugLabeledModifier;
 using core::utils::DebugModifier;
 using core::utils::DefaultModifier;
@@ -38,7 +41,7 @@ TEST(LabeledModifier, ConstructWithEventAndLabel) {
 // test constructing LabeledModifier with different events and a modifier,
 // should have event's string as label
 TEST(LabeledModifier, ConstructWithEventAndModifier) {
-  Modifier modifier(FG::FG_LIGHT_BLUE, BG::BG_LIGHT_CYAN, FMT::FMT_HIDDEN);
+  Modifier modifier({FG::LIGHT_BLUE, BG::LIGHT_CYAN, FMT::HIDDEN});
   for (size_t i = 0; i < kEvents.size(); i++) {
     const LabeledModifier lm(kEvents[i], modifier);
     ExpectEqLabeledModifier(kEvents[i], EventLevelToString(kEvents[i]),
@@ -49,7 +52,7 @@ TEST(LabeledModifier, ConstructWithEventAndModifier) {
 // test constructing LabeledModifier with different events, a label and a
 // modifier
 TEST(LabeledModifier, ConstructWithEventAndLabelAndModifier) {
-  Modifier modifier(FG::FG_LIGHT_BLUE, BG::BG_LIGHT_CYAN, FMT::FMT_HIDDEN);
+  Modifier modifier({FG::LIGHT_BLUE, BG::LIGHT_CYAN, FMT::HIDDEN});
   const char* label = "label";
   for (const auto& event : kEvents) {
     const LabeledModifier lm(event, label, modifier);
@@ -59,7 +62,7 @@ TEST(LabeledModifier, ConstructWithEventAndLabelAndModifier) {
 
 // test streaming LabeledModifier for different events
 TEST(LabeledModifier, TestStream) {
-  Modifier modifier(FG::FG_LIGHT_BLUE, BG::BG_LIGHT_CYAN, FMT::FMT_HIDDEN);
+  Modifier modifier({FG::LIGHT_BLUE, BG::LIGHT_CYAN, FMT::HIDDEN});
   const char* label = "label";
   for (const auto& event : kEvents) {
     const LabeledModifier lm(event, label, modifier);
@@ -71,7 +74,7 @@ TEST(LabeledModifier, TestStream) {
 
 // test streaming LabeledModifier for different events
 TEST(LabeledModifier, TestToString) {
-  Modifier modifier(FG::FG_LIGHT_BLUE, BG::BG_LIGHT_CYAN, FMT::FMT_HIDDEN);
+  Modifier modifier({FG::LIGHT_BLUE, BG::LIGHT_CYAN, FMT::HIDDEN});
   const char* label = "label";
   for (const auto& event : kEvents) {
     const LabeledModifier lm(event, label, modifier);

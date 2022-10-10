@@ -33,8 +33,8 @@ class MockLogger : public Logger {
   MockLogger() : Logger({}) {
   }
   void Log(const LabeledModifier& lm, const std::string& msg) override {
-    lm_ = lm;
-    msg_ = msg;
+    // lm_ = lm;
+    // msg_ = msg;
   }
   inline std::string Msg() const {
     return msg_;

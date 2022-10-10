@@ -22,30 +22,28 @@ testing::AssertionResult AssertEqWithLabel(int expect, int actual,
          << "\n\tActual: " << actual << std::endl;
 }
 
+std::string ModifierToString(const std::vector<int>& options) {
+  std::string str;
+  for (const auto& opt : options) {
+    str += "\x1B[" + std::to_string(opt) + "m";
+  }
+  return str;
+}
+
+void ExpectEqModifier(const std::vector<int>& expect_options,
+                      const Modifier& actual) {
+  EXPECT_EQ(ModifierToString(expect_options), actual.ToString());
+}
+
+void ExpectEqModifier(const Modifier& expect, const Modifier& actual) {
+  EXPECT_EQ(expect.ToString(), actual.ToString());
+}
+
 std::string StreamExpectedLabeledModifier(std::string_view label,
                                           const Modifier& modifier) {
   std::stringstream ss;
   ss << modifier << label << core::utils::DefaultModifier();
   return ss.str();
-}
-
-std::string ModifierToString(FG fg, BG bg, FMT fmt) {
-  constexpr auto kBuffSize = 25;
-  std::string buffer(kBuffSize, ' ', std::allocator<char>());
-  const auto actual_size = snprintf(buffer.data(), buffer.size(),
-                                    "\x1B[%dm\x1B[%dm\x1B[%dm", fmt, fg, bg);
-  buffer.resize(static_cast<size_t>(actual_size));
-  return buffer;
-}
-
-void ExpectEqModifier(FG expect_fg, BG expect_bg, FMT expect_fmt,
-                      const Modifier& actual) {
-  EXPECT_EQ(ModifierToString(expect_fg, expect_bg, expect_fmt),
-            actual.ToString());
-}
-
-void ExpectEqModifier(const Modifier& expect, const Modifier& actual) {
-  EXPECT_EQ(expect.ToString(), actual.ToString());
 }
 
 void ExpectEqLabeledModifier(EventLevel expect_event,
