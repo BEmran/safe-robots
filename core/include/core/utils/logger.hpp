@@ -12,6 +12,7 @@
 
 #include "core/utils/exception.hpp"
 #include "core/utils/formatter.hpp"
+#include "core/utils/formatter2.hpp"
 #include "core/utils/labeld_modifier.hpp"
 #include "core/utils/modifier.hpp"
 #include "core/utils/writer.hpp"
@@ -51,7 +52,7 @@ struct LogLocation {
 
 struct WriterFormatterPair {
   std::shared_ptr<Writer> writer;
-  Formatter formatter;
+  std::shared_ptr<FormaterInterface> formatter;
 };
 
 /**
@@ -90,9 +91,16 @@ class Logger {
    */
   virtual void Log(const LabeledModifier& lm, const std::string& msg);
 
+  /**
+   * @brief logs the passed message using the writer
+   *
+   * @param event logging label
+   * @param msg msg to log
+   */
+  virtual void Log(const EventLevel event, std::string_view msg);
+
  protected:
-  static void Dump(const WriterFormatterPair& wf, const LabeledModifier& lm,
-                   const std::string& msg);
+  static void Dump(const WriterFormatterPair& wf, std::string_view msg);
 
   void ThrowExceptionForErrorEvent(EventLevel event, const std::string& msg);
 
@@ -109,7 +117,8 @@ class Logger {
  * filename as "<name>_logger.txt"
  * @return std::shared_ptr<Logger> logger object
  */
-std::shared_ptr<Logger> CreateFileAndConsoleLogger(const std::string& name);
+std::shared_ptr<Logger> CreateFileAndConsoleLogger(
+  std::string_view name, std::string_view filename = "");
 
 }  // namespace core::utils
 
