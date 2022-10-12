@@ -3,7 +3,6 @@
 #ifndef CORE_UTILS_MODIFIER_HPP_
 #define CORE_UTILS_MODIFIER_HPP_
 
-#include <list>
 #include <ostream>
 #include <string>
 #include <vector>
