@@ -22,12 +22,13 @@ class LabeledModifier {
 
   LabeledModifier(EventLevel event, std::string_view label,
                   const Modifier& modifier);
+
   /**
    * @brief convert object to string by decoding modifier value and label string
    *
    * @return std::string string represent the object string
    */
-  std::string ToString() const;
+  const std::string& ToString() const;
 
   /**
    * @brief Get the EventLevel value
@@ -50,7 +51,7 @@ class LabeledModifier {
    * @param event event level
    * @return terminal::Modifier* a pointer to associated the modifier
    */
-  std::string GetLabel() const;
+  const std::string& GetLabel() const;
 
  private:
   EventLevel event_;
@@ -68,12 +69,11 @@ class LabeledModifier {
  */
 std::ostream& operator<<(std::ostream& os, const LabeledModifier& lm);
 
+// creating typical LabeledModifier
 LabeledModifier DebugLabeledModifier();
-
 LabeledModifier ErrorLabeledModifier();
-
+LabeledModifier FatalLabeledModifier();
 LabeledModifier InfoLabeledModifier();
-
 LabeledModifier WarnLabeledModifier();
 
 }  // namespace core::utils
