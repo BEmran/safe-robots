@@ -27,15 +27,17 @@ LabeledModifier::LabeledModifier(EventLevel event, std::string_view label,
   : event_(event), label_(label), modifier_(modifier) {
 }
 
-std::string LabeledModifier::ToString() const {
-  return modifier_.ToString() + label_ + DefaultModifier().ToString();
+const std::string& LabeledModifier::ToString() const {
+  static std::string string =
+    modifier_.ToString() + label_ + DefaultModifier().ToString();
+  return string;
 }
 
 EventLevel LabeledModifier::GetEventLevel() const {
   return event_;
 }
 
-std::string LabeledModifier::GetLabel() const {
+const std::string& LabeledModifier::GetLabel() const {
   return label_;
 }
 
@@ -53,9 +55,15 @@ LabeledModifier DebugLabeledModifier() {
   return LabeledModifier(event, modifier);
 }
 
-LabeledModifier ErrorLabeledModifier() {
+LabeledModifier FatalLabeledModifier() {
   const Modifier modifier = ErrorModifier();
   const auto event = EventLevel::ERROR;
+  return LabeledModifier(event, modifier);
+}
+
+LabeledModifier ErrorLabeledModifier() {
+  const Modifier modifier = FatalModifier();
+  const auto event = EventLevel::FATAL;
   return LabeledModifier(event, modifier);
 }
 
