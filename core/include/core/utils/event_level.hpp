@@ -8,7 +8,7 @@
 
 namespace core::utils {
 /**
- * @brief Defines the level of an event to be deal with
+ * @brief Defines the level of an event to deal with
  *
  */
 enum class EventLevel : uint8_t {
