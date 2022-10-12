@@ -73,7 +73,7 @@ class Modifier {
    *
    * @param options  vector holds the desired options
    */
-  Modifier(const std::vector<int>& options);
+  Modifier(const std::vector<int>& options = {});
   std::string ToString() const;
 
  private:
