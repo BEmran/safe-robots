@@ -7,10 +7,10 @@
 
 int main(int argc, char* argv[]) {
   auto app = core::utils::CreateSystemNode("app");
-  app.GetLogger()->LogDebug("running....");
+  app.GetLogger().Debug("running....");
 
   if (argc < 2) {
-    app.GetLogger()->LogError("no port provided");
+    app.GetLogger().Error("no port provided");
     return EXIT_FAILURE;
   }
 
@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
       server >> data;
       server << data;
     }
-    app.GetLogger()->LogWarn("Lost connection");
+    app.GetLogger().Warn("Lost connection");
   }
 
   return 0;

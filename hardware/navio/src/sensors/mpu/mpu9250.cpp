@@ -85,7 +85,7 @@ void Mpu9250::ReadCalibrationFile() {
 
 bool Mpu9250::ProbeMpu() const {
   if (ReadRegister(mpu9250::WHO_AM_I) != mpu9250::WHO_AM_I_RESPONSE) {
-    node_->GetLogger()->LogWarn("Bad IMU device ID");
+    node_->GetLogger().Warn("Bad IMU device ID");
     return false;
   }
   return true;
@@ -94,7 +94,7 @@ bool Mpu9250::ProbeMpu() const {
 bool Mpu9250::ProbeAk8963() const {
   ConfigureI2C();
   if (ReadAK8963Register(ak8963::WHO_AM_I) != ak8963::WHO_AM_I_RESPONSE) {
-    node_->GetLogger()->LogWarn("Bad Magnetometer device ID");
+    node_->GetLogger().Warn("Bad Magnetometer device ID");
     return false;
   }
   return true;
@@ -102,7 +102,7 @@ bool Mpu9250::ProbeAk8963() const {
 
 bool Mpu9250::Probe() {
   if (ProbeMpu() && ProbeAk8963()) {
-    node_->GetLogger()->LogDebug("MPU9250 is online!");
+    node_->GetLogger().Debug("MPU9250 is online!");
     return true;
   }
   return false;
@@ -186,7 +186,7 @@ void Mpu9250::InitializeGyro() const {
 void Mpu9250::InitializeMag() const {
   const auto scale = cu::ToByte(config_.mag_scale);
   const auto mode = cu::ToByte(config_.mag_mode);
-  node_->GetLogger()->LogInfo(std::to_string(mode));
+  node_->GetLogger().Info(std::to_string(mode));
   const auto res = static_cast<uint8_t>(scale | mode);
   WriteAK8963Register(ak8963::CNTL, res);
   navio::hardware_utils::Delay(ShortDelay);
@@ -208,7 +208,7 @@ void Mpu9250::ExtractMagnetometerSensitivityAdjustmentValues() {
   std::stringstream msg;
   msg << "Magnetometer Sensitivity Adjustment Values: "
       << mag_sensitivity_calibration_.transpose();
-  node_->GetLogger()->LogDebug(msg.str());
+  node_->GetLogger().Debug(msg.str());
 
   // re-initialize magnetometer to reset mode
   InitializeMag();
@@ -228,7 +228,7 @@ AccelBandWidthHz Mpu9250::ReadAccelBandWidth() const {
   constexpr auto mask_bw = 0x07_uc;  // mask bits [2:0]
   const auto bw = static_cast<uint8_t>(data & mask_bw);
   if (f_inv != 0) {
-    node_->GetLogger()->LogError("Accelerometer fChoice is disabled");
+    node_->GetLogger().Error("Accelerometer fChoice is disabled");
   }
   return cu::Find(AccelBWMap(), bw);
 }
@@ -247,7 +247,7 @@ GyroScale Mpu9250::ReadGyroScale() const {
   constexpr auto mask_fs = 0x18_uc;  // mask bits [4:3]
   const auto fs = static_cast<uint8_t>(data & mask_fs);
   if (f_inv != 0) {
-    node_->GetLogger()->LogError("Gyroscope fChoice is disabled");
+    node_->GetLogger().Error("Gyroscope fChoice is disabled");
   }
   return cu::Find(GyroScaleMap(), fs);
 }
@@ -291,9 +291,9 @@ std::pair<bool, Config> Mpu9250::ValidateConfiguration() const {
                           " initialized! Actual configuration is set to:\n" +
                           config_str;
   if (valid) {
-    node_->GetLogger()->LogDebug(msg);
+    node_->GetLogger().Debug(msg);
   } else {
-    node_->GetLogger()->LogWarn(msg);
+    node_->GetLogger().Warn(msg);
   }
   return {valid, actual_cfg};
 }
@@ -374,7 +374,7 @@ cu::ImuData Mpu9250::ApplySensorSpecs(const SensorRawData& raw) const {
   imu.mag.data = mag_spec_.Apply(raw.mag);
   imu.temp.value = temp_spec_.Apply(raw.temp);
   if (raw.mag_over_flow) {
-    node_->GetLogger()->LogDebug("detect over flow");
+    node_->GetLogger().Debug("detect over flow");
     // imu.mag.data = cu::Vec3::Zero();
   }
   return imu;

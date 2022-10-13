@@ -7,9 +7,9 @@
 #include <string_view>
 
 constexpr std::string_view HEADER = "HEADER";
+using depend::Debug;
+using depend::Error;
 using depend::Log;
-using depend::LogDebug;
-using depend::LogError;
 using depend::Logger;
 using namespace std::literals::string_literals;
 
@@ -20,15 +20,15 @@ TEST(Logger, DefaultTest) {
   EXPECT_TRUE(true);
 }
 
-TEST(Logger, LogDebugTest) {
+TEST(Logger, DebugTest) {
   const std::string msg = "debug msg";
-  LogDebug() << msg;
+  Debug() << msg;
   EXPECT_TRUE(true);
 }
 
-TEST(Logger, LogErrorTest) {
+TEST(Logger, ErrorTest) {
   const std::string msg = "error msg";
-  LogError() << msg;
+  Error() << msg;
   EXPECT_TRUE(true);
 }
 

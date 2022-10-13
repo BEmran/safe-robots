@@ -28,12 +28,12 @@ TEST(Node, ConstructWithName) {
   EXPECT_EQ(node.GetName(), kNodeName);
 }
 
-// construct Node with Name and logger
-TEST(Node, ConstructWithNameAndLogger) {
-  auto node_logger = core::utils::CreateNodeLogger("name");
-  const Node node(kNodeName, node_logger);
-  EXPECT_EQ(node.GetLogger(), node_logger);
-}
+// // construct Node with Name and logger
+// TEST(Node, ConstructWithNameAndLogger) {
+//   auto node_logger = core::utils::CreateNodeLogger("name");
+//   const Node node(kNodeName, node_logger);
+//   EXPECT_EQ(node.GetLogger(), node_logger);
+// }
 
 // construct system Node
 TEST(CreateSystemNode, ConstructNode) {

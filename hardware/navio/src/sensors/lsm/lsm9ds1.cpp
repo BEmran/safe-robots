@@ -94,7 +94,7 @@ bool Lsm9ds1::ProbeAG() const {
   auto a = ReadAGRegister(xg::WHO_AM_I);
   std::cout << a << "\t" << int(a) << std::endl;
   if (ReadAGRegister(xg::WHO_AM_I) != xg::WHO_AM_I_RESPONSE) {
-    node_->GetLogger()->LogWarn("Bad IMU device ID");
+    node_->GetLogger().Warn("Bad IMU device ID");
     return false;
   }
   return true;
@@ -104,7 +104,7 @@ bool Lsm9ds1::ProbeMag() const {
   auto a = ReadMagRegister(mag::WHO_AM_I);
   std::cout << a << "\t" << int(a) << std::endl;
   if (ReadMagRegister(mag::WHO_AM_I) != mag::WHO_AM_I_RESPONSE) {
-    node_->GetLogger()->LogWarn("Bad Magnetometer device ID");
+    node_->GetLogger().Warn("Bad Magnetometer device ID");
     return false;
   }
   return true;
@@ -112,7 +112,7 @@ bool Lsm9ds1::ProbeMag() const {
 
 bool Lsm9ds1::Probe() {
   if (ProbeAG() && ProbeMag()) {
-    node_->GetLogger()->LogDebug("LSM9DS1 is online!");
+    node_->GetLogger().Debug("LSM9DS1 is online!");
     return true;
   }
   return false;
@@ -360,7 +360,7 @@ std::pair<bool, Config> Lsm9ds1::ValidateConfiguration() const {
   const std::string msg = "LSM9DS1 " + valid_str +
                           " initialized! Actual configuration is set to:\n" +
                           config_str;
-  valid ? node_->GetLogger()->LogDebug(msg) : node_->GetLogger()->LogWarn(msg);
+  valid ? node_->GetLogger().Debug(msg) : node_->GetLogger().Warn(msg);
 
   return {valid, actual_cfg};
 }

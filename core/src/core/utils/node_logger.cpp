@@ -3,57 +3,80 @@
 #include "core/utils/node_logger.hpp"
 
 namespace core::utils {
-NodeLogger::NodeLogger(std::shared_ptr<Logger> logger)
-  : NodeLogger(std::move(logger), NodeLabeledModifiers()) {
+
+// constexpr std::string_view system_name = "sys";
+
+NodeLogger::NodeLogger(const Logger& logger)
+  : NodeLogger(logger, NodeLabeledModifiers()) {
 }
 
-NodeLogger::NodeLogger(std::shared_ptr<Logger> logger,
+NodeLogger::NodeLogger(const Logger& logger,
                        NodeLabeledModifiers labeled_modifiers)
-  : logger_(std::move(logger))
-  , labeled_modifiers_(std::move(labeled_modifiers)) {
+  : logger_{logger}, labeled_modifiers_{labeled_modifiers} {
 }
 
-void NodeLogger::LogDebug(const std::string& msg) const {
+// void NodeLogger::SetLabeledModifier(NodeLabeledModifiers labeled_modifiers)
+// {
+//   // labeled_modifiers_ = labeled_modifiers;
+// }
+
+// NodeLogger::NodeLogger(std::shared_ptr<Logger> logger)
+//   : NodeLogger(std::move(logger), NodeLabeledModifiers()) {
+// }
+
+// NodeLogger::NodeLogger(std::shared_ptr<Logger> logger,
+//                        NodeLabeledModifiers labeled_modifiers)
+//   : logger_(std::move(logger))
+//   , labeled_modifiers_(std::move(labeled_modifiers)) {
+// }
+
+const Logger& NodeLogger::Debug(std::string_view msg) const {
   LogImpl(labeled_modifiers_.debug, msg);
+  return logger_;
 }
 
-void NodeLogger::LogError(const std::string& msg) const {
+const Logger& NodeLogger::Error(std::string_view msg) const {
   LogImpl(labeled_modifiers_.error, msg);
+  return logger_;
 }
 
-void NodeLogger::LogInfo(const std::string& msg) const {
+const Logger& NodeLogger::Fatal(std::string_view msg) const {
+  LogImpl(labeled_modifiers_.fatal, msg);
+  return logger_;
+}
+
+const Logger& NodeLogger::Info(std::string_view msg) const {
   LogImpl(labeled_modifiers_.info, msg);
+  return logger_;
 }
 
-void NodeLogger::LogWarn(const std::string& msg) const {
+const Logger& NodeLogger::Warn(std::string_view msg) const {
   LogImpl(labeled_modifiers_.warn, msg);
+  return logger_;
 }
 
-void NodeLogger::SetLogHeader(const std::string& header) {
+void NodeLogger::SetHeader(std::string_view header) {
+  using namespace std::literals;
   if (header.empty()) {
     return;
   }
-  header_ = "[" + header + "]: ";
+  header_ = "["s + header.data() + "] "s;
 }
 
 void NodeLogger::LogImpl(const LabeledModifier& lm,
-                         const std::string& msg) const {
-  logger_->Log(lm, header_ + msg);
+                         std::string_view msg) const {
+  logger_.Log(lm, header_ + msg.data());
 }
 
-std::shared_ptr<NodeLogger> CreateNodeLogger(const std::string& name) {
+NodeLogger CreateNodeLogger(const std::string& name) {
   const auto logger = CreateFileAndConsoleLogger(name);
-  auto node_logger = std::make_shared<NodeLogger>(logger);
-  return node_logger;
+  return NodeLogger(logger);
 }
 
-std::shared_ptr<NodeLogger> CreateSystemNodeLogger(const std::string& header) {
-  static std::shared_ptr<Logger> logger = nullptr;
-  if (!logger) {
-    logger = CreateFileAndConsoleLogger("sys");
-  }
-  auto node_logger = std::make_shared<NodeLogger>(logger);
-  node_logger->SetLogHeader(header);
+NodeLogger CreateSystemNodeLogger(const std::string& header) {
+  static Logger logger{CreateFileAndConsoleLogger("sys")};
+  NodeLogger node_logger(logger);
+  node_logger.SetHeader(header);
   return node_logger;
 }
 }  // namespace core::utils

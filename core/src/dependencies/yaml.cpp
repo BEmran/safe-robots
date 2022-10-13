@@ -11,15 +11,15 @@ Node* ExtractSequence(const std::string& key, const YAML::Node& second);
 Node* Extract(const YAML::Node& node);
 Structure* LoadNode(const YAML::Node& node);
 
-void LogError(const std::string& msg) {
-  depend::LogError() << msg;
+void Error(const std::string& msg) {
+  depend::Error() << msg;
 }
 
 Structure* LoadNode(const YAML::Node& node) {
   std::vector<Node*> vector{};
   for (auto it = node.begin(); it != node.end(); ++it) {
     if (it->first.IsNull()) {
-      LogError("IsNull");
+      Error("IsNull");
       continue;
     }
 
@@ -41,15 +41,15 @@ Structure* LoadNode(const YAML::Node& node) {
         break;
 
       case (YAML::NodeType::value::Undefined):
-        LogError("Node of type Undefined detected");
+        Error("Node of type Undefined detected");
         break;
 
       case (YAML::NodeType::value::Null):
-        LogError("Node of type Null detected");
+        Error("Node of type Null detected");
         break;
 
       default:
-        LogError("Undefined Type");
+        Error("Undefined Type");
     }
   }
   return new Structure(vector);  // create Root node
@@ -69,7 +69,7 @@ Node* ExtractSequence(const std::string& key, const YAML::Node& second) {
     if (node.IsMap()) {
       vector.push_back(LoadNode(node));
     } else {
-      LogError("Unrecognized type");
+      Error("Unrecognized type");
     }
   }
   return new List(key, vector);
@@ -79,7 +79,7 @@ Node* Extract(const YAML::Node& node) {
   try {
     return LoadNode(node);
   } catch (const YAML::Exception& e) {
-    LogError(e.what());
+    Error(e.what());
   }
   return new Structure({});
 }

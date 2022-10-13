@@ -4,15 +4,15 @@
 
 #include "core/utils/data.hpp"
 #include "core/utils/data_logger.hpp"
-#include "core/utils/formatter.hpp"
+#include "core/utils/formatter2.hpp"
 #include "core/utils/subject.hpp"
 #include "core/utils/writer.hpp"
 #include "utest/utils.hpp"
 
-using core::utils::CreateNullFormatter;
 using core::utils::DataLogger;
 using core::utils::HeadingData;
 using core::utils::Logger;
+using core::utils::NullFormater;
 using core::utils::Subject;
 using core::utils::WriterFormatterPair;
 
@@ -32,9 +32,9 @@ class MockWriter : public core::utils::Writer {
 
 TEST(MockLogger, LogWithDefaultHeaderAndLM) {
   auto writer = std::make_shared<MockWriter>();
+  auto formater = std::make_shared<NullFormater>();
 
-  const std::vector<WriterFormatterPair> writer_formatter_vec{
-    {writer, CreateNullFormatter()}};
+  std::vector<WriterFormatterPair> writer_formatter_vec{{writer, formater}};
 
   auto mock_logger = std::make_shared<Logger>(writer_formatter_vec);
 

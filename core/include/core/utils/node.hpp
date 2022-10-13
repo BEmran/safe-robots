@@ -25,7 +25,7 @@ class Node {
    * @param name node name
    * @param logger shared ptr to a logger object
    */
-  Node(const std::string& name, std::shared_ptr<NodeLogger> n_logger);
+  Node(const std::string& name, const NodeLogger& n_logger);
 
   /**
    * @brief Get the node's Name
@@ -38,21 +38,21 @@ class Node {
   /**
    * @brief Get a shared ptr to the NodeLogger
    *
-   * @return std::shared_ptr<const NodeLogger>
+   * @return const NodeLogger&
    */
-  std::shared_ptr<const NodeLogger> GetLogger() const;
+  const NodeLogger& GetLogger() const;
 
  protected:
   std::string name_;
-  std::shared_ptr<NodeLogger> n_logger_;
+  NodeLogger n_logger_;
 };
 
 /**
  * @brief calls node's log_error function and pass to it error information
  *
  */
-#define LOG_ERROR(node, msg)                                                   \
-  node.GetLogger().LogError(LOG_INFORMATION_STRING + ": " + (msg))
+// #define LOG_ERROR(node, msg)                                                   \
+//   node.GetLogger().Error(LOG_INFORMATION_STRING + ": " + (msg))
 
 /**
  * @brief Create a Node with a same NodeLogger but with different node name

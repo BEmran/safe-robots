@@ -3,18 +3,18 @@
 #include "core/utils/node.hpp"
 
 namespace core::utils {
-Node::Node(const std::string& name) : Node(name, CreateNodeLogger(name)) {
+Node::Node(const std::string& name) : Node(name, CreateSystemNodeLogger(name)) {
 }
 
-Node::Node(const std::string& name, std::shared_ptr<NodeLogger> n_logger)
-  : name_(name), n_logger_(std::move(n_logger)) {
+Node::Node(const std::string& name, const NodeLogger& n_logger)
+  : name_(name), n_logger_(n_logger) {
 }
 
 std::string Node::GetName() const {
   return name_;
 }
 
-std::shared_ptr<const NodeLogger> Node::GetLogger() const {
+const NodeLogger& Node::GetLogger() const {
   return n_logger_;
 }
 

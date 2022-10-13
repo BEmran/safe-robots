@@ -37,14 +37,14 @@ struct App {
       std::make_unique<Node>(core::utils::CreateSystemNode("im"
                                                            "u"));
     if (option == "mpu") {
-      node->GetLogger()->LogDebug("Selected: MPU9250");
+      node->GetLogger().Debug("Selected: MPU9250");
       sensors::mpu::Config config;
       auto spi =
         std::make_unique<SPI>(navio::hardware_utils::MPU_SPI_PATH, false);
       sensor =
         std::make_unique<Mpu9250>(config, std::move(spi), std::move(imu_node));
     } else if (option == "lsm") {
-      node->GetLogger()->LogDebug("Selected: LSM9DS1");
+      node->GetLogger().Debug("Selected: LSM9DS1");
       sensors::lsm::Config config;
       auto spi_a_g =
         std::make_unique<SPI>(navio::hardware_utils::LSM_A_G_PATH, false);
@@ -54,7 +54,7 @@ struct App {
                                          std::move(spi_mag), std::move(node));
 
     } else {
-      node->GetLogger()->LogError("Unknown Sensor");
+      node->GetLogger().Error("Unknown Sensor");
     }
   }
 
@@ -71,12 +71,12 @@ struct App {
           "\t-p [port number] \t\t\t Select port number\n"
           "\t-h               \t\t\t Print help message"
        << std::endl;
-    node->GetLogger()->LogDebug(ss.str());
+    node->GetLogger().Debug(ss.str());
   }
 
   void ExtractArgument(int argc, char* argv[]) {
     if (argc < 2) {
-      node->GetLogger()->LogWarn(
+      node->GetLogger().Warn(
         "Please provide input information (mpu/lsm) and port");
       PrintHelp();
     }
@@ -100,7 +100,7 @@ struct App {
           break;
 
         default:
-          node->GetLogger()->LogError("Wrong parameter.");
+          node->GetLogger().Error("Wrong parameter.");
       }
     }
   }

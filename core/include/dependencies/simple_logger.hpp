@@ -123,11 +123,11 @@ class Logger {
 
 const std::string_view Logger::default_header = "Logger";
 
-Logger LogDebug() {
+Logger Debug() {
   return Logger("DEBUG", std::cout, TimeInfo);
 }
 
-Logger LogError() {
+Logger Error() {
   return Logger("ERROR", std::cerr, TimeInfo);
 }
 

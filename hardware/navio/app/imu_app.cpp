@@ -10,10 +10,10 @@
 
 int main(int argc, char* argv[]) {
   App app;
-  app.node->GetLogger()->LogDebug("running....");
+  app.node->GetLogger().Debug("running....");
 
   if (navio::hardware_utils::CheckApm()) {
-    app.node->GetLogger()->LogError("APM is busy. Can't launch the app");
+    app.node->GetLogger().Error("APM is busy. Can't launch the app");
     return EXIT_FAILURE;
   }
 
@@ -24,12 +24,12 @@ int main(int argc, char* argv[]) {
   }
 
   if (!app.sensor->Probe()) {
-    app.node->GetLogger()->LogError("Sensor can't be probed");
+    app.node->GetLogger().Error("Sensor can't be probed");
     return EXIT_FAILURE;
   }
 
   app.sensor->Initialize();
-  app.node->GetLogger()->LogDebug("Sensor is initialized successfully");
+  app.node->GetLogger().Debug("Sensor is initialized successfully");
   // sensor->Calibrate();
 
   constexpr auto display_delay = 500;

@@ -15,29 +15,53 @@ Logger::Logger(const std::vector<WriterFormatterPair>& writer_formatter)
 Logger::Logger(const std::vector<WriterFormatterPair>& writer_formatter,
                std::shared_ptr<ExceptionFactory> expectation_factory)
   : writer_formatter_vec_(writer_formatter)
-  , expectation_factory_(std::move(expectation_factory)) {
+  , expectation_factory_(expectation_factory) {
 }
+
+// void Logger::Debug(std::string_view msg) const {
+//   Log(labeled_modifiers_.debug, msg.data());
+// }
+
+// void Logger::Error(std::string_view msg) const {
+//   Log(labeled_modifiers_.error, msg.data());
+// }
+
+// void Logger::Fatal(std::string_view msg) const {
+//   Log(labeled_modifiers_.fatal, msg.data());
+// }
+
+// void Logger::Info(std::string_view msg) const {
+//   Log(labeled_modifiers_.info, msg.data());
+// }
+
+// void Logger::Warn(std::string_view msg) const {
+//   Log(labeled_modifiers_.warn, msg.data());
+// }
 
 /* TODO: Instead of the logger Associate exception to LabeledModifier, so user
  * can select what kind of exception they want to throw when it is used/called
  */
-void Logger::Log(const LabeledModifier& lm, const std::string& msg) {
-  for (const auto& wf : writer_formatter_vec_) {
-    const std::string str = lm.ToString() + ' ' + msg.data();
-    Dump(wf, str);
-  }
-  ThrowExceptionForErrorEvent(lm.GetEventLevel(), msg.data());
+void Logger::Log(const LabeledModifier& lm, std::string_view msg) const {
+  const std::string event_str = lm.ToString() + ' ' + msg.data();
+  LogImp(lm.GetEventLevel(), event_str, msg);
 }
 
-void Logger::Log(const EventLevel event, std::string_view msg) {
-  for (const auto& wf : writer_formatter_vec_) {
-    const std::string str = EventLevelToString(event) + ' ' + msg.data();
-    Dump(wf, str);
-  }
-  ThrowExceptionForErrorEvent(event, msg.data());
+void Logger::Log(const EventLevel event, std::string_view msg) const {
+  const std::string event_str =
+    "[" + EventLevelToString(event) + "] " + msg.data();
+  LogImp(event, event_str, msg);
 }
 
-void Logger::Dump(const WriterFormatterPair& wf, std::string_view msg) {
+void Logger::LogImp(const EventLevel event, const std::string& event_str,
+                    std::string_view msg) const {
+  const std::string str = event_str + msg.data();
+  for (const auto& wf : writer_formatter_vec_) {
+    Dump(wf, str);
+  }
+  ThrowExceptionForErrorEvent(event, msg);
+}
+
+void Logger::Dump(const WriterFormatterPair& wf, const std::string& msg) const {
   if (wf.writer && wf.formatter) {
     const auto formatted = wf.formatter->Format(msg);
     wf.writer->Write(formatted);
@@ -45,9 +69,9 @@ void Logger::Dump(const WriterFormatterPair& wf, std::string_view msg) {
 }
 
 void Logger::ThrowExceptionForErrorEvent(const EventLevel event,
-                                         const std::string& msg) {
+                                         std::string_view msg) const {
   if (event == EventLevel::ERROR || event == EventLevel::FATAL) {
-    expectation_factory_->Throw(msg);
+    expectation_factory_->Throw(msg.data());
   }
 }
 
@@ -58,19 +82,16 @@ std::string GetFilename(std::string_view name, std::string_view filename) {
   return filename.data();
 }
 
-std::shared_ptr<Logger> CreateFileAndConsoleLogger(std::string_view name,
-                                                   std::string_view filename) {
+Logger CreateFileAndConsoleLogger(std::string_view name,
+                                  std::string_view filename) {
   auto filename_updated = GetFilename(name, filename);
   auto file_writer = std::make_shared<FileWriter>(filename_updated);
   auto console_writer = std::make_shared<Writer>(std::cout);
-  const std::vector<WriterFormatterPair> writer_formatter_vec{
-    {file_writer, std::make_shared<NullFormater>()},
-    {
-      console_writer,
-      std::make_shared<TimeFormater<std::string_view>>(name),
-    }};
+  auto formater = std::make_shared<TimeFormater<std::string_view>>(name);
+  std::vector<WriterFormatterPair> writer_formatter_vec{
+    {file_writer, formater}, {console_writer, formater}};
   const auto except_fact = std::make_shared<ExceptionFactory>(name.data());
-  return std::make_shared<Logger>(writer_formatter_vec, except_fact);
+  return Logger(writer_formatter_vec, except_fact);
 }
 
 }  // namespace core::utils

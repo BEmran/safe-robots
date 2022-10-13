@@ -28,24 +28,24 @@ class Subject {
     auto it = observers_.find(cb);
     // TODO(Bara): not needed for Set container
     if (it != observers_.end()) {
-      node_->GetLogger()->LogWarn("This observer has been registered before.");
+      node_->GetLogger().Warn("This observer has been registered before.");
       return;
     }
 
     observers_.insert(cb);
-    node_->GetLogger()->LogDebug("Registered new observer.");
+    node_->GetLogger().Debug("Registered new observer.");
   }
 
   void Unregister(std::shared_ptr<ObserverCallback<T>> cb) {
     auto it = observers_.find(cb);
 
     if (it == observers_.end()) {
-      node_->GetLogger()->LogWarn("This observer was not registered.");
+      node_->GetLogger().Warn("This observer was not registered.");
       return;
     }
 
     observers_.erase(it);
-    node_->GetLogger()->LogDebug("Unregistered an observer.");
+    node_->GetLogger().Debug("Unregistered an observer.");
   }
 
   void Inform() const {
