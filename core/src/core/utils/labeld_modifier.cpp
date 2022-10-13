@@ -10,12 +10,16 @@
 
 namespace core::utils {
 
+std::string LMToString(std::string_view label, const Modifier& modifier) {
+  return modifier.ToString() + label.data() + DefaultModifier().ToString();
+}
+
 LabeledModifier::LabeledModifier(EventLevel event)
   : LabeledModifier(event, EventLevelToString(event)) {
 }
 
 LabeledModifier::LabeledModifier(EventLevel event, std::string_view label)
-  : LabeledModifier(event, label, DefaultModifier()) {
+  : LabeledModifier(event, label, Modifier()) {
 }
 
 LabeledModifier::LabeledModifier(EventLevel event, const Modifier& modifier)
@@ -24,13 +28,14 @@ LabeledModifier::LabeledModifier(EventLevel event, const Modifier& modifier)
 
 LabeledModifier::LabeledModifier(EventLevel event, std::string_view label,
                                  const Modifier& modifier)
-  : event_(event), label_(label), modifier_(modifier) {
+  : event_{event}
+  , label_{label}
+  , modifier_{modifier}
+  , lm_string_{LMToString(label, modifier)} {
 }
 
 const std::string& LabeledModifier::ToString() const {
-  static std::string string =
-    modifier_.ToString() + label_ + DefaultModifier().ToString();
-  return string;
+  return lm_string_;
 }
 
 EventLevel LabeledModifier::GetEventLevel() const {
@@ -55,13 +60,13 @@ LabeledModifier DebugLabeledModifier() {
   return LabeledModifier(event, modifier);
 }
 
-LabeledModifier FatalLabeledModifier() {
+LabeledModifier ErrorLabeledModifier() {
   const Modifier modifier = ErrorModifier();
   const auto event = EventLevel::ERROR;
   return LabeledModifier(event, modifier);
 }
 
-LabeledModifier ErrorLabeledModifier() {
+LabeledModifier FatalLabeledModifier() {
   const Modifier modifier = FatalModifier();
   const auto event = EventLevel::FATAL;
   return LabeledModifier(event, modifier);

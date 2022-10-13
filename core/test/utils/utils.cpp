@@ -53,6 +53,9 @@ void ExpectEqLabeledModifier(EventLevel expect_event,
   EXPECT_EQ(expect_event, actual.GetEventLevel());
   EXPECT_EQ(expect_label, actual.GetLabel());
   ExpectEqModifier(expect_modifier, actual.GetModifier());
+  std::stringstream ss;
+  ss << expect_modifier << expect_label << core::utils::DefaultModifier();
+  EXPECT_EQ(ss.str(), actual.ToString());
 }
 
 void ExpectEqLabeledModifier(const LabeledModifier& expect,

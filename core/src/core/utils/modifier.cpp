@@ -23,7 +23,7 @@ Modifier::Modifier(const std::vector<int>& options)
   : options_string_{OptionsToString(options)} {
 }
 
-std::string Modifier::ToString() const {
+const std::string& Modifier::ToString() const {
   return options_string_;
 }
 

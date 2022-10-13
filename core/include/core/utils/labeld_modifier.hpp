@@ -57,6 +57,7 @@ class LabeledModifier {
   EventLevel event_;
   std::string label_;
   Modifier modifier_;
+  std::string lm_string_;
 };
 
 /**

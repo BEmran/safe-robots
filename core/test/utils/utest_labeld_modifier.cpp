@@ -13,6 +13,8 @@ using core::utils::DebugModifier;
 using core::utils::DefaultModifier;
 using core::utils::ErrorLabeledModifier;
 using core::utils::ErrorModifier;
+using core::utils::FatalLabeledModifier;
+using core::utils::FatalModifier;
 using core::utils::InfoLabeledModifier;
 using core::utils::InfoModifier;
 using core::utils::WarnLabeledModifier;
@@ -24,7 +26,7 @@ TEST(LabeledModifier, ConstructWithEvent) {
   for (size_t i = 0; i < kEvents.size(); i++) {
     const LabeledModifier lm(kEvents[i]);
     ExpectEqLabeledModifier(kEvents[i], EventLevelToString(kEvents[i]),
-                            DefaultModifier(), lm);
+                            Modifier(), lm);
   }
 }
 
@@ -34,7 +36,7 @@ TEST(LabeledModifier, ConstructWithEventAndLabel) {
   const char* label = "label";
   for (const auto& event : kEvents) {
     const LabeledModifier lm(event, label);
-    ExpectEqLabeledModifier(event, label, DefaultModifier(), lm);
+    ExpectEqLabeledModifier(event, label, Modifier(), lm);
   }
 }
 
@@ -86,7 +88,7 @@ TEST(LabeledModifier, TestToString) {
 
 // check debug labeled modifier settings created using DebugLabeledModifier
 // function
-TEST(LabeledModifier, DebugLabeledModifier) {
+TEST(LabeledModifier, Debug) {
   const auto actual = DebugLabeledModifier();
   const auto event = EventLevel::DEBUG;
   ExpectEqLabeledModifier(event, EventLevelToString(event), DebugModifier(),
@@ -95,16 +97,25 @@ TEST(LabeledModifier, DebugLabeledModifier) {
 
 // check error labeled modifier settings created using error_labeled_modifier
 // function
-TEST(LabeledModifier, error_labeled_modifier) {
+TEST(LabeledModifier, Error) {
   const auto actual = ErrorLabeledModifier();
   const auto event = EventLevel::ERROR;
   ExpectEqLabeledModifier(event, EventLevelToString(event), ErrorModifier(),
                           actual);
 }
 
+// check fatal labeled modifier settings created using error_labeled_modifier
+// function
+TEST(LabeledModifier, Fatal) {
+  const auto actual = FatalLabeledModifier();
+  const auto event = EventLevel::FATAL;
+  ExpectEqLabeledModifier(event, EventLevelToString(event), FatalModifier(),
+                          actual);
+}
+
 // check info labeled modifier settings created using info_labeled_modifier
 // function
-TEST(LabeledModifier, info_labeled_modifier) {
+TEST(LabeledModifier, Info) {
   const auto actual = InfoLabeledModifier();
   const auto event = EventLevel::INFO;
   ExpectEqLabeledModifier(event, EventLevelToString(event), InfoModifier(),
@@ -113,7 +124,7 @@ TEST(LabeledModifier, info_labeled_modifier) {
 
 // check warn labeled modifier settings created using warn_labeled_modifier
 // function
-TEST(LabeledModifier, warn_labeled_modifier) {
+TEST(LabeledModifier, Warn) {
   const auto actual = WarnLabeledModifier();
   const auto event = EventLevel::WARN;
   ExpectEqLabeledModifier(event, EventLevelToString(event), WarnModifier(),
