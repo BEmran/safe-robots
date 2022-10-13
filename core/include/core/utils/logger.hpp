@@ -83,13 +83,48 @@ class Logger {
    */
   virtual ~Logger() = default;
 
+  // /**
+  //  * @brief log the passed message using the Debug LabeledModifier
+  //  *
+  //  * @param msg msg to log
+  //  */
+  // void Debug(std::string_view msg) const;
+
+  // /**
+  //  * @brief log the passed message using the Error LabeledModifier
+  //  *
+  //  * @param msg msg to log
+  //  */
+  // void Error(std::string_view msg) const;
+
+  // /**
+  //  * @brief log the passed message using the Fatal LabeledModifier
+  //  *
+  //  * @param msg msg to log
+  //  */
+  // void Fatal(std::string_view msg) const;
+
+  // /**
+  //  * @brief log the passed message using the Info LabeledModifier
+  //  *
+  //  * @param msg msg to log
+  //  */
+  // void Info(std::string_view msg) const;
+
+  // /**
+  //  * @brief log the passed message using the Warn LabeledModifier
+  //  *
+  //  * @param msg msg to log
+  //  */
+  // void Warn(std::string_view msg) const;
+
   /**
    * @brief logs the passed message using the writer
    *
    * @param lm label modifier to use with the formatter
    * @param msg msg to log
    */
-  virtual void Log(const LabeledModifier& lm, const std::string& msg);
+  virtual void Log(const LabeledModifier& lm, std::string_view msg) const;
 
   /**
    * @brief logs the passed message using the writer
@@ -97,16 +132,29 @@ class Logger {
    * @param event logging label
    * @param msg msg to log
    */
-  virtual void Log(const EventLevel event, std::string_view msg);
+  virtual void Log(const EventLevel event, std::string_view msg) const;
+
+  template <typename T>
+  Logger& operator<<(const T& data) {
+    for (auto& wf : writer_formatter_vec_) {
+      wf.writer << data;
+    }
+    return *this;
+  }
 
  protected:
-  static void Dump(const WriterFormatterPair& wf, std::string_view msg);
+  void LogImp(const EventLevel event, const std::string& event_str,
+              std::string_view msg) const;
 
-  void ThrowExceptionForErrorEvent(EventLevel event, const std::string& msg);
+  void Dump(const WriterFormatterPair& wf, const std::string& msg) const;
+
+  void ThrowExceptionForErrorEvent(EventLevel event,
+                                   std::string_view msg) const;
 
  private:
   std::vector<WriterFormatterPair> writer_formatter_vec_;
   std::shared_ptr<ExceptionFactory> expectation_factory_;
+  std::string name_ = "";
 };
 
 /**
@@ -115,10 +163,10 @@ class Logger {
  *
  * @param name name of Exception factory header, also used to create logger
  * filename as "<name>_logger.txt"
- * @return std::shared_ptr<Logger> logger object
+ * @return Logger logger object
  */
-std::shared_ptr<Logger> CreateFileAndConsoleLogger(
-  std::string_view name, std::string_view filename = "");
+Logger CreateFileAndConsoleLogger(std::string_view name,
+                                  std::string_view filename = "");
 
 }  // namespace core::utils
 
