@@ -20,12 +20,12 @@ TEST(Writer, LogThroughWriteFunc) {
   Writer w(ss);
 
   w.Write(msg1);
-  EXPECT_EQ(msg1.data() + "\n"s, ss.str());
+  EXPECT_EQ(msg1.data(), ss.str());
 
   ss.str("");  // clear stringstream
 
   w.Write(msg2);
-  EXPECT_EQ(msg2.data() + "\n"s, ss.str());
+  EXPECT_EQ(msg2.data(), ss.str());
 }
 
 TEST(Writer, LogThroughStream) {
@@ -45,8 +45,8 @@ TEST(FileWriter, LogThroughWriteFunc) {
   const std::string file_name = "utest_file_writer_log.txt";
   FileWriter writer(file_name);
 
-  writer.Write(msg1);
-  writer.Write(msg2);
+  writer.Write(msg1.data() + "\n"s);
+  writer.Write(msg2.data() + "\n"s);
   auto logged_data = ReadAllLinesFromFile(file_name);
 
   ASSERT_EQ(2, logged_data.size());
