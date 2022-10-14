@@ -12,18 +12,21 @@
 using core::utils::EventLevel;
 using core::utils::Exception;
 using core::utils::ExceptionFactory;
+using core::utils::Formater;
 using core::utils::FormaterInterface;
 using core::utils::Logger;
 using core::utils::LogLocation;
 using core::utils::Modifier;
 using core::utils::NullFormater;
+using core::utils::Writer;
 
-constexpr const char* kMessage = "message";
+constexpr std::string_view kMessage = "message";
 constexpr const EventLevel debug = EventLevel::DEBUG;
 constexpr const EventLevel error = EventLevel::ERROR;
 constexpr const EventLevel fatal = EventLevel::FATAL;
-const LabeledModifier simple_lm(debug, Modifier());
-const LabeledModifier debug_lm(debug);
+const LabeledModifier simple_lm(debug);
+const LabeledModifier simple_lm1(EventLevel::WARN);
+const LabeledModifier debug_lm = core::utils::DebugLabeledModifier();
 
 TEST(LoggerInformation, Construction) {
   auto info = LOG_INFORMATION;
@@ -37,9 +40,17 @@ TEST(LoggerInformation, ToString) {
   EXPECT_EQ("[filename][funcname][1]", info.ToString());
 }
 
-class MockWriter : public core::utils::Writer {
+std::string ExpectMessage(const EventLevel event) {
+  return "[" + EventLevelToString(event) + "] " + kMessage.data();
+}
+
+std::string ExpectMessage(const LabeledModifier lm) {
+  return "[" + lm.ToString() + "] " + kMessage.data();
+}
+
+class MockWriter : public Writer {
  public:
-  MockWriter() : core::utils::Writer(ss) {
+  MockWriter() : Writer(ss) {
   }
   std::string Msg() const {
     std::string str{ss.str()};
@@ -62,47 +73,55 @@ core::utils::WriterFormatterPair wf_pair2{writer2, formater2};
 TEST(Logger, LogWithEvent) {
   Logger logger({wf_pair1});
   logger.Log(debug, kMessage);
-  const auto expect = EventLevelToString(debug) + " " + kMessage + "\n";
-  EXPECT_EQ(expect, writer1->Msg());
+  EXPECT_EQ(ExpectMessage(debug), writer1->Msg());
 }
+
 TEST(Logger, LogWithLabeledModifier) {
   Logger logger({wf_pair1});
   logger.Log(debug_lm, kMessage);
-  const auto expect = debug_lm.ToString() + " " + kMessage + "\n";
-  EXPECT_EQ(expect, writer1->Msg());
+  EXPECT_EQ(ExpectMessage(debug_lm), writer1->Msg());
 }
 
 TEST(Logger, SingleWriterFormatter) {
   Logger logger({wf_pair1});
   logger.Log(simple_lm, kMessage);
-  const auto expect = simple_lm.ToString() + " " + kMessage + "\n";
-  EXPECT_EQ(expect, writer1->Msg());
+  EXPECT_EQ(ExpectMessage(simple_lm), writer1->Msg());
 }
 
 TEST(Logger, MultipleWriterFormatter) {
   Logger logger({wf_pair1, wf_pair2});
   logger.Log(simple_lm, kMessage);
-  const auto expect = simple_lm.ToString() + " " + kMessage + "\n";
-  EXPECT_EQ(expect, writer1->Msg());
-  EXPECT_EQ(expect, writer2->Msg());
+  EXPECT_EQ(ExpectMessage(simple_lm), writer1->Msg());
+  EXPECT_EQ(ExpectMessage(simple_lm), writer2->Msg());
+}
+
+TEST(Logger, LogWithFormater) {
+  auto format = std::make_shared<Formater<std::string>>("name");
+  Logger logger({{writer1, format}});
+  logger.Log(simple_lm, kMessage);
+  EXPECT_EQ(format->Format(ExpectMessage(simple_lm)), writer1->Msg());
+}
+
+TEST(Logger, LogWithStreamMethod) {
+  Logger logger({wf_pair1});
+  logger << kMessage;
+  EXPECT_EQ(kMessage, writer1->Msg());
 }
 
 TEST(Logger, ExceptionWhenErrorEvent) {
   auto exception = std::make_shared<ExceptionFactory>("");
   Logger logger({wf_pair1}, exception);
 
-  const auto expect = EventLevelToString(error) + " " + kMessage + "\n";
   EXPECT_THROW(logger.Log(error, kMessage), core::utils::Exception);
-  EXPECT_EQ(expect, writer1->Msg());
+  EXPECT_EQ(ExpectMessage(error), writer1->Msg());
 }
 
 TEST(Logger, ExceptionWheFatalEvent) {
   auto exception = std::make_shared<ExceptionFactory>("");
   Logger logger({wf_pair1}, exception);
 
-  const auto expect = EventLevelToString(fatal) + " " + kMessage + "\n";
   EXPECT_THROW(logger.Log(fatal, kMessage), core::utils::Exception);
-  EXPECT_EQ(expect, writer1->Msg());
+  EXPECT_EQ(ExpectMessage(fatal), writer1->Msg());
 }
 
 // TEST(CreateFileAndConsoleLogger, CheckInitializedWriters) {

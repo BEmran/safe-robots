@@ -83,6 +83,31 @@ class Logger {
    */
   virtual ~Logger() = default;
 
+  /**
+   * @brief logs the passed message using the writer
+   *
+   * @param lm label modifier to use with the formatter
+   * @param msg msg to log
+   */
+  virtual void Log(const LabeledModifier& lm, std::string_view msg) const;
+
+  /**
+   * @brief logs the passed message using the writer
+   *
+   * @param event logging label
+   * @param msg msg to log
+   */
+  void Log(const EventLevel event, std::string_view msg) const;
+
+  template <typename T>
+  const Logger& operator<<(const T& data) const {
+    for (auto& wf : writer_formatter_vec_) {
+      auto& writer = *(wf.writer.get());
+      writer << data;
+    }
+    return *this;
+  }
+
   // /**
   //  * @brief log the passed message using the Debug LabeledModifier
   //  *
@@ -117,30 +142,6 @@ class Logger {
   //  * @param msg msg to log
   //  */
   // void Warn(std::string_view msg) const;
-
-  /**
-   * @brief logs the passed message using the writer
-   *
-   * @param lm label modifier to use with the formatter
-   * @param msg msg to log
-   */
-  virtual void Log(const LabeledModifier& lm, std::string_view msg) const;
-
-  /**
-   * @brief logs the passed message using the writer
-   *
-   * @param event logging label
-   * @param msg msg to log
-   */
-  virtual void Log(const EventLevel event, std::string_view msg) const;
-
-  template <typename T>
-  Logger& operator<<(const T& data) {
-    for (auto& wf : writer_formatter_vec_) {
-      wf.writer << data;
-    }
-    return *this;
-  }
 
  protected:
   void LogImp(const EventLevel event, const std::string& event_str,
