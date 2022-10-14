@@ -14,24 +14,26 @@ using core::utils::HeadingData;
 using core::utils::Logger;
 using core::utils::NullFormater;
 using core::utils::Subject;
+using core::utils::Writer;
 using core::utils::WriterFormatterPair;
 
-class MockWriter : public core::utils::Writer {
- public:
-  void Dump(const std::string& str) const {
-    msg_ = str;
-    std::cout << "writer: " << msg_ << std::endl;
-  }
-  std::string Msg() const {
-    return msg_;
-  }
+// class MockWriter : public  {
+//  public:
+//   void Dump(const std::string& str) const {
+//     msg_ = str;
+//     std::cout << "writer: " << msg_ << std::endl;
+//   }
+//   std::string Msg() const {
+//     return msg_;
+//   }
 
- private:
-  mutable std::string msg_;
-};
+//  private:
+//   mutable std::string msg_;
+// };
 
 TEST(MockLogger, LogWithDefaultHeaderAndLM) {
-  auto writer = std::make_shared<MockWriter>();
+  std::stringstream ss;
+  auto writer = std::make_shared<Writer>(ss);
   auto formater = std::make_shared<NullFormater>();
 
   std::vector<WriterFormatterPair> writer_formatter_vec{{writer, formater}};
@@ -48,15 +50,18 @@ TEST(MockLogger, LogWithDefaultHeaderAndLM) {
 
   data_logger.Observe(sub);
   data_logger.Log();
+  // *writer << std::endl;
 
   sub->Inform();
   heading.value = 2.0;
   sub->Set(heading);
   data_logger.Log();
+  // *writer << std::endl;
 
   heading.value = 3.0;
   sub->Set(heading);
   data_logger.Log();
+  // *writer << std::endl;
 
-  EXPECT_EQ(sub->Get().ToString(), writer->Msg());
+  // EXPECT_EQ(sub->Get().ToString(), ss.str());
 }
