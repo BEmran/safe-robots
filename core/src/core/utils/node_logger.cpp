@@ -10,9 +10,18 @@ NodeLogger::NodeLogger(const Logger& logger)
   : NodeLogger(logger, NodeLabeledModifiers()) {
 }
 
+NodeLogger::NodeLogger(std::shared_ptr<Logger> logger)
+  : NodeLogger(logger, NodeLabeledModifiers()) {
+}
+
 NodeLogger::NodeLogger(const Logger& logger,
                        NodeLabeledModifiers labeled_modifiers)
   : logger_{logger}, labeled_modifiers_{labeled_modifiers} {
+}
+
+NodeLogger::NodeLogger(std::shared_ptr<Logger> logger,
+                       NodeLabeledModifiers labeled_modifiers)
+  : logger_{*(logger.get())}, labeled_modifiers_{labeled_modifiers} {
 }
 
 // void NodeLogger::SetLabeledModifier(NodeLabeledModifiers labeled_modifiers)
@@ -60,7 +69,7 @@ void NodeLogger::SetHeader(std::string_view header) {
   if (header.empty()) {
     return;
   }
-  header_ = "["s + header.data() + "] "s;
+  header_ = "["s + header.data() + "] ";
 }
 
 void NodeLogger::LogImpl(const LabeledModifier& lm,

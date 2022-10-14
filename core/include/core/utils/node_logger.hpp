@@ -78,7 +78,8 @@ struct NodeLabeledModifiers {
 
 class NodeLogger {
  public:
-  NodeLogger(const Logger& logger);
+  explicit NodeLogger(const Logger& logger);
+  explicit NodeLogger(std::shared_ptr<Logger> logger);
   /**
    * @brief Construct a new Node Logger object using a logger with specific
    * labeled modifiers
@@ -87,6 +88,8 @@ class NodeLogger {
    * @param labeled_modifiers labeled modifier struct
    */
   NodeLogger(const Logger& logger, NodeLabeledModifiers labeled_modifiers);
+  NodeLogger(std::shared_ptr<Logger> logger,
+             NodeLabeledModifiers labeled_modifiers);
 
   ~NodeLogger() = default;
   /**
