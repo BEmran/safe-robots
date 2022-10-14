@@ -29,7 +29,7 @@ constexpr int LIGHT_BLUE = 94;     // light blue
 constexpr int LIGHT_MAGENTA = 95;  // light magenta
 constexpr int LIGHT_CYAN = 96;     // light cyan
 constexpr int WHITE = 97;          // white
-};                                 // namespace FG
+}  // namespace FG
 
 // background color
 namespace BG {
@@ -49,7 +49,7 @@ constexpr int LIGHT_BLUE = 104;     // light blue
 constexpr int LIGHT_MAGENTA = 105;  // light magenta
 constexpr int LIGHT_CYAN = 106;     // light cyan
 constexpr int WHITE = 107;          // white
-};                                  // namespace BG
+}  // namespace BG
 
 // font format
 namespace FMT {
@@ -60,7 +60,7 @@ constexpr int UNDERLINE = 4;  // underline
 constexpr int BLINK = 5;      // blinking
 constexpr int REVERSE = 7;    // reverse coloring
 constexpr int HIDDEN = 8;     // hidden
-};                            // namespace FMT
+}  // namespace FMT
 
 /**
  * @brief Used to format the data printed at a terminal
