@@ -54,37 +54,37 @@ TEST(NullFormater, Format) {
 // test formater
 TEST(Formater, FormatOneType) {
   Formater<std::string_view> f("Node");
-  const std::string expect_header = "[Node]: ";
+  const std::string expect_header = "[Node] ";
   EXPECT_TRUE(AssertFormatter(expect_header, &f));
 }
 
 TEST(Formater, FormatOneRefType) {
   std::string name = "node 1";
   Formater<std::string&> f(name);
-  const std::string expect_header1 = "[" + name + "]: ";
+  const std::string expect_header1 = "[" + name + "] ";
   EXPECT_TRUE(AssertFormatter(expect_header1, &f));
   name = "node 2";
-  const std::string expect_header2 = "[" + name + "]: ";
+  const std::string expect_header2 = "[" + name + "] ";
   EXPECT_TRUE(AssertFormatter(expect_header2, &f));
 }
 
 TEST(Formater, FormatTwoType) {
   Formater<std::string_view, int> f("Node", 123);
-  const std::string expect_header = "[Node][123]: ";
+  const std::string expect_header = "[Node][123] ";
   EXPECT_TRUE(AssertFormatter(expect_header, &f));
 }
 
 TEST(Formater, FormatWithModifier) {
   Modifier mod = core::utils::DefaultModifier();
   Formater<Modifier> f(mod);
-  const std::string expect_header = "[" + mod.ToString() + "]: ";
+  const std::string expect_header = "[" + mod.ToString() + "] ";
   EXPECT_TRUE(AssertFormatter(expect_header, &f));
 }
 
 TEST(Formater, FormatWithLabeledModifier) {
   LabeledModifier lm = core::utils::DebugLabeledModifier();
   Formater<LabeledModifier> f(lm);
-  const std::string expect_header = "[" + lm.ToString() + "]: ";
+  const std::string expect_header = "[" + lm.ToString() + "] ";
   EXPECT_TRUE(AssertFormatter(expect_header, &f));
 }
 
@@ -92,6 +92,6 @@ TEST(Formater, FormatWithLabeledModifier) {
 TEST(TimeFormatter, FormatOneType) {
   TimeFormater<std::string_view> f("Node");
   const std::string expect_header =
-    "[" + DateTime().TimeToString() + "][Node]: ";
+    "[" + DateTime().TimeToString() + "][Node] ";
   EXPECT_TRUE(AssertFormatter(expect_header, &f));
 }

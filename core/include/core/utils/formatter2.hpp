@@ -78,7 +78,7 @@ class Formater : public FormaterInterface {
   // format tuple values + passed message
   std::string Format(std::string_view msg) const override {
     using namespace std::string_literals;
-    return TupleToString(tuple_, size_) + ": "s + msg.data();
+    return TupleToString(tuple_, size_) + " "s + msg.data();
     // return TupleToString(tuple_) + ": "s + msg.data();
   }
 
