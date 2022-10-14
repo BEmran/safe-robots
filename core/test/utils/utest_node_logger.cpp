@@ -110,7 +110,7 @@ TEST(MockLogger, LogWithHeaderAndDefaultLM) {
   n_logger.Debug(kMessage);
   std::stringstream expect;
   expect << "[" << DebugLabeledModifier().ToString() << "] [" << kHeader << "] "
-         << kMessage;
+         << kMessage << "\n";
   EXPECT_EQ(expect.str(), ss.str());
 }
 
@@ -169,3 +169,11 @@ TEST(MockLogger, ConstructWithSpecialLM) {
 //   EXPECT_TRUE(AssertFileAndConsole(kFilename, c_buf, DebugLabeledModifier(),
 //                                    kMessage.data()));
 // }
+
+TEST(Logger, test1) {
+  auto formater = std::make_shared<core::utils::NullFormater>();
+  auto writer = std::make_shared<core::utils::Writer>(std::cout);
+  Logger logger({{writer, formater}});
+  NodeLogger n_logger(logger);
+  n_logger.Debug() << "line1";
+}

@@ -97,7 +97,7 @@ class NodeLogger {
    *
    * @param msg msg to log
    */
-  const Logger& Debug(std::string_view msg = "") const;
+  NestedLogger Debug(std::string_view msg = "") const;
 
   /**
    * @brief log the passed message using the Error LabeledModifier

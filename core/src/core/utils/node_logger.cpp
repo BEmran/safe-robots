@@ -39,9 +39,9 @@ NodeLogger::NodeLogger(std::shared_ptr<Logger> logger,
 //   , labeled_modifiers_(std::move(labeled_modifiers)) {
 // }
 
-const Logger& NodeLogger::Debug(std::string_view msg) const {
+NestedLogger NodeLogger::Debug(std::string_view msg) const {
   LogImpl(labeled_modifiers_.debug, msg);
-  return logger_;
+  return NestedLogger(logger_);
 }
 
 const Logger& NodeLogger::Error(std::string_view msg) const {

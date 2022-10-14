@@ -158,6 +158,25 @@ class Logger {
   std::string name_ = "";
 };
 
+class NestedLogger : Logger {
+ public:
+  NestedLogger(const Logger& logger) : Logger(logger), logger_(logger) {
+  }
+
+  ~NestedLogger() {
+    logger_ << "\n";
+  }
+
+  template <typename T>
+  const NestedLogger& operator<<(const T& data) const {
+    logger_ << data;
+    return *this;
+  }
+
+ private:
+  const Logger& logger_;
+};
+
 /**
  * @brief Create a new Logger object with typical console and file
  * Formatters and ExceptionFactory
