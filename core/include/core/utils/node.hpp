@@ -51,8 +51,8 @@ class Node {
  * @brief calls node's log_error function and pass to it error information
  *
  */
-// #define LOG_ERROR(node, msg)                                                   \
-//   node.GetLogger().Error(LOG_INFORMATION_STRING + ": " + (msg))
+// define LOG_ERROR(node, msg)
+// node.GetLogger().Error(LOG_INFORMATION_STRING + ": " + (msg))
 
 /**
  * @brief Create a Node with a same NodeLogger but with different node name

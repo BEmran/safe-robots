@@ -12,10 +12,10 @@ using namespace cu::literals;  // NOLINT [build/namespaces_literals] TODO(Bara)
 namespace {
 using SensorModuleType = core::sensors::SensorModuleType;
 constexpr auto ImuType = SensorModuleType::IMU;
-constexpr auto GyroType = SensorModuleType::GYROSCOPE;
-constexpr auto MagType = SensorModuleType::MAGNETOMETER;
-constexpr auto AccelType = SensorModuleType::ACCELEROMETER;
-constexpr auto TempType = SensorModuleType::TEMPERATURE;
+// constexpr auto GyroType = SensorModuleType::GYROSCOPE;
+// constexpr auto MagType = SensorModuleType::MAGNETOMETER;
+// constexpr auto AccelType = SensorModuleType::ACCELEROMETER;
+// constexpr auto TempType = SensorModuleType::TEMPERATURE;
 constexpr auto ShortDelay = 10;
 constexpr auto LongDelay = 100;
 
@@ -202,7 +202,8 @@ void Mpu9250::ExtractMagnetometerSensitivityAdjustmentValues() {
   constexpr auto reg_size = 3;
   const auto asa_values = ReadAK8963Registers(ak8963::ASAX, reg_size);
   for (size_t i = 0; i < asa_values.size(); i++) {
-    mag_sensitivity_calibration_(i) =
+    const long idx = static_cast<long>(i);
+    mag_sensitivity_calibration_[idx] =
       static_cast<float>(asa_values[i] - 128) / 256.0F + 1.0F;  // NOLINT
   }
   std::stringstream msg;
@@ -372,7 +373,7 @@ cu::ImuData Mpu9250::ApplySensorSpecs(const SensorRawData& raw) const {
   imu.accel.data = accel_spec_.Apply(raw.accel);
   imu.gyro.data = gyro_spec_.Apply(raw.gyro);
   imu.mag.data = mag_spec_.Apply(raw.mag);
-  imu.temp.value = temp_spec_.Apply(raw.temp);
+  imu.temp.value = static_cast<double>(temp_spec_.Apply(raw.temp));
   if (raw.mag_over_flow) {
     node_->GetLogger().Debug("detect over flow");
     // imu.mag.data = cu::Vec3::Zero();
