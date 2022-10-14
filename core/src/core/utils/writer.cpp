@@ -12,7 +12,7 @@ Writer::Writer(std::ostream& os) : os_(os) {
 
 void Writer::Write(std::string_view str) const {
   if (IsReady()) {
-    os_ << str << std::endl;
+    os_ << str << std::flush;
   }
 }
 
