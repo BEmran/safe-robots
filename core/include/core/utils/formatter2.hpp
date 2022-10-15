@@ -25,7 +25,7 @@ std::string TupleToString(const Tuple& t, std::index_sequence<Is...>) {
   return ss.str();
 }
 
-// TODO(bara): change name to header pattern than formater as function does
+// TODO(bara): change name to header pattern than formatter as function does
 // nothing on the passed message
 // TODO(bara): change function to not pass any variables
 
@@ -34,9 +34,9 @@ std::string TupleToString(const Tuple& t, std::index_sequence<Is...>) {
  * (style)
  *
  */
-class FormaterInterface {
+class FormatterInterface {
  public:
-  virtual ~FormaterInterface() = default;
+  virtual ~FormatterInterface() = default;
   /**
    * @brief Format passed message
    *
@@ -47,10 +47,10 @@ class FormaterInterface {
 };
 
 /**
- * @brief Concrete class of FormaterInterface used as null formater
+ * @brief Concrete class of FormatterInterface used as null formatter
  *
  */
-class NullFormater : public FormaterInterface {
+class NullFormatter : public FormatterInterface {
  public:
   // return message as it is
   std::string Format(std::string_view msg) const override {
@@ -59,7 +59,7 @@ class NullFormater : public FormaterInterface {
 };
 
 /**
- * @brief Concrete class of FormaterInterface used to append different
+ * @brief Concrete class of FormatterInterface used to append different
  * number/type of object to use when formatting messages.
  * @details it uses Variadic Templates to accept any number of variables of
  * different types
@@ -67,14 +67,14 @@ class NullFormater : public FormaterInterface {
  * @tparam Ts object of any type
  */
 template <class... Ts>
-class Formater : public FormaterInterface {
+class Formatter : public FormatterInterface {
  public:
   /**
-   * @brief Construct a new Formater object of various type
+   * @brief Construct a new Formatter object of various type
    *
    * @param ts types value
    */
-  Formater(Ts... ts) : tuple_(ts...), size_{std::index_sequence_for<Ts...>{}} {
+  Formatter(Ts... ts) : tuple_(ts...), size_{std::index_sequence_for<Ts...>{}} {
   }
 
   // format tuple values + passed message
@@ -90,30 +90,30 @@ class Formater : public FormaterInterface {
 };
 
 /**
- * @brief Concrete class of FormaterInterface similar to Formater but with time
- * information added when formatting the message
+ * @brief Concrete class of FormatterInterface similar to Formatter but with
+ * time information added when formatting the message
  *
  * @tparam Ts object of any type
  */
 template <class... Ts>
-class TimeFormater : public FormaterInterface {
+class TimeFormatter : public FormatterInterface {
  public:
   /**
-   * @brief Construct a new Time Formater object of various type
+   * @brief Construct a new Time Formatter object of various type
    *
    * @param ts types value
    */
-  TimeFormater(Ts... ts) : formater_(ts...) {
+  TimeFormatter(Ts... ts) : formatter_(ts...) {
   }
 
   // format time + tuple values + passed message
   std::string Format(std::string_view msg) const override {
     return "[" + core::utils::DateTime().TimeToString() + "]" +
-           formater_.Format(msg);
+           formatter_.Format(msg);
   }
 
  private:
-  Formater<Ts...> formater_;
+  Formatter<Ts...> formatter_;
 };
 
 }  // namespace core::utils

@@ -10,11 +10,11 @@
 #include "utest/utils.hpp"
 
 using core::utils::DateTime;
-using core::utils::Formater;
-using core::utils::FormaterInterface;
+using core::utils::Formatter;
+using core::utils::FormatterInterface;
 using core::utils::LabeledModifier;
-using core::utils::NullFormater;
-using core::utils::TimeFormater;
+using core::utils::NullFormatter;
+using core::utils::TimeFormatter;
 using core::utils::TupleToString;
 
 constexpr const char* kMsg = "message";
@@ -31,9 +31,9 @@ std::string TupleToStringHelper(const std::tuple<Args...>& t) {
 }
 
 testing::AssertionResult AssertFormatter(const std::string& expect_header,
-                                         FormaterInterface* formater) {
+                                         FormatterInterface* formatter) {
   auto expect = expect_header + std::string(kMsg);
-  if (expect == formater->Format(kMsg)) {
+  if (expect == formatter->Format(kMsg)) {
     return testing::AssertionSuccess();
   }
   return testing::AssertionFailure();
@@ -46,21 +46,21 @@ TEST(TupleToString, Test) {
   EXPECT_EQ(expect, TupleToStringHelper(tuple));
 }
 
-// test Null formater
-TEST(NullFormater, Format) {
-  EXPECT_EQ(kMsg, NullFormater().Format(kMsg));
+// test Null formatter
+TEST(NullFormatter, Format) {
+  EXPECT_EQ(kMsg, NullFormatter().Format(kMsg));
 }
 
-// test formater
-TEST(Formater, FormatOneType) {
-  Formater<std::string_view> f("Node");
+// test formatter
+TEST(Formatter, FormatOneType) {
+  Formatter<std::string_view> f("Node");
   const std::string expect_header = "[Node] ";
   EXPECT_TRUE(AssertFormatter(expect_header, &f));
 }
 
-TEST(Formater, FormatOneRefType) {
+TEST(Formatter, FormatOneRefType) {
   std::string name = "node 1";
-  Formater<std::string&> f(name);
+  Formatter<std::string&> f(name);
   const std::string expect_header1 = "[" + name + "] ";
   EXPECT_TRUE(AssertFormatter(expect_header1, &f));
   name = "node 2";
@@ -68,29 +68,29 @@ TEST(Formater, FormatOneRefType) {
   EXPECT_TRUE(AssertFormatter(expect_header2, &f));
 }
 
-TEST(Formater, FormatTwoType) {
-  Formater<std::string_view, int> f("Node", 123);
+TEST(Formatter, FormatTwoType) {
+  Formatter<std::string_view, int> f("Node", 123);
   const std::string expect_header = "[Node][123] ";
   EXPECT_TRUE(AssertFormatter(expect_header, &f));
 }
 
-TEST(Formater, FormatWithModifier) {
+TEST(Formatter, FormatWithModifier) {
   Modifier mod = core::utils::DefaultModifier();
-  Formater<Modifier> f(mod);
+  Formatter<Modifier> f(mod);
   const std::string expect_header = "[" + mod.ToString() + "] ";
   EXPECT_TRUE(AssertFormatter(expect_header, &f));
 }
 
-TEST(Formater, FormatWithLabeledModifier) {
+TEST(Formatter, FormatWithLabeledModifier) {
   LabeledModifier lm = core::utils::DebugLabeledModifier();
-  Formater<LabeledModifier> f(lm);
+  Formatter<LabeledModifier> f(lm);
   const std::string expect_header = "[" + lm.ToString() + "] ";
   EXPECT_TRUE(AssertFormatter(expect_header, &f));
 }
 
 // test Time Formatter
 TEST(TimeFormatter, FormatOneType) {
-  TimeFormater<std::string_view> f("Node");
+  TimeFormatter<std::string_view> f("Node");
   const std::string expect_header =
     "[" + DateTime().TimeToString() + "][Node] ";
   EXPECT_TRUE(AssertFormatter(expect_header, &f));
