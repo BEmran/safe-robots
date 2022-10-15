@@ -5,6 +5,8 @@
 #include "core/utils/event_level.hpp"
 #include "utest/utils.hpp"
 
+using core::utils::IsCritical;
+
 // test converting an EventLevel to string
 TEST(EventLevel, EventLevelToString) {
   for (size_t i = 0; i < kEvents.size(); i++) {
@@ -19,4 +21,13 @@ TEST(EventLevel, StreamName) {
     ss << event;
     EXPECT_EQ(EventLevelToString(event), ss.str());
   }
+}
+
+// test check if event is critical
+TEST(EventLevel, IsCritical) {
+  EXPECT_FALSE(IsCritical(EventLevel::DEBUG));
+  EXPECT_FALSE(IsCritical(EventLevel::INFO));
+  EXPECT_FALSE(IsCritical(EventLevel::WARN));
+  EXPECT_TRUE(IsCritical(EventLevel::ERROR));
+  EXPECT_TRUE(IsCritical(EventLevel::FATAL));
 }

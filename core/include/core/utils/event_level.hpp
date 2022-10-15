@@ -17,8 +17,6 @@ enum class EventLevel : uint8_t {
   WARN = 1 << 2,   // object behaviour is not desirable but not fatal
   ERROR = 1 << 3,  // object has error and should treat it
   FATAL = 1 << 4,  // object has fatal critical  error and system should abort
-  CRITICAL = WARN | ERROR | FATAL,
-  ALL = DEBUG | INFO | WARN | ERROR | FATAL,
 };
 
 /**
@@ -28,6 +26,15 @@ enum class EventLevel : uint8_t {
  * @return const std::string& name of the event
  */
 const std::string& EventLevelToString(const EventLevel event);
+
+/**
+ * @brief Determine if passed event is critical and should throw an error
+ *
+ * @param event event level
+ * @return true if ERROR or FATAL
+ * @return false otherwise
+ */
+bool IsCritical(const EventLevel event);
 
 /**
  * @brief Stream EventLevel name

@@ -9,13 +9,11 @@
 namespace core::utils {
 namespace {
 static const std::map<EventLevel, std::string> kEventLevelNameMap = {
-  {EventLevel::ALL, "ALL"},            //
-  {EventLevel::CRITICAL, "CRITICAL"},  //
-  {EventLevel::DEBUG, "DEBUG"},        //
-  {EventLevel::ERROR, "ERROR"},        //
-  {EventLevel::FATAL, "FATAL"},        //
-  {EventLevel::INFO, "INFO"},          //
-  {EventLevel::WARN, "WARN"}           //
+  {EventLevel::DEBUG, "DEBUG"},  //
+  {EventLevel::ERROR, "ERROR"},  //
+  {EventLevel::FATAL, "FATAL"},  //
+  {EventLevel::INFO, "INFO"},    //
+  {EventLevel::WARN, "WARN"}     //
 };
 }  // namespace
 
@@ -28,6 +26,10 @@ const std::string& EventLevelToString(const EventLevel event) {
     throw Exception("Undefined EventLevel.");
   }
   return it->second;
+}
+
+bool IsCritical(const EventLevel event) {
+  return event == EventLevel::ERROR || event == EventLevel::FATAL;
 }
 
 std::ostream& operator<<(std::ostream& os, const EventLevel event) {
