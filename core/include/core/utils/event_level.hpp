@@ -34,7 +34,9 @@ const std::string& EventLevelToString(const EventLevel event);
  * @return true if ERROR or FATAL
  * @return false otherwise
  */
-bool IsCritical(const EventLevel event);
+inline bool IsCritical(const EventLevel event) {
+  return event == EventLevel::ERROR || event == EventLevel::FATAL;
+}
 
 /**
  * @brief Stream EventLevel name
