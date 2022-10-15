@@ -8,21 +8,26 @@ namespace core::utils {
 
 constexpr std::string_view kFilenameExten = "_logger.txt";
 
-Logger::Logger(const std::vector<WriterFormatterPair>& writer_formatter)
-  : Logger(writer_formatter, std::make_shared<NullExceptionFactory>()) {
+std::string PrintedName(std::string_view name) {
+  using namespace std::literals;
+  if (name.empty()) {
+    return {};
+  } else {
+    return "["s + name.data() + "] "s;
+  }
 }
 
-Logger::Logger(const std::vector<WriterFormatterPair>& writer_formatter,
-               std::shared_ptr<ExceptionFactory> expectation_factory)
-  : writer_formatter_vec_(writer_formatter)
-  , expectation_factory_(expectation_factory) {
+Logger::Logger(const LoggerConfig& config)
+  : printed_name_{PrintedName(config.name)}
+  , logging_level_{config.level}
+  , writer_formatter_vec_{config.wf_pairs}
+  , expectation_factory_{config.expectation_factory} {
 }
 
-/* TODO: Instead of the logger Associate exception to LabeledModifier, so user
- * can select what kind of exception they want to throw when it is used/called
- */
 void Logger::Log(const LabeledModifier& lm, std::string_view msg) const {
-  LogImp(lm, msg);
+  if (lm.GetEventLevel() >= logging_level_) {
+    LogImp(lm, msg);
+  }
   ThrowExceptionForCriticalEvent(lm.GetEventLevel(), msg);
 }
 
@@ -43,8 +48,10 @@ void Logger::LogImp(const LabeledModifier& lm, std::string_view msg) const {
 }
 
 void Logger::FormatAndWrite(const WriterFormatterPair& wf,
-                            const LabeledModifier& lm, std::string_view msg) {
-  const auto formatted = wf.formatter.Format(lm, msg);
+                            const LabeledModifier& lm,
+                            std::string_view msg) const {
+  const std::string labeled_msg = printed_name_ + msg.data();
+  const auto formatted = wf.formatter.Format(lm, labeled_msg);
   wf.writer->Write(formatted);
 }
 
@@ -76,13 +83,12 @@ std::string GenerateFilename(std::string_view name, std::string_view filename) {
  *
  * @param name logger name
  * @param os output stream
- * @return WriterFormatterPair writer and formater
+ * @return WriterFormatterPair writer and formatter
  */
-WriterFormatterPair CreateWriterFormatterPair(std::string_view name,
-                                              std::ostream& os) {
+WriterFormatterPair CreateWriterFormatterPair(std::ostream& os) {
   auto writer = std::make_shared<Writer>(os);
-  auto formater = CreateTimeLabelModifierFormatter();
-  return {writer, formater};
+  auto formatter = CreateTimeLabelModifierFormatter();
+  return {writer, formatter};
 }
 
 /**
@@ -90,34 +96,46 @@ WriterFormatterPair CreateWriterFormatterPair(std::string_view name,
  *
  * @param name logger name
  * @param filename possible filename
- * @return WriterFormatterPair writer and formater
+ * @return WriterFormatterPair writer and formatter
  */
-WriterFormatterPair CreateWriterFormatterPair(std::string_view name,
-                                              std::string_view filename) {
-  const auto filename_updated = GenerateFilename(name, filename);
-  auto writer = std::make_shared<FileWriter>(filename_updated);
-  auto formater = CreateTimeLabelFormatter();
-  return {writer, formater};
+WriterFormatterPair CreateWriterFormatterPair(std::string_view filename) {
+  auto writer = std::make_shared<FileWriter>(filename);
+  auto formatter = CreateTimeLabelFormatter();
+  return {writer, formatter};
 }
 }  // namespace
 
 Logger CreateStreamLogger(std::string_view name, std::ostream& os) {
   const auto except_fact = std::make_shared<ExceptionFactory>(name);
-  return Logger({CreateWriterFormatterPair(name, os)}, except_fact);
+  LoggerConfig config;
+  config.name = name;
+  config.level = EventLevel::DEBUG;
+  config.wf_pairs = {CreateWriterFormatterPair(os)};
+  config.expectation_factory = std::make_shared<ExceptionFactory>(name);
+  return Logger(config);
 }
 
 Logger CreateFileLogger(std::string_view name, std::string_view filename) {
   const auto except_fact = std::make_shared<ExceptionFactory>(name);
-  return Logger({CreateWriterFormatterPair(name, filename)}, except_fact);
+  const auto filename_updated = GenerateFilename(name, filename);
+  LoggerConfig config;
+  config.name = name;
+  config.level = EventLevel::DEBUG;
+  config.wf_pairs = {CreateWriterFormatterPair(filename_updated)};
+  config.expectation_factory = std::make_shared<ExceptionFactory>(name);
+  return Logger(config);
 }
 
 Logger CreateStreamAndFileLogger(std::string_view name, std::ostream& os,
                                  std::string_view filename) {
-  std::vector<WriterFormatterPair> wf_vec{
-    CreateWriterFormatterPair(name, os),
-    CreateWriterFormatterPair(name, filename)};
-  const auto except_fact = std::make_shared<ExceptionFactory>(name);
-  return Logger(wf_vec, except_fact);
+  const auto filename_updated = GenerateFilename(name, filename);
+  LoggerConfig config;
+  config.name = name;
+  config.level = EventLevel::DEBUG;
+  config.wf_pairs = {CreateWriterFormatterPair(os),
+                     CreateWriterFormatterPair(filename_updated)};
+  config.expectation_factory = std::make_shared<ExceptionFactory>(name);
+  return Logger(config);
 }
 
 }  // namespace core::utils

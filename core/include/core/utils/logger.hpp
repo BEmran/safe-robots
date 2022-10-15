@@ -66,12 +66,25 @@ struct LogLocation {
 #define LOG_INFORMATION_STRING LOG_INFORMATION.ToString()
 
 /**
- * @brief simple struct to pair a writer with formater
+ * @brief simple struct to pair a writer with formatter
  * TODO(bara): do we need shared_ptr?
  */
 struct WriterFormatterPair {
-  std::shared_ptr<Writer> writer;
-  Formatter formatter;
+  std::shared_ptr<Writer> writer = nullptr;
+  Formatter formatter = CreateNullFormatter();
+};
+
+/**
+ * @brief logger configuration used to struct Logger object
+ *
+ */
+struct LoggerConfig {
+  std::string name = "";                      // logger name
+  std::vector<WriterFormatterPair> wf_pairs;  // writer formatter pair
+  EventLevel level = EventLevel::DEBUG;       // logging level
+  std::shared_ptr<ExceptionFactory> expectation_factory =
+    std::make_shared<ExceptionFactory>(NullExceptionFactory());  // exception
+                                                                 // generator
 };
 
 /**
@@ -83,18 +96,9 @@ class Logger {
   /**
    * @brief Construct the Logger object
    *
-   * @param writer_formatter vector of WriterFormatter pairs
+   * @param config logger configuration structure
    */
-  explicit Logger(const std::vector<WriterFormatterPair>& writer_formatter);
-
-  /**
-   * @brief Construct the Logger object
-   *
-   * @param writer_formatter vector of WriterFormatter pairs
-   * @param expectation_factory shared ptr to exception factory
-   */
-  Logger(const std::vector<WriterFormatterPair>& writer_formatter,
-         std::shared_ptr<ExceptionFactory> expectation_factory);
+  explicit Logger(const LoggerConfig& config);
 
   /**
    * @brief Destroy the Logger object
@@ -123,7 +127,7 @@ class Logger {
   /**
    * @brief log data on all Writers using stream method.
    * @details This logging method is used for continues logging thus it does not
-   * use formater here
+   * use formatter here
    *
    * @tparam T anytype
    * @param data data to be logged
@@ -152,14 +156,14 @@ class Logger {
   void LogImp(const LabeledModifier& lm, std::string_view msg) const;
 
   /**
-   * @brief Write message using the passed formater and writer
+   * @brief Write message using the passed formatter and writer
    *
    * @param wf writer and formatter pair
    * @param lm label modifier to use with the formatter
    * @param msg msg to be written
    */
-  static void FormatAndWrite(const WriterFormatterPair& wf,
-                             const LabeledModifier& lm, std::string_view msg);
+  void FormatAndWrite(const WriterFormatterPair& wf, const LabeledModifier& lm,
+                      std::string_view msg) const;
 
   /**
    * @brief Throw error msg using ExceptionFactory if event is Critical
@@ -171,7 +175,28 @@ class Logger {
                                       std::string_view msg) const;
 
  private:
-  std::vector<WriterFormatterPair> writer_formatter_vec_;
+  /**
+   * @brief formatter name surrounded by brackets "[]" if defined
+   *
+   */
+  std::string printed_name_{};
+
+  /**
+   * @brief Logging level
+   *
+   */
+  EventLevel logging_level_{EventLevel::DEBUG};
+
+  /**
+   * @brief writer and formatter pairs
+   *
+   */
+  std::vector<WriterFormatterPair> writer_formatter_vec_{};
+
+  /**
+   * @brief Exception factory generator
+   *
+   */
   std::shared_ptr<ExceptionFactory> expectation_factory_;
 };
 
@@ -196,7 +221,7 @@ class NestedLogger {
 
 /**
  * @brief Create a new Logger object with ExceptionFactory and the passed stream
- * Writer paired with TimeFormater
+ * Writer paired with TimeFormatter
  *
  * @param name name of Logger and Exception factory header
  * @param os output stream with default value as console stream
@@ -206,7 +231,7 @@ Logger CreateStreamLogger(std::string_view name, std::ostream& os = std::cout);
 
 /**
  * @brief Create a new Logger object with ExceptionFactory and the passed
- * FileWriter paired with TimeFormater
+ * FileWriter paired with TimeFormatter
  *
  * @param name name of Logger and Exception factory header, also used to create
  * logger filename as "<name>_logger.txt" if filename is empty
@@ -217,7 +242,7 @@ Logger CreateFileLogger(std::string_view name, std::string_view filename = "");
 
 /**
  * @brief Create a new Logger object with ExceptionFactory and two Writers
- * (Stream and File) each paired with TimeFormater
+ * (Stream and File) each paired with TimeFormatter
  *
  * @param name name of Logger and Exception factory header, also used to create
  * logger filename as "<name>_logger.txt"
