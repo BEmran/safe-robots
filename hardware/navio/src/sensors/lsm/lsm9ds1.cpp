@@ -449,7 +449,7 @@ cu::ImuData Lsm9ds1::ApplySensorSpecs(const SensorRawData& raw) const {
   imu.accel.data = accel_spec_.Apply(raw.accel);
   imu.gyro.data = gyro_spec_.Apply(raw.gyro);
   imu.mag.data = mag_spec_.Apply(raw.mag);
-  imu.temp.value = temp_spec_.Apply(raw.temp);
+  imu.temp.value = static_cast<double>(temp_spec_.Apply(raw.temp));
   return imu;
 }
 
