@@ -6,7 +6,7 @@
 
 namespace core::utils {
 
-Formatter::Formatter() : format_func_{NullFormatter} {
+Formatter::Formatter() : Formatter(NullFormatter) {
 }
 
 Formatter::Formatter(const FormatFunc& func) : format_func_{func} {
