@@ -67,14 +67,15 @@ class NullFormatter : public FormatterInterface {
  * @tparam Ts object of any type
  */
 template <class... Ts>
-class Formatter : public FormatterInterface {
+class TupleFormatter : public FormatterInterface {
  public:
   /**
    * @brief Construct a new Formatter object of various type
    *
    * @param ts types value
    */
-  Formatter(Ts... ts) : tuple_(ts...), size_{std::index_sequence_for<Ts...>{}} {
+  TupleFormatter(Ts... ts)
+    : tuple_(ts...), size_{std::index_sequence_for<Ts...>{}} {
   }
 
   // format tuple values + passed message
@@ -113,7 +114,7 @@ class TimeFormatter : public FormatterInterface {
   }
 
  private:
-  Formatter<Ts...> formatter_;
+  TupleFormatter<Ts...> formatter_;
 };
 
 }  // namespace core::utils
