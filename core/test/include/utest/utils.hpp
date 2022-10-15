@@ -80,7 +80,7 @@ void ExpectEqLabeledModifier(const LabeledModifier& expect,
  * @param file_name file name to read from
  * @return std::list<std::string> data written in a file
  */
-std::list<std::string> ReadAllLinesFromFile(const std::string& file_name);
+std::list<std::string> ReadAllLinesFromFile(std::string_view file_name);
 
 // /**
 //  * @brief This allows to trace what is printout in the stream and write it in

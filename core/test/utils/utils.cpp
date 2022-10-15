@@ -64,11 +64,11 @@ void ExpectEqLabeledModifier(const LabeledModifier& expect,
                           expect.GetModifier(), actual);
 }
 
-std::list<std::string> ReadAllLinesFromFile(const std::string& file_name) {
+std::list<std::string> ReadAllLinesFromFile(std::string_view file_name) {
   std::string line;
   std::list<std::string> lines;
   std::ifstream file;
-  file.open(file_name, std::ios::in);
+  file.open(file_name.data(), std::ios::in);
   if (file.is_open()) {
     while (std::getline(file, line)) {
       lines.push_back(line);
