@@ -17,6 +17,7 @@ using core::utils::InfoLabeledModifier;
 using core::utils::InfoModifier;
 using core::utils::LabeledModifier;
 using core::utils::Logger;
+using core::utils::LoggerConfig;
 using core::utils::NodeLabeledModifiers;
 using core::utils::NodeLogger;
 using core::utils::WarnLabeledModifier;
@@ -103,14 +104,16 @@ TEST(MockLogger, LogWithDefaultHeaderAndLMs) {
 TEST(MockLogger, LogWithHeaderAndDefaultLM) {
   std::stringstream ss;
   auto writer = std::make_shared<core::utils::Writer>(ss);
-  auto formater = core::utils::Formatter();
-  Logger logger({{writer, formater}});
+  auto formatter = core::utils::Formatter();
+  LoggerConfig config;
+  config.wf_pairs = {{writer, formatter}};
+  Logger logger(config);
   NodeLogger n_logger(logger);
   n_logger.SetHeader(kHeader);
 
   n_logger.Debug(kMessage);
   std::stringstream expect;
-  expect << formater.Format(DebugLabeledModifier(), "") << "[" << kHeader
+  expect << formatter.Format(DebugLabeledModifier(), "") << "[" << kHeader
          << "] " << kMessage << "\n";
   EXPECT_EQ(expect.str(), ss.str());
 }
@@ -119,13 +122,15 @@ TEST(MockLogger, LogWithHeaderAndDefaultLM) {
 TEST(MockLogger, LogWithDefaultHeaderAndDefaultLM) {
   std::stringstream ss;
   auto writer = std::make_shared<core::utils::Writer>(ss);
-  auto formater = core::utils::Formatter();
-  Logger logger({{writer, formater}});
+  auto formatter = core::utils::Formatter();
+  LoggerConfig config;
+  config.wf_pairs = {{writer, formatter}};
+  Logger logger(config);
   NodeLogger n_logger(logger);
 
   n_logger.Info() << kMessage;
   std::stringstream expect;
-  expect << formater.Format(InfoLabeledModifier(), "") << kMessage << "\n";
+  expect << formatter.Format(InfoLabeledModifier(), "") << kMessage << "\n";
   EXPECT_EQ(expect.str(), ss.str());
 }
 
@@ -159,9 +164,9 @@ TEST(CreateSystemNodeLogger, CheckInitializedWriters) {
 
   const auto actual = ReadAllLinesFromFile(kFilename);
 
-  auto formater = core::utils::CreateTimeLabelFormatter();
+  auto formatter = core::utils::CreateTimeLabelFormatter();
   std::stringstream expect;
-  expect << formater.Format(DebugLabeledModifier(), "") << "[" << kNodeName
+  expect << formatter.Format(DebugLabeledModifier(), "") << "[" << kNodeName
          << "] " << kMessage;
   EXPECT_TRUE(AssertStringList({expect.str()}, actual));
 }
