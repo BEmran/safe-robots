@@ -18,6 +18,49 @@ using FormatFunc =
   std::function<std::string(const LabeledModifier& lm, std::string_view msg)>;
 
 /**
+ * @brief Simple class used to present message in different format (style) by
+ * calling the passed formatter function.
+ *
+ */
+class Formatter {
+ public:
+  /**
+   * @brief Construct a default Formatter object with NullFormater function
+   *
+   */
+  Formatter();
+
+  /**
+   * @brief Construct a Formatter object with passed formatter function
+   *
+   * @param func formatter function.
+   */
+  explicit Formatter(const FormatFunc& func);
+
+  /**
+   * @brief Destroy the Formatter object
+   *
+   */
+  ~Formatter() = default;
+
+  /**
+   * @brief Apply format function on passed data
+   *
+   * @param lm labeled modifier
+   * @param msg string message to be formatted
+   * @return std::string formatted message
+   */
+  std::string Format(const LabeledModifier& lm, std::string_view msg) const;
+
+ private:
+  /**
+   * @brief format function callback
+   *
+   */
+  FormatFunc format_func_;
+};
+
+/**
  * @brief null formatter
  *
  * @param lm labeled modifier
@@ -44,43 +87,6 @@ std::string TimeLabelFormatter(const LabeledModifier& lm, std::string_view msg);
  */
 std::string TimeLabelModifierFormatter(const LabeledModifier& lm,
                                        std::string_view msg);
-
-/**
- * @brief Simple class used to present message in different format (style) by
- * calling the passed formatter function.
- *
- */
-class Formatter {
- public:
-  /**
-   * @brief Construct a Formatter object with passed formatter function
-   *
-   * @param func formatter function. Default to NullFormater function
-   */
-  explicit Formatter(const FormatFunc& func = NullFormatter);
-
-  /**
-   * @brief Destroy the Formatter object
-   *
-   */
-  ~Formatter() = default;
-
-  /**
-   * @brief Apply format function on passed data
-   *
-   * @param lm labeled modifier
-   * @param msg string message to be formatted
-   * @return std::string formatted message
-   */
-  std::string Format(const LabeledModifier& lm, std::string_view msg) const;
-
- private:
-  /**
-   * @brief format function callback
-   *
-   */
-  FormatFunc format_func_;
-};
 
 /**
  * @brief Create a Null Formatter object

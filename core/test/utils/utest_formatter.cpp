@@ -57,9 +57,9 @@ testing::AssertionResult AssertFormatter(const FormatFunc& expect_func,
 
 // run different Events against the passed function and formatter
 testing::AssertionResult AssertFormatter(const FormatFunc& expect_func,
-                                         const Formatter& actual_formater) {
-  const auto actual_func = [&actual_formater](auto lm, auto msg) {
-    return actual_formater.Format(lm, msg);
+                                         const Formatter& actual_formatter) {
+  const auto actual_func = [&actual_formatter](auto lm, auto msg) {
+    return actual_formatter.Format(lm, msg);
   };
   return AssertFormatter(expect_func, actual_func);
 }
