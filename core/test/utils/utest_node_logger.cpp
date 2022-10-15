@@ -166,7 +166,7 @@ TEST(CreateSystemNodeLogger, CheckInitializedWriters) {
 
   auto formatter = core::utils::CreateTimeLabelFormatter();
   std::stringstream expect;
-  expect << formatter.Format(DebugLabeledModifier(), "") << "[" << kNodeName
-         << "] " << kMessage;
+  expect << formatter.Format(DebugLabeledModifier(), "[sys]") << " ["
+         << kNodeName << "] " << kMessage;
   EXPECT_TRUE(AssertStringList({expect.str()}, actual));
 }

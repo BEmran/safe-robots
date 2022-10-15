@@ -36,7 +36,7 @@ class Subject {
    * @param name subject name
    */
   explicit Subject(const std::string& name)
-    : node_(std::make_unique<Node>(CreatNodeLoggerUsingSystemLogger(name))) {
+    : node_(std::make_unique<Node>(name)) {
   }
 
   void Register(std::shared_ptr<ObserverCallback<T>> cb) {

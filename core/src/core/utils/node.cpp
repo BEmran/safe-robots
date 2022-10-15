@@ -20,7 +20,7 @@ const NodeLogger& Node::GetLogger() const {
 }
 
 Node CreateSystemNode(const std::string& node_name) {
-  auto logger = CreatNodeLoggerUsingSystemLogger(node_name);
-  return Node(node_name, logger);
+  auto node_logger = CreatNodeLoggerUsingSystemLogger(node_name);
+  return Node(node_name, node_logger);
 }
 }  // namespace core::utils

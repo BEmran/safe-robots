@@ -103,10 +103,27 @@ testing::AssertionResult AssertStringList(
   if (expect.size() != actual.size()) {
     return testing::AssertionFailure() << "Size mismatch";
   }
-
-  if (!std::equal(expect.begin(), expect.end(), actual.begin())) {
-    return testing::AssertionFailure() << "Data mismatch";
+  std::stringstream ss;
+  const bool result = std::equal(
+    expect.begin(), expect.end(), actual.begin(), [&ss](auto p1, auto p2) {
+      if (p1.compare(p2) == 0) {
+        return true;
+      }
+      ss << "\n expect: [" << p1 << "] and got: [" << p2 << "]";
+      return false;
+    });
+  // const bool result = std::equal(expect.begin(), expect.end(),
+  // actual.begin());
+  {}
+  if (result) {
+    return testing::AssertionSuccess();
   }
-
-  return testing::AssertionSuccess();
+  // auto first1 = expect.begin();
+  // auto last1 = expect.end();
+  // auto first2 = actual.begin();
+  // for (; first1 != last1; ++first1, ++first2) {
+  //   ss << "\n expect: " << *first1->c_str() << "and got: " <<
+  //   first2->c_str();
+  // }
+  return testing::AssertionFailure() << "Data mismatch: " << ss.str();
 }

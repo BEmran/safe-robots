@@ -63,7 +63,7 @@ void NodeLogger::LogImpl(const LabeledModifier& lm,
 }
 
 NodeLogger CreatNodeLoggerUsingSystemLogger(std::string_view header) {
-  static Logger logger{CreateStreamAndFileLogger(kSystemName)};
+  static Logger logger{CreateStreamAndFileLogger(kSystemName, std::cout)};
   NodeLogger node_logger(logger);
   node_logger.SetHeader(header);
   return node_logger;

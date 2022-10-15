@@ -10,11 +10,11 @@
 #include "utest/utils.hpp"
 
 using core::utils::DateTime;
-using core::utils::Formatter;
 using core::utils::FormatterInterface;
 using core::utils::LabeledModifier;
 using core::utils::NullFormatter;
 using core::utils::TimeFormatter;
+using core::utils::TupleFormatter;
 using core::utils::TupleToString;
 
 constexpr const char* kMsg = "message";
@@ -53,14 +53,14 @@ TEST(NullFormatter, Format) {
 
 // test formatter
 TEST(Formatter, FormatOneType) {
-  Formatter<std::string_view> f("Node");
+  TupleFormatter<std::string_view> f("Node");
   const std::string expect_header = "[Node] ";
   EXPECT_TRUE(AssertFormatter(expect_header, &f));
 }
 
 TEST(Formatter, FormatOneRefType) {
   std::string name = "node 1";
-  Formatter<std::string&> f(name);
+  TupleFormatter<std::string&> f(name);
   const std::string expect_header1 = "[" + name + "] ";
   EXPECT_TRUE(AssertFormatter(expect_header1, &f));
   name = "node 2";
@@ -69,21 +69,21 @@ TEST(Formatter, FormatOneRefType) {
 }
 
 TEST(Formatter, FormatTwoType) {
-  Formatter<std::string_view, int> f("Node", 123);
+  TupleFormatter<std::string_view, int> f("Node", 123);
   const std::string expect_header = "[Node][123] ";
   EXPECT_TRUE(AssertFormatter(expect_header, &f));
 }
 
 TEST(Formatter, FormatWithModifier) {
   Modifier mod = core::utils::DefaultModifier();
-  Formatter<Modifier> f(mod);
+  TupleFormatter<Modifier> f(mod);
   const std::string expect_header = "[" + mod.ToString() + "] ";
   EXPECT_TRUE(AssertFormatter(expect_header, &f));
 }
 
 TEST(Formatter, FormatWithLabeledModifier) {
   LabeledModifier lm = core::utils::DebugLabeledModifier();
-  Formatter<LabeledModifier> f(lm);
+  TupleFormatter<LabeledModifier> f(lm);
   const std::string expect_header = "[" + lm.ToString() + "] ";
   EXPECT_TRUE(AssertFormatter(expect_header, &f));
 }
