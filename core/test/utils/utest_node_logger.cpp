@@ -5,6 +5,8 @@
 #include "core/utils/node_logger.hpp"
 #include "utest/utils.hpp"
 
+using namespace std::literals;
+
 using core::utils::DebugLabeledModifier;
 using core::utils::DebugModifier;
 using core::utils::ErrorLabeledModifier;
@@ -63,7 +65,6 @@ TEST(NodeLabeledModifiers, Construct) {
 }
 
 // check creating Default NodeLabel Modifier using
-// CreateSystemNodeLabelModifier function
 TEST(NodeLabeledModifiers, DefaultConstruct) {
   const NodeLabeledModifiers default_node_lm;
   ExpectEqLabeledModifier(default_node_lm.debug, DebugLabeledModifier());
@@ -102,15 +103,15 @@ TEST(MockLogger, LogWithDefaultHeaderAndLMs) {
 TEST(MockLogger, LogWithHeaderAndDefaultLM) {
   std::stringstream ss;
   auto writer = std::make_shared<core::utils::Writer>(ss);
-  auto formater = std::make_shared<core::utils::NullFormater>();
+  auto formater = core::utils::Formatter();
   Logger logger({{writer, formater}});
   NodeLogger n_logger(logger);
   n_logger.SetHeader(kHeader);
 
   n_logger.Debug(kMessage);
   std::stringstream expect;
-  expect << "[" << DebugLabeledModifier().ToString() << "] [" << kHeader << "] "
-         << kMessage << "\n";
+  expect << formater.Format(DebugLabeledModifier(), "") << "[" << kHeader
+         << "] " << kMessage << "\n";
   EXPECT_EQ(expect.str(), ss.str());
 }
 
@@ -118,13 +119,13 @@ TEST(MockLogger, LogWithHeaderAndDefaultLM) {
 TEST(MockLogger, LogWithDefaultHeaderAndDefaultLM) {
   std::stringstream ss;
   auto writer = std::make_shared<core::utils::Writer>(ss);
-  auto formater = std::make_shared<core::utils::NullFormater>();
+  auto formater = core::utils::Formatter();
   Logger logger({{writer, formater}});
   NodeLogger n_logger(logger);
 
   n_logger.Info() << kMessage;
   std::stringstream expect;
-  expect << "[" << InfoLabeledModifier().ToString() << "] " << kMessage;
+  expect << formater.Format(InfoLabeledModifier(), "") << kMessage << "\n";
   EXPECT_EQ(expect.str(), ss.str());
 }
 
@@ -149,31 +150,18 @@ TEST(MockLogger, ConstructWithSpecialLM) {
   ExpectEqLabeledModifier(kDebugLm, kMockLogger->LM());
 }
 
-// TEST(CreateFileAndConsoleLogger, CheckInitializedWriters) {
-//   constexpr auto kName = "name";
-//   constexpr auto kFilename = "name_logger.txt";
-//   auto logger = core::utils::CreateFileAndConsoleLogger(kName, kFilename);
+TEST(CreateSystemNodeLogger, CheckInitializedWriters) {
+  constexpr auto kFilename = "sys_logger.txt";
+  constexpr std::string_view kNodeName = "node1";
+  const auto n_logger =
+    core::utils::CreatNodeLoggerUsingSystemLogger(kNodeName);
+  n_logger.Debug(kMessage);
 
-//   ConsoleBuffer c_buf;
-//   logger.Debug(kMessage);
-//   EXPECT_TRUE(
-//     AssertFileAndConsole(kFilename, c_buf, DebugLabeledModifier(),
-//     kMessage));
-// }
+  const auto actual = ReadAllLinesFromFile(kFilename);
 
-// TEST(CreateSystemNodeLogger, CheckInitializedWriters) {
-//   constexpr auto kFilename = "sys_logger.txt";
-//   const auto n_logger = core::utils::CreateSystemNodeLogger("");
-//   ConsoleBuffer c_buf;
-//   n_logger.Debug(kMessage);
-//   EXPECT_TRUE(AssertFileAndConsole(kFilename, c_buf, DebugLabeledModifier(),
-//                                    kMessage.data()));
-// }
-
-TEST(Logger, test1) {
-  auto formater = std::make_shared<core::utils::NullFormater>();
-  auto writer = std::make_shared<core::utils::Writer>(std::cout);
-  Logger logger({{writer, formater}});
-  NodeLogger n_logger(logger);
-  n_logger.Debug() << "line1";
+  auto formater = core::utils::CreateTimeLabelFormatter();
+  std::stringstream expect;
+  expect << formater.Format(DebugLabeledModifier(), "") << "[" << kNodeName
+         << "] " << kMessage;
+  EXPECT_TRUE(AssertStringList({expect.str()}, actual));
 }

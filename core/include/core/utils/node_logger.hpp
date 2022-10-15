@@ -53,14 +53,32 @@ struct NodeLabeledModifiers {
   LabeledModifier info;
   LabeledModifier warn;
 
-  NodeLabeledModifiers(const LabeledModifier& debug_,
-                       const LabeledModifier& error_,
-                       const LabeledModifier& fatal_,
-                       const LabeledModifier& info_,
-                       const LabeledModifier& warn_)
-    : debug(debug_), error(error_), fatal(fatal_), info(info_), warn(warn_) {
+  /**
+   * @brief Construct a new Node Labeled Modifiers object
+   *
+   * @param debug_lm debug labeled modifier
+   * @param error_lm error labeled modifier
+   * @param fatal_lm fatal labeled modifier
+   * @param info_lm info labeled modifier
+   * @param warn_lm warn labeled modifier
+   */
+  NodeLabeledModifiers(const LabeledModifier& debug_lm,
+                       const LabeledModifier& error_lm,
+                       const LabeledModifier& fatal_lm,
+                       const LabeledModifier& info_lm,
+                       const LabeledModifier& warn_lm)
+    : debug(debug_lm)
+    , error(error_lm)
+    , fatal(fatal_lm)
+    , info(info_lm)
+    , warn(warn_lm) {
   }
 
+  /**
+   * @brief Construct a new Node Labeled Modifiers object with default Labeled
+   * Modifiers
+   *
+   */
   NodeLabeledModifiers()
     : NodeLabeledModifiers(DebugLabeledModifier(), ErrorLabeledModifier(),
                            FatalLabeledModifier(), InfoLabeledModifier(),
@@ -68,18 +86,13 @@ struct NodeLabeledModifiers {
   }
 };
 
-// void CreateNodeLabeledModifiers(const Modifier& modifier) {
-//   NodeLabeledModifiers(LabeledModifier(EventLevel::DEBUG, modifier),
-//                          LabeledModifier(EventLevel::ERROR, modifier),
-//                          LabeledModifier(EventLevel::FATAL, modifier),
-//                          LabeledModifier(EventLevel::INFO, modifier),
-//                          LabeledModifier(EventLevel::WARN, modifier));
-// }
-
+/**
+ * @brief A named logger uses LabeledModifier to log data
+ *
+ */
 class NodeLogger {
  public:
   explicit NodeLogger(const Logger& logger);
-  explicit NodeLogger(std::shared_ptr<Logger> logger);
   /**
    * @brief Construct a new Node Logger object using a logger with specific
    * labeled modifiers
@@ -88,53 +101,66 @@ class NodeLogger {
    * @param labeled_modifiers labeled modifier struct
    */
   NodeLogger(const Logger& logger, NodeLabeledModifiers labeled_modifiers);
+
+  explicit NodeLogger(std::shared_ptr<Logger> logger);
+
   NodeLogger(std::shared_ptr<Logger> logger,
              NodeLabeledModifiers labeled_modifiers);
 
-  ~NodeLogger() = default;
   /**
-   * @brief log the passed message using the Debug LabeledModifier
+   * @brief Destroy the Node Logger object
+   *
+   */
+  ~NodeLogger() = default;
+
+  /**
+   * @brief Log the passed message using the Debug LabeledModifier
    *
    * @param msg msg to log
    */
   NestedLogger Debug(std::string_view msg = "") const;
 
   /**
-   * @brief log the passed message using the Error LabeledModifier
+   * @brief Log the passed message using the Error LabeledModifier
    *
    * @param msg msg to log
    */
-  const Logger& Error(std::string_view msg = "") const;
+  NestedLogger Error(std::string_view msg = "") const;
 
   /**
-   * @brief log the passed message using the Fatal LabeledModifier
+   * @brief Log the passed message using the Fatal LabeledModifier
    *
    * @param msg msg to log
    */
-  const Logger& Fatal(std::string_view msg = "") const;
+  NestedLogger Fatal(std::string_view msg = "") const;
 
   /**
-   * @brief log the passed message using the Info LabeledModifier
+   * @brief Log the passed message using the Info LabeledModifier
    *
    * @param msg msg to log
    */
-  const Logger& Info(std::string_view msg = "") const;
+  NestedLogger Info(std::string_view msg = "") const;
 
   /**
-   * @brief log the passed message using the Warn LabeledModifier
+   * @brief Log the passed message using the Warn LabeledModifier
    *
    * @param msg msg to log
    */
-  const Logger& Warn(std::string_view msg = "") const;
+  NestedLogger Warn(std::string_view msg = "") const;
 
   /**
-   * @brief Set the Header object
+   * @brief Set the Header string
    *
    * @param header header to be added to each logging message
    */
   void SetHeader(std::string_view header);
 
-  Logger& GetLogger(const std::string& name);
+  /**
+   * @brief Get the internal Logger object
+   *
+   * @return Logger& logger object
+   */
+  Logger& GetLogger();
 
  protected:
   /**
@@ -147,28 +173,19 @@ class NodeLogger {
    */
   void LogImpl(const LabeledModifier& lm, std::string_view msg) const;
 
+ private:
   const Logger& logger_;
   NodeLabeledModifiers labeled_modifiers_;
-  std::string header_ = "";
+  std::string header_{};
 };
 
 /**
- * @brief Create a new NodeLogger with typical settings for console and file
- * formatter
- *
- * @param name name of Exception factory header, also used to create logger
- * filename as "<name>_logger.txt"
- * @return NodeLogger shared_ptr object
- */
-NodeLogger CreateNodeLogger(const std::string& name);
-
-/**
- * @brief Create a System NodeLogger with a common logger
+ * @brief Create a NodeLogger using System Logger
  *
  * @param header NodeLogger header, typically set to node name
- * @return NodeLogger shared_ptr object
+ * @return NodeLogger object
  */
-NodeLogger CreateSystemNodeLogger(const std::string& header);
+NodeLogger CreatNodeLoggerUsingSystemLogger(std::string_view header);
 
 }  // namespace core::utils
 
