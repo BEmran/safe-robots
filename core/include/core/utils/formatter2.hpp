@@ -9,8 +9,6 @@
 #include <tuple>
 
 #include "core/utils/date_time.hpp"
-#include "core/utils/labeld_modifier.hpp"
-#include "core/utils/modifier.hpp"
 
 namespace core::utils {
 
@@ -26,6 +24,10 @@ std::string TupleToString(const Tuple& t, std::index_sequence<Is...>) {
   ((ss << "[" << std::get<Is>(t) << "]"), ...);
   return ss.str();
 }
+
+// TODO(bara): change name to header pattern than formater as function does
+// nothing on the passed message
+// TODO(bara): change function to not pass any variables
 
 /**
  * @brief  Formatter Interface class used to present message in different format
