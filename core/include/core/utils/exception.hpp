@@ -10,22 +10,22 @@
 namespace core::utils {
 class Exception : public std::runtime_error {
  public:
-  explicit Exception(const std::string& msg) : std::runtime_error(msg) {
+  explicit Exception(std::string_view msg) : std::runtime_error(msg.data()) {
   }
 };
 
 class ExceptionFactory {
  public:
-  explicit ExceptionFactory(const std::string& header) : header_(header) {
+  explicit ExceptionFactory(std::string_view header) : header_(header) {
   }
 
   virtual ~ExceptionFactory() = default;
 
-  virtual void Throw(const std::string& msg) const {
+  virtual void Throw(std::string_view msg) const {
     if (header_.empty()) {
       throw Exception(msg);
     }
-    throw Exception(header_ + ": " + msg);
+    throw Exception(header_ + ": " + msg.data());
   }
 
  private:
@@ -37,7 +37,7 @@ class NullExceptionFactory : public ExceptionFactory {
   NullExceptionFactory() : ExceptionFactory("") {
   }
 
-  void Throw(const std::string& msg) const final {
+  void Throw(std::string_view msg) const final {
     (void)msg;
   }
 };
