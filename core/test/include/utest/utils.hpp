@@ -82,34 +82,37 @@ void ExpectEqLabeledModifier(const LabeledModifier& expect,
  */
 std::list<std::string> ReadAllLinesFromFile(const std::string& file_name);
 
+// /**
+//  * @brief This allows to trace what is printout in the stream and write it in
+//  * a file instead in order to be checked latter
+//  *
+//  */
+// class ConsoleBuffer {
+//  public:
+//   explicit ConsoleBuffer(const std::string& file_name = "console.txt");
+
+//   ~ConsoleBuffer();
+
+//   /**
+//    * @brief Restores the string printed at cout
+//    *
+//    * @return std::list<std::string> lines printed to cout
+//    */
+//   std::list<std::string> RestoreCoutBuffer() const;
+
+//   std::string file_name_;
+//   std::ofstream file_;
+//   std::streambuf *file_buf_, *backup;
+// };
+
 /**
- * @brief This allows to trace what is printout in the stream and write it in
- * a file instead in order to be checked latter
+ * @brief  compare two list string
  *
+ * @param expect list 1
+ * @param actual list 2
+ * @return testing::AssertionResult assertion result
  */
-class ConsoleBuffer {
- public:
-  explicit ConsoleBuffer(const std::string& file_name = "console.txt");
+testing::AssertionResult AssertStringList(const std::list<std::string>& expect,
+                                          const std::list<std::string>& actual);
 
-  ~ConsoleBuffer();
-
-  /**
-   * @brief Restores the string printed at cout
-   *
-   * @return std::list<std::string> lines printed to cout
-   */
-  std::list<std::string> RestoreCoutBuffer() const;
-
-  std::string file_name_;
-  std::ofstream file_;
-  std::streambuf *file_buf_, *backup;
-};
-
-testing::AssertionResult AssertStringVector(
-  const std::list<std::string>& expect, const std::list<std::string>& actual);
-
-testing::AssertionResult AssertFileAndConsole(const std::string& filename,
-                                              const ConsoleBuffer& c_buffer,
-                                              const LabeledModifier& lm,
-                                              const std::string& msg);
 #endif  // UTEST_UTILS_HPP_

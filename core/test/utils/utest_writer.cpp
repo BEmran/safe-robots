@@ -49,10 +49,7 @@ TEST(FileWriter, LogThroughWriteFunc) {
   writer.Write(msg2.data() + "\n"s);
   auto logged_data = ReadAllLinesFromFile(file_name);
 
-  ASSERT_EQ(2, logged_data.size());
-  EXPECT_EQ(msg1, logged_data.front());
-  logged_data.pop_front();
-  EXPECT_EQ(msg2, logged_data.front());
+  EXPECT_TRUE(AssertStringList({msg1.data(), msg2.data()}, logged_data));
 }
 
 TEST(FileWriter, LogThroughStream) {
@@ -63,8 +60,5 @@ TEST(FileWriter, LogThroughStream) {
   writer << msg2 << std::endl;
   auto logged_data = ReadAllLinesFromFile(file_name);
 
-  ASSERT_EQ(2, logged_data.size());
-  EXPECT_EQ(msg1, logged_data.front());
-  logged_data.pop_front();
-  EXPECT_EQ(msg2, logged_data.front());
+  EXPECT_TRUE(AssertStringList({msg1.data(), msg2.data()}, logged_data));
 }
