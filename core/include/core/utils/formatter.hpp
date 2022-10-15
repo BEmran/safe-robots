@@ -19,23 +19,17 @@ using FormatFunc =
 
 /**
  * @brief Simple class used to present message in different format (style) by
- * calling the passed formater function.
+ * calling the passed formatter function.
  *
  */
 class Formatter {
  public:
   /**
-   * @brief Construct a default Formatter object with NullFormater
+   * @brief Construct a Formatter object with passed formatter function
    *
+   * @param func formatter function. Default to NullFormater function
    */
-  Formatter();
-
-  /**
-   * @brief Construct a Formatter object with passed formater function
-   *
-   * @param func formater function
-   */
-  explicit Formatter(const FormatFunc& func);
+  explicit Formatter(const FormatFunc& func = NullFormatter);
 
   /**
    * @brief Destroy the Formatter object
@@ -61,7 +55,7 @@ class Formatter {
 };
 
 /**
- * @brief null formater
+ * @brief null formatter
  *
  * @param lm labeled modifier
  * @param msg string message to be formatted
@@ -91,14 +85,15 @@ std::string TimeLabelModifierFormatter(const LabeledModifier& lm,
 /**
  * @brief Create a Null Formatter object
  *
- * @return Formatter a Formater object with NullFormater function as CB function
+ * @return Formatter a Formatter object with NullFormatter function as CB
+ * function
  */
 Formatter CreateNullFormatter();
 
 /**
  * @brief Create a Time Label Formatter object
  *
- * @return Formatter a Formater object with TimeLabelFormatter function as CB
+ * @return Formatter a Formatter object with TimeLabelFormatter function as CB
  * function
  */
 Formatter CreateTimeLabelFormatter();
@@ -106,8 +101,8 @@ Formatter CreateTimeLabelFormatter();
 /**
  * @brief Create a Time Label Modifier Formatter object
  *
- * @return Formatter Formater object with TimeLabelModifierFormatter function as
- * CB function
+ * @return Formatter Formatter object with TimeLabelModifierFormatter function
+ * as CB function
  */
 Formatter CreateTimeLabelModifierFormatter();
 

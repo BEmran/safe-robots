@@ -5,10 +5,6 @@
 #include <sstream>
 
 namespace core::utils {
-
-Formatter::Formatter() : Formatter(NullFormatter) {
-}
-
 Formatter::Formatter(const FormatFunc& func) : format_func_{func} {
 }
 
