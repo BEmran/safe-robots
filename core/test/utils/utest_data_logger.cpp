@@ -12,7 +12,7 @@
 using core::utils::DataLogger;
 using core::utils::HeadingData;
 using core::utils::Logger;
-using core::utils::NullFormater;
+using core::utils::NullFormatter;
 using core::utils::Subject;
 using core::utils::Writer;
 using core::utils::WriterFormatterPair;
@@ -34,9 +34,9 @@ using core::utils::WriterFormatterPair;
 TEST(MockLogger, LogWithDefaultHeaderAndLM) {
   std::stringstream ss;
   auto writer = std::make_shared<Writer>(ss);
-  auto formater = core::utils::Formatter();
+  auto formatter = core::utils::Formatter();
 
-  std::vector<WriterFormatterPair> writer_formatter_vec{{writer, formater}};
+  std::vector<WriterFormatterPair> writer_formatter_vec{{writer, formatter}};
 
   auto mock_logger = std::make_shared<Logger>(writer_formatter_vec);
 
@@ -52,7 +52,7 @@ TEST(MockLogger, LogWithDefaultHeaderAndLM) {
   data_logger.Log();
   // *writer << std::endl;
 
-  sub->Inform();
+  sub->Notify();
   heading.value = 2.0;
   sub->Set(heading);
   data_logger.Log();
