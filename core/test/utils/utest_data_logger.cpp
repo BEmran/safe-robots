@@ -34,7 +34,7 @@ using core::utils::WriterFormatterPair;
 TEST(MockLogger, LogWithDefaultHeaderAndLM) {
   std::stringstream ss;
   auto writer = std::make_shared<Writer>(ss);
-  auto formater = std::make_shared<NullFormater>();
+  auto formater = core::utils::Formatter();
 
   std::vector<WriterFormatterPair> writer_formatter_vec{{writer, formater}};
 
