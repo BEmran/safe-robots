@@ -9,24 +9,26 @@
 #include "core/utils/writer_file.hpp"
 #include "utest/utils.hpp"
 
+using core::utils::CreateNullFormatter;
+using core::utils::CreateTimeLabelFormatter;
+using core::utils::CreateTimeLabelModifierFormatter;
+using core::utils::DebugLabeledModifier;
 using core::utils::EventLevel;
 using core::utils::Exception;
 using core::utils::ExceptionFactory;
-using core::utils::Formater;
-using core::utils::FormaterInterface;
+using core::utils::Formatter;
 using core::utils::Logger;
 using core::utils::LogLocation;
 using core::utils::Modifier;
-using core::utils::NullFormater;
 using core::utils::Writer;
 
+using namespace std::literals;
+
 constexpr std::string_view kMessage = "message";
-constexpr const EventLevel debug = EventLevel::DEBUG;
-constexpr const EventLevel error = EventLevel::ERROR;
-constexpr const EventLevel fatal = EventLevel::FATAL;
-const LabeledModifier simple_lm(debug);
-const LabeledModifier simple_lm1(EventLevel::WARN);
-const LabeledModifier debug_lm = core::utils::DebugLabeledModifier();
+constexpr const EventLevel kDebug = EventLevel::DEBUG;
+constexpr const EventLevel kError = EventLevel::ERROR;
+constexpr const EventLevel kFatal = EventLevel::FATAL;
+const LabeledModifier kSimpleLM(kDebug);
 
 TEST(LoggerInformation, Construction) {
   auto info = LOG_INFORMATION;
@@ -41,12 +43,18 @@ TEST(LoggerInformation, ToString) {
 }
 
 std::string ExpectMessage(const EventLevel event) {
-  return "[" + EventLevelToString(event) + "] " + kMessage.data();
+  return "["s + EventLevelToString(event) + "] "s + kMessage.data();
 }
 
 std::string ExpectMessage(const LabeledModifier lm) {
-  return "[" + lm.ToString() + "] " + kMessage.data();
+  return "["s + lm.ToString() + "] "s + kMessage.data();
 }
+
+// std::string ExpectMessageWithTimeFormater(std::string_view logger_name,
+//                                           const EventLevel event) {
+//   auto formater = CreateTimeLabelModifierFormatter();
+//   return formater.Format("");
+// }
 
 class MockWriter : public Writer {
  public:
@@ -65,72 +73,99 @@ class MockWriter : public Writer {
 
 auto writer1 = std::make_shared<MockWriter>();
 auto writer2 = std::make_shared<MockWriter>();
-auto formater1 = std::make_shared<NullFormater>();
-auto formater2 = std::make_shared<NullFormater>();
-core::utils::WriterFormatterPair wf_pair1{writer1, formater1};
-core::utils::WriterFormatterPair wf_pair2{writer2, formater2};
+core::utils::WriterFormatterPair wf_pair1{writer1, Formatter()};
+core::utils::WriterFormatterPair wf_pair2{writer2, Formatter()};
 
 TEST(Logger, LogWithEvent) {
   Logger logger({wf_pair1});
-  logger.Log(debug, kMessage);
-  EXPECT_EQ(ExpectMessage(debug), writer1->Msg());
+  logger.Log(kDebug, kMessage);
+  auto expect = wf_pair1.formatter.Format(DebugLabeledModifier(), kMessage);
+  EXPECT_EQ(expect, writer1->Msg());
 }
 
 TEST(Logger, LogWithLabeledModifier) {
   Logger logger({wf_pair1});
-  logger.Log(debug_lm, kMessage);
-  EXPECT_EQ(ExpectMessage(debug_lm), writer1->Msg());
+  logger.Log(DebugLabeledModifier(), kMessage);
+  auto expect = wf_pair1.formatter.Format(DebugLabeledModifier(), kMessage);
+  EXPECT_EQ(expect, writer1->Msg());
 }
 
 TEST(Logger, SingleWriterFormatter) {
   Logger logger({wf_pair1});
-  logger.Log(simple_lm, kMessage);
-  EXPECT_EQ(ExpectMessage(simple_lm), writer1->Msg());
+  logger.Log(kSimpleLM, kMessage);
+  auto expect = wf_pair1.formatter.Format(kSimpleLM, kMessage);
+  EXPECT_EQ(expect, writer1->Msg());
 }
 
 TEST(Logger, MultipleWriterFormatter) {
   Logger logger({wf_pair1, wf_pair2});
-  logger.Log(simple_lm, kMessage);
-  EXPECT_EQ(ExpectMessage(simple_lm), writer1->Msg());
-  EXPECT_EQ(ExpectMessage(simple_lm), writer2->Msg());
+  logger.Log(kSimpleLM, kMessage);
+  auto expect1 = wf_pair1.formatter.Format(kSimpleLM, kMessage);
+  EXPECT_EQ(expect1, writer1->Msg());
+  auto expect2 = wf_pair2.formatter.Format(kSimpleLM, kMessage);
+  EXPECT_EQ(expect2, writer2->Msg());
 }
 
 TEST(Logger, LogWithFormater) {
-  auto format = std::make_shared<Formater<std::string>>("name");
+  auto format = CreateTimeLabelFormatter();
   Logger logger({{writer1, format}});
-  logger.Log(simple_lm, kMessage);
-  EXPECT_EQ(format->Format(ExpectMessage(simple_lm)), writer1->Msg());
-}
-
-TEST(Logger, LogWithStreamMethod) {
-  Logger logger({wf_pair1});
-  logger << kMessage;
-  EXPECT_EQ(kMessage, writer1->Msg());
+  logger.Log(kSimpleLM, kMessage);
+  auto expect = format.Format(kSimpleLM, kMessage);
+  EXPECT_EQ(expect, writer1->Msg());
 }
 
 TEST(Logger, ExceptionWhenErrorEvent) {
   auto exception = std::make_shared<ExceptionFactory>("");
   Logger logger({wf_pair1}, exception);
 
-  EXPECT_THROW(logger.Log(error, kMessage), core::utils::Exception);
-  EXPECT_EQ(ExpectMessage(error), writer1->Msg());
+  EXPECT_THROW(logger.Log(kError, kMessage), core::utils::Exception);
+  auto expect = wf_pair1.formatter.Format(LabeledModifier(kError), kMessage);
+  EXPECT_EQ(expect, writer1->Msg());
 }
 
 TEST(Logger, ExceptionWheFatalEvent) {
   auto exception = std::make_shared<ExceptionFactory>("");
   Logger logger({wf_pair1}, exception);
 
-  EXPECT_THROW(logger.Log(fatal, kMessage), core::utils::Exception);
-  EXPECT_EQ(ExpectMessage(fatal), writer1->Msg());
+  EXPECT_THROW(logger.Log(kFatal, kMessage), core::utils::Exception);
+  auto expect = wf_pair1.formatter.Format(LabeledModifier(kFatal), kMessage);
+  EXPECT_EQ(expect, writer1->Msg());
 }
 
-// TEST(CreateFileAndConsoleLogger, CheckInitializedWriters) {
-//   constexpr auto kName = "name";
-//   constexpr auto kFilename = "name_logger.txt";
-//   auto logger = core::utils::CreateFileAndConsoleLogger(kName);
+TEST(Logger, CreateStreamLogger) {
+  constexpr auto kName = "name";
+  std::stringstream ss;
+  auto logger = core::utils::CreateStreamLogger(kName, ss);
+  logger.Log(DebugLabeledModifier(), kMessage);
+  auto formater = CreateTimeLabelModifierFormatter();
+  auto expect = formater.Format(DebugLabeledModifier(), kMessage);
+  EXPECT_EQ(expect, ss.str());
+}
 
-//   ConsoleBuffer c_buf;
-//   logger->Log(event, kMessage);
-//   EXPECT_TRUE(
-//     AssertFileAndConsole(kFilename, c_buf, labeled_modifier, kMessage));
-// }
+TEST(Logger, CreateFileLogger) {
+  constexpr auto kName = "name";
+  constexpr auto kFilename = "name_logger.txt";
+  auto logger = core::utils::CreateFileLogger(kName, kFilename);
+  logger.Log(DebugLabeledModifier(), kMessage);
+
+  const auto f_logged_data = ReadAllLinesFromFile(kFilename);
+  auto formater = CreateTimeLabelFormatter();
+  auto expect = formater.Format(DebugLabeledModifier(), kMessage);
+  EXPECT_TRUE(AssertStringList({expect}, f_logged_data));
+}
+
+TEST(Logger, CreateStreamAndFileLogger) {
+  constexpr auto kName = "name";
+  std::stringstream ss;
+  constexpr auto kFilename = "name_logger.txt";
+  auto logger = core::utils::CreateStreamAndFileLogger(kName, ss, kFilename);
+  logger.Log(DebugLabeledModifier(), kMessage);
+
+  const auto f_logged_data = ReadAllLinesFromFile(kFilename);
+  auto ss_formater = CreateTimeLabelModifierFormatter();
+  auto file_formater = CreateTimeLabelFormatter();
+  auto ss_expect = ss_formater.Format(DebugLabeledModifier(), kMessage);
+  auto file_expect = file_formater.Format(DebugLabeledModifier(), kMessage);
+  EXPECT_EQ(ss_expect, ss.str());
+  EXPECT_TRUE(AssertStringList({file_expect}, f_logged_data));
+}

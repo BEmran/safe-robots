@@ -12,7 +12,6 @@
 
 #include "core/utils/exception.hpp"
 #include "core/utils/formatter.hpp"
-#include "core/utils/formatter2.hpp"
 #include "core/utils/labeld_modifier.hpp"
 #include "core/utils/modifier.hpp"
 #include "core/utils/writer.hpp"
@@ -23,6 +22,9 @@
   (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
 namespace core::utils {
+
+class NestedLogger;
+
 /**
  * @brief location information about where the log came from
  *
@@ -31,6 +33,10 @@ struct LogLocation {
   std::string file;
   std::string func;
   int line;
+  /**
+   * @brief create a new LogLocation object
+   *
+   */
   LogLocation(const char* file_, const char* func_, int line_)
     : file(file_), func(func_), line(line_) {
   }
@@ -46,13 +52,26 @@ struct LogLocation {
   }
 };
 
+/**
+ * @brief a macro to create LogLocation object
+ *
+ */
 #define LOG_INFORMATION                                                        \
   core::utils::LogLocation(__FILENAME__, __func__, __LINE__)
+
+/**
+ * @brief a macro used to simplify logging LogLocation object
+ *
+ */
 #define LOG_INFORMATION_STRING LOG_INFORMATION.ToString()
 
+/**
+ * @brief simple struct to pair a writer with formater
+ * TODO(bara): do we need shared_ptr?
+ */
 struct WriterFormatterPair {
   std::shared_ptr<Writer> writer;
-  std::shared_ptr<FormaterInterface> formatter;
+  Formatter formatter;
 };
 
 /**
@@ -99,68 +118,66 @@ class Logger {
    */
   void Log(const EventLevel event, std::string_view msg) const;
 
+ protected:
+  friend NestedLogger;
+  /**
+   * @brief log data on all Writers using stream method.
+   * @details This logging method is used for continues logging thus it does not
+   * use formater here
+   *
+   * @tparam T anytype
+   * @param data data to be logged
+   * @return const Logger& constant reference to the logger
+   */
   template <typename T>
   const Logger& operator<<(const T& data) const {
-    for (auto& wf : writer_formatter_vec_) {
-      auto& writer = *(wf.writer.get());
-      writer << data;
+    for (size_t idx = 0; idx < writer_formatter_vec_.size(); ++idx) {
+      auto writer_shared = writer_formatter_vec_[idx].writer;
+      if (writer_shared) {
+        auto& writer = *(writer_shared.get());
+        writer << data;
+      } else {
+        std::cerr << "Logger: Writer #[" << idx << "] is invalid" << std::endl;
+      }
     }
     return *this;
   }
 
-  // /**
-  //  * @brief log the passed message using the Debug LabeledModifier
-  //  *
-  //  * @param msg msg to log
-  //  */
-  // void Debug(std::string_view msg) const;
+  /**
+   * @brief Logging implementation called by Log() function
+   *
+   * @param lm label modifier to use with the formatter
+   * @param msg msg to be logged
+   */
+  void LogImp(const LabeledModifier& lm, std::string_view msg) const;
 
-  // /**
-  //  * @brief log the passed message using the Error LabeledModifier
-  //  *
-  //  * @param msg msg to log
-  //  */
-  // void Error(std::string_view msg) const;
+  /**
+   * @brief Write message using the passed formater and writer
+   *
+   * @param wf writer and formatter pair
+   * @param lm label modifier to use with the formatter
+   * @param msg msg to be written
+   */
+  static void FormatAndWrite(const WriterFormatterPair& wf,
+                             const LabeledModifier& lm, std::string_view msg);
 
-  // /**
-  //  * @brief log the passed message using the Fatal LabeledModifier
-  //  *
-  //  * @param msg msg to log
-  //  */
-  // void Fatal(std::string_view msg) const;
-
-  // /**
-  //  * @brief log the passed message using the Info LabeledModifier
-  //  *
-  //  * @param msg msg to log
-  //  */
-  // void Info(std::string_view msg) const;
-
-  // /**
-  //  * @brief log the passed message using the Warn LabeledModifier
-  //  *
-  //  * @param msg msg to log
-  //  */
-  // void Warn(std::string_view msg) const;
-
- protected:
-  void LogImp(const EventLevel event, const std::string& event_str,
-              std::string_view msg) const;
-
-  void Dump(const WriterFormatterPair& wf, const std::string& msg) const;
-
-  void ThrowExceptionForErrorEvent(EventLevel event,
-                                   std::string_view msg) const;
+  /**
+   * @brief Throw error msg using ExceptionFactory if event is Critical
+   *
+   * @param event event level
+   * @param msg msg to throw
+   */
+  void ThrowExceptionForCriticalEvent(EventLevel event,
+                                      std::string_view msg) const;
 
  private:
   std::vector<WriterFormatterPair> writer_formatter_vec_;
   std::shared_ptr<ExceptionFactory> expectation_factory_;
-  std::string name_ = "";
 };
 
-class NestedLogger : Logger {
+class NestedLogger {
  public:
-  NestedLogger(const Logger& logger) : Logger(logger), logger_(logger) {
+  NestedLogger(const Logger& logger) : logger_(logger) {
   }
 
   ~NestedLogger() {
@@ -178,15 +195,39 @@ class NestedLogger : Logger {
 };
 
 /**
- * @brief Create a new Logger object with typical console and file
- * Formatters and ExceptionFactory
+ * @brief Create a new Logger object with ExceptionFactory and the passed stream
+ * Writer paired with TimeFormater
  *
- * @param name name of Exception factory header, also used to create logger
- * filename as "<name>_logger.txt"
+ * @param name name of Logger and Exception factory header
+ * @param os output stream with default value as console stream
  * @return Logger logger object
  */
-Logger CreateFileAndConsoleLogger(std::string_view name,
-                                  std::string_view filename = "");
+Logger CreateStreamLogger(std::string_view name, std::ostream& os = std::cout);
+
+/**
+ * @brief Create a new Logger object with ExceptionFactory and the passed
+ * FileWriter paired with TimeFormater
+ *
+ * @param name name of Logger and Exception factory header, also used to create
+ * logger filename as "<name>_logger.txt" if filename is empty
+ * @param filename logger file name
+ * @return Logger logger object
+ */
+Logger CreateFileLogger(std::string_view name, std::string_view filename = "");
+
+/**
+ * @brief Create a new Logger object with ExceptionFactory and two Writers
+ * (Stream and File) each paired with TimeFormater
+ *
+ * @param name name of Logger and Exception factory header, also used to create
+ * logger filename as "<name>_logger.txt"
+ * @param os output stream with default value as console stream
+ * @param filename logger file name
+ * @return Logger logger object
+ */
+Logger CreateStreamAndFileLogger(std::string_view name,
+                                 std::ostream& os = std::cout,
+                                 std::string_view filename = "");
 
 }  // namespace core::utils
 
