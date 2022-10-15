@@ -18,6 +18,34 @@ using FormatFunc =
   std::function<std::string(const LabeledModifier& lm, std::string_view msg)>;
 
 /**
+ * @brief null formatter
+ *
+ * @param lm labeled modifier
+ * @param msg string message to be formatted
+ * @return std::string formatted message
+ */
+std::string NullFormatter(const LabeledModifier& lm, std::string_view msg);
+
+/**
+ * @brief Format using current time and label formatter
+ *
+ * @param lm labeled modifier
+ * @param msg string message to be formatted
+ * @return std::string formatted message
+ */
+std::string TimeLabelFormatter(const LabeledModifier& lm, std::string_view msg);
+
+/**
+ * @brief Format using current time and time and label modifier
+ *
+ * @param lm labeled modifier
+ * @param msg string message to be formatted
+ * @return std::string formatted message
+ */
+std::string TimeLabelModifierFormatter(const LabeledModifier& lm,
+                                       std::string_view msg);
+
+/**
  * @brief Simple class used to present message in different format (style) by
  * calling the passed formatter function.
  *
@@ -53,34 +81,6 @@ class Formatter {
    */
   FormatFunc format_func_;
 };
-
-/**
- * @brief null formatter
- *
- * @param lm labeled modifier
- * @param msg string message to be formatted
- * @return std::string formatted message
- */
-std::string NullFormatter(const LabeledModifier& lm, std::string_view msg);
-
-/**
- * @brief Format using current time and label formatter
- *
- * @param lm labeled modifier
- * @param msg string message to be formatted
- * @return std::string formatted message
- */
-std::string TimeLabelFormatter(const LabeledModifier& lm, std::string_view msg);
-
-/**
- * @brief Format using current time and time and label modifier
- *
- * @param lm labeled modifier
- * @param msg string message to be formatted
- * @return std::string formatted message
- */
-std::string TimeLabelModifierFormatter(const LabeledModifier& lm,
-                                       std::string_view msg);
 
 /**
  * @brief Create a Null Formatter object
