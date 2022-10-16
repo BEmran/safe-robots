@@ -8,6 +8,7 @@
 
 #include "core/utils/labeld_modifier.hpp"
 #include "core/utils/logger.hpp"
+#include "core/utils/logger_helper.hpp"
 
 namespace core::utils {
 
@@ -42,57 +43,20 @@ this.Warn(" %a %b %c", a, b, c) << .... << endl;
 */
 
 /**
- * @brief holds various LabeledModifier objects to be used inside the node when
- * logging messages
- *
- */
-struct NodeLabeledModifiers {
-  LabeledModifier debug;
-  LabeledModifier error;
-  LabeledModifier fatal;
-  LabeledModifier info;
-  LabeledModifier warn;
-
-  /**
-   * @brief Construct a new Node Labeled Modifiers object
-   *
-   * @param debug_lm debug labeled modifier
-   * @param error_lm error labeled modifier
-   * @param fatal_lm fatal labeled modifier
-   * @param info_lm info labeled modifier
-   * @param warn_lm warn labeled modifier
-   */
-  NodeLabeledModifiers(const LabeledModifier& debug_lm,
-                       const LabeledModifier& error_lm,
-                       const LabeledModifier& fatal_lm,
-                       const LabeledModifier& info_lm,
-                       const LabeledModifier& warn_lm)
-    : debug(debug_lm)
-    , error(error_lm)
-    , fatal(fatal_lm)
-    , info(info_lm)
-    , warn(warn_lm) {
-  }
-
-  /**
-   * @brief Construct a new Node Labeled Modifiers object with default Labeled
-   * Modifiers
-   *
-   */
-  NodeLabeledModifiers()
-    : NodeLabeledModifiers(DebugLabeledModifier(), ErrorLabeledModifier(),
-                           FatalLabeledModifier(), InfoLabeledModifier(),
-                           WarnLabeledModifier()) {
-  }
-};
-
-/**
  * @brief A named logger uses LabeledModifier to log data
  *
  */
 class NodeLogger {
  public:
+  /**
+   * @brief Construct a new Node Logger object using a logger with default
+   * labeled modifiers
+   *
+   * @param logger shared ptr to a logger object
+   * @param labeled_modifiers labeled modifier struct
+   */
   explicit NodeLogger(const Logger& logger);
+
   /**
    * @brief Construct a new Node Logger object using a logger with specific
    * labeled modifiers
@@ -100,12 +64,12 @@ class NodeLogger {
    * @param logger shared ptr to a logger object
    * @param labeled_modifiers labeled modifier struct
    */
-  NodeLogger(const Logger& logger, NodeLabeledModifiers labeled_modifiers);
+  NodeLogger(const Logger& logger, LoggerLabeledModifiers labeled_modifiers);
 
   explicit NodeLogger(std::shared_ptr<Logger> logger);
 
   NodeLogger(std::shared_ptr<Logger> logger,
-             NodeLabeledModifiers labeled_modifiers);
+             LoggerLabeledModifiers labeled_modifiers);
 
   /**
    * @brief Destroy the Node Logger object
@@ -117,43 +81,48 @@ class NodeLogger {
    * @brief Log the passed message using the Debug LabeledModifier
    *
    * @param msg msg to log
+   * @return StreamLogger logger used with stream to log extra data
    */
-  NestedLogger Debug(std::string_view msg = "") const;
+  StreamLogger Debug(std::string_view msg = "") const;
 
   /**
    * @brief Log the passed message using the Error LabeledModifier
    *
    * @param msg msg to log
+   * @return StreamLogger logger used with stream to log extra data
    */
-  NestedLogger Error(std::string_view msg = "") const;
+  StreamLogger Error(std::string_view msg = "") const;
 
   /**
    * @brief Log the passed message using the Fatal LabeledModifier
    *
    * @param msg msg to log
+   * @return StreamLogger logger used with stream to log extra data
    */
-  NestedLogger Fatal(std::string_view msg = "") const;
+  StreamLogger Fatal(std::string_view msg = "") const;
 
   /**
    * @brief Log the passed message using the Info LabeledModifier
    *
    * @param msg msg to log
+   * @return StreamLogger logger used with stream to log extra data
    */
-  NestedLogger Info(std::string_view msg = "") const;
+  StreamLogger Info(std::string_view msg = "") const;
 
   /**
    * @brief Log the passed message using the Warn LabeledModifier
    *
    * @param msg msg to log
+   * @return StreamLogger logger used with stream to log extra data
    */
-  NestedLogger Warn(std::string_view msg = "") const;
+  StreamLogger Warn(std::string_view msg = "") const;
 
   /**
    * @brief Set the Header string
    *
-   * @param header header to be added to each logging message
+   * @param label a label to be added before logging message
    */
-  void SetHeader(std::string_view header);
+  void SetLabel(std::string_view label);
 
   /**
    * @brief Get the internal Logger object
@@ -164,18 +133,18 @@ class NodeLogger {
 
  protected:
   /**
-   * @brief Logs a message with specific LabeledModifier
-   * @details this function is also called internally by all log_*
-   functions
+   * @brief Logs a message with specific LabeledModifier by calling internal
+   * logger object
    *
    * @param lm labeled modifier which defines event and its label
    * @param msg message to be logged
+   * @return StreamLogger logger used with stream to log extra data
    */
-  void LogImpl(const LabeledModifier& lm, std::string_view msg) const;
+  StreamLogger LogMsg(const LabeledModifier& lm, std::string_view msg) const;
 
  private:
   const Logger& logger_;
-  NodeLabeledModifiers labeled_modifiers_;
+  LoggerLabeledModifiers labeled_modifiers_;
   std::string header_{};
 };
 

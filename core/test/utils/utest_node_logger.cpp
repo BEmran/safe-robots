@@ -18,8 +18,9 @@ using core::utils::InfoModifier;
 using core::utils::LabeledModifier;
 using core::utils::Logger;
 using core::utils::LoggerConfig;
-using core::utils::NodeLabeledModifiers;
+using core::utils::LoggerLabeledModifiers;
 using core::utils::NodeLogger;
+using core::utils::StreamLogger;
 using core::utils::WarnLabeledModifier;
 using core::utils::WarnModifier;
 
@@ -28,8 +29,8 @@ const LabeledModifier kErrorLm(EventLevel::ERROR, ErrorModifier());
 const LabeledModifier kFatalLm(EventLevel::FATAL, FatalModifier());
 const LabeledModifier kInfoLm(EventLevel::INFO, InfoModifier());
 const LabeledModifier kWarnLm(EventLevel::WARN, WarnModifier());
-const NodeLabeledModifiers kNodeLm(kDebugLm, kErrorLm, kFatalLm, kInfoLm,
-                                   kWarnLm);
+const LoggerLabeledModifiers kNodeLm(kDebugLm, kErrorLm, kFatalLm, kInfoLm,
+                                     kWarnLm);
 
 constexpr std::string_view kMessage = "message";
 constexpr std::string_view kHeader = "Header";
@@ -57,7 +58,7 @@ class MockLogger : public Logger {
 const auto kMockLogger = std::make_shared<MockLogger>();
 
 // check creating NodeLabel Modifier
-TEST(NodeLabeledModifiers, Construct) {
+TEST(LoggerLabeledModifiers, Construct) {
   ExpectEqLabeledModifier(kDebugLm, kNodeLm.debug);
   ExpectEqLabeledModifier(kErrorLm, kNodeLm.error);
   ExpectEqLabeledModifier(kFatalLm, kNodeLm.fatal);
@@ -66,8 +67,8 @@ TEST(NodeLabeledModifiers, Construct) {
 }
 
 // check creating Default NodeLabel Modifier using
-TEST(NodeLabeledModifiers, DefaultConstruct) {
-  const NodeLabeledModifiers default_node_lm;
+TEST(LoggerLabeledModifiers, DefaultConstruct) {
+  const LoggerLabeledModifiers default_node_lm;
   ExpectEqLabeledModifier(default_node_lm.debug, DebugLabeledModifier());
   ExpectEqLabeledModifier(default_node_lm.error, ErrorLabeledModifier());
   ExpectEqLabeledModifier(default_node_lm.fatal, FatalLabeledModifier());
@@ -80,23 +81,23 @@ TEST(MockLogger, LogWithDefaultHeaderAndLMs) {
   NodeLogger n_logger(kMockLogger);
 
   n_logger.Debug(kMessage);
-  EXPECT_EQ(kMessage, kMockLogger->Msg());
+  EXPECT_EQ(kMessage.data() + "\n"s, kMockLogger->Msg());
   ExpectEqLabeledModifier(DebugLabeledModifier(), kMockLogger->LM());
 
   n_logger.Error(kMessage);
-  EXPECT_EQ(kMessage, kMockLogger->Msg());
+  EXPECT_EQ(kMessage.data() + "\n"s, kMockLogger->Msg());
   ExpectEqLabeledModifier(ErrorLabeledModifier(), kMockLogger->LM());
 
   n_logger.Fatal(kMessage);
-  EXPECT_EQ(kMessage, kMockLogger->Msg());
+  EXPECT_EQ(kMessage.data() + "\n"s, kMockLogger->Msg());
   ExpectEqLabeledModifier(FatalLabeledModifier(), kMockLogger->LM());
 
   n_logger.Warn(kMessage);
-  EXPECT_EQ(kMessage, kMockLogger->Msg());
+  EXPECT_EQ(kMessage.data() + "\n"s, kMockLogger->Msg());
   ExpectEqLabeledModifier(WarnLabeledModifier(), kMockLogger->LM());
 
   n_logger.Info(kMessage);
-  EXPECT_EQ(kMessage, kMockLogger->Msg());
+  EXPECT_EQ(kMessage.data() + "\n"s, kMockLogger->Msg());
   ExpectEqLabeledModifier(InfoLabeledModifier(), kMockLogger->LM());
 }
 
@@ -109,7 +110,7 @@ TEST(MockLogger, LogWithHeaderAndDefaultLM) {
   config.wf_pairs = {{writer, formatter}};
   Logger logger(config);
   NodeLogger n_logger(logger);
-  n_logger.SetHeader(kHeader);
+  n_logger.SetLabel(kHeader);
 
   n_logger.Debug(kMessage);
   std::stringstream expect;
@@ -136,7 +137,7 @@ TEST(MockLogger, LogWithDefaultHeaderAndDefaultLM) {
 
 // construct with special LM
 TEST(MockLogger, ConstructWithSpecialLM) {
-  NodeLabeledModifiers lms(kDebugLm, kDebugLm, kDebugLm, kDebugLm, kDebugLm);
+  LoggerLabeledModifiers lms(kDebugLm, kDebugLm, kDebugLm, kDebugLm, kDebugLm);
   NodeLogger n_logger(kMockLogger, lms);
 
   n_logger.Debug(kMessage);
