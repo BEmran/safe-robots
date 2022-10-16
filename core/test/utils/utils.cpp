@@ -109,7 +109,7 @@ testing::AssertionResult AssertStringList(
       if (p1.compare(p2) == 0) {
         return true;
       }
-      ss << "\n expect: [" << p1 << "] and got: [" << p2 << "]";
+      ss << "\n expect: \"" << p1 << "\" and got: \"" << p2 << "\"";
       return false;
     });
   // const bool result = std::equal(expect.begin(), expect.end(),
