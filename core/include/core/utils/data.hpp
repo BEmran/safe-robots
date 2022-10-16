@@ -5,6 +5,7 @@
 
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -22,8 +23,11 @@ struct Data {
   virtual std::string ToString() const = 0;
 };
 
-std::string Header(std::vector<const Data*> vec);
-std::string ToString(std::vector<const Data*> vec);
+std::string Header(const std::vector<Data*>& vec);
+std::string Header(const std::vector<std::shared_ptr<Data>>& vec);
+
+std::string ToString(const std::vector<Data*>& vec);
+std::string ToString(const std::vector<std::shared_ptr<Data>>& vec);
 
 struct AdcData : public Data {
   Vec3 values = Vec3::Zero();
@@ -168,8 +172,9 @@ struct ImuData : public Data {
   MagData mag;           ///< magnetometer (XYZ) in units of uT
   QuatData quat;         ///< normalized quaternion
   RPYData tait_bryan;    ///< Tait-Bryan angles (roll pitch yaw) in radians
-  std::vector<const Data*> vec{&accel,      &gyro,    &mag, &quat,
-                               &tait_bryan, &heading, &temp};
+
+  std::vector<Data*> vec{&accel,      &gyro,    &mag, &quat,
+                         &tait_bryan, &heading, &temp};
 
   inline void Clear() override {
     temp.Clear();
@@ -180,9 +185,11 @@ struct ImuData : public Data {
     tait_bryan.Clear();
     quat.Clear();
   }
+
   inline std::string Header() const override {
     return core::utils::Header(vec);
   }
+
   inline std::string ToString() const override {
     return core::utils::ToString(vec);
   }
@@ -193,6 +200,7 @@ struct ImuData : public Data {
 namespace cu = core::utils;
 
 /* print data details */
+std::ostream& operator<<(std::ostream& os, const cu::Data* const data);
 std::ostream& operator<<(std::ostream& os, const cu::AdcData& adc);
 std::ostream& operator<<(std::ostream& os, const cu::BarData& bar);
 std::ostream& operator<<(std::ostream& os, const cu::TemperatureData& temp);

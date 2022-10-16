@@ -3,22 +3,45 @@
 #include "core/utils/data.hpp"
 
 namespace core::utils {
-std::string Header(std::vector<const Data*> vec) {
+std::string Header(const std::vector<Data*>& vec) {
   std::string header;
-  std::for_each(vec.begin(), vec.end(),
-                [&header](auto ele) { header += ele->Header() + ", "; });
+  std::for_each(vec.begin(), vec.end(), [&header](const Data* data) {
+    header += data->Header() + ", ";
+  });
   return header;
 }
 
-std::string ToString(std::vector<const Data*> vec) {
+std::string Header(const std::vector<std::shared_ptr<Data>>& vec) {
+  std::string header;
+  std::for_each(vec.begin(), vec.end(),
+                [&header](const std::shared_ptr<Data> data) {
+                  header += data->Header() + ", ";
+                });
+  return header;
+}
+
+std::string ToString(const std::vector<Data*>& vec) {
   std::string str;
   std::for_each(vec.begin(), vec.end(),
-                [&str](auto ele) { str += ele->ToString() + ", "; });
+                [&str](const Data* data) { str += data->ToString() + ", "; });
+  return str;
+}
+
+std::string ToString(const std::vector<std::shared_ptr<Data>>& vec) {
+  std::string str;
+  std::for_each(vec.begin(), vec.end(),
+                [&str](const std::shared_ptr<Data> data) {
+                  str += data->ToString() + ", ";
+                });
   return str;
 }
 }  // namespace core::utils
 
 namespace cu = core::utils;
+
+std::ostream& operator<<(std::ostream& os, const cu::Data* const data) {
+  return os << data->ToString();
+}
 
 std::ostream& operator<<(std::ostream& os, const cu::BarData& bar) {
   return os << std::setprecision(cu::HALF_PRECISION)
