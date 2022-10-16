@@ -46,7 +46,7 @@ StreamLogger NodeLogger::Warn(std::string_view msg) const {
 
 StreamLogger NodeLogger::LogMsg(const LabeledModifier& lm,
                                 std::string_view msg) const {
-  const std::string updated_msg = header_ + msg.data();
+  const std::string updated_msg = label_ + msg.data();
   return StreamLogger(logger_, lm, updated_msg);
 }
 
@@ -55,7 +55,7 @@ void NodeLogger::SetLabel(std::string_view header) {
   if (header.empty()) {
     return;
   }
-  header_ = "["s + header.data() + "] ";
+  label_ = "["s + header.data() + "] ";
 }
 
 NodeLogger CreatNodeLoggerUsingSystemLogger(std::string_view header) {

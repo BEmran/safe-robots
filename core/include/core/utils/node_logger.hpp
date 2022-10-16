@@ -145,7 +145,7 @@ class NodeLogger {
  private:
   const Logger& logger_;
   LoggerLabeledModifiers labeled_modifiers_;
-  std::string header_{};
+  std::string label_{};
 };
 
 /**

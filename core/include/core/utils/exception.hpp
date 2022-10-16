@@ -16,20 +16,20 @@ class Exception : public std::runtime_error {
 
 class ExceptionFactory {
  public:
-  explicit ExceptionFactory(std::string_view header) : header_(header) {
+  explicit ExceptionFactory(std::string_view header) : label_(header) {
   }
 
   virtual ~ExceptionFactory() = default;
 
   virtual void Throw(std::string_view msg) const {
-    if (header_.empty()) {
+    if (label_.empty()) {
       throw Exception(msg);
     }
-    throw Exception(header_ + ": " + msg.data());
+    throw Exception(label_ + ": " + msg.data());
   }
 
  private:
-  std::string header_;
+  std::string label_;
 };
 
 class NullExceptionFactory : public ExceptionFactory {
