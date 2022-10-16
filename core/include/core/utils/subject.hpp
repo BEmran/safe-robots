@@ -5,6 +5,7 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <set>
 #include <string>
 
@@ -19,16 +20,19 @@ namespace core::utils {
  * @tparam T subject data type
  */
 template <typename T>
-using ObserverCallback = std::function<void(const T& data)>;
+using ObserverCB = std::function<void(const T& data)>;
 
 /**
- * @brief General Subject class holds observers' callback to inform when
+ * @brief General registry class holds observers' callback to inform when
  * internal data changes
  *
  * @tparam T internal data type
  */
 template <typename T>
 class Subject {
+ private:
+  using Registry = std::set<std::shared_ptr<ObserverCB<T>>>;
+
  public:
   /**
    * @brief Construct a new Subject object
@@ -39,48 +43,91 @@ class Subject {
     : node_(std::make_unique<Node>(name)) {
   }
 
-  void Register(std::shared_ptr<ObserverCallback<T>> cb) {
-    auto it = observers_.find(cb);
-    // TODO(Bara): not needed for Set container
-    if (it != observers_.end()) {
-      node_->GetLogger().Warn("This observer has been registered before");
+  /**
+   * @brief Register new observer callback if not registered before
+   *
+   * @param cb observer callback
+   */
+  void Register(std::shared_ptr<ObserverCB<T>> cb) {
+    if (FindMatch(cb)) {
+      node_->GetLogger().Warn(
+        "Failed to register an observer callback; it has been registered "
+        "before");
     } else {
-      observers_.insert(cb);
-      node_->GetLogger().Debug("Registered new observer");
+      register_.insert(cb);
+      node_->GetLogger().Debug("Successfully register a new observer callback");
     }
   }
 
-  void Unregister(std::shared_ptr<ObserverCallback<T>> cb) {
-    auto it = observers_.find(cb);
-
-    if (it == observers_.end()) {
-      node_->GetLogger().Warn("This observer was not registered");
+  /**
+   * @brief Unregister observer callback if registered before
+   *
+   * @param cb observer callback
+   */
+  void Unregister(std::shared_ptr<ObserverCB<T>> cb) {
+    auto it = FindMatch(cb);
+    if (it) {
+      register_.erase(it.value());
+      node_->GetLogger().Debug("Successfully unregister an observer callback");
     } else {
-      observers_.erase(it);
-      node_->GetLogger().Debug("Unregistered an observer");
+      node_->GetLogger().Warn(
+        "Failed to find a match for an observer callback to unregister");
     }
   }
 
-  void Notify() const {
-    const auto data = Get();
-    std::for_each(observers_.begin(), observers_.end(),
-                  [&data](auto obs) { (*obs)(data); });
+  /**
+   * @brief Find a match of the passed Observer callback in the registry
+   *
+   * @param cb observer callback
+   * @return std::optional<Registry::iterator> iteration of the founded match
+   */
+  std::optional<typename Registry::iterator>
+  FindMatch(std::shared_ptr<ObserverCB<T>> cb) {
+    auto it = register_.find(cb);
+    if (it == register_.end()) {
+      return {};
+    }
+    return it;
   }
 
-  void Set(const T& data) {
+  /**
+   * @brief Set internal data and Notify observers
+   *
+   * @param data new data
+   */
+  void SetAndNotify(const T& data) {
     cash_data_.Set(data);
     Notify();
   }
 
+  /**
+   * @brief Notify all observers and give them a copy of internal data
+   *
+   */
+  void Notify() const {
+    const auto data = Get();
+    std::for_each(register_.begin(), register_.end(),
+                  [&data](auto obs) { (*obs)(data); });
+  }
+
+  /**
+   * @brief Get internal data
+   *
+   * @return T stored data
+   */
   T Get() const {
     return cash_data_.Get();
   }
 
  private:
+  /// @brief node used to log data
   std::unique_ptr<Node> node_;
+
+  /// @brief cash object to safely store and retrieve object data
   Cash<T> cash_data_;
-  // store as unique_ptr to get its address for comparison specially lambda func
-  std::set<std::shared_ptr<ObserverCallback<T>>> observers_;
+
+  /// @brief set of shared_ptr to all ObserverCallback function
+  Registry register_;
 };
 
 }  // namespace core::utils
