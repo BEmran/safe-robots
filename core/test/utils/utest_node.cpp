@@ -15,8 +15,8 @@ using core::utils::InfoLabeledModifier;
 using core::utils::InfoModifier;
 using core::utils::LabeledModifier;
 using core::utils::Logger;
+using core::utils::LoggerLabeledModifiers;
 using core::utils::Node;
-using core::utils::NodeLabeledModifiers;
 using core::utils::WarnLabeledModifier;
 using core::utils::WarnModifier;
 
