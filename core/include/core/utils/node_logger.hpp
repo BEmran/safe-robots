@@ -43,6 +43,63 @@ this.Warn(" %a %b %c", a, b, c) << .... << endl;
 */
 
 /**
+ * @brief Logger Class used to log with stream method
+ * @details When class is destructed it will:
+ * 1- Append a new line
+ * 2- Log the stream data by calling the logger function, this might throw an
+ * error
+ */
+class StreamLogger {
+ public:
+  // define end type for stream
+  using endl_type = std::ostream&(std::ostream&);
+
+  /**
+   * @brief Construct a new Stream Logger object
+   *
+   * @param logger logger to use at destruction to log data
+   * @param lm labeled modifier indicate level type and modifier
+   * @param msg initial msg to log
+   */
+  StreamLogger(const Logger& logger, const LabeledModifier& lm,
+               std::string_view ini_msg = "");
+
+  /**
+   * @brief Destroy the Stream Logger object
+   *
+   * @throws Logger::ExceptionFactory by calling the log function
+   */
+  ~StreamLogger() noexcept(false);
+
+  /**
+   * @brief template overriding stream operator
+   *
+   * @tparam T any type
+   * @param obj object to be logged
+   * @return StreamLogger& return reference of class to continue logging
+   */
+  template <typename T>
+  StreamLogger& operator<<(T obj) {
+    oss_ << obj;
+    return *this;
+  }
+
+  /**
+   * @brief to log endl object
+   *
+   */
+  StreamLogger& operator<<(endl_type endl);
+
+ private:
+  /// @brief Reference to Logger used at destruction to log stream
+  const Logger& logger_;
+  /// @brief Labeled modifier used when calling Logger::Log function
+  LabeledModifier lm_;
+  /// @brief A stream to collect all data to be logged
+  std::ostringstream oss_;
+};
+
+/**
  * @brief A named logger uses LabeledModifier to log data
  *
  */
@@ -52,8 +109,7 @@ class NodeLogger {
    * @brief Construct a new Node Logger object using a logger with default
    * labeled modifiers
    *
-   * @param logger shared ptr to a logger object
-   * @param labeled_modifiers labeled modifier struct
+   * @param logger reference to Logger object
    */
   explicit NodeLogger(const Logger& logger);
 
@@ -61,13 +117,26 @@ class NodeLogger {
    * @brief Construct a new Node Logger object using a logger with specific
    * labeled modifiers
    *
-   * @param logger shared ptr to a logger object
+   * @param logger reference to Logger object
    * @param labeled_modifiers labeled modifier struct
    */
   NodeLogger(const Logger& logger, LoggerLabeledModifiers labeled_modifiers);
 
+  /**
+   * @brief Construct a new Node Logger object using a shared_ptr to logger with
+   * default labeled modifiers
+   *
+   * @param logger shared ptr to a logger object
+   */
   explicit NodeLogger(std::shared_ptr<Logger> logger);
 
+  /**
+   * @brief Construct a new Node Logger object using a shared_ptr to logger with
+   * specific labeled modifiers
+   *
+   * @param logger shared ptr to a logger object
+   * @param labeled_modifiers labeled modifier struct
+   */
   NodeLogger(std::shared_ptr<Logger> logger,
              LoggerLabeledModifiers labeled_modifiers);
 
@@ -143,8 +212,13 @@ class NodeLogger {
   StreamLogger LogMsg(const LabeledModifier& lm, std::string_view msg) const;
 
  private:
+  /// @brief Base reference to Logger object to log data
   const Logger& logger_;
+
+  /// @brief List of labeled modifiers to use
   LoggerLabeledModifiers labeled_modifiers_;
+
+  /// @brief Logger label
   std::string label_{};
 };
 

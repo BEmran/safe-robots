@@ -16,20 +16,40 @@
 
 namespace core::utils {
 
-class StreamLogger;
+/**
+ * @brief Return overall logger level
+ *
+ * @return constexpr EventLevel current overall logger level
+ */
+EventLevel OverallLoggerLevel();
+
+/**
+ * @brief Set the Overall Logger Level object
+ *
+ * @param level new overall logger level
+ */
+void SetOverallLoggerLevel(const EventLevel level);
 
 /**
  * @brief logger configuration used to struct Logger object
  *
  */
 struct LoggerConfig {
-  std::string name = "";                      // logger name
-  std::vector<WriterFormatterPair> wf_pairs;  // writer formatter pair
-  EventLevel level = EventLevel::DEBUG;       // logging level
+  /// @brief Logger name
+  std::string name = "";
+
+  /// @brief Writer formatter pair
+  std::vector<WriterFormatterPair> wf_pairs;
+
+  /// @brief Logging level
+  EventLevel level = EventLevel::DEBUG;
+
+  /// @brief Exception generator
   std::shared_ptr<ExceptionFactory> expectation_factory =
-    std::make_shared<ExceptionFactory>(NullExceptionFactory());  // exception
-                                                                 // generator
-  LoggerLabeledModifiers labeled_modifiers;  // logger labeled modifiers
+    std::make_shared<ExceptionFactory>(NullExceptionFactory());
+
+  /// @brief Logger labeled modifiers
+  LoggerLabeledModifiers labeled_modifiers;
 };
 
 /**
@@ -52,47 +72,7 @@ class Logger {
   virtual ~Logger() = default;
 
   /**
-   * @brief Log the passed message using the Debug LabeledModifier
-   *
-   * @param msg msg to log
-   * @return StreamLogger logger used with stream to log extra data
-   */
-  StreamLogger Debug(std::string_view msg = "") const;
-
-  /**
-   * @brief Log the passed message using the Error LabeledModifier
-   *
-   * @param msg msg to log
-   * @return StreamLogger logger used with stream to log extra data
-   */
-  StreamLogger Error(std::string_view msg = "") const;
-
-  /**
-   * @brief Log the passed message using the Fatal LabeledModifier
-   *
-   * @param msg msg to log
-   * @return StreamLogger logger used with stream to log extra data
-   */
-  StreamLogger Fatal(std::string_view msg = "") const;
-
-  /**
-   * @brief Log the passed message using the Info LabeledModifier
-   *
-   * @param msg msg to log
-   * @return StreamLogger logger used with stream to log extra data
-   */
-  StreamLogger Info(std::string_view msg = "") const;
-
-  /**
-   * @brief Log the passed message using the Warn LabeledModifier
-   *
-   * @param msg msg to log
-   * @return StreamLogger logger used with stream to log extra data
-   */
-  StreamLogger Warn(std::string_view msg = "") const;
-
-  /**
-   * @brief logs the passed message using the writer
+   * @brief Log the passed message using the passed LabeledModifier
    *
    * @param lm label modifier to use with the formatter
    * @param msg msg to log
@@ -100,9 +80,10 @@ class Logger {
   virtual void Log(const LabeledModifier& lm, std::string_view msg) const;
 
   /**
-   * @brief logs the passed message using the writer
+   * @brief Log the passed message using the internal LabeledModifier and passed
+   * EventLevel
    *
-   * @param event logging label
+   * @param event event level of the desired msg to log
    * @param msg msg to log
    */
   void Log(const EventLevel event, std::string_view msg) const;
@@ -129,56 +110,39 @@ class Logger {
   /**
    * @brief Throw error msg using ExceptionFactory if event is Critical
    *
-   * @param event event level
+   * @param event event level of the desired msg to log
    * @param msg msg to throw
    */
-  void ThrowExceptionForCriticalEvent(EventLevel event,
+  void ThrowExceptionForCriticalEvent(const EventLevel event,
                                       std::string_view msg) const;
+  /**
+   * @brief Compare LoggerLevel with OverallLoggerLevel
+   *
+   * @return true if LoggerLevel is bigger or equal
+   * @return false otherwise
+   */
+  bool IsLoggerLevelSufficientToLog() const;
+
+  /**
+   * @brief Compare EventLevel with result of IsLoggerLevelSufficientToLog()
+   *
+   * @param EventLevel event level of the desired msg to log
+   * @return true if EventLevel is bigger or equal
+   * @return false otherwise
+   */
+  bool IsEventLevelSufficientToLog(const EventLevel event) const;
 
  private:
-  // logger name surrounded by brackets "[]" if defined
+  /// @brief Logger name surrounded by brackets "[]" if defined
   std::string printed_name_{};
-  // Logging level
+  /// @brief Logging level
   EventLevel logging_level_{EventLevel::DEBUG};
-  // writer and formatter pairs
+  /// @brief Writer and formatter pairs
   std::vector<WriterFormatterPair> writer_formatter_vec_{};
-  // Exception factory generator
+  /// @brief Exception factory generator
   std::shared_ptr<ExceptionFactory> expectation_factory_;
-  // Internal labeled modifier
+  /// @brief Internal labeled modifier
   LoggerLabeledModifiers labeled_modifiers_;
-};
-
-class StreamLogger {
- public:
-  using endl_type = std::ostream&(std::ostream&);
-
-  StreamLogger(const Logger& logger, const LabeledModifier& lm,
-               std::string_view msg = "")
-    : logger_(logger), lm_(lm) {
-    oss_ << msg;
-  }
-
-  ~StreamLogger() noexcept(false) {
-    // std::stringstream ss;
-    oss_ << "\n";
-    logger_.Log(lm_, oss_.str());  // cppcheck-suppress exceptThrowInDestructor
-  }
-
-  template <typename T>
-  StreamLogger& operator<<(T obj) {
-    oss_ << obj;
-    return *this;
-  }
-
-  StreamLogger& operator<<(endl_type endl) {
-    oss_ << endl;
-    return *this;
-  }
-
- private:
-  const Logger& logger_;
-  LabeledModifier lm_;
-  std::ostringstream oss_;
 };
 
 /**

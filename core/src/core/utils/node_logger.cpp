@@ -4,7 +4,28 @@
 
 namespace core::utils {
 
+namespace {
+
+/// @brief Name of system logger
 constexpr std::string_view kSystemName = "sys";
+
+}  // namespace
+
+StreamLogger::StreamLogger(const Logger& logger, const LabeledModifier& lm,
+                           std::string_view ini_msg)
+  : logger_(logger), lm_(lm) {
+  oss_ << ini_msg;
+}
+
+StreamLogger::~StreamLogger() noexcept(false) {
+  oss_ << "\n";
+  logger_.Log(lm_, oss_.str());  // cppcheck-suppress exceptThrowInDestructor
+}
+
+StreamLogger& StreamLogger::operator<<(endl_type endl) {
+  oss_ << endl;
+  return *this;
+}
 
 NodeLogger::NodeLogger(const Logger& logger)
   : NodeLogger(logger, LoggerLabeledModifiers()) {

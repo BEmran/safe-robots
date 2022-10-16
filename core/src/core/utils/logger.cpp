@@ -8,7 +8,23 @@
 
 namespace core::utils {
 
+namespace {
+
+/// @brief default extention of filename if not defined
 constexpr std::string_view kFilenameExten = "_logger.txt";
+
+/// @brief Overall logger level used over all loggers
+static EventLevel sOverallLoggerLevel = EventLevel::DEBUG;
+
+}  // namespace
+
+EventLevel OverallLoggerLevel() {
+  return sOverallLoggerLevel;
+}
+
+void SetOverallLoggerLevel(const EventLevel level) {
+  sOverallLoggerLevel = level;
+}
 
 std::string PrintedName(std::string_view name) {
   using namespace std::literals;
@@ -27,28 +43,8 @@ Logger::Logger(const LoggerConfig& config)
   , labeled_modifiers_{config.labeled_modifiers} {
 }
 
-StreamLogger Logger::Debug(std::string_view msg) const {
-  return StreamLogger(*this, labeled_modifiers_.debug, msg);
-}
-
-StreamLogger Logger::Error(std::string_view msg) const {
-  return StreamLogger(*this, labeled_modifiers_.error, msg);
-}
-
-StreamLogger Logger::Fatal(std::string_view msg) const {
-  return StreamLogger(*this, labeled_modifiers_.fatal, msg);
-}
-
-StreamLogger Logger::Info(std::string_view msg) const {
-  return StreamLogger(*this, labeled_modifiers_.info, msg);
-}
-
-StreamLogger Logger::Warn(std::string_view msg) const {
-  return StreamLogger(*this, labeled_modifiers_.warn, msg);
-}
-
 void Logger::Log(const LabeledModifier& lm, std::string_view msg) const {
-  if (lm.GetEventLevel() >= logging_level_) {
+  if (IsEventLevelSufficientToLog(lm.GetEventLevel())) {
     LogImp(lm, msg);
   }
   ThrowExceptionForCriticalEvent(lm.GetEventLevel(), msg);
@@ -104,7 +100,14 @@ void Logger::ThrowExceptionForCriticalEvent(const EventLevel event,
   }
 }
 
-namespace {
+bool Logger::IsLoggerLevelSufficientToLog() const {
+  return logging_level_ >= OverallLoggerLevel();
+}
+
+bool Logger::IsEventLevelSufficientToLog(const EventLevel event) const {
+  return IsLoggerLevelSufficientToLog() && event >= logging_level_;
+}
+
 /**
  * @brief Generate filename using the passed name and filename which could be
  * empty
@@ -145,7 +148,6 @@ WriterFormatterPair CreateWriterFormatterPair(std::string_view filename) {
   auto formatter = CreateTimeLabelFormatter();
   return {writer, formatter};
 }
-}  // namespace
 
 Logger CreateStreamLogger(std::string_view name, std::ostream& os) {
   const auto except_fact = std::make_shared<ExceptionFactory>(name);
