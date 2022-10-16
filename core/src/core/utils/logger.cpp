@@ -2,7 +2,9 @@
 
 #include "core/utils/logger.hpp"
 
-#include "core/utils/exception.hpp"
+#include "core/utils/formatter.hpp"
+#include "core/utils/writer.hpp"
+#include "core/utils/writer_file.hpp"
 
 namespace core::utils {
 
@@ -21,7 +23,28 @@ Logger::Logger(const LoggerConfig& config)
   : printed_name_{PrintedName(config.name)}
   , logging_level_{config.level}
   , writer_formatter_vec_{config.wf_pairs}
-  , expectation_factory_{config.expectation_factory} {
+  , expectation_factory_{config.expectation_factory}
+  , labeled_modifiers_{config.labeled_modifiers} {
+}
+
+StreamLogger Logger::Debug(std::string_view msg) const {
+  return StreamLogger(*this, labeled_modifiers_.debug, msg);
+}
+
+StreamLogger Logger::Error(std::string_view msg) const {
+  return StreamLogger(*this, labeled_modifiers_.error, msg);
+}
+
+StreamLogger Logger::Fatal(std::string_view msg) const {
+  return StreamLogger(*this, labeled_modifiers_.fatal, msg);
+}
+
+StreamLogger Logger::Info(std::string_view msg) const {
+  return StreamLogger(*this, labeled_modifiers_.info, msg);
+}
+
+StreamLogger Logger::Warn(std::string_view msg) const {
+  return StreamLogger(*this, labeled_modifiers_.warn, msg);
 }
 
 void Logger::Log(const LabeledModifier& lm, std::string_view msg) const {
@@ -32,7 +55,26 @@ void Logger::Log(const LabeledModifier& lm, std::string_view msg) const {
 }
 
 void Logger::Log(const EventLevel event, std::string_view msg) const {
-  Log(LabeledModifier(event), msg);
+  switch (event) {
+    case EventLevel::DEBUG:
+      Log(labeled_modifiers_.debug, msg);
+      break;
+    case EventLevel::ERROR:
+      Log(labeled_modifiers_.error, msg);
+      break;
+    case EventLevel::FATAL:
+      Log(labeled_modifiers_.fatal, msg);
+      break;
+    case EventLevel::INFO:
+      Log(labeled_modifiers_.info, msg);
+      break;
+    case EventLevel::WARN:
+      Log(labeled_modifiers_.warn, msg);
+      break;
+    default:
+      std::cerr << LOG_INFORMATION_STRING << " undefined EventLevel"
+                << std::endl;
+  }
 }
 
 void Logger::LogImp(const LabeledModifier& lm, std::string_view msg) const {

@@ -3,7 +3,6 @@
 #ifndef CORE_UTILS_LOGGER_HPP_
 #define CORE_UTILS_LOGGER_HPP_
 
-#include <cstring>  // to use strrchr
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -11,68 +10,13 @@
 #include <vector>
 
 #include "core/utils/exception.hpp"
-#include "core/utils/formatter.hpp"
 #include "core/utils/labeld_modifier.hpp"
+#include "core/utils/logger_helper.hpp"
 #include "core/utils/modifier.hpp"
-#include "core/utils/writer.hpp"
-#include "core/utils/writer_file.hpp"
-
-// extract filename from file's full path
-#define __FILENAME__                                                           \
-  (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
 namespace core::utils {
 
-class NestedLogger;
-
-/**
- * @brief location information about where the log came from
- *
- */
-struct LogLocation {
-  std::string file;
-  std::string func;
-  int line;
-  /**
-   * @brief create a new LogLocation object
-   *
-   */
-  LogLocation(const char* file_, const char* func_, int line_)
-    : file(file_), func(func_), line(line_) {
-  }
-
-  /**
-   @brief Converts object information to string in the format of
-   * [file][func][line]
-   *
-   * @return std::string a string contains the object information
-   */
-  inline std::string ToString() const {
-    return "[" + file + "][" + func + "][" + std::to_string(line) + "]";
-  }
-};
-
-/**
- * @brief a macro to create LogLocation object
- *
- */
-#define LOG_INFORMATION                                                        \
-  core::utils::LogLocation(__FILENAME__, __func__, __LINE__)
-
-/**
- * @brief a macro used to simplify logging LogLocation object
- *
- */
-#define LOG_INFORMATION_STRING LOG_INFORMATION.ToString()
-
-/**
- * @brief simple struct to pair a writer with formatter
- * TODO(bara): do we need shared_ptr?
- */
-struct WriterFormatterPair {
-  std::shared_ptr<Writer> writer = nullptr;
-  Formatter formatter = CreateNullFormatter();
-};
+class StreamLogger;
 
 /**
  * @brief logger configuration used to struct Logger object
@@ -85,6 +29,7 @@ struct LoggerConfig {
   std::shared_ptr<ExceptionFactory> expectation_factory =
     std::make_shared<ExceptionFactory>(NullExceptionFactory());  // exception
                                                                  // generator
+  LoggerLabeledModifiers labeled_modifiers;  // logger labeled modifiers
 };
 
 /**
@@ -107,6 +52,46 @@ class Logger {
   virtual ~Logger() = default;
 
   /**
+   * @brief Log the passed message using the Debug LabeledModifier
+   *
+   * @param msg msg to log
+   * @return StreamLogger logger used with stream to log extra data
+   */
+  StreamLogger Debug(std::string_view msg = "") const;
+
+  /**
+   * @brief Log the passed message using the Error LabeledModifier
+   *
+   * @param msg msg to log
+   * @return StreamLogger logger used with stream to log extra data
+   */
+  StreamLogger Error(std::string_view msg = "") const;
+
+  /**
+   * @brief Log the passed message using the Fatal LabeledModifier
+   *
+   * @param msg msg to log
+   * @return StreamLogger logger used with stream to log extra data
+   */
+  StreamLogger Fatal(std::string_view msg = "") const;
+
+  /**
+   * @brief Log the passed message using the Info LabeledModifier
+   *
+   * @param msg msg to log
+   * @return StreamLogger logger used with stream to log extra data
+   */
+  StreamLogger Info(std::string_view msg = "") const;
+
+  /**
+   * @brief Log the passed message using the Warn LabeledModifier
+   *
+   * @param msg msg to log
+   * @return StreamLogger logger used with stream to log extra data
+   */
+  StreamLogger Warn(std::string_view msg = "") const;
+
+  /**
    * @brief logs the passed message using the writer
    *
    * @param lm label modifier to use with the formatter
@@ -123,30 +108,6 @@ class Logger {
   void Log(const EventLevel event, std::string_view msg) const;
 
  protected:
-  friend NestedLogger;
-  /**
-   * @brief log data on all Writers using stream method.
-   * @details This logging method is used for continues logging thus it does not
-   * use formatter here
-   *
-   * @tparam T anytype
-   * @param data data to be logged
-   * @return const Logger& constant reference to the logger
-   */
-  template <typename T>
-  const Logger& operator<<(const T& data) const {
-    for (size_t idx = 0; idx < writer_formatter_vec_.size(); ++idx) {
-      auto writer_shared = writer_formatter_vec_[idx].writer;
-      if (writer_shared) {
-        auto& writer = *(writer_shared.get());
-        writer << data;
-      } else {
-        std::cerr << "Logger: Writer #[" << idx << "] is invalid" << std::endl;
-      }
-    }
-    return *this;
-  }
-
   /**
    * @brief Logging implementation called by Log() function
    *
@@ -175,53 +136,54 @@ class Logger {
                                       std::string_view msg) const;
 
  private:
-  /**
-   * @brief formatter name surrounded by brackets "[]" if defined
-   *
-   */
+  // logger name surrounded by brackets "[]" if defined
   std::string printed_name_{};
-
-  /**
-   * @brief Logging level
-   *
-   */
+  // Logging level
   EventLevel logging_level_{EventLevel::DEBUG};
-
-  /**
-   * @brief writer and formatter pairs
-   *
-   */
+  // writer and formatter pairs
   std::vector<WriterFormatterPair> writer_formatter_vec_{};
-
-  /**
-   * @brief Exception factory generator
-   *
-   */
+  // Exception factory generator
   std::shared_ptr<ExceptionFactory> expectation_factory_;
+  // Internal labeled modifier
+  LoggerLabeledModifiers labeled_modifiers_;
 };
 
-class NestedLogger {
+class StreamLogger {
  public:
-  NestedLogger(const Logger& logger) : logger_(logger) {
+  using endl_type = std::ostream&(std::ostream&);
+
+  StreamLogger(const Logger& logger, const LabeledModifier& lm,
+               std::string_view msg = "")
+    : logger_(logger), lm_(lm) {
+    oss_ << msg;
   }
 
-  ~NestedLogger() {
-    logger_ << "\n";
+  ~StreamLogger() noexcept(false) {
+    // std::stringstream ss;
+    oss_ << "\n";
+    logger_.Log(lm_, oss_.str());  // cppcheck-suppress exceptThrowInDestructor
   }
 
   template <typename T>
-  const NestedLogger& operator<<(const T& data) const {
-    logger_ << data;
+  StreamLogger& operator<<(T obj) {
+    oss_ << obj;
+    return *this;
+  }
+
+  StreamLogger& operator<<(endl_type endl) {
+    oss_ << endl;
     return *this;
   }
 
  private:
   const Logger& logger_;
+  LabeledModifier lm_;
+  std::ostringstream oss_;
 };
 
 /**
- * @brief Create a new Logger object with ExceptionFactory and the passed stream
- * Writer paired with TimeFormatter
+ * @brief Create a new Logger object with ExceptionFactory and the passed
+ * stream Writer paired with TimeFormatter
  *
  * @param name name of Logger and Exception factory header
  * @param os output stream with default value as console stream
@@ -233,8 +195,8 @@ Logger CreateStreamLogger(std::string_view name, std::ostream& os = std::cout);
  * @brief Create a new Logger object with ExceptionFactory and the passed
  * FileWriter paired with TimeFormatter
  *
- * @param name name of Logger and Exception factory header, also used to create
- * logger filename as "<name>_logger.txt" if filename is empty
+ * @param name name of Logger and Exception factory header, also used to
+ * create logger filename as "<name>_logger.txt" if filename is empty
  * @param filename logger file name
  * @return Logger logger object
  */
@@ -244,8 +206,8 @@ Logger CreateFileLogger(std::string_view name, std::string_view filename = "");
  * @brief Create a new Logger object with ExceptionFactory and two Writers
  * (Stream and File) each paired with TimeFormatter
  *
- * @param name name of Logger and Exception factory header, also used to create
- * logger filename as "<name>_logger.txt"
+ * @param name name of Logger and Exception factory header, also used to
+ * create logger filename as "<name>_logger.txt"
  * @param os output stream with default value as console stream
  * @param filename logger file name
  * @return Logger logger object
