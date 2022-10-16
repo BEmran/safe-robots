@@ -15,6 +15,11 @@
 
 namespace core::utils {
 
+/**
+ * @brief Class to log a set of Data registered by observing their corresponding
+ * Subject Object
+ *
+ */
 class DataLogger {
  public:
   /**
@@ -22,72 +27,88 @@ class DataLogger {
    *
    * @param logger shared ptr to a logger object
    */
-  explicit DataLogger(std::shared_ptr<Logger> logger) : logger_(logger) {
+  explicit DataLogger(std::shared_ptr<Logger> logger)
+    : DataLogger(logger, InfoLabeledModifier()) {
   }
 
-  virtual ~DataLogger() = default;
+  /**
+   * @brief Construct a new Data Logger object using a logger
+   *
+   * @param logger shared ptr to a logger object
+   * @param lm labeled data modifier to use when logging the data
+   */
+  DataLogger(std::shared_ptr<Logger> logger, LabeledModifier lm)
+    : logger_(logger), lm_(lm) {
+  }
+
+  virtual ~DataLogger() {
+  }
 
   /**
-   * @brief Log data
+   * @brief Log all data using internal Logger and LabeledModifier
    *
    */
   void Log() const {
-    auto msg =
-      std::accumulate(data_vec_.begin(), data_vec_.end(), std::string(),
-                      [](std::string str, const auto& data) {
-                        return std::move(str) + data->ToString();
-                      });
-    logger_->Log(lm_, msg);
+    const std::string msg_data = ToString(data_vec_);
+    logger_->Log(lm_, msg_data);
   }
 
+  /**
+   * @brief Observe passed subject
+   * @details It creates a new data entree. then create an ObserverCB, which is
+   * a lambda hocked up to the newly created data entree. Finally register the
+   * ObserverCB at the subject the subject
+   *
+   * @tparam T subject's type (type of the data own by the subject)
+   * @param subject subject to be observed
+   */
   template <typename T>
   void Observe(std::shared_ptr<Subject<T>> subject) {
-    const auto size = data_vec_.size();
-    data_vec_.push_back(new T(subject->Get()));
-    auto lambda = [this, size](const T& d) {
-      std::cout << "lambda call back for " << d.ToString() << std::endl;
-      data_vec_[size] = new T(d);
-    };
-    auto cb = std::make_shared<ObserverCallback<T>>(lambda);
-    subject->Register(cb);
+    const size_t new_data_idx = CreateAndInitNewData<T>(subject);
+    auto observer_cb = CreateObserverCBAt<T>(new_data_idx);
+    subject->Register(observer_cb);
   }
 
  protected:
-  // /**
-  //  * @brief Logs a message with specific LabeledModifier
-  //  * @details this function is also called internally by all log_* functions
-  //  *
-  //  * @param lm labeled modifier which defines event and its label
-  //  * @param msg message to be logged
-  //  */
-  // virtual void LogImpl(const LabeledModifier& lm, const std::string& msg)
-  // const;
+  /**
+   * @brief Create a And Initialize New Data object using the passed Subject
+   *
+   * @tparam T data type (subject type)
+   * @param subject subject to get initial data from
+   * @return size_t index of the newly created data
+   */
+  template <typename T>
+  size_t CreateAndInitNewData(std::shared_ptr<Subject<T>> subject) {
+    data_vec_.push_back(std::make_shared<T>(subject->Get()));
+    const size_t data_idx = data_vec_.size() - 1;
+    return data_idx;
+  }
+
+  /**
+   * @brief Create a new observer callback to register it at a desired subject
+   *
+   * @tparam T data type (subject type)
+   * @param idx index of the newly created data
+   * @return  std::shared_ptr<ObserverCB<T>> observer callback
+   */
+  template <typename T>
+  std::shared_ptr<ObserverCB<T>> CreateObserverCBAt(const size_t idx) {
+    auto lambda = [this, idx](const T& data) {
+      data_vec_[idx] = std::make_shared<T>(data);
+    };
+    return std::make_shared<ObserverCB<T>>(lambda);
+  }
 
  private:
+  /// @brief logger to be used when logging the data
   std::shared_ptr<Logger> logger_;
-  std::vector<Data*> data_vec_;
+
+  /// @brief LabeledModifier to use when logging the data
   LabeledModifier lm_ = InfoLabeledModifier();
+
+  /// @brief data vector to hold latest data values
+  std::vector<std::shared_ptr<Data>> data_vec_;
 };
-
-// /**
-//  * @brief Create a new NodeLogger with typical settings for console and file
-//  * formatter
-//  *
-//  * @param name name of Exception factory header, also used to create logger
-//  * filename as "<name>_logger.txt"
-//  * @return std::shared_ptr<NodeLogger> NodeLogger shared_ptr object
-//  */
-// std::shared_ptr<NodeLogger> CreateNodeLogger(const std::string& name);
-
-// /**
-//  * @brief Create a System NodeLogger with a common logger
-//  *
-//  * @param header NodeLogger header, typically set to node name
-//  * @return std::shared_ptr<NodeLogger> NodeLogger shared_ptr object
-//  */
-// std::shared_ptr<NodeLogger> CreateSystemNodeLogger(const std::string&
-// header);
-
 }  // namespace core::utils
 
 #endif  // CORE_UTILS_NODE_LOGGER_HPP_

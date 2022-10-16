@@ -44,7 +44,7 @@ TEST(MockLogger, LogWithDefaultHeaderAndLM) {
 
   HeadingData heading;
   heading.value = 1.0;
-  sub->Set(heading);
+  sub->SetAndNotify(heading);
 
   DataLogger data_logger(mock_logger);
 
@@ -54,12 +54,12 @@ TEST(MockLogger, LogWithDefaultHeaderAndLM) {
 
   sub->Notify();
   heading.value = 2.0;
-  sub->Set(heading);
+  sub->SetAndNotify(heading);
   data_logger.Log();
   // *writer << std::endl;
 
   heading.value = 3.0;
-  sub->Set(heading);
+  sub->SetAndNotify(heading);
   data_logger.Log();
   // *writer << std::endl;
 
