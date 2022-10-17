@@ -92,4 +92,38 @@ std::list<std::string> ReadAllLinesFromFile(std::string_view file_name);
 testing::AssertionResult AssertStringList(const std::list<std::string>& expect,
                                           const std::list<std::string>& actual);
 
+/**
+ * @brief Create expected message by a logger using name and msg
+ *
+ * @param logger_name logger name if defined
+ * @param msg msg logged
+ * @return std::string expected logger message
+ */
+std::string ExpectLoggerMsg(std::string_view logger_name, std::string_view msg);
+
+/**
+ * @brief Expected logged message by a logger with file writer and
+ * TimeLabeledFormatter
+ *
+ * @param lm labeled modifier
+ * @param logger_name logger name if defined
+ * @param msg logged message
+ * @return std::string expected logger message
+ */
+std::string ExpectMsgForFileLogger(const LabeledModifier lm,
+                                   std::string_view logger_name,
+                                   std::string_view msg);
+
+/**
+ * @brief Expected logged message by a logger with stream writer and
+ * TimeLabeledModifierFormatter
+ *
+ * @param lm labeled modifier
+ * @param logger_name logger name if defined
+ * @param msg logged message
+ * @return std::string expected logger message
+ */
+std::string ExpectMsgForStreamLogger(const LabeledModifier lm,
+                                     std::string_view logger_name,
+                                     std::string_view msg);
 #endif  // UTEST_UTILS_HPP_

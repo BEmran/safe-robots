@@ -4,6 +4,10 @@
 
 #include "core/utils/formatter.hpp"
 
+using namespace std::literals;
+
+using core::utils::CreateTimeLabelFormatter;
+using core::utils::CreateTimeLabelModifierFormatter;
 using core::utils::TimeLabelFormatter;
 using core::utils::TimeLabelModifierFormatter;
 
@@ -92,18 +96,32 @@ testing::AssertionResult AssertStringList(
       ss << "\n expect: \"" << p1 << "\" and got: \"" << p2 << "\"";
       return false;
     });
-  // const bool result = std::equal(expect.begin(), expect.end(),
-  // actual.begin());
-  {}
   if (result) {
     return testing::AssertionSuccess();
   }
-  // auto first1 = expect.begin();
-  // auto last1 = expect.end();
-  // auto first2 = actual.begin();
-  // for (; first1 != last1; ++first1, ++first2) {
-  //   ss << "\n expect: " << *first1->c_str() << "and got: " <<
-  //   first2->c_str();
-  // }
   return testing::AssertionFailure() << "Data mismatch: " << ss.str();
+}
+
+std::string ExpectLoggerMsg(std::string_view logger_name,
+                            std::string_view msg) {
+  std::string labeled_msg;
+  if (logger_name.size() > 0) {
+    labeled_msg += "["s + logger_name.data() + "] "s;
+  }
+  labeled_msg += msg.data();
+  return labeled_msg;
+}
+
+std::string ExpectMsgForFileLogger(const LabeledModifier lm,
+                                   std::string_view logger_name,
+                                   std::string_view msg) {
+  auto formatter = CreateTimeLabelFormatter();
+  return formatter.Format(lm, ExpectLoggerMsg(logger_name, msg));
+}
+
+std::string ExpectMsgForStreamLogger(const LabeledModifier lm,
+                                     std::string_view logger_name,
+                                     std::string_view msg) {
+  auto formatter = CreateTimeLabelModifierFormatter();
+  return formatter.Format(lm, ExpectLoggerMsg(logger_name, msg));
 }
