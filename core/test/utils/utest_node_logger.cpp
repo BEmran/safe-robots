@@ -160,7 +160,7 @@ TEST(CreateSystemNodeLogger, CheckInitializedWriters) {
   constexpr auto kFilename = "sys_logger.txt";
   constexpr std::string_view kNodeName = "node1";
   const auto n_logger =
-    core::utils::CreatNodeLoggerUsingSystemLogger(kNodeName);
+    core::utils::CreateNodeLoggerUsingSystemLogger(kNodeName);
   n_logger.Debug(kMessage);
 
   const auto actual = ReadAllLinesFromFile(kFilename);

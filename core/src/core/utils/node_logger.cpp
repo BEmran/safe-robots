@@ -4,13 +4,6 @@
 
 namespace core::utils {
 
-namespace {
-
-/// @brief Name of system logger
-constexpr std::string_view kSystemName = "sys";
-
-}  // namespace
-
 StreamLogger::StreamLogger(const Logger& logger, const LabeledModifier& lm,
                            std::string_view ini_msg)
   : logger_(logger), lm_(lm) {
@@ -79,8 +72,8 @@ void NodeLogger::SetLabel(std::string_view header) {
   label_ = "["s + header.data() + "] ";
 }
 
-NodeLogger CreatNodeLoggerUsingSystemLogger(std::string_view header) {
-  static Logger logger{CreateStreamAndFileLogger(kSystemName, std::cout)};
+NodeLogger CreateNodeLoggerUsingSystemLogger(std::string_view header) {
+  auto logger = SystemLogger();
   NodeLogger node_logger(logger);
   node_logger.SetLabel(header);
   return node_logger;

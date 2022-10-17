@@ -10,6 +10,9 @@ namespace core::utils {
 
 namespace {
 
+/// @brief Name of system logger
+constexpr std::string_view kSystemName = "sys";
+
 /// @brief default extention of filename if not defined
 constexpr std::string_view kFilenameExten = "_logger.txt";
 
@@ -180,6 +183,11 @@ Logger CreateStreamAndFileLogger(std::string_view name, std::ostream& os,
                      CreateWriterFormatterPair(filename_updated)};
   config.expectation_factory = std::make_shared<ExceptionFactory>(name);
   return Logger(config);
+}
+
+Logger& SystemLogger() {
+  static Logger logger{CreateStreamAndFileLogger(kSystemName, std::cout)};
+  return logger;
 }
 
 }  // namespace core::utils

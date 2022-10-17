@@ -228,7 +228,7 @@ class NodeLogger {
  * @param header NodeLogger header, typically set to node name
  * @return NodeLogger object
  */
-NodeLogger CreatNodeLoggerUsingSystemLogger(std::string_view header);
+NodeLogger CreateNodeLoggerUsingSystemLogger(std::string_view header);
 
 }  // namespace core::utils
 

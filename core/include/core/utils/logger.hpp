@@ -180,6 +180,13 @@ Logger CreateStreamAndFileLogger(std::string_view name,
                                  std::ostream& os = std::cout,
                                  std::string_view filename = "");
 
+/**
+ * @brief Get System logger which is a static object created with
+ * CreateStreamAndFileLogger using "sys" as name and std::cout as ostream
+ *
+ * @return Logger& system logger reference
+ */
+Logger& SystemLogger();
 }  // namespace core::utils
 
 #endif  // CORE_UTILS_LOGGER_HPP_

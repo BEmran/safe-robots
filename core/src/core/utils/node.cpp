@@ -4,7 +4,7 @@
 
 namespace core::utils {
 Node::Node(const std::string& name)
-  : Node(name, CreatNodeLoggerUsingSystemLogger(name)) {
+  : Node(name, CreateNodeLoggerUsingSystemLogger(name)) {
 }
 
 Node::Node(const std::string& name, const NodeLogger& n_logger)
@@ -20,7 +20,7 @@ const NodeLogger& Node::GetLogger() const {
 }
 
 Node CreateSystemNode(const std::string& node_name) {
-  auto node_logger = CreatNodeLoggerUsingSystemLogger(node_name);
+  auto node_logger = CreateNodeLoggerUsingSystemLogger(node_name);
   return Node(node_name, node_logger);
 }
 }  // namespace core::utils
