@@ -15,53 +15,58 @@ using core::utils::Logger;
 using core::utils::LoggerConfig;
 using core::utils::NullFormatter;
 using core::utils::Subject;
+using core::utils::TemperatureData;
 using core::utils::Writer;
 using core::utils::WriterFormatterPair;
 
-// class MockWriter : public  {
-//  public:
-//   void Dump(const std::string& str) const {
-//     msg_ = str;
-//     std::cout << "writer: " << msg_ << std::endl;
-//   }
-//   std::string Msg() const {
-//     return msg_;
-//   }
-
-//  private:
-//   mutable std::string msg_;
-// };
-
-TEST(MockLogger, LogWithDefaultHeaderAndLM) {
-  std::stringstream ss;
+std::shared_ptr<Logger> CreateLogger(std::stringstream& ss) {
   auto writer = std::make_shared<Writer>(ss);
   auto formatter = core::utils::Formatter();
   LoggerConfig config;
   config.wf_pairs = {{writer, formatter}};
-  auto mock_logger = std::make_shared<Logger>(config);
+  return std::make_shared<Logger>(config);
+}
 
-  auto sub = std::make_shared<Subject<HeadingData>>("sub");
+TEST(MockLogger, LogWithDefaultHeaderAndLM) {
+  auto sub = std::make_shared<Subject<HeadingData>>("node");
 
   HeadingData heading;
   heading.value = 1.0;
   sub->SetAndNotify(heading);
 
-  DataLogger data_logger(mock_logger);
+  std::stringstream ss;
+  auto logger = CreateLogger(ss);
+  DataLogger data_logger(logger);
 
   data_logger.Observe(sub);
   data_logger.Log();
-  // *writer << std::endl;
+  EXPECT_EQ(ss.str(), "1.000000");
+  ss.str("");
 
-  sub->Notify();
   heading.value = 2.0;
   sub->SetAndNotify(heading);
   data_logger.Log();
-  // *writer << std::endl;
+  EXPECT_EQ(ss.str(), "2.000000");
+  ss.str("");
+}
 
-  heading.value = 3.0;
-  sub->SetAndNotify(heading);
+TEST(MockLogger, Log2DataWithDefaultHeaderAndLM) {
+  auto sub1 = std::make_shared<Subject<HeadingData>>("node1");
+  HeadingData heading;
+  heading.value = 1.0;
+  sub1->SetAndNotify(heading);
+
+  auto sub2 = std::make_shared<Subject<TemperatureData>>("node2");
+  TemperatureData temp;
+  temp.value = -10.0;
+  sub2->SetAndNotify(temp);
+
+  std::stringstream ss;
+  auto logger = CreateLogger(ss);
+  DataLogger data_logger(logger);
+
+  data_logger.Observe(sub1);
+  data_logger.Observe(sub2);
   data_logger.Log();
-  // *writer << std::endl;
-
-  // EXPECT_EQ(sub->Get().ToString(), ss.str());
+  EXPECT_EQ(ss.str(), "1.000000, -10.000000");
 }
