@@ -3,37 +3,46 @@
 #include "core/utils/data.hpp"
 
 namespace core::utils {
+
+template <class T>
+using CB = std::function<std::string(T)>;
+
+template <class T>
+std::string ApplyOnEach(const std::vector<T>& vec, CB<T> cb) {
+  std::string str;
+  const size_t size = vec.size();
+  for (size_t idx = 0; idx < size; ++idx) {
+    if (idx == size - 1) {
+      str += cb(vec[idx]);
+    } else {
+      str += cb(vec[idx]) + ", ";
+    }
+  }
+  return str;
+}
+
 std::string Header(const std::vector<Data*>& vec) {
-  std::string header;
-  std::for_each(vec.begin(), vec.end(), [&header](const Data* data) {
-    header += data->Header() + ", ";
-  });
-  return header;
+  auto lambda = [](Data* d) -> std::string { return d->Header(); };
+  return ApplyOnEach<Data*>(vec, lambda);
 }
 
 std::string Header(const std::vector<std::shared_ptr<Data>>& vec) {
-  std::string header;
-  std::for_each(vec.begin(), vec.end(),
-                [&header](const std::shared_ptr<Data> data) {
-                  header += data->Header() + ", ";
-                });
-  return header;
+  auto lambda = [](std::shared_ptr<Data> d) -> std::string {
+    return d->Header();
+  };
+  return ApplyOnEach<std::shared_ptr<Data>>(vec, lambda);
 }
 
 std::string ToString(const std::vector<Data*>& vec) {
-  std::string str;
-  std::for_each(vec.begin(), vec.end(),
-                [&str](const Data* data) { str += data->ToString() + ", "; });
-  return str;
+  auto lambda = [](Data* d) -> std::string { return d->ToString(); };
+  return ApplyOnEach<Data*>(vec, lambda);
 }
 
 std::string ToString(const std::vector<std::shared_ptr<Data>>& vec) {
-  std::string str;
-  std::for_each(vec.begin(), vec.end(),
-                [&str](const std::shared_ptr<Data> data) {
-                  str += data->ToString() + ", ";
-                });
-  return str;
+  auto lambda = [](std::shared_ptr<Data> d) -> std::string {
+    return d->ToString();
+  };
+  return ApplyOnEach<std::shared_ptr<Data>>(vec, lambda);
 }
 }  // namespace core::utils
 
