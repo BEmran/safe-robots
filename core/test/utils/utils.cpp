@@ -78,26 +78,6 @@ std::list<std::string> ReadAllLinesFromFile(std::string_view file_name) {
   return lines;
 }
 
-// ConsoleBuffer::ConsoleBuffer(const std::string& file_name)
-//   : file_name_(file_name) {
-//   file_.open(file_name_, std::ios_base::out);
-//   backup = std::cout.rdbuf();  // back up cout's streambuf
-//   file_buf_ = file_.rdbuf();   // get file's streambuf
-//   std::cout.rdbuf(file_buf_);  // assign streambuf to cout
-// }
-
-// ConsoleBuffer::~ConsoleBuffer() {
-//   if (!file_.is_open()) {
-//     file_.close();
-//   }
-// }
-
-// std::list<std::string> ConsoleBuffer::RestoreCoutBuffer() const {
-//   // restore cout's original buffer
-//   std::cout.rdbuf(backup);
-//   return ReadAllLinesFromFile(file_name_);
-// }
-
 testing::AssertionResult AssertStringList(
   const std::list<std::string>& expect, const std::list<std::string>& actual) {
   if (expect.size() != actual.size()) {

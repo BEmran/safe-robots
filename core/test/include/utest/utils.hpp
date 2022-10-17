@@ -82,29 +82,6 @@ void ExpectEqLabeledModifier(const LabeledModifier& expect,
  */
 std::list<std::string> ReadAllLinesFromFile(std::string_view file_name);
 
-// /**
-//  * @brief This allows to trace what is printout in the stream and write it in
-//  * a file instead in order to be checked latter
-//  *
-//  */
-// class ConsoleBuffer {
-//  public:
-//   explicit ConsoleBuffer(const std::string& file_name = "console.txt");
-
-//   ~ConsoleBuffer();
-
-//   /**
-//    * @brief Restores the string printed at cout
-//    *
-//    * @return std::list<std::string> lines printed to cout
-//    */
-//   std::list<std::string> RestoreCoutBuffer() const;
-
-//   std::string file_name_;
-//   std::ofstream file_;
-//   std::streambuf *file_buf_, *backup;
-// };
-
 /**
  * @brief  compare two list string
  *
