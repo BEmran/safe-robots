@@ -43,29 +43,6 @@ TEST(LoggerInformation, ToString) {
   EXPECT_EQ("[filename][funcname][1]", info.ToString());
 }
 
-std::string ExpectMsg(std::string_view logger_name, std::string_view msg) {
-  std::string labeled_msg;
-  if (logger_name.size() > 0) {
-    labeled_msg += "["s + logger_name.data() + "] "s;
-  }
-  labeled_msg += msg.data();
-  return labeled_msg;
-}
-
-std::string ExpectMsgForFileLogger(const LabeledModifier lm,
-                                   std::string_view logger_name,
-                                   std::string_view msg) {
-  auto formatter = CreateTimeLabelFormatter();
-  return formatter.Format(lm, ExpectMsg(logger_name, msg));
-}
-
-std::string ExpectMsgForStreamLogger(const LabeledModifier lm,
-                                     std::string_view logger_name,
-                                     std::string_view msg) {
-  auto formatter = CreateTimeLabelModifierFormatter();
-  return formatter.Format(lm, ExpectMsg(logger_name, msg));
-}
-
 class MockWriter : public Writer {
  public:
   MockWriter() : Writer(ss) {
@@ -141,7 +118,7 @@ TEST(Logger, LogWithName) {
   config.wf_pairs = {{writer1, format}};
   Logger logger(config);
   logger.Log(kSimpleLM, kMsg);
-  auto expect = format.Format(kSimpleLM, ExpectMsg(config.name, kMsg));
+  auto expect = format.Format(kSimpleLM, ExpectLoggerMsg(config.name, kMsg));
   EXPECT_EQ(expect, writer1->Msg());
 }
 
