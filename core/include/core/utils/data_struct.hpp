@@ -24,16 +24,6 @@ namespace core::utils {
 
 // Custom data needs to have default constructor
 
-struct Gps {
-  double lat;
-  double lon;
-  double alt;
-  Gps() : Gps(0.0, 0.0, 0.0) {
-  }
-  Gps(double lat_, double lon_, double alt_) : lat(lat_), lon(lon_), alt(alt_) {
-  }
-};
-
 struct RPY {
   MATH_TYPE roll;
   MATH_TYPE pitch;
@@ -128,11 +118,6 @@ void DataStruct<MATH_TYPE>::Clear() {
   data_ = 0;
 }
 
-// template <>
-// std::string DataStruct<MATH_TYPE>::Header() const {
-//   return label_;
-// }
-
 template <>
 std::string DataStruct<MATH_TYPE>::ToString() const {
   return std::to_string(data_);
@@ -188,43 +173,7 @@ std::string DataStruct<Quat>::ToString() const {
   return ss.str();
 }
 
-// Gps ------------------------------------------------------------------------
-// template <>
-// DataStruct<Gps>::DataStruct(const std::string& label)
-//   : data_(Gps()), label_("gps") {
-// }
-
-// template <>
-// void DataStruct<Gps>::Clear() {
-//   data_ = Gps();
-// }
-
-template <>
-std::string DataStruct<Gps>::Header() const {
-  static const auto header =
-    label_ + "gps.lat, " + label_ + "gps.long, " + label_ + "gps.alt";
-  return header;
-}
-
-template <>
-std::string DataStruct<Gps>::ToString() const {
-  std::stringstream ss;
-  ss << std::to_string(data_.lat) << ", " << std::to_string(data_.lon) << ", "
-     << std::to_string(data_.alt);
-  return ss.str();
-}
-
 // RPY ------------------------------------------------------------------------
-// template <>
-// DataStruct<RPY>::DataStruct(const std::string& label)
-//   : data_(RPY()), label_("rpy") {
-// }
-
-// template <>
-// void DataStruct<RPY>::Clear() {
-//   data_ = RPY();
-// }
-
 template <>
 std::string DataStruct<RPY>::Header() const {
   static const auto header =
@@ -242,7 +191,6 @@ std::string DataStruct<RPY>::ToString() const {
 
 using Vec3DataStruct = DataStruct<Vec3>;
 using QuatDataStruct = DataStruct<Quat>;
-using GpsDataStruct = DataStruct<Gps>;
 using MathTypeDataStruct = DataStruct<MATH_TYPE>;
 using RPYDataStruct = DataStruct<RPY>;
 
@@ -252,36 +200,7 @@ using MagDataStruct = LabelDataStruct<Vec3, MAG_LABEL>;
 using TemperatureDataStruct = LabelDataStruct<MATH_TYPE, TEMP_LABEL>;
 using HeadingDataStruct = LabelDataStruct<MATH_TYPE, HEADING_LABEL>;
 
-// class AccelDataStruct : public Vec3DataStruct {
-//  public:
-//   AccelDataStruct() : Vec3DataStruct("accel") {
-//   }
-// };
-
-// class GyroDataStruct : public Vec3DataStruct {
-//  public:
-//   GyroDataStruct() : Vec3DataStruct("gyro") {
-//   }
-// };
-
-// class MagDataStruct : public Vec3DataStruct {
-//  public:
-//   MagDataStruct() : Vec3DataStruct("mag") {
-//   }
-// };
-
-// class TemperatureDataStruct : public MathTypeDataStruct {
-//  public:
-//   TemperatureDataStruct() : MathTypeDataStruct("temp") {
-//   }
-// };
-
-// class HeadingDataStruct : public MathTypeDataStruct {
-//  public:
-//   HeadingDataStruct() : MathTypeDataStruct("heading") {
-//   }
-// };
-
+// Imu ------------------------------------------------------------------------
 struct Imu {
   TemperatureDataStruct temp;  ///< thermometer, in units of degrees Celsius
   HeadingDataStruct heading;   ///< fused heading filtered with gyro and accel
@@ -316,15 +235,6 @@ struct Imu {
     return *this;
   }
 
-  // Imu(const Imu& imu) :
-  //   temp{imu.temp.Get()},
-  //   heading{imu.heading.Get()},
-  //   accel{imu.accel.Get()},
-  //   gyro{imu.gyro.Get()},
-  //   mag{imu.mag.Get()},
-  //   quat{imu.quat.Get()},
-  //   rpy{imu.rpy.Get()}{
-  // }
   Imu(const Imu& imu)
     : temp{imu.temp}
     , heading{imu.heading}
@@ -336,18 +246,6 @@ struct Imu {
     , array{&temp, &heading, &accel, &gyro, &mag, &quat, &rpy} {
   }
 };
-
-// Imu ------------------------------------------------------------------------
-// template <>
-// DataStruct<Imu>::DataStruct(const std::string& label)
-//   : data_(Imu()), label_("imu") {
-// }
-
-// template <>
-// void DataStruct<Imu>::Clear() {
-//   std::for_each(data_.array.begin(), data_.array.end(),
-//                 [](DataStructInterface* const ptr) { ptr->Clear(); });
-// }
 
 using CB = std::function<std::string(DataStructInterface* const)>;
 

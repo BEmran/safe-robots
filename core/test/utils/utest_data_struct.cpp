@@ -182,42 +182,6 @@ TEST(RPYDataStruct, ToString) {
   EXPECT_EQ(msg, rpy.ToString());
 }
 
-// GpsData --------------------------------------------------------------------
-TEST(GpsDataStruct, Print) {
-  GpsDataStruct gps;
-  gps.Set(Gps{7.4, 8.5, 9.6});
-  const std::string msg =
-    "[gps.lat, gps.long, gps.alt]: 7.400000, 8.500000, 9.600000";
-  std::stringstream ss;
-  ss << gps;
-  EXPECT_EQ(msg, ss.str());
-}
-
-TEST(GpsDataStruct, Header) {
-  const std::string msg = "gps.lat, gps.long, gps.alt";
-  EXPECT_EQ(msg, GpsDataStruct().Header());
-}
-
-TEST(GpsDataStruct, ToString) {
-  GpsDataStruct gps;
-  gps.Set(Gps{7.4, 8.5, 9.6});
-  const std::string msg = "7.400000, 8.500000, 9.600000";
-  EXPECT_EQ(msg, gps.ToString());
-}
-
-TEST(GpsDataStruct, Construct) {
-  const GpsDataStruct gps;
-  EXPECT_GPS(Gps(), gps.Get());
-}
-
-TEST(GpsDataStruct, Clear) {
-  GpsDataStruct gps("");
-  gps.Set(Gps{7.4, 8.5, 9.6});
-  EXPECT_GPS(Gps{7.4, 8.5, 9.6}, gps.Get());
-  gps.Clear();
-  EXPECT_GPS(Gps(), gps.Get());
-}
-
 // ImuData --------------------------------------------------------------------
 TEST(ImuDataStruct, Construct) {
   const ImuDataStruct imu;
