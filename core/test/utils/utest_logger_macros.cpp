@@ -11,18 +11,17 @@ using core::utils::FatalLabeledModifier;
 using core::utils::InfoLabeledModifier;
 using core::utils::Logger;
 using core::utils::WarnLabeledModifier;
-using namespace std::literals;
 
 constexpr std::string_view kMsg = "message";
 constexpr std::string_view kName = "sys";
 constexpr std::string_view kFilename = "sys_logger.txt";
 
 TEST(SysLogger, SystemDebugMacros) {
-  SYS_LOG_DEBUG(kMsg.data() + "\n"s);
-  EXPECT_THROW(SYS_LOG_ERROR(kMsg.data() + "\n"s), core::utils::Exception);
-  EXPECT_THROW(SYS_LOG_FATAL(kMsg.data() + "\n"s), core::utils::Exception);
-  SYS_LOG_INFO(kMsg.data() + "\n"s);
-  SYS_LOG_WARN(kMsg.data() + "\n"s);
+  SYS_LOG_DEBUG(kMsg);
+  EXPECT_THROW(SYS_LOG_ERROR(kMsg), core::utils::Exception);
+  EXPECT_THROW(SYS_LOG_FATAL(kMsg), core::utils::Exception);
+  SYS_LOG_INFO(kMsg);
+  SYS_LOG_WARN(kMsg);
 
   const auto file_logged_data = ReadAllLinesFromFile(kFilename);
 

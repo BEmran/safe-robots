@@ -8,6 +8,7 @@ using namespace std::literals;
 
 using core::utils::CreateTimeLabelFormatter;
 using core::utils::CreateTimeLabelModifierFormatter;
+using core::utils::Formatter;
 using core::utils::TimeLabelFormatter;
 using core::utils::TimeLabelModifierFormatter;
 
@@ -73,9 +74,14 @@ std::list<std::string> ReadAllLinesFromFile(std::string_view file_name) {
   std::list<std::string> lines;
   std::ifstream file;
   file.open(file_name.data(), std::ios::in);
+
   if (file.is_open()) {
     while (std::getline(file, line)) {
       lines.push_back(line);
+      // if not the end of file(more lines to read) append "\n" at the end
+      if (not file.eof()) {
+        lines.back() += "\n";
+      }
     }
     file.close();
   }
@@ -85,7 +91,9 @@ std::list<std::string> ReadAllLinesFromFile(std::string_view file_name) {
 testing::AssertionResult AssertStringList(
   const std::list<std::string>& expect, const std::list<std::string>& actual) {
   if (expect.size() != actual.size()) {
-    return testing::AssertionFailure() << "Size mismatch";
+    return testing::AssertionFailure()
+           << "Size mismatch expect " << expect.size() << " and got "
+           << actual.size();
   }
   std::stringstream ss;
   const bool result = std::equal(
@@ -102,26 +110,36 @@ testing::AssertionResult AssertStringList(
   return testing::AssertionFailure() << "Data mismatch: " << ss.str();
 }
 
-std::string ExpectLoggerMsg(std::string_view logger_name,
-                            std::string_view msg) {
+std::string ExpectLoggerMsg(std::string_view logger_name, std::string_view msg,
+                            std::string_view end_msg) {
   std::string labeled_msg;
   if (logger_name.size() > 0) {
     labeled_msg += "["s + logger_name.data() + "] "s;
   }
   labeled_msg += msg.data();
+  labeled_msg += end_msg.data();
   return labeled_msg;
+}
+
+std::string ExpectFormattedLoggerMsg(Formatter* formatter,
+                                     const LabeledModifier lm,
+                                     std::string_view logger_name,
+                                     std::string_view msg,
+                                     std::string_view end_msg) {
+  const auto expected_logger_msg = ExpectLoggerMsg(logger_name, msg, end_msg);
+  return formatter->Format(lm, expected_logger_msg);
 }
 
 std::string ExpectMsgForFileLogger(const LabeledModifier lm,
                                    std::string_view logger_name,
                                    std::string_view msg) {
   auto formatter = CreateTimeLabelFormatter();
-  return formatter.Format(lm, ExpectLoggerMsg(logger_name, msg));
+  return ExpectFormattedLoggerMsg(&formatter, lm, logger_name, msg, "\n");
 }
 
 std::string ExpectMsgForStreamLogger(const LabeledModifier lm,
                                      std::string_view logger_name,
                                      std::string_view msg) {
   auto formatter = CreateTimeLabelModifierFormatter();
-  return formatter.Format(lm, ExpectLoggerMsg(logger_name, msg));
+  return ExpectFormattedLoggerMsg(&formatter, lm, logger_name, msg, "\n");
 }

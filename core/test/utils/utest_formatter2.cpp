@@ -6,12 +6,13 @@
 #include <utility>
 
 #include "core/utils/formatter2.hpp"
+#include "core/utils/labeld_modifier.hpp"
 #include "core/utils/modifier.hpp"
-#include "utest/utils.hpp"
 
 using core::utils::DateTime;
 using core::utils::FormatterInterface;
 using core::utils::LabeledModifier;
+using core::utils::Modifier;
 using core::utils::NullFormatter;
 using core::utils::TimeFormatter;
 using core::utils::TupleFormatter;
@@ -48,7 +49,8 @@ TEST(TupleToString, Test) {
 
 // test Null formatter
 TEST(NullFormatter, Format) {
-  EXPECT_EQ(kMsg, NullFormatter().Format(kMsg));
+  NullFormatter formatter;
+  EXPECT_EQ(kMsg, formatter.Format(kMsg));
 }
 
 // test formatter

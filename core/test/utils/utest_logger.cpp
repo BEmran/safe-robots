@@ -68,7 +68,9 @@ TEST(Logger, LogWithEvent) {
   config.wf_pairs = {wf_pair1};
   Logger logger(config);
   logger.Log(kDebug, kMsg);
-  auto expect = wf_pair1.formatter.Format(DebugLabeledModifier(), kMsg);
+
+  auto expect = ExpectFormattedLoggerMsg(&wf_pair1.formatter,
+                                         DebugLabeledModifier(), "", kMsg);
   EXPECT_EQ(expect, writer1->Msg());
 }
 
@@ -77,7 +79,9 @@ TEST(Logger, LogWithLabeledModifier) {
   config.wf_pairs = {wf_pair1};
   Logger logger(config);
   logger.Log(DebugLabeledModifier(), kMsg);
-  auto expect = wf_pair1.formatter.Format(DebugLabeledModifier(), kMsg);
+
+  auto expect = ExpectFormattedLoggerMsg(&wf_pair1.formatter,
+                                         DebugLabeledModifier(), "", kMsg);
   EXPECT_EQ(expect, writer1->Msg());
 }
 
@@ -86,7 +90,9 @@ TEST(Logger, SingleWriterFormatter) {
   config.wf_pairs = {wf_pair1};
   Logger logger(config);
   logger.Log(kSimpleLM, kMsg);
-  auto expect = wf_pair1.formatter.Format(kSimpleLM, kMsg);
+
+  auto expect =
+    ExpectFormattedLoggerMsg(&wf_pair1.formatter, kSimpleLM, "", kMsg);
   EXPECT_EQ(expect, writer1->Msg());
 }
 
@@ -95,9 +101,13 @@ TEST(Logger, MultipleWriterFormatter) {
   config.wf_pairs = {wf_pair1, wf_pair2};
   Logger logger(config);
   logger.Log(kSimpleLM, kMsg);
-  auto expect1 = wf_pair1.formatter.Format(kSimpleLM, kMsg);
+
+  auto expect1 =
+    ExpectFormattedLoggerMsg(&wf_pair1.formatter, kSimpleLM, "", kMsg);
   EXPECT_EQ(expect1, writer1->Msg());
-  auto expect2 = wf_pair2.formatter.Format(kSimpleLM, kMsg);
+
+  auto expect2 =
+    ExpectFormattedLoggerMsg(&wf_pair2.formatter, kSimpleLM, "", kMsg);
   EXPECT_EQ(expect2, writer2->Msg());
 }
 
@@ -107,7 +117,8 @@ TEST(Logger, LogWithFormatter) {
   config.wf_pairs = {{writer1, format}};
   Logger logger(config);
   logger.Log(kSimpleLM, kMsg);
-  auto expect = format.Format(kSimpleLM, kMsg);
+
+  auto expect = ExpectFormattedLoggerMsg(&format, kSimpleLM, "", kMsg);
   EXPECT_EQ(expect, writer1->Msg());
 }
 
@@ -118,7 +129,8 @@ TEST(Logger, LogWithName) {
   config.wf_pairs = {{writer1, format}};
   Logger logger(config);
   logger.Log(kSimpleLM, kMsg);
-  auto expect = format.Format(kSimpleLM, ExpectLoggerMsg(config.name, kMsg));
+
+  auto expect = ExpectFormattedLoggerMsg(&format, kSimpleLM, config.name, kMsg);
   EXPECT_EQ(expect, writer1->Msg());
 }
 
@@ -130,7 +142,8 @@ TEST(Logger, ExceptionWhenErrorEvent) {
   Logger logger(config);
 
   EXPECT_THROW(logger.Log(kError, kMsg), core::utils::Exception);
-  auto expect = wf_pair1.formatter.Format(LabeledModifier(kError), kMsg);
+  auto expect = ExpectFormattedLoggerMsg(&wf_pair1.formatter,
+                                         LabeledModifier(kError), "", kMsg);
   EXPECT_EQ(expect, writer1->Msg());
 }
 
@@ -142,8 +155,38 @@ TEST(Logger, ExceptionWhenFatalEvent) {
   Logger logger(config);
 
   EXPECT_THROW(logger.Log(kFatal, kMsg), core::utils::Exception);
-  auto expect = wf_pair1.formatter.Format(LabeledModifier(kFatal), kMsg);
+  auto expect = ExpectFormattedLoggerMsg(&wf_pair1.formatter,
+                                         LabeledModifier(kFatal), "", kMsg);
   EXPECT_EQ(expect, writer1->Msg());
+}
+
+TEST(Logger, TestDefaultStrAtEnd) {
+  std::stringstream ss;
+  LoggerConfig config;
+  auto writer = std::make_shared<Writer>(ss);
+  config.wf_pairs = {{writer, Formatter()}};
+  Logger logger(config);
+  logger.Log(EventLevel::DEBUG, kMsg);
+
+  auto expect = ExpectFormattedLoggerMsg(&config.wf_pairs[0].formatter,
+                                         LabeledModifier(kDebug), "",
+                                         kMsg.data(), config.end_str);
+  EXPECT_EQ(expect, ss.str());
+}
+
+TEST(Logger, TestSettingStrAtEnd) {
+  std::stringstream ss;
+  LoggerConfig config;
+  auto writer = std::make_shared<Writer>(ss);
+  config.wf_pairs = {{writer, Formatter()}};
+  config.end_str = "end-msg";
+  Logger logger(config);
+  logger.Log(EventLevel::DEBUG, kMsg);
+
+  auto expect = ExpectFormattedLoggerMsg(&config.wf_pairs[0].formatter,
+                                         LabeledModifier(kDebug), "",
+                                         kMsg.data(), config.end_str);
+  EXPECT_EQ(expect, ss.str());
 }
 
 TEST(Logger, CreateStreamLogger) {

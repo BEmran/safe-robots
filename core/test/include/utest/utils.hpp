@@ -11,11 +11,13 @@
 #include <string>
 #include <vector>
 
+#include "core/utils/formatter.hpp"
 #include "core/utils/labeld_modifier.hpp"
 #include "core/utils/modifier.hpp"
 #include "gtest/gtest.h"
 
 using core::utils::EventLevel;
+using core::utils::Formatter;
 using core::utils::LabeledModifier;
 using core::utils::Modifier;
 namespace BG = core::utils::BG;
@@ -96,11 +98,29 @@ testing::AssertionResult AssertStringList(const std::list<std::string>& expect,
  * @brief Create expected message by a logger using name and msg
  *
  * @param logger_name logger name if defined
- * @param msg msg logged
+ * @param msg msg logged msg
+ * @param end_msg msg appended at end
  * @return std::string expected logger message
  */
-std::string ExpectLoggerMsg(std::string_view logger_name, std::string_view msg);
+std::string ExpectLoggerMsg(std::string_view logger_name, std::string_view msg,
+                            std::string_view end_msg = "\n");
 
+/**
+ * @brief Create expected logged message for the passed formatter,
+ * LabeledModifier and msg settings
+ *
+ * @param formater pointer to formater object
+ * @param lm labeled modifier
+ * @param logger_name logger name if defined
+ * @param msg msg logged msg
+ * @param end_msg msg appended at end
+ * @return std::string expected logger message
+ */
+std::string ExpectFormattedLoggerMsg(Formatter* formatter,
+                                     const LabeledModifier lm,
+                                     std::string_view logger_name,
+                                     std::string_view msg,
+                                     std::string_view end_msg = "\n");
 /**
  * @brief Expected logged message by a logger with file writer and
  * TimeLabeledFormatter

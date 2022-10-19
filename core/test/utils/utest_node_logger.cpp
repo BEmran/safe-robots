@@ -81,23 +81,23 @@ TEST(MockLogger, LogWithDefaultHeaderAndLMs) {
   NodeLogger n_logger(kMockLogger);
 
   n_logger.Debug(kMessage);
-  EXPECT_EQ(kMessage.data() + "\n"s, kMockLogger->Msg());
+  EXPECT_EQ(kMessage, kMockLogger->Msg());
   ExpectEqLabeledModifier(DebugLabeledModifier(), kMockLogger->LM());
 
   n_logger.Error(kMessage);
-  EXPECT_EQ(kMessage.data() + "\n"s, kMockLogger->Msg());
+  EXPECT_EQ(kMessage, kMockLogger->Msg());
   ExpectEqLabeledModifier(ErrorLabeledModifier(), kMockLogger->LM());
 
   n_logger.Fatal(kMessage);
-  EXPECT_EQ(kMessage.data() + "\n"s, kMockLogger->Msg());
+  EXPECT_EQ(kMessage, kMockLogger->Msg());
   ExpectEqLabeledModifier(FatalLabeledModifier(), kMockLogger->LM());
 
   n_logger.Warn(kMessage);
-  EXPECT_EQ(kMessage.data() + "\n"s, kMockLogger->Msg());
+  EXPECT_EQ(kMessage, kMockLogger->Msg());
   ExpectEqLabeledModifier(WarnLabeledModifier(), kMockLogger->LM());
 
   n_logger.Info(kMessage);
-  EXPECT_EQ(kMessage.data() + "\n"s, kMockLogger->Msg());
+  EXPECT_EQ(kMessage, kMockLogger->Msg());
   ExpectEqLabeledModifier(InfoLabeledModifier(), kMockLogger->LM());
 }
 
@@ -164,10 +164,7 @@ TEST(CreateSystemNodeLogger, CheckInitializedWriters) {
   n_logger.Debug(kMessage);
 
   const auto actual = ReadAllLinesFromFile(kFilename);
-
-  auto formatter = core::utils::CreateTimeLabelFormatter();
-  std::stringstream expect;
-  expect << formatter.Format(DebugLabeledModifier(), "[sys]") << " ["
-         << kNodeName << "] " << kMessage;
-  EXPECT_TRUE(AssertStringList({expect.str()}, actual));
+  auto expect = ExpectMsgForFileLogger(DebugLabeledModifier(),
+                                       "sys] ["s + kNodeName.data(), kMessage);
+  EXPECT_TRUE(AssertStringList({expect}, actual));
 }

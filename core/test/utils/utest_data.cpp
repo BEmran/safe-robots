@@ -345,7 +345,7 @@ TEST(ImuData, Header) {
   ImuData imu;
   const std::string msg =
     "accel:x, accel:y, accel:z, gyro:x, gyro:y, gyro:z, mag:x, mag:y, mag:z, "
-    "quat:w, quat:x, quat:y, quat:z, roll, pitch, yaw, heading, temp, ";
+    "quat:w, quat:x, quat:y, quat:z, roll, pitch, yaw, heading, temp";
   EXPECT_EQ(msg, imu.Header());
 }
 
@@ -361,6 +361,6 @@ TEST(ImuData, ToString) {
   imu.temp.value = 11.2;
   const std::string msg =
     "1.4, 2.5, 3.6, 4.4, 5.5, 6.6, 4.1, 5.2, 6.3, 4.7, 1.4, 2.5, 3.6, 7.4, "
-    "8.5, 9.6, 10.100000, 11.200000, ";
+    "8.5, 9.6, 10.100000, 11.200000";
   EXPECT_EQ(msg, imu.ToString());
 }
