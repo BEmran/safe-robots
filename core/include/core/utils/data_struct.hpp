@@ -22,6 +22,8 @@ const char* IMU_LABEL = "imu";
 
 namespace core::utils {
 
+// Custom data needs to have default constructor
+
 struct Gps {
   double lat;
   double lon;
@@ -48,35 +50,50 @@ struct DataStructInterface {
   virtual std::string Label() const = 0;
   virtual std::string Header() const = 0;
   virtual std::string ToString() const = 0;
+  virtual std::string ToString() const = 0;
   virtual void Set(DataStructInterface* d) = 0;
 };
 
 template <class T>
 struct DataStruct : public DataStructInterface {
  public:
-  explicit DataStruct(const std::string& label = "") : label_{label} {};
-  explicit DataStruct(const DataStruct& ds)
+  explicit DataStruct(const std::string& label = "")
+    : data_{}, label_{label} {};
+
+  explicit DataStruct(const DataStruct<T>& ds)
     : data_{ds.Get()}, label_{ds.Label()} {
   }
+
   ~DataStruct() = default;
+
   T Get() const {
     return data_;
   }
+
+  T& Get() {
+    return data_;
+  }
+
   void Set(const T& new_data) {
     data_ = new_data;
   }
+
   void Clear() override {
     data_ = T{};
   }
+
   std::string Label() const override {
     return label_;
   }
+
   std::string Header() const override {
     return label_;
   }
+
   std::string ToString() const override {
     return "";
   }
+
   void Set(DataStructInterface* dsi_ptr) override {
     if (auto ds = dynamic_cast<DataStruct<T>*>(dsi_ptr); ds != nullptr) {
       Set(ds->Get());  // safe to call
@@ -84,13 +101,14 @@ struct DataStruct : public DataStructInterface {
       throw std::bad_cast();
     }
   }
+
   friend std::ostream& operator<<(std::ostream& os, const DataStruct<T>& ds) {
     return os << "[" << ds.Header() << "]: " << ds.ToString();
   }
 
  protected:
-  T data_;
-  std::string label_;
+  T data_{};
+  std::string label_{};
 };
 
 template <class TYPE, auto& LABEL>
@@ -102,7 +120,7 @@ struct LabelDataStruct : public DataStruct<TYPE> {
 // Math_TYPE ------------------------------------------------------------------
 template <>
 DataStruct<MATH_TYPE>::DataStruct(const std::string& label)
-  : data_(0), label_(label) {
+  : data_{0}, label_{label} {
 }
 
 template <>
@@ -267,16 +285,24 @@ using HeadingDataStruct = LabelDataStruct<MATH_TYPE, HEADING_LABEL>;
 struct Imu {
   TemperatureDataStruct temp;  ///< thermometer, in units of degrees Celsius
   HeadingDataStruct heading;   ///< fused heading filtered with gyro and accel
-                               ///< data, same as Tait-Bryan yaw in radians
+                               ///< data, same as rpy yaw in radians
   AccelDataStruct accel;       ///< accelerometer (XYZ) in units of m/s^2
   GyroDataStruct gyro;         ///< gyroscope (XYZ) in units of degrees/s
   MagDataStruct mag;           ///< magnetometer (XYZ) in units of uT
   QuatDataStruct quat;         ///< normalized quaternion
-  RPYDataStruct tait_bryan;  ///< Tait-Bryan angles (roll pitch yaw) in radians
-  const std::array<DataStructInterface* const, 7> array = {
-    &temp, &heading, &accel, &gyro, &mag, &quat, &tait_bryan};
+  RPYDataStruct rpy;           ///< (roll pitch yaw) angles in radians
+  const std::array<DataStructInterface* const, 7> array{
+    &temp, &heading, &accel, &gyro, &mag, &quat, &rpy};
 
-  Imu() {
+  Imu()
+    : temp{}
+    , heading{}
+    , accel{}
+    , gyro{}
+    , mag{}
+    , quat{}
+    , rpy{}
+    , array{&temp, &heading, &accel, &gyro, &mag, &quat, &rpy} {
   }
 
   Imu& operator=(const Imu& imu) {
@@ -286,7 +312,7 @@ struct Imu {
     gyro.Set(imu.gyro.Get());
     mag.Set(imu.mag.Get());
     quat.Set(imu.quat.Get());
-    tait_bryan.Set(imu.tait_bryan.Get());
+    rpy.Set(imu.rpy.Get());
     return *this;
   }
 
@@ -297,7 +323,7 @@ struct Imu {
   //   gyro{imu.gyro.Get()},
   //   mag{imu.mag.Get()},
   //   quat{imu.quat.Get()},
-  //   tait_bryan{imu.tait_bryan.Get()}{
+  //   rpy{imu.rpy.Get()}{
   // }
   Imu(const Imu& imu)
     : temp{imu.temp}
@@ -306,8 +332,8 @@ struct Imu {
     , gyro{imu.gyro}
     , mag{imu.mag}
     , quat{imu.quat}
-    , tait_bryan{imu.tait_bryan}
-    , array{&temp, &heading, &accel, &gyro, &mag, &quat, &tait_bryan} {
+    , rpy{imu.rpy}
+    , array{&temp, &heading, &accel, &gyro, &mag, &quat, &rpy} {
   }
 };
 
@@ -323,24 +349,36 @@ struct Imu {
 //                 [](DataStructInterface* const ptr) { ptr->Clear(); });
 // }
 
+using CB = std::function<std::string(DataStructInterface* const)>;
+
+std::string ApplyOnEach(const std::array<DataStructInterface* const, 7> array,
+                        CB cb) {
+  const size_t size = 7;
+  std::string str;
+  for (size_t idx = 0; idx < size; ++idx) {
+    if (idx == size - 1) {
+      str += cb(array[idx]);
+    } else {
+      str += cb(array[idx]) + ", ";
+    }
+  }
+  return str;
+}
+
 template <>
 std::string DataStruct<Imu>::Header() const {
-  std::stringstream ss;
-  std::for_each(
-    data_.array.begin(), data_.array.end() - 1,
-    [&ss](DataStructInterface* const ptr) { ss << ptr->Header() << ", "; });
-  ss << data_.array.back()->Header();
-  return ss.str();
+  auto lambda = [](DataStructInterface* const d) -> std::string {
+    return d->Header();
+  };
+  return ApplyOnEach(data_.array, lambda);
 }
 
 template <>
 std::string DataStruct<Imu>::ToString() const {
-  std::stringstream ss;
-  std::for_each(
-    data_.array.begin(), data_.array.end() - 1,
-    [&ss](DataStructInterface* const ptr) { ss << ptr->ToString() << ", "; });
-  ss << data_.array.back()->ToString();
-  return ss.str();
+  auto lambda = [](DataStructInterface* const d) -> std::string {
+    return d->ToString();
+  };
+  return ApplyOnEach(data_.array, lambda);
 }
 
 using ImuDataStruct = LabelDataStruct<Imu, IMU_LABEL>;
@@ -354,6 +392,6 @@ namespace cu = core::utils;
 std::ostream& operator<<(std::ostream& os,
                          const cu::DataStructInterface* const dsi);
 
-std::ostream& operator<<(std::ostream& os, const cu::Imu& imu);
+// std::ostream& operator<<(std::ostream& os, const cu::Imu& imu);
 
 #endif  // CORE_UTILS_DATA_STRUCT_HPP_

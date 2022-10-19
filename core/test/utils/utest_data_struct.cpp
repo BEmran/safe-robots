@@ -17,6 +17,7 @@ using core::utils::MagDataStruct;
 using core::utils::MathTypeDataStruct;
 using core::utils::Quat;
 using core::utils::QuatDataStruct;
+using core::utils::RPY;
 using core::utils::RPYDataStruct;
 using core::utils::TemperatureDataStruct;
 using core::utils::Vec3;
@@ -217,49 +218,60 @@ TEST(GpsDataStruct, Clear) {
   EXPECT_GPS(Gps(), gps.Get());
 }
 
-// // ImuData
-// --------------------------------------------------------------------
-// TEST(ImuData, Construct) {
-//   const ImuData imu;
-//   ExpectImuData(ImuData(), imu);
-// }
+// ImuData --------------------------------------------------------------------
+TEST(ImuDataStruct, Construct) {
+  const ImuDataStruct imu;
+  // ExpectImuData(ImuDataStruct(), imu);
+}
 
-// TEST(ImuData, Clear) {
-//   ImuData imu;
-//   imu.gyro.data.x() = 1;
-//   EXPECT_FLOAT_EQ(1, imu.gyro.data.x());
-//   imu.Clear();
-//   EXPECT_FLOAT_EQ(0, imu.gyro.data.x());
-// }
+TEST(ImuDataStruct, Clear) {
+  ImuDataStruct imu;
 
-// TEST(ImuData, Print) {
-//   ImuData imu;
-//   imu.accel.data = Vec3(1.4F, 2.5F, 3.6F);
-//   imu.gyro.data = Vec3(4.4F, 5.5F, 6.6F);
-//   imu.mag.data = Vec3(4.1F, 5.2F, 6.3F);
-//   imu.quat.data.w() = 4.7F;
-//   imu.quat.data.vec() = Vec3(1.4F, 2.5F, 3.6F);
-//   imu.tait_bryan.data = Vec3(7.4F, 8.5F, 9.6F);
-//   imu.heading.value = 10.1;
-//   imu.temp.value = 11.2;
-//   const std::string msg =
-//     "IMU data:\n- Accel XYZ(m/s^2): [1.4, 2.5, 3.6]\n- Gyro  XYZ(rad/s): "
-//     "[4.4, 5.5, 6.6]\n- Mag Field XYZ(uT): [4.1, 5.2, 6.3]\n- Quat WXYZ: ang
-//     "
-//     "= 4.7, [1.4, 2.5, 3.6]\n- TaitBryan RPY(rad): [7.4, 8.5, 9.6]\n- "
-//     "heading (rad): 10.1\n- Temp (C): 11.2\n";
-//   std::stringstream ss;
-//   ss << imu;
-//   EXPECT_EQ(msg, ss.str());
-// }
+  imu.Get().accel.Get().x() = 1.F;
+  imu.Get().gyro.Set(Vec3(4.F, 5.F, 6.F));
+  imu.Get().mag.Get() = Vec3(7.F, 8.F, 9.F);
+  imu.Get().rpy.Get().yaw = 1.F;
+  EXPECT_FLOAT_EQ(1, imu.Get().accel.Get().x());
+  ExpectVec3Eq(Vec3(4.F, 5.F, 6.F), imu.Get().gyro.Get());
+  ExpectVec3Eq(Vec3(7.F, 8.F, 9.F), imu.Get().mag.Get());
+  EXPECT_FLOAT_EQ(1, imu.Get().rpy.Get().yaw);
 
-// TEST(ImuData, Header) {
-//   ImuData imu;
-//   const std::string msg =
-//     "accel:x, accel:y, accel:z, gyro:x, gyro:y, gyro:z, mag:x, mag:y, mag:z,
-//     " "quat:w, quat:x, quat:y, quat:z, roll, pitch, yaw, heading, temp, ";
-//   EXPECT_EQ(msg, imu.Header());
-// }
+  imu.Clear();
+
+  ExpectVec3Eq(Vec3(), imu.Get().accel.Get());
+  ExpectVec3Eq(Vec3(), imu.Get().gyro.Get());
+  ExpectVec3Eq(Vec3(), imu.Get().mag.Get());
+  EXPECT_FLOAT_EQ(0, imu.Get().rpy.Get().yaw);
+  // EXPECT_FLOAT_EQ(0, imu.gyro.data.x());
+}
+
+TEST(ImuDataStruct, Print) {
+  ImuDataStruct imu;
+  // imu.accel.data = Vec3(1.4F, 2.5F, 3.6F);
+  // imu.gyro.data = Vec3(4.4F, 5.5F, 6.6F);
+  // imu.mag.data = Vec3(4.1F, 5.2F, 6.3F);
+  // imu.quat.data.w() = 4.7F;
+  // imu.quat.data.vec() = Vec3(1.4F, 2.5F, 3.6F);
+  // imu.rpy = RPY(7.4F, 8.5F, 9.6F);
+  // imu.heading.value = 10.1;
+  // imu.temp.value = 11.2;
+  const std::string msg =
+    "IMU data:\n- Accel XYZ(m/s^2): [1.4, 2.5, 3.6]\n- Gyro  XYZ(rad/s): "
+    "[4.4, 5.5, 6.6]\n- Mag Field XYZ(uT): [4.1, 5.2, 6.3]\n- Quat WXYZ: ang"
+    "= 4.7, [1.4, 2.5, 3.6]\n- RPY(rad): [7.4, 8.5, 9.6]\n- "
+    "heading (rad): 10.1\n- Temp (C): 11.2\n";
+  std::stringstream ss;
+  ss << imu;
+  EXPECT_EQ(msg, ss.str());
+}
+
+TEST(ImuDataStruct, Header) {
+  ImuDataStruct imu;
+  const std::string msg =
+    "accel:x, accel:y, accel:z, gyro:x, gyro:y, gyro:z, mag:x, mag:y, mag:z,"
+    " quat:w, quat:x, quat:y, quat:z, roll, pitch, yaw, heading, temp";
+  EXPECT_EQ(msg, imu.Header());
+}
 
 // TEST(ImuData, ToString) {
 //   ImuData imu;

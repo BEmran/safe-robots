@@ -9,10 +9,11 @@ std::ostream& operator<<(std::ostream& os,
   return os << "[" << dsi->Header() << "]: " << dsi->ToString();
 }
 
-std::ostream& operator<<(std::ostream& os, const Imu& imu) {
-  std::for_each(imu.array.begin(), imu.array.end() - 1,
-                [&os](DataStructInterface* const dsi) { os << dsi << ", "; });
-  os << imu.array.back();
-  return os;
-}
+// std::ostream& operator<<(std::ostream& os, const Imu& imu) {
+//   std::for_each(imu.array.begin(), imu.array.end() - 1,
+//                 [&os](DataStructInterface* const dsi) { os << dsi << ", ";
+//                 });
+//   os << imu.array.back();
+//   return os;
+// }
 }  // namespace core::utils
