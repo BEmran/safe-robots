@@ -8,8 +8,6 @@
 #include "utest/utils_data.hpp"
 
 using core::utils::AccelDataStruct;
-using core::utils::Gps;
-using core::utils::GpsDataStruct;
 using core::utils::GyroDataStruct;
 using core::utils::HeadingDataStruct;
 using core::utils::ImuDataStruct;
@@ -23,11 +21,6 @@ using core::utils::TemperatureDataStruct;
 using core::utils::Vec3;
 using core::utils::Vec3DataStruct;
 
-void EXPECT_GPS(Gps gps1, Gps gps2) {
-  EXPECT_DOUBLE_EQ(gps1.lat, gps2.lat);
-  EXPECT_DOUBLE_EQ(gps1.lon, gps2.lon);
-  EXPECT_DOUBLE_EQ(gps1.alt, gps2.alt);
-}
 // MathTypeDataStruct
 // ------------------------------------------------------------
 TEST(MathTypeDataStruct, Print) {
