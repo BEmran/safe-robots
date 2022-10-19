@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_UTILS_NODE_LOGGER_HPP_
-#define CORE_UTILS_NODE_LOGGER_HPP_
+#ifndef CORE_UTILS_LOGGER_NODE_HPP_
+#define CORE_UTILS_LOGGER_NODE_HPP_
 
 #include <memory>
 #include <string>
@@ -9,6 +9,7 @@
 #include "core/utils/labeld_modifier.hpp"
 #include "core/utils/logger.hpp"
 #include "core/utils/logger_helper.hpp"
+#include "core/utils/logger_stream.hpp"
 
 namespace core::utils {
 
@@ -41,62 +42,6 @@ this.Warn() << .... << endl;
 - using printf style:
 this.Warn(" %a %b %c", a, b, c) << .... << endl;
 */
-
-/**
- * @brief Logger Class used to log with stream method
- * @details When class is destructed it will log the stream data by calling the
- * logger function, this might throw an error depend on the the passed
- * LabeledModifier object
- */
-class StreamLogger {
- public:
-  // define end type for stream
-  using endl_type = std::ostream&(std::ostream&);
-
-  /**
-   * @brief Construct a new Stream Logger object
-   *
-   * @param logger logger to use at destruction to log data
-   * @param lm labeled modifier indicate level type and modifier
-   * @param msg initial msg to log
-   */
-  StreamLogger(const Logger& logger, const LabeledModifier& lm,
-               std::string_view ini_msg = "");
-
-  /**
-   * @brief Destroy the Stream Logger object
-   *
-   * @throws Logger::ExceptionFactory by calling the log function
-   */
-  ~StreamLogger() noexcept(false);
-
-  /**
-   * @brief template overriding stream operator
-   *
-   * @tparam T any type
-   * @param obj object to be logged
-   * @return StreamLogger& return reference of class to continue logging
-   */
-  template <typename T>
-  StreamLogger& operator<<(T obj) {
-    oss_ << obj;
-    return *this;
-  }
-
-  /**
-   * @brief to log endl object
-   *
-   */
-  StreamLogger& operator<<(endl_type endl);
-
- private:
-  /// @brief Reference to Logger used at destruction to log stream
-  const Logger& logger_;
-  /// @brief Labeled modifier used when calling Logger::Log function
-  LabeledModifier lm_;
-  /// @brief A stream to collect all data to be logged
-  std::ostringstream oss_;
-};
 
 /**
  * @brief A named logger uses LabeledModifier to log data
@@ -231,4 +176,4 @@ NodeLogger CreateNodeLoggerUsingSystemLogger(std::string_view header);
 
 }  // namespace core::utils
 
-#endif  // CORE_UTILS_NODE_LOGGER_HPP_
+#endif  // CORE_UTILS_LOGGER_NODE_HPP_

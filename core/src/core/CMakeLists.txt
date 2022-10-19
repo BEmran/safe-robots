@@ -12,10 +12,13 @@ set(CORE_HEADER_LIST
     ${CORE_INCLUDE_DIR}/utils/labeld_modifier.hpp
     ${CORE_INCLUDE_DIR}/utils/exception.hpp
     ${CORE_INCLUDE_DIR}/utils/formatter.hpp
+    ${CORE_INCLUDE_DIR}/utils/logger_helper.hpp
+    ${CORE_INCLUDE_DIR}/utils/logger_macros.hpp
+    ${CORE_INCLUDE_DIR}/utils/logger_node.hpp
+    ${CORE_INCLUDE_DIR}/utils/logger_stream.hpp
     ${CORE_INCLUDE_DIR}/utils/logger.hpp
     ${CORE_INCLUDE_DIR}/utils/math.hpp
     ${CORE_INCLUDE_DIR}/utils/module.hpp
-    ${CORE_INCLUDE_DIR}/utils/node_logger.hpp
     ${CORE_INCLUDE_DIR}/utils/node.hpp
     ${CORE_INCLUDE_DIR}/utils/socket_exception.hpp
     ${CORE_INCLUDE_DIR}/utils/socket.hpp
@@ -39,10 +42,11 @@ set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/utils/labeld_modifier.cpp
     ${CORE_SOURCE_DIR}/utils/formatter.cpp
     ${CORE_SOURCE_DIR}/utils/modifier.cpp
+    ${CORE_SOURCE_DIR}/utils/logger_node.cpp
+    ${CORE_SOURCE_DIR}/utils/logger_stream.cpp
     ${CORE_SOURCE_DIR}/utils/logger.cpp
     ${CORE_SOURCE_DIR}/utils/math.cpp
     ${CORE_SOURCE_DIR}/utils/module.cpp
-    ${CORE_SOURCE_DIR}/utils/node_logger.cpp
     ${CORE_SOURCE_DIR}/utils/node.cpp
     ${CORE_SOURCE_DIR}/utils/server_socket.cpp
     ${CORE_SOURCE_DIR}/utils/socket.cpp

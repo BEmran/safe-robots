@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "core/utils/node_logger.hpp"
+#include "core/utils/logger_node.hpp"
 #include "utest/utils.hpp"
 
 using namespace std::literals;

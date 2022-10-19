@@ -46,6 +46,16 @@ set(UTEST_LOGGER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_logger.cpp
 package_add_test_with_libraries(utest_logger "${UTEST_LOGGER_FILES}"
                                 "${CORE_LIBRARY}" "")
 
+set(UTEST_LOGGER_NODE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_logger_node.cpp
+                            ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
+package_add_test_with_libraries(utest_logger_node "${UTEST_LOGGER_NODE_FILES}"
+                                "${CORE_LIBRARY}" "")
+                                
+set(UTEST_LOGGER_STREAM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_logger_stream.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
+package_add_test_with_libraries(utest_logger_stream "${UTEST_LOGGER_STREAM_FILES}"
+    "${CORE_LIBRARY}" "")
+
 set(UTEST_LOGGER_MACROS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_logger_macros.cpp
                        ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
 package_add_test_with_libraries(utest_logger_macros "${UTEST_LOGGER_MACROS_FILES}"
@@ -56,10 +66,6 @@ set(UTEST_NODE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_node.cpp
 package_add_test_with_libraries(utest_node "${UTEST_NODE_FILES}"
                                 "${CORE_LIBRARY}" "")
 
-set(UTEST_NODE_LOGGER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_node_logger.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
-package_add_test_with_libraries(utest_node_logger "${UTEST_NODE_LOGGER_FILES}"
-                                "${CORE_LIBRARY}" "")
 
 set(UTEST_MODULE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_module.cpp)
 package_add_test_with_libraries(utest_module "${UTEST_MODULE_FILES}"

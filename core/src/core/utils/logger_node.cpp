@@ -1,23 +1,8 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#include "core/utils/node_logger.hpp"
+#include "core/utils/logger_node.hpp"
 
 namespace core::utils {
-
-StreamLogger::StreamLogger(const Logger& logger, const LabeledModifier& lm,
-                           std::string_view ini_msg)
-  : logger_(logger), lm_(lm) {
-  oss_ << ini_msg;
-}
-
-StreamLogger::~StreamLogger() noexcept(false) {
-  logger_.Log(lm_, oss_.str());  // cppcheck-suppress exceptThrowInDestructor
-}
-
-StreamLogger& StreamLogger::operator<<(endl_type endl) {
-  oss_ << endl;
-  return *this;
-}
 
 NodeLogger::NodeLogger(const Logger& logger)
   : NodeLogger(logger, LoggerLabeledModifiers()) {
