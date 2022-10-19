@@ -11,7 +11,6 @@ StreamLogger::StreamLogger(const Logger& logger, const LabeledModifier& lm,
 }
 
 StreamLogger::~StreamLogger() noexcept(false) {
-  oss_ << "\n";
   logger_.Log(lm_, oss_.str());  // cppcheck-suppress exceptThrowInDestructor
 }
 
@@ -73,7 +72,7 @@ void NodeLogger::SetLabel(std::string_view header) {
 }
 
 NodeLogger CreateNodeLoggerUsingSystemLogger(std::string_view header) {
-  auto logger = SystemLogger();
+  auto& logger = SystemLogger();
   NodeLogger node_logger(logger);
   node_logger.SetLabel(header);
   return node_logger;

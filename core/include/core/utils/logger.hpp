@@ -36,13 +36,13 @@ void SetOverallLoggerLevel(const EventLevel level);
  */
 struct LoggerConfig {
   /// @brief Logger name
-  std::string name = "";
+  std::string name{};
 
   /// @brief Writer formatter pair
   std::vector<WriterFormatterPair> wf_pairs;
 
   /// @brief Logging level
-  EventLevel level = EventLevel::DEBUG;
+  EventLevel level{EventLevel::DEBUG};
 
   /// @brief Exception generator
   std::shared_ptr<ExceptionFactory> expectation_factory =
@@ -50,6 +50,9 @@ struct LoggerConfig {
 
   /// @brief Logger labeled modifiers
   LoggerLabeledModifiers labeled_modifiers;
+
+  /// @brief string appended at the end of msg when logging data
+  std::string end_str{"\n"};
 };
 
 /**
@@ -143,6 +146,8 @@ class Logger {
   std::shared_ptr<ExceptionFactory> expectation_factory_;
   /// @brief Internal labeled modifier
   LoggerLabeledModifiers labeled_modifiers_;
+  /// @brief string to append at the end of message before logging
+  std::string end_msg_str_{};
 };
 
 /**

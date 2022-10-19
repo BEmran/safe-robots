@@ -44,10 +44,9 @@ this.Warn(" %a %b %c", a, b, c) << .... << endl;
 
 /**
  * @brief Logger Class used to log with stream method
- * @details When class is destructed it will:
- * 1- Append a new line
- * 2- Log the stream data by calling the logger function, this might throw an
- * error
+ * @details When class is destructed it will log the stream data by calling the
+ * logger function, this might throw an error depend on the the passed
+ * LabeledModifier object
  */
 class StreamLogger {
  public:

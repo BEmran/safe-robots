@@ -43,7 +43,8 @@ Logger::Logger(const LoggerConfig& config)
   , logging_level_{config.level}
   , writer_formatter_vec_{config.wf_pairs}
   , expectation_factory_{config.expectation_factory}
-  , labeled_modifiers_{config.labeled_modifiers} {
+  , labeled_modifiers_{config.labeled_modifiers}
+  , end_msg_str_{config.end_str} {
 }
 
 void Logger::Log(const LabeledModifier& lm, std::string_view msg) const {
@@ -91,7 +92,7 @@ void Logger::LogImp(const LabeledModifier& lm, std::string_view msg) const {
 void Logger::FormatAndWrite(const WriterFormatterPair& wf,
                             const LabeledModifier& lm,
                             std::string_view msg) const {
-  const std::string labeled_msg = printed_name_ + msg.data();
+  const std::string labeled_msg = printed_name_ + msg.data() + end_msg_str_;
   const auto formatted = wf.formatter.Format(lm, labeled_msg);
   wf.writer->Write(formatted);
 }
