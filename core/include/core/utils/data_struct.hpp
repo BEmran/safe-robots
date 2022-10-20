@@ -3,111 +3,45 @@
 #ifndef CORE_UTILS_DATA_STRUCT_HPP_
 #define CORE_UTILS_DATA_STRUCT_HPP_
 
-// #include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
 
+#include "core/utils/data_struct_template.hpp"
 #include "core/utils/math.hpp"
 
-const char* QUAT_LABEL = "quat";
-const char* GPS_LABEL = "gps";
-const char* RPY_LABEL = "rpy";
-const char* ACCEL_LABEL = "accel";
-const char* GYRO_LABEL = "gyro";
-const char* MAG_LABEL = "mag";
-const char* HEADING_LABEL = "heading";
-const char* TEMP_LABEL = "temp";
-const char* IMU_LABEL = "imu";
+/* data structure labels */
 
 namespace core::utils {
 
-// Custom data needs to have default constructor
+/// @brief quaternion label
+const char* QUAT_LABEL = "quat";
+/// @brief roll-pitch-yaw label
+const char* RPY_LABEL = "rpy";
+/// @brief accelerometer label
+const char* ACCEL_LABEL = "accel";
+/// @brief gyroscope label
+const char* GYRO_LABEL = "gyro";
+/// @brief magnetometer label
+const char* MAG_LABEL = "mag";
+/// @brief heading angle label
+const char* HEADING_LABEL = "heading";
+/// @brief temperature label
+const char* TEMP_LABEL = "temp";
+/// @brief imu label
+const char* IMU_LABEL = "imu";
 
-struct RPY {
-  MATH_TYPE roll;
-  MATH_TYPE pitch;
-  MATH_TYPE yaw;
-  RPY() : RPY(0.0, 0.0, 0.0) {
-  }
-  RPY(MATH_TYPE r, MATH_TYPE p, MATH_TYPE y) : roll(r), pitch(p), yaw(y) {
-  }
-};
+/* Define General Data Struct types */
+using Vec3DataStruct = DataStruct<Vec3>;
+using QuatDataStruct = DataStruct<Quat>;
+using MathTypeDataStruct = DataStruct<MATH_TYPE>;
+using AccelDataStruct = LabelDataStruct<Vec3, ACCEL_LABEL>;
+using GyroDataStruct = LabelDataStruct<Vec3, GYRO_LABEL>;
+using MagDataStruct = LabelDataStruct<Vec3, MAG_LABEL>;
+using TemperatureDataStruct = LabelDataStruct<MATH_TYPE, TEMP_LABEL>;
+using HeadingDataStruct = LabelDataStruct<MATH_TYPE, HEADING_LABEL>;
 
-struct DataStructInterface {
-  virtual ~DataStructInterface() = default;
-  virtual void Clear() = 0;
-  virtual std::string Label() const = 0;
-  virtual std::string Header() const = 0;
-  virtual std::string ToString() const = 0;
-  virtual std::string ToString() const = 0;
-  virtual void Set(DataStructInterface* d) = 0;
-};
-
-template <class T>
-struct DataStruct : public DataStructInterface {
- public:
-  explicit DataStruct(const std::string& label = "")
-    : data_{}, label_{label} {};
-
-  explicit DataStruct(const DataStruct<T>& ds)
-    : data_{ds.Get()}, label_{ds.Label()} {
-  }
-
-  ~DataStruct() = default;
-
-  T Get() const {
-    return data_;
-  }
-
-  T& Get() {
-    return data_;
-  }
-
-  void Set(const T& new_data) {
-    data_ = new_data;
-  }
-
-  void Clear() override {
-    data_ = T{};
-  }
-
-  std::string Label() const override {
-    return label_;
-  }
-
-  std::string Header() const override {
-    return label_;
-  }
-
-  std::string ToString() const override {
-    return "";
-  }
-
-  void Set(DataStructInterface* dsi_ptr) override {
-    if (auto ds = dynamic_cast<DataStruct<T>*>(dsi_ptr); ds != nullptr) {
-      Set(ds->Get());  // safe to call
-    } else {
-      throw std::bad_cast();
-    }
-  }
-
-  friend std::ostream& operator<<(std::ostream& os, const DataStruct<T>& ds) {
-    return os << "[" << ds.Header() << "]: " << ds.ToString();
-  }
-
- protected:
-  T data_{};
-  std::string label_{};
-};
-
-template <class TYPE, auto& LABEL>
-struct LabelDataStruct : public DataStruct<TYPE> {
-  LabelDataStruct() : DataStruct<TYPE>(LABEL) {
-  }
-};
-
-// Math_TYPE ------------------------------------------------------------------
+// Math_TYPE Partial Specialization -------------------------------------------
 template <>
 DataStruct<MATH_TYPE>::DataStruct(const std::string& label)
   : data_{0}, label_{label} {
@@ -123,7 +57,7 @@ std::string DataStruct<MATH_TYPE>::ToString() const {
   return std::to_string(data_);
 }
 
-// Vec3 ----------------------------------------------------------------------
+// Vec3 Partial Specialization ------------------------------------------------
 template <>
 DataStruct<Vec3>::DataStruct(const std::string& label)
   : data_(Vec3::Zero()), label_(label) {
@@ -147,8 +81,7 @@ std::string DataStruct<Vec3>::ToString() const {
   return ss.str();
 }
 
-// Quat
-// -----------------------------------------------------------------------
+// Quat Partial Specialization ------------------------------------------------
 template <>
 DataStruct<Quat>::DataStruct(const std::string& label)
   : data_(Quat::Identity()), label_(label) {
@@ -173,7 +106,39 @@ std::string DataStruct<Quat>::ToString() const {
   return ss.str();
 }
 
-// RPY ------------------------------------------------------------------------
+// Custom data needs to have default constructor
+
+/**
+ * @brief simple structure to hold RPY data in radian
+ *
+ */
+struct RPY {
+  /// @brief angle around x-axis in radian
+  MATH_TYPE roll;
+  /// @brief angle around y-axis in radian
+  MATH_TYPE pitch;
+  /// @brief angle around z-axis in radian
+  MATH_TYPE yaw;
+
+  /**
+   * @brief Default Construct for RPY object
+   *
+   */
+  RPY() : RPY(0.0, 0.0, 0.0) {
+  }
+
+  /**
+   * @brief Construct a new RPY object
+   *
+   * @param r roll angle in radian
+   * @param p pitch angle in radian
+   * @param y yaw angle in radian
+   */
+  RPY(MATH_TYPE r, MATH_TYPE p, MATH_TYPE y) : roll(r), pitch(p), yaw(y) {
+  }
+};
+
+// RPY Partial Specialization -------------------------------------------------
 template <>
 std::string DataStruct<RPY>::Header() const {
   static const auto header =
@@ -189,30 +154,33 @@ std::string DataStruct<RPY>::ToString() const {
   return ss.str();
 }
 
-using Vec3DataStruct = DataStruct<Vec3>;
-using QuatDataStruct = DataStruct<Quat>;
-using MathTypeDataStruct = DataStruct<MATH_TYPE>;
 using RPYDataStruct = DataStruct<RPY>;
-
-using AccelDataStruct = LabelDataStruct<Vec3, ACCEL_LABEL>;
-using GyroDataStruct = LabelDataStruct<Vec3, GYRO_LABEL>;
-using MagDataStruct = LabelDataStruct<Vec3, MAG_LABEL>;
-using TemperatureDataStruct = LabelDataStruct<MATH_TYPE, TEMP_LABEL>;
-using HeadingDataStruct = LabelDataStruct<MATH_TYPE, HEADING_LABEL>;
 
 // Imu ------------------------------------------------------------------------
 struct Imu {
-  TemperatureDataStruct temp;  ///< thermometer, in units of degrees Celsius
-  HeadingDataStruct heading;   ///< fused heading filtered with gyro and accel
-                               ///< data, same as rpy yaw in radians
-  AccelDataStruct accel;       ///< accelerometer (XYZ) in units of m/s^2
-  GyroDataStruct gyro;         ///< gyroscope (XYZ) in units of degrees/s
-  MagDataStruct mag;           ///< magnetometer (XYZ) in units of uT
-  QuatDataStruct quat;         ///< normalized quaternion
-  RPYDataStruct rpy;           ///< (roll pitch yaw) angles in radians
+  /// @brief thermometer, in units of degrees Celsius
+  TemperatureDataStruct temp;
+  /// @brief  fused heading filtered with gyro and accel data, same as rpy yaw
+  /// in radians
+  HeadingDataStruct heading;
+  /// @brief accelerometer (XYZ) in units of m/s^2
+  AccelDataStruct accel;
+  /// @brief gyroscope (XYZ) in units of degrees/s
+  GyroDataStruct gyro;
+  /// @brief normalized quaternion
+  MagDataStruct mag;
+  /// @brief normalized quaternion
+  QuatDataStruct quat;
+  /// @brief  (roll pitch yaw) angles in radians
+  RPYDataStruct rpy;
+  /// @brief a list reference of all data to recall later
   const std::array<DataStructInterface* const, 7> array{
     &temp, &heading, &accel, &gyro, &mag, &quat, &rpy};
 
+  /**
+   * @brief Default constructor of Imu object
+   *
+   */
   Imu()
     : temp{}
     , heading{}
@@ -223,18 +191,11 @@ struct Imu {
     , rpy{}
     , array{&temp, &heading, &accel, &gyro, &mag, &quat, &rpy} {
   }
-
-  Imu& operator=(const Imu& imu) {
-    temp.Set(imu.temp.Get());
-    heading.Set(imu.heading.Get());
-    accel.Set(imu.accel.Get());
-    gyro.Set(imu.gyro.Get());
-    mag.Set(imu.mag.Get());
-    quat.Set(imu.quat.Get());
-    rpy.Set(imu.rpy.Get());
-    return *this;
-  }
-
+  /**
+   * @brief Copy constructor of Imu object
+   *
+   * @param imu imu data object
+   */
   Imu(const Imu& imu)
     : temp{imu.temp}
     , heading{imu.heading}
@@ -245,7 +206,34 @@ struct Imu {
     , rpy{imu.rpy}
     , array{&temp, &heading, &accel, &gyro, &mag, &quat, &rpy} {
   }
+
+  /**
+   * @brief overload = operator to set the imu data
+   *
+   * @param imu new values
+   * @return Imu& reference for the current object
+   */
+  Imu& operator=(const Imu& new_imu) {
+    temp.Set(new_imu.temp.Get());
+    heading.Set(new_imu.heading.Get());
+    accel.Set(new_imu.accel.Get());
+    gyro.Set(new_imu.gyro.Get());
+    mag.Set(new_imu.mag.Get());
+    quat.Set(new_imu.quat.Get());
+    rpy.Set(new_imu.rpy.Get());
+    return *this;
+  }
+  /**
+   * @brief overload << operator to print imu data nicely
+   *
+   * @param os output-stream reference
+   * @param imu imu data to be printed
+   * @return std::ostream& updated output-stream
+   */
+  friend std::ostream& operator<<(std::ostream& os, const Imu& imu);
 };
+
+// IMU Partial Specialization -------------------------------------------------
 
 using CB = std::function<std::string(DataStructInterface* const)>;
 
@@ -279,17 +267,10 @@ std::string DataStruct<Imu>::ToString() const {
   return ApplyOnEach(data_.array, lambda);
 }
 
+/* Define Custom Data Struct types */
 using ImuDataStruct = LabelDataStruct<Imu, IMU_LABEL>;
 
 }  // namespace core::utils
-
-namespace cu = core::utils;
-
-/* print data details */
-
 std::ostream& operator<<(std::ostream& os,
-                         const cu::DataStructInterface* const dsi);
-
-// std::ostream& operator<<(std::ostream& os, const cu::Imu& imu);
-
+                         const core::utils::ImuDataStruct& imu_data);
 #endif  // CORE_UTILS_DATA_STRUCT_HPP_

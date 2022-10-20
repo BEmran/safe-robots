@@ -218,15 +218,16 @@ TEST(ImuDataStruct, Print) {
     "= 4.7, [1.4, 2.5, 3.6]\n- RPY(rad): [7.4, 8.5, 9.6]\n- "
     "heading (rad): 10.1\n- Temp (C): 11.2\n";
   std::stringstream ss;
-  ss << imu;
+  ss << imu.Get();
   EXPECT_EQ(msg, ss.str());
 }
 
 TEST(ImuDataStruct, Header) {
   ImuDataStruct imu;
   const std::string msg =
-    "accel:x, accel:y, accel:z, gyro:x, gyro:y, gyro:z, mag:x, mag:y, mag:z,"
-    " quat:w, quat:x, quat:y, quat:z, roll, pitch, yaw, heading, temp";
+    "temp, heading, accel.x, accel.y, accel.z, gyro.x, gyro.y, gyro.z, mag.x, "
+    "mag.y, mag.z, quat.w, quat.x, quat.y, quat.z, rpy.roll, rpy.pitch, "
+    "rpy.yaw";
   EXPECT_EQ(msg, imu.Header());
 }
 

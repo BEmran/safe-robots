@@ -9,11 +9,15 @@ std::ostream& operator<<(std::ostream& os,
   return os << "[" << dsi->Header() << "]: " << dsi->ToString();
 }
 
-// std::ostream& operator<<(std::ostream& os, const Imu& imu) {
-//   std::for_each(imu.array.begin(), imu.array.end() - 1,
-//                 [&os](DataStructInterface* const dsi) { os << dsi << ", ";
-//                 });
-//   os << imu.array.back();
-//   return os;
-// }
+std::ostream& operator<<(std::ostream& os, const Imu& imu) {
+  os << "IMU:";
+  for (auto element : imu.array) {
+    os << "\n\t -" << element;
+  }
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const ImuDataStruct& imu_data) {
+  return os << imu_data.Label() << ": " << imu_data.Get();
+}
 }  // namespace core::utils
