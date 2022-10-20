@@ -12,11 +12,11 @@ bool Equal(MATH_TYPE actual, MATH_TYPE expect) {
 }
 
 void ExpectEq(MATH_TYPE actual, MATH_TYPE expect) {
-  if constexpr (std::is_same<MATH_TYPE, float>::value) {
-    EXPECT_FLOAT_EQ(actual, expect);
-  } else {
-    EXPECT_DOUBLE_EQ(actual, expect);
-  }
+  // if constexpr (std::is_same<MATH_TYPE, float>::value) {
+  EXPECT_NEAR(actual, expect, 0.00001);
+  // } else {
+  // EXPECT_NEAR(actual, expect);
+  // }
 }
 
 void ExpectDoubleDataEq(const DoubleData& d1, const DoubleData& d2) {
