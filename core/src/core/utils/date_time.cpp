@@ -56,12 +56,7 @@ int64_t TimeInSeconds() {
 }
 
 std::string TimeInSecondsString() {
-  constexpr auto kMaxSize = 15;
-  std::string buffer(kMaxSize, ' ', std::allocator<char>());
-  const auto size =
-    snprintf(buffer.data(), buffer.size(), "%ld", TimeInSeconds());  // NOLINT
-  buffer.resize(static_cast<size_t>(size));
-  return buffer;
+  return std::to_string(TimeInSeconds());
 }
 
 std::string GenerateFileName(const DateTime dt) {

@@ -37,13 +37,13 @@ testing::AssertionResult IsEqualDateTime(const tm& expect, const tm& actual) {
 
 // check time_in_seconds function
 TEST(DateTime, time_in_seconds) {
-  auto expect = TimeSinceEpochInSec();
+  const auto expect = TimeSinceEpochInSec();
   EXPECT_EQ(expect, TimeInSeconds());
 }
 
-// check time_in_seconds_string function
-TEST(DateTime, time_in_seconds_string) {
-  auto expect = std::to_string(TimeSinceEpochInSec());
+// check CreateNodeUsingSystemLogger function
+TEST(DateTime, CreateNodeUsingSystemLogger) {
+  const auto expect = std::to_string(TimeSinceEpochInSec());
   EXPECT_EQ(expect, TimeInSecondsString());
 }
 
