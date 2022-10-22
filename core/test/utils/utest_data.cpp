@@ -1,7 +1,5 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#include <gtest/gtest.h>
-
 #include <sstream>
 
 #include "utest/utils_data.hpp"
@@ -23,7 +21,7 @@ using core::utils::Vec3Data;
 
 TEST(AdcData, Construct) {
   const AdcData adc;
-  ExpectVec3Eq(Vec3::Zero(), adc.values);
+  EXPECT_TRUE(ExpectVec3Eq(Vec3::Zero(), adc.values));
 }
 
 TEST(AdcData, Clear) {
@@ -32,7 +30,7 @@ TEST(AdcData, Clear) {
   adc.values = vec;
   ExpectVec3Eq(vec, adc.values);
   adc.Clear();
-  ExpectVec3Eq(Vec3::Zero(), adc.values);
+  EXPECT_TRUE(ExpectVec3Eq(Vec3::Zero(), adc.values));
 }
 
 TEST(AdcData, Print) {
@@ -92,7 +90,7 @@ TEST(BarData, ToString) {
 // GpsData --------------------------------------------------------------------
 TEST(GpsData, Construct) {
   const GpsData gps;
-  ExpectGPSData(0, 0, 0, gps);
+  EXPECT_TRUE(ExpectGPSData(0, 0, 0, gps));
 }
 
 TEST(GpsData, Clear) {
@@ -310,7 +308,7 @@ TEST(HeadingData, ToString) {
 // ImuData --------------------------------------------------------------------
 TEST(ImuData, Construct) {
   const ImuData imu;
-  ExpectImuData(ImuData(), imu);
+  EXPECT_TRUE(ExpectImuData(ImuData(), imu));
 }
 
 TEST(ImuData, Clear) {

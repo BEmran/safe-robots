@@ -3,10 +3,11 @@
 #ifndef TEST_UTEST_DATA_HPP
 #define TEST_UTEST_DATA_HPP
 
+#include <gtest/gtest.h>
+
 #include <sstream>
 
 #include "core/utils/math.hpp"
-#include "gtest/gtest.h"
 #include "utest/utils_data.hpp"
 
 using core::utils::InputMat;
@@ -53,7 +54,7 @@ TEST(InputMat, PassingMatrixToFuncAsOutput) {
   Matrix<size, size> mat;
   ASSERT_EQ(size * size, mat.size());
   Initialize(size, arr, mat);
-  EXPECT_TRUE(std::equal(arr, arr + size, mat.data(), Equal));
+  EXPECT_TRUE(std::equal(arr, arr + size, mat.data()));
 }
 
 TEST(CreateVector, Vec4) {
@@ -63,7 +64,7 @@ TEST(CreateVector, Vec4) {
   std::copy(arr, arr + size, vec.data());
 
   ASSERT_EQ(size, vec.size());
-  EXPECT_TRUE(std::equal(arr, arr + size, vec.data(), Equal));
+  EXPECT_TRUE(std::equal(arr, arr + size, vec.data()));
 }
 
 TEST(Scalar, Scalar) {
@@ -86,7 +87,7 @@ TEST(CreateMatrix, Mat22) {
   MATH_TYPE arr[size] = {1, 0, 0, 1};
 
   ASSERT_EQ(size, mat.size());
-  EXPECT_TRUE(std::equal(arr, arr + size, mat.data(), Equal));
+  EXPECT_TRUE(std::equal(arr, arr + size, mat.data()));
 }
 // Vec3 -----------------------------------------------------------------------
 TEST(Vec3, DefaultValuesUsingBrackets) {

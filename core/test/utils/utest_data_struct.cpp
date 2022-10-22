@@ -43,15 +43,15 @@ TEST(MathTypeDataStruct, HeaderWithLabel) {
 
 TEST(MathTypeDataStruct, Construct) {
   const MathTypeDataStruct mt;
-  ExpectEq(0, mt.Get());
+  EXPECT_TRUE(ExpectEq(0, mt.Get()));
 }
 
 TEST(MathTypeDataStruct, Clear) {
   MathTypeDataStruct mt;
   mt.Set(1.0);
-  ExpectEq(1.0, mt.Get());
+  EXPECT_TRUE(ExpectEq(1.0, mt.Get()));
   mt.Clear();
-  ExpectEq(0, mt.Get());
+  EXPECT_TRUE(ExpectEq(0, mt.Get()));
 }
 // TemperatureData -----------------------------------------------------------
 TEST(TemperatureDataStruct, Header) {
@@ -97,16 +97,16 @@ TEST(Vec3DataStruct, ToString) {
 
 TEST(Vec3DataStruct, Construct) {
   const Vec3DataStruct vec;
-  ExpectVec3Eq(Vec3{0.0, 0.0, 0.0}, vec.Get());
+  EXPECT_TRUE(ExpectVec3Eq(Vec3{0.0, 0.0, 0.0}, vec.Get()));
 }
 
 TEST(Vec3DataStruct, Clear) {
   Vec3DataStruct vec;
   Vec3 expect{1.4F, 2.5F, 3.6F};
   vec.Set(expect);
-  ExpectVec3Eq(expect, vec.Get());
+  EXPECT_TRUE(ExpectVec3Eq(expect, vec.Get()));
   vec.Clear();
-  ExpectVec3Eq(Vec3{0.0, 0.0, 0.0}, vec.Get());
+  EXPECT_TRUE(ExpectVec3Eq(Vec3{0.0, 0.0, 0.0}, vec.Get()));
 }
 
 // AccelData -------------------------------------------------------------------
@@ -189,15 +189,15 @@ TEST(ImuDataStruct, Clear) {
   imu.Get().mag.Get() = Vec3(7.F, 8.F, 9.F);
   imu.Get().rpy.Get().yaw = 1.F;
   EXPECT_FLOAT_EQ(1, imu.Get().accel.Get().x());
-  ExpectVec3Eq(Vec3(4.F, 5.F, 6.F), imu.Get().gyro.Get());
-  ExpectVec3Eq(Vec3(7.F, 8.F, 9.F), imu.Get().mag.Get());
+  EXPECT_TRUE(ExpectVec3Eq(Vec3(4.F, 5.F, 6.F), imu.Get().gyro.Get()));
+  EXPECT_TRUE(ExpectVec3Eq(Vec3(7.F, 8.F, 9.F), imu.Get().mag.Get()));
   EXPECT_FLOAT_EQ(1, imu.Get().rpy.Get().yaw);
-
+  std::cout << imu.Get() << std::endl;
   imu.Clear();
-
-  ExpectVec3Eq(Vec3(), imu.Get().accel.Get());
-  ExpectVec3Eq(Vec3(), imu.Get().gyro.Get());
-  ExpectVec3Eq(Vec3(), imu.Get().mag.Get());
+  std::cout << imu.Get() << std::endl;
+  EXPECT_TRUE(ExpectVec3Eq(Vec3(), imu.Get().accel.Get()));
+  EXPECT_TRUE(ExpectVec3Eq(Vec3(), imu.Get().gyro.Get()));
+  EXPECT_TRUE(ExpectVec3Eq(Vec3(), imu.Get().mag.Get()));
   EXPECT_FLOAT_EQ(0, imu.Get().rpy.Get().yaw);
   // EXPECT_FLOAT_EQ(0, imu.gyro.data.x());
 }
