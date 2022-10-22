@@ -6,11 +6,11 @@
 #include "core/utils/server_socket.hpp"
 
 int main(int argc, char* argv[]) {
-  auto app = core::utils::CreateSystemNode("app");
-  app.GetLogger().Debug("running....");
+  auto app = core::utils::CreateNodeUsingSystemLogger("app");
+  app.GetNodeLogger()->Debug("running....");
 
   if (argc < 2) {
-    app.GetLogger().Error("no port provided");
+    app.GetNodeLogger()->Error("no port provided");
     return EXIT_FAILURE;
   }
 
@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
       server >> data;
       server << data;
     }
-    app.GetLogger().Warn("Lost connection");
+    app.GetNodeLogger()->Warn("Lost connection");
   }
 
   return 0;

@@ -28,23 +28,23 @@ struct App {
   std::unique_ptr<ServerSocket> server;
 
   App()
-    : node{std::make_unique<Node>(core::utils::CreateSystemNode("app"))}
+    : node{std::make_unique<Node>(
+        core::utils::CreateNodeUsingSystemLogger("app"))}
     , sensor{nullptr} {
   }
 
   void SelectSensor(const std::string& option) {
     auto imu_node =
-      std::make_unique<Node>(core::utils::CreateSystemNode("im"
-                                                           "u"));
+      std::make_unique<Node>(core::utils::CreateNodeUsingSystemLogger("imu"));
     if (option == "mpu") {
-      node->GetLogger().Debug("Selected: MPU9250");
+      node->GetNodeLogger()->Debug("Selected: MPU9250");
       sensors::mpu::Config config;
       auto spi =
         std::make_unique<SPI>(navio::hardware_utils::MPU_SPI_PATH, false);
       sensor =
         std::make_unique<Mpu9250>(config, std::move(spi), std::move(imu_node));
     } else if (option == "lsm") {
-      node->GetLogger().Debug("Selected: LSM9DS1");
+      node->GetNodeLogger()->Debug("Selected: LSM9DS1");
       sensors::lsm::Config config;
       auto spi_a_g =
         std::make_unique<SPI>(navio::hardware_utils::LSM_A_G_PATH, false);
@@ -54,7 +54,7 @@ struct App {
                                          std::move(spi_mag), std::move(node));
 
     } else {
-      node->GetLogger().Error("Unknown Sensor");
+      node->GetNodeLogger()->Error("Unknown Sensor");
     }
   }
 
@@ -71,12 +71,12 @@ struct App {
           "\t-p [port number] \t\t\t Select port number\n"
           "\t-h               \t\t\t Print help message"
        << std::endl;
-    node->GetLogger().Debug(ss.str());
+    node->GetNodeLogger()->Debug(ss.str());
   }
 
   void ExtractArgument(int argc, char* argv[]) {
     if (argc < 2) {
-      node->GetLogger().Warn(
+      node->GetNodeLogger()->Warn(
         "Please provide input information (mpu/lsm) and port");
       PrintHelp();
     }
@@ -100,7 +100,7 @@ struct App {
           break;
 
         default:
-          node->GetLogger().Error("Wrong parameter.");
+          node->GetNodeLogger()->Error("Wrong parameter.");
       }
     }
   }

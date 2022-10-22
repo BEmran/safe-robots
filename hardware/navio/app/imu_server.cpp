@@ -7,10 +7,10 @@ constexpr auto MaximumClientTries = 5;
 
 int main(int argc, char* argv[]) {
   App app;
-  app.node->GetLogger().Debug("running....");
+  app.node->GetNodeLogger()->Debug("running....");
 
   if (navio::hardware_utils::CheckApm()) {
-    app.node->GetLogger().Error("APM is busy. Can't launch the app");
+    app.node->GetNodeLogger()->Error("APM is busy. Can't launch the app");
     return EXIT_FAILURE;
   }
 
@@ -21,12 +21,12 @@ int main(int argc, char* argv[]) {
   }
 
   if (!app.sensor->Probe()) {
-    app.node->GetLogger().Error("Sensor can't be probed");
+    app.node->GetNodeLogger()->Error("Sensor can't be probed");
     return EXIT_FAILURE;
   }
 
   app.sensor->Initialize();
-  app.node->GetLogger().Debug("Sensor is initialized successfully");
+  app.node->GetNodeLogger()->Debug("Sensor is initialized successfully");
 
   //-------------------------------------------------------------------------
   const auto begin = core::utils::TimeInMilliSec();
@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
       (*app.server) << ss.str();
       navio::hardware_utils::Delay(send_delay);
     }
-    app.node->GetLogger().Warn("Lost connection");
+    app.node->GetNodeLogger()->Warn("Lost connection");
   }
 
   return EXIT_SUCCESS;

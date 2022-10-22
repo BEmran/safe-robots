@@ -18,21 +18,28 @@ constexpr std::string_view kFilename = "sys_logger.txt";
 
 TEST(SysLogger, SystemDebugMacros) {
   SYS_LOG_DEBUG(kMsg);
-  EXPECT_THROW(SYS_LOG_ERROR(kMsg), core::utils::Exception);
-  EXPECT_THROW(SYS_LOG_FATAL(kMsg), core::utils::Exception);
+  EXPECT_THROW(SYS_LOG_ERROR(kMsg.data()), core::utils::Exception);
+  EXPECT_THROW(SYS_LOG_FATAL(kMsg.data()), core::utils::Exception);
   SYS_LOG_INFO(kMsg);
   SYS_LOG_WARN(kMsg);
 
   const auto file_logged_data = ReadAllLinesFromFile(kFilename);
-
   auto debug_expect_msg =
     ExpectMsgForFileLogger(DebugLabeledModifier(), kName, kMsg);
-  auto error_expect_msg =
-    ExpectMsgForFileLogger(ErrorLabeledModifier(), kName, kMsg);
-  auto fatal_expect_msg =
-    ExpectMsgForFileLogger(FatalLabeledModifier(), kName, kMsg);
+
+  auto error_extra_data =
+    std::string("[utest_logger_macros.cpp][TestBody][21]");
+  auto error_expect_msg = ExpectMsgForFileLogger(
+    ErrorLabeledModifier(), kName, error_extra_data + kMsg.data());
+
+  auto fatal_extra_data =
+    std::string("[utest_logger_macros.cpp][TestBody][22]");
+  auto fatal_expect_msg = ExpectMsgForFileLogger(
+    FatalLabeledModifier(), kName, fatal_extra_data + kMsg.data());
+
   auto info_expect_msg =
     ExpectMsgForFileLogger(InfoLabeledModifier(), kName, kMsg);
+
   auto warn_expect_msg =
     ExpectMsgForFileLogger(WarnLabeledModifier(), kName, kMsg);
 

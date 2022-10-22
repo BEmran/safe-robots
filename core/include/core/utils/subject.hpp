@@ -50,12 +50,13 @@ class Subject {
    */
   void Register(std::shared_ptr<ObserverCB<T>> cb) {
     if (FindMatch(cb)) {
-      node_->GetLogger().Warn(
+      node_->GetNodeLogger()->Warn(
         "Failed to register an observer callback; it has been registered "
         "before");
     } else {
       register_.insert(cb);
-      node_->GetLogger().Debug("Successfully register a new observer callback");
+      node_->GetNodeLogger()->Debug(
+        "Successfully register a new observer callback");
     }
   }
 
@@ -68,9 +69,10 @@ class Subject {
     auto it = FindMatch(cb);
     if (it) {
       register_.erase(it.value());
-      node_->GetLogger().Debug("Successfully unregister an observer callback");
+      node_->GetNodeLogger()->Debug(
+        "Successfully unregister an observer callback");
     } else {
-      node_->GetLogger().Warn(
+      node_->GetNodeLogger()->Warn(
         "Failed to find a match for an observer callback to unregister");
     }
   }

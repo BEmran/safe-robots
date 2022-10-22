@@ -36,7 +36,7 @@ TEST(Node, ConstructWithName) {
 // }
 
 // construct system Node
-TEST(CreateSystemNode, ConstructNode) {
-  auto node = core::utils::CreateSystemNode(kNodeName);
+TEST(CreateNodeLoggerUsingSystemLogger, ConstructNode) {
+  auto node = core::utils::CreateNodeUsingSystemLogger(kNodeName);
   EXPECT_EQ(node.GetName(), kNodeName);
 }

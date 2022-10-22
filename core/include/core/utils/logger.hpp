@@ -138,14 +138,19 @@ class Logger {
  private:
   /// @brief Logger name surrounded by brackets "[]" if defined
   std::string printed_name_{};
+
   /// @brief Logging level
   EventLevel logging_level_{EventLevel::DEBUG};
+
   /// @brief Writer and formatter pairs
   std::vector<WriterFormatterPair> writer_formatter_vec_{};
+
   /// @brief Exception factory generator
   std::shared_ptr<ExceptionFactory> expectation_factory_;
+
   /// @brief Internal labeled modifier
   LoggerLabeledModifiers labeled_modifiers_;
+
   /// @brief string to append at the end of message before logging
   std::string end_msg_str_{};
 };
@@ -189,9 +194,9 @@ Logger CreateStreamAndFileLogger(std::string_view name,
  * @brief Get System logger which is a static object created with
  * CreateStreamAndFileLogger using "sys" as name and std::cout as ostream
  *
- * @return Logger& system logger reference
+ * @return std::shared_ptr<Logger> shared_ptr to system logger
  */
-Logger& SystemLogger();
+std::shared_ptr<Logger> SystemLogger();
 }  // namespace core::utils
 
 #endif  // CORE_UTILS_LOGGER_HPP_

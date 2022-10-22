@@ -50,23 +50,6 @@ this.Warn(" %a %b %c", a, b, c) << .... << endl;
 class NodeLogger {
  public:
   /**
-   * @brief Construct a new Node Logger object using a logger with default
-   * labeled modifiers
-   *
-   * @param logger reference to Logger object
-   */
-  explicit NodeLogger(const Logger& logger);
-
-  /**
-   * @brief Construct a new Node Logger object using a logger with specific
-   * labeled modifiers
-   *
-   * @param logger reference to Logger object
-   * @param labeled_modifiers labeled modifier struct
-   */
-  NodeLogger(const Logger& logger, LoggerLabeledModifiers labeled_modifiers);
-
-  /**
    * @brief Construct a new Node Logger object using a shared_ptr to logger with
    * default labeled modifiers
    *
@@ -140,9 +123,9 @@ class NodeLogger {
   /**
    * @brief Get the internal Logger object
    *
-   * @return Logger& logger object
+   * @return shared ptr to a logger object
    */
-  Logger& GetLogger();
+  std::shared_ptr<Logger> GetLogger();
 
  protected:
   /**
@@ -156,8 +139,8 @@ class NodeLogger {
   StreamLogger LogMsg(const LabeledModifier& lm, std::string_view msg) const;
 
  private:
-  /// @brief Base reference to Logger object to log data
-  const Logger& logger_;
+  /// @brief shared_ptr to Base Logger object to log data
+  std::shared_ptr<Logger> logger_;
 
   /// @brief List of labeled modifiers to use
   LoggerLabeledModifiers labeled_modifiers_;

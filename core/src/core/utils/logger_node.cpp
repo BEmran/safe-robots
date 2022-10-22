@@ -4,22 +4,13 @@
 
 namespace core::utils {
 
-NodeLogger::NodeLogger(const Logger& logger)
-  : NodeLogger(logger, LoggerLabeledModifiers()) {
-}
-
-NodeLogger::NodeLogger(const Logger& logger,
-                       LoggerLabeledModifiers labeled_modifiers)
-  : logger_{logger}, labeled_modifiers_{labeled_modifiers} {
-}
-
 NodeLogger::NodeLogger(std::shared_ptr<Logger> logger)
   : NodeLogger(logger, LoggerLabeledModifiers()) {
 }
 
 NodeLogger::NodeLogger(std::shared_ptr<Logger> logger,
                        LoggerLabeledModifiers labeled_modifiers)
-  : logger_{*(logger.get())}, labeled_modifiers_{labeled_modifiers} {
+  : logger_{logger}, labeled_modifiers_{labeled_modifiers} {
 }
 
 StreamLogger NodeLogger::Debug(std::string_view msg) const {
@@ -57,7 +48,7 @@ void NodeLogger::SetLabel(std::string_view header) {
 }
 
 NodeLogger CreateNodeLoggerUsingSystemLogger(std::string_view header) {
-  auto& logger = SystemLogger();
+  auto logger = SystemLogger();
   NodeLogger node_logger(logger);
   node_logger.SetLabel(header);
   return node_logger;

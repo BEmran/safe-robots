@@ -26,11 +26,11 @@ class StreamLogger {
   /**
    * @brief Construct a new Stream Logger object
    *
-   * @param logger logger to use at destruction to log data
+   * @param logger shared_ptr logger to use at destruction to log data
    * @param lm labeled modifier indicate level type and modifier
    * @param msg initial msg to log
    */
-  StreamLogger(const Logger& logger, const LabeledModifier& lm,
+  StreamLogger(std::shared_ptr<Logger> logger, const LabeledModifier& lm,
                std::string_view init_msg = "");
 
   /**
@@ -60,8 +60,8 @@ class StreamLogger {
   StreamLogger& operator<<(EndlType endl);
 
  private:
-  /// @brief Reference to Logger used at destruction to log stream
-  const Logger& logger_;
+  /// @brief shared_ptr to Logger used at destruction to log stream
+  std::shared_ptr<Logger> logger_;
 
   /// @brief Labeled modifier used when calling Logger::Log function
   LabeledModifier lm_;

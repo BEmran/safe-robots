@@ -108,7 +108,7 @@ TEST(MockLogger, LogWithHeaderAndDefaultLM) {
   auto formatter = core::utils::Formatter();
   LoggerConfig config;
   config.wf_pairs = {{writer, formatter}};
-  Logger logger(config);
+  auto logger = std::make_shared<Logger>(config);
   NodeLogger n_logger(logger);
   n_logger.SetLabel(kHeader);
 
@@ -126,7 +126,7 @@ TEST(MockLogger, LogWithDefaultHeaderAndDefaultLM) {
   auto formatter = core::utils::Formatter();
   LoggerConfig config;
   config.wf_pairs = {{writer, formatter}};
-  Logger logger(config);
+  auto logger = std::make_shared<Logger>(config);
   NodeLogger n_logger(logger);
 
   n_logger.Info() << kMessage;
@@ -156,7 +156,7 @@ TEST(MockLogger, ConstructWithSpecialLM) {
   ExpectEqLabeledModifier(kDebugLm, kMockLogger->LM());
 }
 
-TEST(CreateSystemNodeLogger, CheckInitializedWriters) {
+TEST(CreateNodeLoggerUsingSystemLoggerLogger, CheckInitializedWriters) {
   constexpr auto kFilename = "sys_logger.txt";
   constexpr std::string_view kNodeName = "node1";
   const auto n_logger =

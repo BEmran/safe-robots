@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include "core/utils/logger_node.hpp"
 
@@ -17,7 +18,7 @@ class Node {
    *
    * @param name node name
    */
-  explicit Node(const std::string& name);
+  explicit Node(std::string_view name);
 
   /**
    * @brief Construct a new Node object using its name and logger
@@ -25,7 +26,7 @@ class Node {
    * @param name node name
    * @param logger shared ptr to a logger object
    */
-  Node(const std::string& name, const NodeLogger& n_logger);
+  Node(std::string_view name, std::shared_ptr<NodeLogger> n_logger);
 
   /**
    * @brief Get the node's Name
@@ -38,13 +39,13 @@ class Node {
   /**
    * @brief Get a shared ptr to the NodeLogger
    *
-   * @return const NodeLogger&
+   * @return shared_ptr to NodeLogger
    */
-  const NodeLogger& GetLogger() const;
+  std::shared_ptr<NodeLogger> GetNodeLogger() const;
 
  protected:
   std::string name_;
-  NodeLogger n_logger_;
+  std::shared_ptr<NodeLogger> n_logger_;
 };
 
 /**
@@ -52,15 +53,15 @@ class Node {
  *
  */
 // define LOG_ERROR(node, msg)
-// node.GetLogger().Error(LOG_INFORMATION_STRING + ": " + (msg))
+// node.GetLogger()->Error(LOG_INFORMATION_STRING + ": " + (msg))
 
 /**
- * @brief Create a Node with a same NodeLogger but with different node name
+ * @brief Create a Node with system Logger but with different node name
  *
  * @param node_name node name
  * @return Node object
  */
-Node CreateSystemNode(const std::string& node_name);
+Node CreateNodeUsingSystemLogger(std::string_view node_name);
 
 }  // namespace core::utils
 

@@ -186,8 +186,9 @@ Logger CreateStreamAndFileLogger(std::string_view name, std::ostream& os,
   return Logger(config);
 }
 
-Logger& SystemLogger() {
-  static Logger logger{CreateStreamAndFileLogger(kSystemName, std::cout)};
+std::shared_ptr<Logger> SystemLogger() {
+  static auto logger =
+    std::make_shared<Logger>(CreateStreamAndFileLogger(kSystemName, std::cout));
   return logger;
 }
 
