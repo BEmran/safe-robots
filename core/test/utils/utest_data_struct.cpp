@@ -43,15 +43,15 @@ TEST(MathTypeDataStruct, HeaderWithLabel) {
 
 TEST(MathTypeDataStruct, Construct) {
   const MathTypeDataStruct mt;
-  EXPECT_TRUE(ExpectEq(0, mt.Get()));
+  EXPECT_TRUE(ExpectEq(0.f, mt.Get()));
 }
 
 TEST(MathTypeDataStruct, Clear) {
   MathTypeDataStruct mt;
   mt.Set(1.0);
-  EXPECT_TRUE(ExpectEq(1.0, mt.Get()));
+  EXPECT_TRUE(ExpectEq(1.f, mt.Get()));
   mt.Clear();
-  EXPECT_TRUE(ExpectEq(0, mt.Get()));
+  EXPECT_TRUE(ExpectEq(0.f, mt.Get()));
 }
 // TemperatureData -----------------------------------------------------------
 TEST(TemperatureDataStruct, Header) {
@@ -195,8 +195,11 @@ TEST(ImuDataStruct, Clear) {
   std::cout << imu.Get() << std::endl;
   imu.Clear();
   std::cout << imu.Get() << std::endl;
+  std::cout << "acc" << std::endl;
   EXPECT_TRUE(ExpectVec3Eq(Vec3(), imu.Get().accel.Get()));
+  std::cout << "gyro" << std::endl;
   EXPECT_TRUE(ExpectVec3Eq(Vec3(), imu.Get().gyro.Get()));
+  std::cout << "mag" << std::endl;
   EXPECT_TRUE(ExpectVec3Eq(Vec3(), imu.Get().mag.Get()));
   EXPECT_FLOAT_EQ(0, imu.Get().rpy.Get().yaw);
   // EXPECT_FLOAT_EQ(0, imu.gyro.data.x());

@@ -25,8 +25,8 @@ using core::utils::WarnModifier;
 TEST(LabeledModifier, ConstructWithEvent) {
   for (size_t i = 0; i < kEvents.size(); i++) {
     const LabeledModifier lm(kEvents[i]);
-    ExpectEqLabeledModifier(kEvents[i], EventLevelToString(kEvents[i]),
-                            Modifier(), lm);
+    EXPECT_TRUE(ExpectEqLabeledModifier(
+      kEvents[i], EventLevelToString(kEvents[i]), Modifier(), lm));
   }
 }
 
@@ -36,7 +36,7 @@ TEST(LabeledModifier, ConstructWithEventAndLabel) {
   const char* label = "label";
   for (const auto& event : kEvents) {
     const LabeledModifier lm(event, label);
-    ExpectEqLabeledModifier(event, label, Modifier(), lm);
+    EXPECT_TRUE(ExpectEqLabeledModifier(event, label, Modifier(), lm));
   }
 }
 
@@ -46,8 +46,8 @@ TEST(LabeledModifier, ConstructWithEventAndModifier) {
   Modifier modifier({FG::LIGHT_BLUE, BG::LIGHT_CYAN, FMT::HIDDEN});
   for (size_t i = 0; i < kEvents.size(); i++) {
     const LabeledModifier lm(kEvents[i], modifier);
-    ExpectEqLabeledModifier(kEvents[i], EventLevelToString(kEvents[i]),
-                            modifier, lm);
+    EXPECT_TRUE(ExpectEqLabeledModifier(
+      kEvents[i], EventLevelToString(kEvents[i]), modifier, lm));
   }
 }
 
@@ -58,7 +58,7 @@ TEST(LabeledModifier, ConstructWithEventAndLabelAndModifier) {
   const char* label = "label";
   for (const auto& event : kEvents) {
     const LabeledModifier lm(event, label, modifier);
-    ExpectEqLabeledModifier(event, label, modifier, lm);
+    EXPECT_TRUE(ExpectEqLabeledModifier(event, label, modifier, lm));
   }
 }
 
@@ -70,7 +70,7 @@ TEST(LabeledModifier, TestStream) {
     const LabeledModifier lm(event, label, modifier);
     std::stringstream ss;
     ss << lm;
-    EXPECT_EQ(StreamExpectedLabeledModifier(label, modifier), ss.str());
+    EXPECT_EQ(StreamExpectedLabeledModifier(modifier, label), ss.str());
   }
 }
 
@@ -91,8 +91,8 @@ TEST(LabeledModifier, TestToString) {
 TEST(LabeledModifier, Debug) {
   const auto actual = DebugLabeledModifier();
   const auto event = EventLevel::DEBUG;
-  ExpectEqLabeledModifier(event, EventLevelToString(event), DebugModifier(),
-                          actual);
+  EXPECT_TRUE(ExpectEqLabeledModifier(event, EventLevelToString(event),
+                                      DebugModifier(), actual));
 }
 
 // check error labeled modifier settings created using error_labeled_modifier
@@ -100,8 +100,8 @@ TEST(LabeledModifier, Debug) {
 TEST(LabeledModifier, Error) {
   const auto actual = ErrorLabeledModifier();
   const auto event = EventLevel::ERROR;
-  ExpectEqLabeledModifier(event, EventLevelToString(event), ErrorModifier(),
-                          actual);
+  EXPECT_TRUE(ExpectEqLabeledModifier(event, EventLevelToString(event),
+                                      ErrorModifier(), actual));
 }
 
 // check fatal labeled modifier settings created using error_labeled_modifier
@@ -109,8 +109,8 @@ TEST(LabeledModifier, Error) {
 TEST(LabeledModifier, Fatal) {
   const auto actual = FatalLabeledModifier();
   const auto event = EventLevel::FATAL;
-  ExpectEqLabeledModifier(event, EventLevelToString(event), FatalModifier(),
-                          actual);
+  EXPECT_TRUE(ExpectEqLabeledModifier(event, EventLevelToString(event),
+                                      FatalModifier(), actual));
 }
 
 // check info labeled modifier settings created using info_labeled_modifier
@@ -118,8 +118,8 @@ TEST(LabeledModifier, Fatal) {
 TEST(LabeledModifier, Info) {
   const auto actual = InfoLabeledModifier();
   const auto event = EventLevel::INFO;
-  ExpectEqLabeledModifier(event, EventLevelToString(event), InfoModifier(),
-                          actual);
+  EXPECT_TRUE(ExpectEqLabeledModifier(event, EventLevelToString(event),
+                                      InfoModifier(), actual));
 }
 
 // check warn labeled modifier settings created using warn_labeled_modifier
@@ -127,6 +127,6 @@ TEST(LabeledModifier, Info) {
 TEST(LabeledModifier, Warn) {
   const auto actual = WarnLabeledModifier();
   const auto event = EventLevel::WARN;
-  ExpectEqLabeledModifier(event, EventLevelToString(event), WarnModifier(),
-                          actual);
+  EXPECT_TRUE(ExpectEqLabeledModifier(event, EventLevelToString(event),
+                                      WarnModifier(), actual));
 }

@@ -3,7 +3,10 @@
 #ifndef UTEST_UTILS_HPP_
 #define UTEST_UTILS_HPP_
 
+#include <gtest/gtest.h>
+
 #include <array>
+#include <cmath>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -14,7 +17,6 @@
 #include "core/utils/formatter.hpp"
 #include "core/utils/labeld_modifier.hpp"
 #include "core/utils/modifier.hpp"
-#include "gtest/gtest.h"
 
 using core::utils::EventLevel;
 using core::utils::Formatter;
@@ -24,57 +26,137 @@ namespace BG = core::utils::BG;
 namespace FG = core::utils::FG;
 namespace FMT = core::utils::FMT;
 
-// carate list of available variables
+/// @brief carate list of available variables
 constexpr const char* kLabels[] = {"DEBUG", "ERROR", "FATAL", "INFO", "WARN"};
-// should be same order as kLabels
+
+/// @brief should be same order as kLabels
 const std::vector<EventLevel> kEvents = {EventLevel::DEBUG, EventLevel::ERROR,
                                          EventLevel::FATAL, EventLevel::INFO,
                                          EventLevel::WARN};
+/// @brief epsilon used for comparison
+constexpr auto kEpsilon = 0.00001;
+
+template <typename T>
+inline bool IsEqual(const T& actual, const T& expect) {
+  return actual == expect;
+}
+
+template <>
+inline bool IsEqual(const float& actual, const float& expect) {
+  return std::fabs(actual - expect) < static_cast<float>(kEpsilon);
+}
+
+template <>
+inline bool IsEqual(const double& actual, const double& expect) {
+  return std::fabs(actual - expect) < static_cast<double>(kEpsilon);
+}
 
 /**
- * @brief apply and operation of two AssertionResult
+ * @brief Create failure assertion with information
+ *
+ * @param expect expected value
+ * @param actual actual value
+ * @param msg string to append at the beginning of failure msg
+ * @return testing::AssertionResult failure assentation with msg
+ */
+template <typename T>
+testing::AssertionResult AssertionFailureMsg(const T& expect, const T& actual,
+                                             std::string_view msg = "") {
+  return testing::AssertionFailure()
+         << msg << " expect: \'" << expect << "\' actual: \'" << actual << "\'";
+}
+
+/**
+ * @brief assert if two values are equal with message to display at failure
+ *
+ * @param expect expected value
+ * @param actual actual value
+ * @param msg string to display at failure
+ * @return testing::AssertionResult assentation result
+ */
+template <typename T>
+::testing::AssertionResult ExpectEq(const T& expect, const T& actual,
+                                    std::string_view msg = "") {
+  if (IsEqual(actual, expect)) {
+    return ::testing::AssertionSuccess();
+  } else {
+    return AssertionFailureMsg(expect, actual, msg);
+  }
+}
+
+/**
+ * @brief Apply && operation of two AssertionResults
  *
  * @param lhs AssertionResult of the left hand side
  * @param rhs AssertionResult of the right hand side
  * @return testing::AssertionResult the and result
  */
-testing::AssertionResult operator&&(const testing::AssertionResult& lhs,
-                                    const testing::AssertionResult& rhs);
+inline testing::AssertionResult operator&&(
+  const testing::AssertionResult& lhs, const testing::AssertionResult& rhs) {
+  return lhs ? rhs : lhs;
+}
 
 /**
- * @brief assert if two values are equal with additional information
+ * @brief Convert Modifier to a string
  *
- * @param expect expected value
- * @param actual actual value
- * @param label values label
- * @return testing::AssertionResult assentation result
+ * @param options modifier options
+ * @return std::string resulted conversion
  */
-testing::AssertionResult AssertEqWithLabel(int expect, int actual,
-                                           const char* label);
-
-// convert Modifier to a string
 std::string ModifierToString(const std::vector<int>& options);
 
-// check if the passed modifier has the passed configuration
-void ExpectEqModifier(const std::vector<int>& expect_options,
-                      const Modifier& actual);
+/**
+ * @brief Check if the actual modifier has the expected options
+ *
+ * @param expect_options options of the expected modifier
+ * @param actual actual modifier
+ * @return testing::AssertionResult assertion result
+ */
+testing::AssertionResult ExpectEqModifier(
+  const std::vector<int>& expect_options, const Modifier& actual);
 
-// check if the passed modifiers have the same configuration
-void ExpectEqModifier(const Modifier& expect, const Modifier& actual);
+/**
+ * @brief Check if the passed modifiers have the same configuration
+ *
+ * @param expect expect modifier
+ * @param actual actual modifier
+ * @return testing::AssertionResult assertion result
+ */
+testing::AssertionResult ExpectEqModifier(const Modifier& expect,
+                                          const Modifier& actual);
 
-// generate a string using stream method of the passed label and modifier
-std::string StreamExpectedLabeledModifier(std::string_view label,
-                                          const Modifier& modifier);
+/**
+ * @brief Generate a string using stream method of the passed label and modifier
+ *
+ * @param modifier modifier to stream
+ * @param label labeled message
+ * @return std::string resulted stream
+ */
+std::string StreamExpectedLabeledModifier(const Modifier& modifier,
+                                          std::string_view label);
 
-// check if the passed labeled-modifier has the same expected configuration
-void ExpectEqLabeledModifier(EventLevel expect_event,
-                             const std::string& expect_label,
-                             const Modifier& expect_modifier,
-                             const LabeledModifier& actual);
+/**
+ * @brief Check if the passed labeled-modifier has the same expected
+ * configuration
+ *
+ * @param expect_event expected event
+ * @param expect_label expected label
+ * @param expect_modifier expected modifier
+ * @param actual actual modifier
+ * @return testing::AssertionResult
+ */
+testing::AssertionResult ExpectEqLabeledModifier(
+  const EventLevel expect_event, const std::string& expect_label,
+  const Modifier& expect_modifier, const LabeledModifier& actual);
 
-// check if the passed labeled-modifiers have the expected configuration
-void ExpectEqLabeledModifier(const LabeledModifier& expect,
-                             const LabeledModifier& actual);
+/**
+ * @brief Check if the passed labeled-modifiers have the expected configuration
+ *
+ * @param expect expect modifier
+ * @param actual actual modifier
+ * @return testing::AssertionResult
+ */
+testing::AssertionResult ExpectEqLabeledModifier(const LabeledModifier& expect,
+                                                 const LabeledModifier& actual);
 
 /**
  * @brief Reads all lines from a file
@@ -87,8 +169,8 @@ std::list<std::string> ReadAllLinesFromFile(std::string_view file_name);
 /**
  * @brief  compare two list string
  *
- * @param expect list 1
- * @param actual list 2
+ * @param expect list of strings
+ * @param actual list of strings
  * @return testing::AssertionResult assertion result
  */
 testing::AssertionResult AssertStringList(const std::list<std::string>& expect,

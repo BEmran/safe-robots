@@ -90,7 +90,11 @@ TEST(BarData, ToString) {
 // GpsData --------------------------------------------------------------------
 TEST(GpsData, Construct) {
   const GpsData gps;
-  EXPECT_TRUE(ExpectGPSData(0, 0, 0, gps));
+  GpsData expect;
+  expect.lat = 0;
+  expect.lon = 0;
+  expect.alt = 0;
+  EXPECT_TRUE(ExpectGPSData(expect, gps));
 }
 
 TEST(GpsData, Clear) {
@@ -263,7 +267,7 @@ TEST(RPYData, ToString) {
 // TemperatureData ------------------------------------------------------------
 TEST(TemperatureData, Print) {
   TemperatureData temp;
-  temp.value = 11.2F;
+  temp.value = 11.2;
   const std::string msg = "Temp (C): 11.2";
   std::stringstream ss;
   ss << temp;
@@ -277,7 +281,7 @@ TEST(TemperatureData, Header) {
 
 TEST(TemperatureData, ToString) {
   TemperatureData temp;
-  temp.value = 11.2F;
+  temp.value = 11.2;
   const std::string msg = "11.200000";
 
   EXPECT_EQ(msg, temp.ToString());
@@ -286,7 +290,7 @@ TEST(TemperatureData, ToString) {
 // HeadingData ----------------------------------------------------------------
 TEST(HeadingData, Print) {
   HeadingData head;
-  head.value = 10.1F;
+  head.value = 10.1;
   const std::string msg = "heading (rad): 10.1";
   std::stringstream ss;
   ss << head;
@@ -300,7 +304,7 @@ TEST(HeadingData, Header) {
 
 TEST(HeadingData, ToString) {
   HeadingData head;
-  head.value = 10.1F;
+  head.value = 10.1;
   const std::string msg = "10.100000";
   EXPECT_EQ(msg, head.ToString());
 }

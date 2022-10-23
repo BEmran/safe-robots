@@ -8,6 +8,7 @@
 #include <string_view>
 
 #include "core/utils/data.hpp"
+#include "utest/utils.hpp"
 
 using core::utils::DoubleData;
 using core::utils::GpsData;
@@ -19,32 +20,72 @@ using core::utils::QuatData;
 using core::utils::Vec3;
 using core::utils::Vec3Data;
 
-bool IsEqual(float actual, float expect);
+/**
+ * @brief Check if values are equal
+ *
+ * @param expect expected DoubleData object
+ * @param actual actual DoubleData object
+ * @return ::testing::AssertionResult assentation result
+ */
+::testing::AssertionResult ExpectDoubleDataEq(const DoubleData& expect,
+                                              const DoubleData& actual);
 
-bool IsEqual(double actual, double expect);
+/**
+ * @brief Check if values are equal
+ *
+ * @param expect expected Vec3
+ * @param actual actual Vec3
+ * @return ::testing::AssertionResult assentation result
+ */
+::testing::AssertionResult ExpectVec3Eq(const Vec3& expect, const Vec3& actual);
 
-::testing::AssertionResult operator&&(::testing::AssertionResult ar1,
-                                      ::testing::AssertionResult ar2);
+/**
+ * @brief Check if values are equal
+ *
+ * @param expect expected Vec3Data
+ * @param actual actual Vec3Data
+ * @return ::testing::AssertionResult assentation result
+ */
+::testing::AssertionResult ExpectVec3DataEq(const Vec3Data& expect,
+                                            const Vec3Data& actual);
 
-::testing::AssertionResult ExpectEq(MATH_TYPE actual, MATH_TYPE expect,
-                                    std::string_view extra_msg = "");
+/**
+ * @brief Check if values are equal
+ *
+ * @param expect expected Quat
+ * @param actual actual Quat
+ * @return ::testing::AssertionResult assentation result
+ */
+::testing::AssertionResult ExpectQuatEq(const Quat& expect, const Quat& actual);
 
-::testing::AssertionResult ExpectDoubleDataEq(const DoubleData& d1,
-                                              const DoubleData& d2);
+/**
+ * @brief Check if values are equal
+ *
+ * @param expect expected QuatData
+ * @param actual actual QuatData
+ * @return ::testing::AssertionResult assentation result
+ */
+::testing::AssertionResult ExpectQuatDataEq(const QuatData& expect,
+                                            const QuatData& actual);
 
-::testing::AssertionResult ExpectVec3Eq(const Vec3& v1, const Vec3& v2);
+/**
+ * @brief Check if values are equal
+ *
+ * @param expect expected ImuData
+ * @param actual actual ImuData
+ * @return ::testing::AssertionResult assentation result
+ */
+::testing::AssertionResult ExpectImuData(const ImuData& expect,
+                                         const ImuData& actual);
 
-::testing::AssertionResult ExpectVec3DataEq(const Vec3Data& v1,
-                                            const Vec3Data& v2);
-
-::testing::AssertionResult ExpectQuatEq(const Quat& q1, const Quat& q2);
-
-::testing::AssertionResult ExpectQuatDataEq(const QuatData& q1,
-                                            const QuatData& q2);
-
-::testing::AssertionResult ExpectImuData(const ImuData& d1, const ImuData& d2);
-
-::testing::AssertionResult ExpectGPSData(double lat, double lon, double alt,
-                                         const GpsData& gps);
+/**
+ * @brief Check if gps data are equal
+ *
+ * @param expect expected GpsData
+ * @param actual actual GpsData
+ * @return ::testing::AssertionResult assentation result
+ */
+::testing::AssertionResult ExpectGPSData(const GpsData& expect,
+                                         const GpsData& actual);
 
 #endif  // UTEST_UTEST_DATA_HPP_
