@@ -4,8 +4,12 @@
 #define CORE_UTILS_SPINNER_HPP_
 
 #include <chrono>
+#include <memory>
 
-namespace spinner {
+#include "core/utils/clock.hpp"
+#include "core/utils/logger_node.hpp"
+
+namespace core::utils {
 
 /**
  * @brief A blocking class used to ensure a loop will take a certain frequency
@@ -20,9 +24,17 @@ class Spinner {
   /**
    * @brief Construct a new Spinner object
    *
-   * @param rate rate of spinning in hz
+   * @param hz rate of spinning in hz
    */
-  Spinner(const double rate, const bool debug = false);
+  Spinner(const double hz);
+
+  /**
+   * @brief Construct a new Spinner object
+   *
+   * @param hz rate of spinning in hz
+   */
+  Spinner(const double hz, std::unique_ptr<ClockInterface> clock,
+          std::shared_ptr<NodeLogger> logger);
 
   /**
    * @brief Spin the time once
@@ -33,6 +45,7 @@ class Spinner {
   double SpinOnce();
 
   void SetRate(const double hz);
+
   void SetSamplingTime(const double st_sec);
 
  protected:
@@ -49,15 +62,16 @@ class Spinner {
   double UpdateTime();
 
  private:
-  bool debug_{false};  ///> debugging flag used to print object running rate
-  Duration sampling_time_{1};    ///> sampling time, 1/rate
-  double min_dt_{1e9};           ///> minimum sampling time
-  double max_dt_{0.};            ///> minimum sampling time
-  TimePoint ptime_before_sleep;  ///> previous spin's time before sleep
-  TimePoint ptime_after_sleep;   ///> previous running time
-  TimePoint ptime_debug;         ///> previous time for printing debugging msg
+  std::unique_ptr<ClockInterface> clock_;
+  std::shared_ptr<NodeLogger> logger_;
+  TimeStruct sampling_time_{1.};  ///> sampling time, 1/rate
+  double min_dt_{1e9};            ///> minimum sampling time
+  double max_dt_{0.};             ///> minimum sampling time
+  TimeStruct ptime_before_sleep;  ///> previous spin's time before sleep
+  TimeStruct ptime_after_sleep;   ///> previous running time
+  TimeStruct ptime_debug;         ///> previous time for printing debugging msg
 };
 
-}  // namespace spinner
+}  // namespace core::utils
 
 #endif  // CORE_UTILS_SPINNER_HPP_
