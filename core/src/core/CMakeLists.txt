@@ -37,6 +37,7 @@ set(CORE_HEADER_LIST
 # ##############################################################################
 set(CORE_SOURCE_DIR ${PROJECT_SOURCE_DIR}/core/src/core)
 set(CORE_SOURCE_LIST
+    ${CORE_SOURCE_DIR}/utils/clock.cpp
     ${CORE_SOURCE_DIR}/utils/date_time.cpp
     ${CORE_SOURCE_DIR}/utils/data_struct.cpp
     ${CORE_SOURCE_DIR}/utils/data.cpp

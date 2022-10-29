@@ -1,5 +1,6 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
+#include <memory>
 #include <string>
 #include <thread>
 
@@ -10,6 +11,9 @@ using core::utils::ClockInterface;
 using core::utils::HighResolutionClock;
 using core::utils::Time;
 using core::utils::TimeComponent;
+using core::utils::TimeInMicroSeconds;
+using core::utils::TimeInSeconds;
+using core::utils::TimeInSecondsString;
 
 constexpr double INACCURACY_IN_SLEEP_FOR_SEC{0.0002};
 
@@ -28,36 +32,39 @@ TEST(TimeComponent, SeparateConstruct) {
 }
 
 TEST(TimeComponent, ConstructUsingTimeInSec) {
-  constexpr double in_sec = 3.4;
-  const TimeComponent tc{in_sec};
+  constexpr double time_in_sec = 3.4;
+  const TimeComponent tc{time_in_sec};
   EXPECT_EQ(3, tc.seconds);
   EXPECT_EQ(4e5, tc.micros);
 }
 
-TEST(TimeComponent, InSec) {
-  constexpr double in_sec = 3.4;
-  const TimeComponent tc{in_sec};
-  EXPECT_DOUBLE_EQ(in_sec, tc.ToSec());
+TEST(TimeComponent, ToSeconds) {
+  constexpr double time_in_sec = 3.4;
+  const TimeComponent tc{time_in_sec};
+  EXPECT_DOUBLE_EQ(time_in_sec, tc.ToSeconds());
 }
 
 TEST(Time, DefaultConstruct) {
   const Time time_struct;
-  EXPECT_DOUBLE_EQ(0.0, time_struct.InSec());
+  EXPECT_DOUBLE_EQ(0.0, time_struct.InSeconds());
+  EXPECT_EQ(0, time_struct.InMicroSeconds());
 }
 
 TEST(Time, ConstructUsingTimeInSec) {
   constexpr double time_in_sec = 1.02;
   Time time_struct(time_in_sec);
-  EXPECT_DOUBLE_EQ(time_in_sec, time_struct.InSec());
+  EXPECT_DOUBLE_EQ(time_in_sec, time_struct.InSeconds());
+  const uint32_t expect = static_cast<uint32_t>(time_in_sec * 1e6);
+  EXPECT_EQ(expect, time_struct.InMicroSeconds());
 }
 
-TEST(Time, Component) {
-  constexpr long sec = 3;
-  constexpr long micro = 5;
-  const TimeComponent tc{sec, micro};
-  Time time_struct(tc.ToSec());
-  EXPECT_EQ(sec, time_struct.Component().seconds);
-  EXPECT_EQ(micro, time_struct.Component().micros);
+TEST(Time, ConstructUsingTimeComponent) {
+  constexpr double time_in_sec = 3.4;
+  const TimeComponent tc{time_in_sec};
+  Time time_struct(tc);
+  EXPECT_DOUBLE_EQ(time_in_sec, time_struct.InSeconds());
+  EXPECT_EQ(tc.seconds, time_struct.Component().seconds);
+  EXPECT_EQ(tc.micros, time_struct.Component().micros);
 }
 
 TEST(Time, CheckAdding) {
@@ -89,14 +96,14 @@ TEST(Time, ConstructNewTimeAfterArithmetic) {
 TEST(Time, ToString) {
   double start_time_in_sec = 5.2;
   Time time_struct(start_time_in_sec);
-  std::string expect = std::to_string(time_struct.InSec());
+  std::string expect = std::to_string(time_struct.InSeconds());
   EXPECT_EQ(expect, time_struct.ToString());
 }
 
 TEST(Time, Pretty) {
   double start_time_in_sec = 5.2;
   Time time_struct(start_time_in_sec);
-  std::string expect = std::to_string(time_struct.InSec()) + " [sec]";
+  std::string expect = std::to_string(time_struct.InSeconds()) + " [sec]";
   EXPECT_EQ(expect, time_struct.Pretty());
 }
 
@@ -146,4 +153,22 @@ TEST(HighResolutionClock, TestWithSleepFor) {
   const Time measured_duration = end - start;
   EXPECT_GT(measured_duration, sleep_duration);
   EXPECT_LE(measured_duration, sleep_duration + INACCURACY_IN_SLEEP_FOR_SEC);
+}
+
+// check TimeInSeconds function
+TEST(TimeInSeconds, test) {
+  auto clock = std::make_unique<MockClock>();
+  const double time_in_sec = 1.234;
+  const Time time{time_in_sec};
+  clock->Set(time);
+  EXPECT_DOUBLE_EQ(time_in_sec, TimeInSeconds(std::move(clock)));
+}
+
+// check TimeInSecondsString function
+TEST(TimeInSecondsString, test) {
+  auto clock = std::make_unique<MockClock>();
+  const double time_in_sec = 1.234;
+  const Time time{time_in_sec};
+  clock->Set(time);
+  EXPECT_EQ(time.ToString(), TimeInSecondsString(std::move(clock)));
 }

@@ -8,7 +8,6 @@
 
 using core::utils::HighResolutionClock;
 using core::utils::Spinner;
-using core::utils::TimeStruct;
 
 int main(int /*argc*/, char const** /*argv[]*/) {
   HighResolutionClock clock;

@@ -35,18 +35,6 @@ testing::AssertionResult IsEqualDateTime(const tm& expect, const tm& actual) {
          ExpectEq(expect.tm_sec, actual.tm_sec, "Seconds");
 }
 
-// check time_in_seconds function
-TEST(DateTime, time_in_seconds) {
-  const auto expect = TimeSinceEpochInSec();
-  EXPECT_EQ(expect, TimeInSeconds());
-}
-
-// check CreateNodeUsingSystemLogger function
-TEST(DateTime, CreateNodeUsingSystemLogger) {
-  const auto expect = std::to_string(TimeSinceEpochInSec());
-  EXPECT_EQ(expect, TimeInSecondsString());
-}
-
 // check generate_file_name function
 TEST(DateTime, GenerateFileName) {
   tm local_tm{};

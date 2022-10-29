@@ -16,13 +16,6 @@ tm CreateTmStruct() {
   return time_struct;
 }
 
-template <typename T>
-constexpr int64_t TimeNow() {
-  const auto now = std::chrono::system_clock::now();
-  const auto epoch = now.time_since_epoch();
-  return std::chrono::duration_cast<T>(epoch).count();
-}
-
 /**
  * @brief Format time_info_ struct to string by rapping strftime function
  *
@@ -47,20 +40,8 @@ std::string FormatTimeInfo(const char* format, const tm time_info) {
 }
 }  // namespace
 
-int64_t TimeInMilliSec() {
-  return TimeNow<std::chrono::milliseconds>();
-}
-
-int64_t TimeInSeconds() {
-  return TimeNow<std::chrono::seconds>();
-}
-
-std::string TimeInSecondsString() {
-  return std::to_string(TimeInSeconds());
-}
-
 std::string GenerateFileName(const DateTime dt) {
-  tm time_struct = dt.GetTimeStruct();
+  const tm time_struct = dt.GetTimeStruct();
   return FormatTimeInfo("%d-%b-%Y_%H-%M-%S", time_struct);
 }
 
