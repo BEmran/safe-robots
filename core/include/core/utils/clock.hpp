@@ -12,7 +12,6 @@ namespace core::utils {
 
 namespace {
 using Duration = std::chrono::duration<double, std::ratio<1>>;
-
 constexpr long MEGA = 1e6;
 constexpr double MICRO = 1e-6;
 
@@ -79,51 +78,23 @@ std::ostream& operator<<(std::ostream& os, const Time& time) {
   return os << time.ToString();
 }
 
-class TimeInterface {
- public:
-  virtual ~TimeInterface() = default;
-  virtual Time GetTime() const = 0;
-};
-
-class ChronoTime : public TimeInterface {
-  using TimePoint = std::chrono::system_clock::time_point;
-
- public:
-  ChronoTime(TimePoint tp) : tp_(tp) {
-  }
-
-  TimePoint GetTimePoint() const {
-    return tp_;
-  }
-
-  TimePoint& GetTimePoint() {
-    return tp_;
-  }
-
-  Time GetTime() const override {
-    Duration d{tp_.time_since_epoch()};
-    return Time(d.count());
-  }
-
- private:
-  TimePoint tp_{};
-};
-
 class ClockInterface {
  public:
   virtual ~ClockInterface() = default;
-  virtual std::unique_ptr<TimeInterface> Now() const = 0;
-  virtual Time GetTime() const = 0;
+  virtual Time Now() const = 0;
 };
 
 class HighResolutionClock : public ClockInterface {
+  using ChronoTimePoint = std::chrono::system_clock::time_point;
+
  public:
-  std::unique_ptr<TimeInterface> Now() const override {
-    return std::make_unique<ChronoTime>(
-      std::chrono::high_resolution_clock::now());
+  Time Now() const override {
+    const Duration d = TimePoint().time_since_epoch();
+    return Time{d.count()};
   }
-  Time GetTime() const override {
-    return Now()->GetTime();
+
+  ChronoTimePoint TimePoint() const {
+    return std::chrono::high_resolution_clock::now();
   }
 };
 

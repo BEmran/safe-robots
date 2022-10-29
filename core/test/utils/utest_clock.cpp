@@ -1,16 +1,17 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#include <cmath>
-#include <memory>
 #include <string>
+#include <thread>
 
 #include "core/utils/clock.hpp"
 #include "gtest/gtest.h"
 
 using core::utils::ClockInterface;
+using core::utils::HighResolutionClock;
 using core::utils::Time;
 using core::utils::TimeComponent;
-using core::utils::TimeInterface;
+
+constexpr double INACCURACY_IN_SLEEP_FOR_SEC{0.0002};
 
 TEST(TimeComponent, DefaultConstruct) {
   const TimeComponent tc;
@@ -108,54 +109,41 @@ TEST(Time, Stream) {
   EXPECT_EQ(time_struct.ToString(), ss.str());
 }
 
-class SimpleTime : public TimeInterface {
+class MockClock : public ClockInterface {
  public:
-  SimpleTime(double time) : time_(time) {
+  Time Now() const override {
+    return time_;
   }
-
-  Time GetTime() const override {
-    return Time(time_);
+  void Set(const Time& time) {
+    time_ = time;
   }
 
  private:
-  double time_;
+  Time time_;
 };
 
-TEST(SimpleTime, Construct) {
-  constexpr double in_sec = 6.7;
-  const SimpleTime st(in_sec);
-  EXPECT_DOUBLE_EQ(in_sec, st.GetTime().InSec());
+TEST(MockClock, Construct) {
+  const Time time{6.7};
+  MockClock clock;
+  clock.Set(time);
+  EXPECT_DOUBLE_EQ(time, clock.Now());
 }
 
-TEST(SimpleTime, AsPointer) {
-  constexpr double in_sec = 6.7;
-  const SimpleTime st(in_sec);
-  const TimeInterface* st_ptr = &st;
-  EXPECT_DOUBLE_EQ(in_sec, st_ptr->GetTime().InSec());
+TEST(MockClock, AsPointer) {
+  const Time time{6.7};
+  MockClock clock;
+  clock.Set(time);
+  ClockInterface* clock_ptr = &clock;
+  EXPECT_DOUBLE_EQ(time, clock_ptr->Now());
 }
 
-// class MockClock : public ClockInterface {
-//  public:
-//   std::unique_ptr<TimeInterface> Now() override {
-//     return std::make_unique<SimpleTime>(time_);
-//   }
-//   Time TimeNow() override {
-//     return Now()->Time();
-//   }
-//   void Set(Time time) {
-//     time_ = time;
-//   }
-
-//  private:
-//   Time time_;
-// };
-
-// TEST(Clock, ) {
-// }
-// ::testing::AssertionResult ExpectGPSData(GpsData& expect,
-//                                          GpsData& actual) {
-//   auto e1 = ExpectEq(expect.lat, actual.lat, "Latitude value:");
-//   auto e2 = ExpectEq(expect.lon, actual.lon, "Longitude value:");
-//   auto e3 = ExpectEq(expect.alt, actual.alt, "Altitude value:");
-//   return e1 && e2 && e3;
-// }
+TEST(HighResolutionClock, TestWithSleepFor) {
+  HighResolutionClock clock;
+  const auto start = clock.Now();
+  Time sleep_duration(0.1);
+  std::this_thread::sleep_for(sleep_duration.ToChronoDuration());
+  const auto end = clock.Now();
+  const Time measured_duration = end - start;
+  EXPECT_GT(measured_duration, sleep_duration);
+  EXPECT_LE(measured_duration, sleep_duration + INACCURACY_IN_SLEEP_FOR_SEC);
+}

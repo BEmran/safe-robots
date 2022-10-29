@@ -23,8 +23,8 @@ Spinner::Spinner(const double hz, std::unique_ptr<ClockInterface> clock,
                  std::shared_ptr<NodeLogger> logger)
   : clock_(std::move(clock)), logger_(logger) {
   SetRate(hz);
-  ptime_after_sleep = clock_->GetTime();
-  ptime_before_sleep = clock_->GetTime();
+  ptime_after_sleep = clock_->Now();
+  ptime_before_sleep = clock_->Now();
 }
 
 void Spinner::SetRate(const double hz) {
@@ -54,7 +54,7 @@ double Spinner::UpdateTime() {
 }
 
 double Spinner::SpinOnce() {
-  const auto ctime = clock_->GetTime();
+  const auto ctime = clock_->Now();
   const Time actual_sampling_time = ctime - ptime_before_sleep;
   const Time elapsed = ctime - ptime_after_sleep;
   if (sampling_time_ > elapsed) {
@@ -67,7 +67,7 @@ double Spinner::SpinOnce() {
                     << std::endl;
   }
   ptime_before_sleep = ctime;
-  ptime_after_sleep = clock_->GetTime();
+  ptime_after_sleep = clock_->Now();
 
   update_max_min_values(actual_sampling_time);
   PrintInfo(actual_sampling_time);
