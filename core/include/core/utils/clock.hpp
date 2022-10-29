@@ -4,59 +4,67 @@
 #define CORE_UTILS_CLOCK_HPP_
 
 #include <chrono>
+#include <cstdio>
 #include <iostream>
 #include <memory>
 
 namespace core::utils {
 
 namespace {
+using Duration = std::chrono::duration<double, std::ratio<1>>;
+
 constexpr long MEGA = 1e6;
 constexpr double MICRO = 1e-6;
 
-constexpr double ToSec(const long micro) {
-  return static_cast<double>(micro) * MICRO;
-}
-
-constexpr long ToMicro(const double sec) {
-  return static_cast<long>(sec * MEGA);
-}
 }  // namespace
 
-class TimeStruct {
+struct TimeComponent {
+  long seconds{0};
+  long micros{0};
+
+  TimeComponent() : seconds{0}, micros{0} {
+  }
+
+  TimeComponent(const long sec, const long micro)
+    : seconds{sec}, micros{micro} {
+  }
+
+  TimeComponent(const double time_in_sec) {
+    seconds = static_cast<long>(time_in_sec);
+    micros = static_cast<long>(time_in_sec * MEGA) - seconds * MEGA;
+  }
+
+  double ToSec() const {
+    return static_cast<double>(seconds) + static_cast<double>(micros) * MICRO;
+  }
+};
+
+class Time {
  public:
-  TimeStruct() : secs{0}, micros{0}, in_sec{0.0} {
+  Time() : in_sec_{0.0} {
   }
 
-  TimeStruct(long time_in_micro) : TimeStruct(ToSec(time_in_micro)) {
+  Time(const double time_in_sec) : in_sec_(time_in_sec) {
   }
 
-  TimeStruct(double time_in_sec) : in_sec(time_in_sec) {
-    secs = static_cast<long>(in_sec);
-    micros = ToMicro(in_sec - static_cast<double>(secs));
-  }
-
-  inline long Secs() const {
-    return secs;
-  }
-
-  inline long Micros() const {
-    return micros;
+  inline TimeComponent Component() const {
+    return TimeComponent(in_sec_);
   }
 
   inline double InSec() const {
-    return in_sec;
+    return in_sec_;
   }
 
-  std::chrono::duration<double> ToChronoDuration() const {
-    return std::chrono::duration<double, std::ratio<1>>{in_sec};
+  Duration ToChronoDuration() const {
+    return Duration{in_sec_};
   }
 
   inline operator double() const {
-    return in_sec;
+    return in_sec_;
   }
 
   inline std::string ToString() const {
-    return std::to_string(in_sec);
+    return std::to_string(in_sec_);
   }
 
   inline std::string Pretty() const {
@@ -64,88 +72,58 @@ class TimeStruct {
   }
 
  private:
-  long secs{0};
-  long micros{0};
-  double in_sec{0.0};
+  double in_sec_{0.0};
 };
 
-std::ostream& operator<<(std::ostream& os, const TimeStruct& time) {
+std::ostream& operator<<(std::ostream& os, const Time& time) {
   return os << time.ToString();
 }
 
 class TimeInterface {
  public:
   virtual ~TimeInterface() = default;
-  virtual TimeStruct Time() const = 0;
-};
-
-class SimpleTime : public TimeInterface {
- public:
-  SimpleTime(TimeStruct time) : time_(time) {
-  }
-
-  TimeStruct Time() const override {
-    return time_;
-  }
-
- private:
-  TimeStruct time_;
+  virtual Time GetTime() const = 0;
 };
 
 class ChronoTime : public TimeInterface {
   using TimePoint = std::chrono::system_clock::time_point;
-  using Duration = std::chrono::duration<double>;
 
  public:
   ChronoTime(TimePoint tp) : tp_(tp) {
-    Duration d = tp_.time_since_epoch();
-    time_ = TimeStruct(d.count());
   }
 
   TimePoint GetTimePoint() const {
     return tp_;
   }
 
-  TimeStruct Time() const override {
-    return time_;
+  TimePoint& GetTimePoint() {
+    return tp_;
+  }
+
+  Time GetTime() const override {
+    Duration d{tp_.time_since_epoch()};
+    return Time(d.count());
   }
 
  private:
   TimePoint tp_{};
-  TimeStruct time_;
 };
 
 class ClockInterface {
  public:
   virtual ~ClockInterface() = default;
-  virtual std::unique_ptr<TimeInterface> Now() = 0;
-  virtual TimeStruct TimeNow() = 0;
-};
-
-class MockClock : public ClockInterface {
- public:
-  std::unique_ptr<TimeInterface> Now() override {
-    return std::make_unique<SimpleTime>(time_);
-  }
-  TimeStruct TimeNow() override {
-    return Now()->Time();
-  }
-  void Set(TimeStruct time) {
-    time_ = time;
-  }
-
- private:
-  TimeStruct time_;
+  virtual std::unique_ptr<TimeInterface> Now() const = 0;
+  virtual Time GetTime() const = 0;
 };
 
 class HighResolutionClock : public ClockInterface {
  public:
-  std::unique_ptr<TimeInterface> Now() override {
+  std::unique_ptr<TimeInterface> Now() const override {
     return std::make_unique<ChronoTime>(
       std::chrono::high_resolution_clock::now());
   }
-  TimeStruct TimeNow() override {
-    return Now()->Time();
+  Time GetTime() const override {
+    return Now()->GetTime();
   }
 };
 

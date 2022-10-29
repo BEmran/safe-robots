@@ -23,15 +23,15 @@ Spinner::Spinner(const double hz, std::unique_ptr<ClockInterface> clock,
                  std::shared_ptr<NodeLogger> logger)
   : clock_(std::move(clock)), logger_(logger) {
   SetRate(hz);
-  ptime_after_sleep = clock_->TimeNow();
-  ptime_before_sleep = clock_->TimeNow();
+  ptime_after_sleep = clock_->GetTime();
+  ptime_before_sleep = clock_->GetTime();
 }
 
 void Spinner::SetRate(const double hz) {
   if (hz <= 0) {
     return;
   }
-  sampling_time_ = TimeStruct(1 / hz);
+  sampling_time_ = Time(1 / hz);
 }
 
 void Spinner::SetSamplingTime(const double st_sec) {
@@ -42,23 +42,23 @@ void Spinner::SetSamplingTime(const double st_sec) {
                     << sampling_time_ << std::endl;
     return;
   }
-  sampling_time_ = TimeStruct(st_sec);
+  sampling_time_ = Time(st_sec);
 }
 
 double Spinner::UpdateTime() {
   // auto ctime = std::chrono::high_resolution_clock::now();
   // check time difference in milli
-  // TimeStruct dt = ctime - ptime_after_sleep;
+  // Time dt = ctime - ptime_after_sleep;
   // ptime_ = ctime;
   return 1;
 }
 
 double Spinner::SpinOnce() {
-  const auto ctime = clock_->TimeNow();
-  const TimeStruct actual_sampling_time = ctime - ptime_before_sleep;
-  const TimeStruct elapsed = ctime - ptime_after_sleep;
+  const auto ctime = clock_->GetTime();
+  const Time actual_sampling_time = ctime - ptime_before_sleep;
+  const Time elapsed = ctime - ptime_after_sleep;
   if (sampling_time_ > elapsed) {
-    const TimeStruct sleep = sampling_time_ - elapsed;
+    const Time sleep = sampling_time_ - elapsed;
     std::this_thread::sleep_for(sleep.ToChronoDuration());
   } else {
     logger_->Warn() << "violate sleeping time: Required Sampling time is too "
@@ -67,7 +67,7 @@ double Spinner::SpinOnce() {
                     << std::endl;
   }
   ptime_before_sleep = ctime;
-  ptime_after_sleep = clock_->TimeNow();
+  ptime_after_sleep = clock_->GetTime();
 
   update_max_min_values(actual_sampling_time);
   PrintInfo(actual_sampling_time);

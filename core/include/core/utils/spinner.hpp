@@ -64,12 +64,12 @@ class Spinner {
  private:
   std::unique_ptr<ClockInterface> clock_;
   std::shared_ptr<NodeLogger> logger_;
-  TimeStruct sampling_time_{1.};  ///> sampling time, 1/rate
-  double min_dt_{1e9};            ///> minimum sampling time
-  double max_dt_{0.};             ///> minimum sampling time
-  TimeStruct ptime_before_sleep;  ///> previous spin's time before sleep
-  TimeStruct ptime_after_sleep;   ///> previous running time
-  TimeStruct ptime_debug;         ///> previous time for printing debugging msg
+  Time sampling_time_{1.};  ///> sampling time, 1/rate
+  double min_dt_{1e9};      ///> minimum sampling time
+  double max_dt_{0.};       ///> minimum sampling time
+  Time ptime_before_sleep;  ///> previous spin's time before sleep
+  Time ptime_after_sleep;   ///> previous running time
+  Time ptime_debug;         ///> previous time for printing debugging msg
 };
 
 }  // namespace core::utils
