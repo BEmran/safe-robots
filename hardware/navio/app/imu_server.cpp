@@ -29,8 +29,7 @@ int main(int argc, char* argv[]) {
   app.node->GetNodeLogger()->Debug("Sensor is initialized successfully");
 
   //-------------------------------------------------------------------------
-  core::utils::HighResolutionClock clock;
-  const auto begin = clock.Now().InMicroSeconds();
+  const auto begin = core::utils::TimeInMicroSeconds();
   auto tries = MaximumClientTries;
   constexpr auto send_delay = 10;
   while (--tries > 0) {
@@ -39,9 +38,9 @@ int main(int argc, char* argv[]) {
       app.sensor->Update();
       const auto data = app.sensor->GetData();
       std::stringstream ss;
-      ss << clock.Now().InMicroSeconds() - begin << ", "  //
-         << data.accel.data << ", "                       //
-         << data.gyro.data << ", "                        //
+      ss << core::utils::TimeInMicroSeconds() - begin << ", "  //
+         << data.accel.data << ", "                            //
+         << data.gyro.data << ", "                             //
          << data.mag.data << ", " << data.tait_bryan.data << ";";
 
       (*app.server) << ss.str();

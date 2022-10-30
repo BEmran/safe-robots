@@ -14,14 +14,14 @@ constexpr std::string_view SPINNER_NAME = "SPINNER";
 namespace core::utils {
 
 Spinner::Spinner(const double hz)
-  : Spinner(hz, std::make_unique<HighResolutionClock>(),
+  : Spinner(hz, std::shared_ptr<HighResolutionClock>(),
             std::make_shared<NodeLogger>(
               CreateNodeLoggerUsingSystemLogger(SPINNER_NAME))) {
 }
 
-Spinner::Spinner(const double hz, std::unique_ptr<ClockInterface> clock,
+Spinner::Spinner(const double hz, std::shared_ptr<ClockInterface> clock,
                  std::shared_ptr<NodeLogger> logger)
-  : clock_(std::move(clock)), logger_(logger) {
+  : clock_(clock), logger_(logger) {
   SetRate(hz);
   ptime_after_sleep = clock_->Now();
   ptime_before_sleep = clock_->Now();

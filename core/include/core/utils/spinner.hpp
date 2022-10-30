@@ -33,7 +33,7 @@ class Spinner {
    *
    * @param hz rate of spinning in hz
    */
-  Spinner(const double hz, std::unique_ptr<ClockInterface> clock,
+  Spinner(const double hz, std::shared_ptr<ClockInterface> clock,
           std::shared_ptr<NodeLogger> logger);
 
   /**

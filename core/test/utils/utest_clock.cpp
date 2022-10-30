@@ -59,29 +59,29 @@ TEST(HighResolutionClock, TestWithSleepFor) {
 
 // check TimeInSeconds function
 TEST(TimeInSeconds, test) {
-  auto clock = std::make_unique<MockClock>();
+  auto clock = std::make_shared<MockClock>();
   const double time_in_sec = 1.234;
   const Time time{time_in_sec};
   clock->Set(time);
-  EXPECT_DOUBLE_EQ(time_in_sec, TimeInSeconds(std::move(clock)));
+  EXPECT_DOUBLE_EQ(time_in_sec, TimeInSeconds(clock));
 }
 
 // check TimeInMicroSeconds function
 TEST(TimeInMicroSeconds, test) {
-  auto clock = std::make_unique<MockClock>();
+  auto clock = std::make_shared<MockClock>();
   const double time_in_sec = 1.234;
   const Time time{time_in_sec};
   clock->Set(time);
   constexpr uint64_t Mega = 1e6;
   const uint64_t expect = static_cast<uint64_t>(time_in_sec * Mega);
-  EXPECT_EQ(expect, TimeInMicroSeconds(std::move(clock)));
+  EXPECT_EQ(expect, TimeInMicroSeconds(clock));
 }
 
 // check TimeInSecondsString function
 TEST(TimeInSecondsString, test) {
-  auto clock = std::make_unique<MockClock>();
+  auto clock = std::make_shared<MockClock>();
   const double time_in_sec = 1.234;
   const Time time{time_in_sec};
   clock->Set(time);
-  EXPECT_EQ(time.ToString(), TimeInSecondsString(std::move(clock)));
+  EXPECT_EQ(time.ToString(), TimeInSecondsString(clock));
 }

@@ -13,17 +13,17 @@ HighResolutionClock::ChronoTimePoint HighResolutionClock::TimePoint() {
   return std::chrono::high_resolution_clock::now();
 }
 
-double TimeInSeconds(std::unique_ptr<ClockInterface> clock) {
+double TimeInSeconds(std::shared_ptr<ClockInterface> clock) {
   const Time now = clock->Now();
   return now.InSeconds();
 }
 
-uint64_t TimeInMicroSeconds(std::unique_ptr<ClockInterface> clock) {
+uint64_t TimeInMicroSeconds(std::shared_ptr<ClockInterface> clock) {
   const Time now = clock->Now();
   return now.InMicroSeconds();
 }
 
-std::string TimeInSecondsString(std::unique_ptr<ClockInterface> clock) {
+std::string TimeInSecondsString(std::shared_ptr<ClockInterface> clock) {
   const Time now = clock->Now();
   return now.ToString();
 }

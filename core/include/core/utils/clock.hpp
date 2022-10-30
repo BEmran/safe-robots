@@ -61,8 +61,8 @@ class HighResolutionClock : public ClockInterface {
  * @param clock clock used to calculate time
  * @return double current time in seconds
  */
-double TimeInSeconds(std::unique_ptr<ClockInterface> clock =
-                       std::make_unique<HighResolutionClock>());
+double TimeInSeconds(std::shared_ptr<ClockInterface> clock =
+                       std::make_shared<HighResolutionClock>());
 /**
  * @brief Returns current time in microseconds using the passed clock.
  * @details It simplifies the procedure of calculating current time in
@@ -71,8 +71,8 @@ double TimeInSeconds(std::unique_ptr<ClockInterface> clock =
  * @param clock clock used to calculate time
  * @return uint64_t current time in microseconds
  */
-uint64_t TimeInMicroSeconds(std::unique_ptr<ClockInterface> clock =
-                              std::make_unique<HighResolutionClock>());
+uint64_t TimeInMicroSeconds(std::shared_ptr<ClockInterface> clock =
+                              std::make_shared<HighResolutionClock>());
 
 /**
  * @brief Returns a string contains the current time in seconds using the passed
@@ -83,8 +83,8 @@ uint64_t TimeInMicroSeconds(std::unique_ptr<ClockInterface> clock =
  * @param clock clock used to calculate time
  * @return std::string time in seconds as string
  */
-std::string TimeInSecondsString(std::unique_ptr<ClockInterface> clock =
-                                  std::make_unique<HighResolutionClock>());
+std::string TimeInSecondsString(std::shared_ptr<ClockInterface> clock =
+                                  std::make_shared<HighResolutionClock>());
 
 }  // namespace core::utils
 
