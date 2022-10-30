@@ -59,7 +59,7 @@ double Spinner::SpinOnce() {
   const Time elapsed = ctime - ptime_after_sleep;
   if (sampling_time_ > elapsed) {
     const Time sleep = sampling_time_ - elapsed;
-    std::this_thread::sleep_for(sleep.ToChronoDuration());
+    std::this_thread::sleep_for(ToChronoDuration(sleep));
   } else {
     logger_->Warn() << "violate sleeping time: Required Sampling time is too "
                        "small: "

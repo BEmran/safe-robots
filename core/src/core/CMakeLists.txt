@@ -26,6 +26,7 @@ set(CORE_HEADER_LIST
     ${CORE_INCLUDE_DIR}/utils/subject.hpp
     ${CORE_INCLUDE_DIR}/utils/system.hpp
     ${CORE_INCLUDE_DIR}/utils/spinner.hpp
+    ${CORE_INCLUDE_DIR}/utils/time.hpp
     ${CORE_INCLUDE_DIR}/utils/modifier.hpp
     ${CORE_INCLUDE_DIR}/utils/writer_file.hpp
     ${CORE_INCLUDE_DIR}/utils/writer.hpp
@@ -55,6 +56,7 @@ set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/utils/socket.cpp
     ${CORE_SOURCE_DIR}/utils/spinner.cpp
     ${CORE_SOURCE_DIR}/utils/system.cpp
+    ${CORE_SOURCE_DIR}/utils/time.cpp
     ${CORE_SOURCE_DIR}/utils/writer_file.cpp
     ${CORE_SOURCE_DIR}/utils/writer.cpp
     ${CORE_SOURCE_DIR}/sensors/module_sensor_imu.cpp
