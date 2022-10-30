@@ -5,8 +5,9 @@
 namespace core::utils {
 
 namespace {
-// using Duration = std::chrono::duration<double, std::ratio<1>>;
+/// @brief Mega scale used for conversion
 constexpr long MEGA = 1e6;
+/// @brief Micro scale used for conversion
 constexpr double MICRO = 1e-6;
 }  // namespace
 
@@ -47,7 +48,7 @@ uint64_t Time::InMicroSeconds() const {
   return static_cast<uint64_t>(in_sec_ * MEGA);
 }
 
-Duration Time::ToChronoDuration() const {
+Time::Duration Time::ToChronoDuration() const {
   return Duration{in_sec_};
 }
 
@@ -68,7 +69,7 @@ std::ostream& operator<<(std::ostream& os, const Time& time) {
 }
 
 Time HighResolutionClock::Now() const {
-  const Duration d = TimePoint().time_since_epoch();
+  const std::chrono::duration<double> d = TimePoint().time_since_epoch();
   return Time{d.count()};
 }
 
