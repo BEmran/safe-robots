@@ -7,7 +7,7 @@
 #include "core/utils/clock.hpp"
 #include "gtest/gtest.h"
 
-using core::utils::ClockInterface;
+using core::utils::ClockSource;
 using core::utils::HighResolutionClock;
 using core::utils::Time;
 using core::utils::TimeInMicroSeconds;
@@ -17,7 +17,7 @@ using core::utils::ToChronoDuration;
 
 constexpr double ESTIMATED_INACCURACY_IN_SLEEP_FOR_SEC{0.0003};
 
-class MockClock : public ClockInterface {
+class MockClock : public ClockSource {
  public:
   Time Now() const override {
     return time_;
@@ -41,7 +41,7 @@ TEST(MockClock, AsPointer) {
   const Time time{6.7};
   MockClock clock;
   clock.Set(time);
-  ClockInterface* clock_ptr = &clock;
+  ClockSource* clock_ptr = &clock;
   EXPECT_DOUBLE_EQ(time, clock_ptr->Now());
 }
 

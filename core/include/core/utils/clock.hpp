@@ -15,13 +15,13 @@ namespace core::utils {
  * @brief Interface to implement different method to capture time
  *
  */
-class ClockInterface {
+class ClockSource {
  public:
   /**
    * @brief Destroy the Clock Interface object
    *
    */
-  virtual ~ClockInterface() = default;
+  virtual ~ClockSource() = default;
 
   /**
    * @brief Returns current time
@@ -32,16 +32,16 @@ class ClockInterface {
 };
 
 /**
- * @brief Concrete implementation to ClockInterface uses
+ * @brief Concrete implementation to ClockSource uses
  * chrono::high_resolution_clock as its internal clock implementation.
  *
  */
-class HighResolutionClock : public ClockInterface {
+class HighResolutionClock : public ClockSource {
   using ChronoTimePoint = std::chrono::system_clock::time_point;
 
  public:
   /**
-   * @implements Now function from ClockInterface
+   * @implements Now function from ClockSource
    */
   Time Now() const override;
 
@@ -54,37 +54,45 @@ class HighResolutionClock : public ClockInterface {
 };
 
 /**
+ * @brief Create a shared ptr to default clock source
+ *
+ * @return std::shared_ptr<ClockSource> ptr to ClockSource
+ */
+std::shared_ptr<ClockSource> DefaultClockSource();
+
+/**
  * @brief Returns current time in seconds using the passed clock.
  * @details It simplifies the procedure of calculating current time in seconds
- * using the HighResolutionClock as it is default clock.
+ * using the DefaultClockSource as it is default clock source.
  *
  * @param clock clock used to calculate time
  * @return double current time in seconds
  */
-double TimeInSeconds(std::shared_ptr<ClockInterface> clock =
-                       std::make_shared<HighResolutionClock>());
+double TimeInSeconds(std::shared_ptr<ClockSource> clock = DefaultClockSource());
 /**
  * @brief Returns current time in microseconds using the passed clock.
  * @details It simplifies the procedure of calculating current time in
- * microseconds using the HighResolutionClock as it is default clock.
+ * microseconds using the DefaultClockSource as it is default clock
+ * source.
  *
  * @param clock clock used to calculate time
  * @return uint64_t current time in microseconds
  */
-uint64_t TimeInMicroSeconds(std::shared_ptr<ClockInterface> clock =
-                              std::make_shared<HighResolutionClock>());
+uint64_t
+TimeInMicroSeconds(std::shared_ptr<ClockSource> clock = DefaultClockSource());
 
 /**
  * @brief Returns a string contains the current time in seconds using the passed
  * clock.
  * @details It simplifies the procedure of creating a string contains the
- * current time in seconds using the HighResolutionClock as it is default clock.
+ * current time in seconds using the DefaultClockSource as it is default clock
+ * source.
  *
  * @param clock clock used to calculate time
  * @return std::string time in seconds as string
  */
-std::string TimeInSecondsString(std::shared_ptr<ClockInterface> clock =
-                                  std::make_shared<HighResolutionClock>());
+std::string
+TimeInSecondsString(std::shared_ptr<ClockSource> clock = DefaultClockSource());
 
 }  // namespace core::utils
 
