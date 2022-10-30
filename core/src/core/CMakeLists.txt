@@ -27,6 +27,7 @@ set(CORE_HEADER_LIST
     ${CORE_INCLUDE_DIR}/utils/system.hpp
     ${CORE_INCLUDE_DIR}/utils/spinner.hpp
     ${CORE_INCLUDE_DIR}/utils/time.hpp
+    ${CORE_INCLUDE_DIR}/utils/timer.hpp
     ${CORE_INCLUDE_DIR}/utils/modifier.hpp
     ${CORE_INCLUDE_DIR}/utils/writer_file.hpp
     ${CORE_INCLUDE_DIR}/utils/writer.hpp
