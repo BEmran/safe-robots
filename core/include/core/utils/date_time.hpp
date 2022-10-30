@@ -87,37 +87,6 @@ class DateTime {
 };
 
 /**
- * @brief returns the current time since the start of its clock in milliseconds
- * as long long integer
- *
- * @return int64_t time in milliseconds
- */
-int64_t TimeInMilliSec();
-
-/**
- * @brief returns the current time since the start of its clock in seconds as
- * long long integer
- *
- * @return int64_t time in seconds
- */
-int64_t TimeInSeconds();
-
-/**
- * @brief returns the current time since the start of its clock in milliseconds
- * as long long integer
- *
- * @return int64_t time in milliseconds
- */
-
-/**
- * @brief returns the current time since the start of its clock in seconds as
- * string format
- *
- * @return std::string time in seconds
- */
-std::string TimeInSecondsString();
-
-/**
  * @brief A standard way to generate a filename using DateTime information
  *
  * @param dt use the passed DateTime object or using current DateTime

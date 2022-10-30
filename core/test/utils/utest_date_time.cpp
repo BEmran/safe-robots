@@ -10,20 +10,12 @@
 
 using core::utils::DateTime;
 using core::utils::GenerateFileName;
-using core::utils::TimeInSeconds;
-using core::utils::TimeInSecondsString;
 
 tm GetLocalTime() {
   time_t now = time(nullptr);
   tm local_tm;
   localtime_r(&now, &local_tm);
   return local_tm;
-}
-
-int64_t TimeSinceEpochInSec() {
-  auto now = std::chrono::system_clock::now();
-  auto epoch = now.time_since_epoch();
-  return std::chrono::duration_cast<std::chrono::seconds>(epoch).count();
 }
 
 testing::AssertionResult IsEqualDateTime(const tm& expect, const tm& actual) {
