@@ -19,6 +19,7 @@ set(CORE_HEADER_LIST
     ${CORE_INCLUDE_DIR}/utils/logger_stream.hpp
     ${CORE_INCLUDE_DIR}/utils/logger.hpp
     ${CORE_INCLUDE_DIR}/utils/math.hpp
+    ${CORE_INCLUDE_DIR}/utils/min_max_statistics.hpp
     ${CORE_INCLUDE_DIR}/utils/module.hpp
     ${CORE_INCLUDE_DIR}/utils/node.hpp
     ${CORE_INCLUDE_DIR}/utils/socket_exception.hpp
@@ -58,6 +59,7 @@ set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/utils/spinner.cpp
     ${CORE_SOURCE_DIR}/utils/system.cpp
     ${CORE_SOURCE_DIR}/utils/time.cpp
+    ${CORE_SOURCE_DIR}/utils/timer.cpp
     ${CORE_SOURCE_DIR}/utils/writer_file.cpp
     ${CORE_SOURCE_DIR}/utils/writer.cpp
     ${CORE_SOURCE_DIR}/sensors/module_sensor_imu.cpp

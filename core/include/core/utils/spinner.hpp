@@ -8,9 +8,11 @@
 
 #include "core/utils/clock.hpp"
 #include "core/utils/logger_node.hpp"
+#include "core/utils/min_max_statistics.hpp"
+#include "core/utils/time.hpp"
+#include "core/utils/timer.hpp"
 
 namespace core::utils {
-
 /**
  * @brief A blocking class used to ensure a loop will take a certain frequency
  * time
@@ -33,7 +35,7 @@ class Spinner {
    *
    * @param hz rate of spinning in hz
    */
-  Spinner(const double hz, std::shared_ptr<ClockInterface> clock,
+  Spinner(const double hz, std::shared_ptr<ClockSource> clock,
           std::shared_ptr<NodeLogger> logger);
 
   /**
@@ -44,32 +46,54 @@ class Spinner {
    */
   double SpinOnce();
 
+  /**
+   * @brief Set object's Rate
+   * @details it reset the max and min information
+   *
+   * @param hz rate in hertz
+   */
   void SetRate(const double hz);
 
+  /**
+   * @brief Set object's Sampling Time
+   * @details it reset the max and min information
+   *
+   * @param st_sec sampling time in seconds
+   */
   void SetSamplingTime(const double st_sec);
 
  protected:
+  double CalculateActualSamplingTime(const Time& ctime);
+
+  /**
+   * @brief Calculate if sleep is needed to meet the set rate
+   *
+   * @param ctime current time
+   */
+  void SleepIfNeeded(const Time& ctime);
+
   /**
    * @brief prints spinning information on screen for debugging purposes
    *
-   * @param dt actual sampling time to print
    */
-  void PrintInfo(const double dt);
-
-  // update max min data if not the first time
-  void update_max_min_values(const double dt);
-
-  double UpdateTime();
+  void PrintInfoIfTimer();
 
  private:
-  std::unique_ptr<ClockInterface> clock_;
+  /// @brief ptr to internal clock object
+  std::shared_ptr<ClockSource> clock_;
+  /// @brief ptr to logger object
   std::shared_ptr<NodeLogger> logger_;
-  Time sampling_time_{1.};  ///> sampling time, 1/rate
-  double min_dt_{1e9};      ///> minimum sampling time
-  double max_dt_{0.};       ///> minimum sampling time
-  Time ptime_before_sleep;  ///> previous spin's time before sleep
-  Time ptime_after_sleep;   ///> previous running time
-  Time ptime_debug;         ///> previous time for printing debugging msg
+  ///@brief sampling time, 1/rate
+  Time sampling_time_{1.};
+  ///@brief previous spin time before sleep used to calculate actual sampling
+  /// time
+  Time ptime_before_sleep_;
+  ///@brief previous running time needed as sleep_for function is not accurate
+  Time ptime_;
+  /// @brief used to store and print statistics information
+  MinMaxStatistics<double> statics_;
+  /// @brief timer for debugging statistics information
+  Timer debug_timer_;
 };
 
 }  // namespace core::utils
