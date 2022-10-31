@@ -22,6 +22,11 @@ set(UTEST_TIME_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_time.cpp
 package_add_test_with_libraries(utest_time "${UTEST_TIME_FILES}"
                                 "${CORE_LIBRARY}" "")
 
+set(UTEST_TIMER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_timer.cpp
+                      ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
+package_add_test_with_libraries(utest_timer "${UTEST_TIMER_FILES}"
+                                "${CORE_LIBRARY}" "")
+
 set(UTEST_CLOCK_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_clock.cpp
                       ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
 package_add_test_with_libraries(utest_clock "${UTEST_CLOCK_FILES}"

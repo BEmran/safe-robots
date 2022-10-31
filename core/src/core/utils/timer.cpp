@@ -24,7 +24,7 @@ void Timer::ResetTime() {
 bool Timer::IsTime() {
   const Time ctime = clock_->Now();
   const double tmp_duration = ctime - ptime_;
-  if (tmp_duration > duration_) {
+  if (tmp_duration >= duration_) {
     ptime_ = ctime;
     return true;
   }
