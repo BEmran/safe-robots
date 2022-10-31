@@ -17,6 +17,12 @@ set(UTEST_DATE_TIME_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_date_time.cpp
 package_add_test_with_libraries(utest_date_time "${UTEST_DATE_TIME_FILES}"
                                 "${CORE_LIBRARY}" "")
 
+set(UTEST_MIN_MAX_STAT_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/utest_min_max_statistics.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
+package_add_test_with_libraries(
+    utest_min_max_statistics "${UTEST_MIN_MAX_STAT_FILES}" "${CORE_LIBRARY}" "")
+
 set(UTEST_TIME_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_time.cpp
                      ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
 package_add_test_with_libraries(utest_time "${UTEST_TIME_FILES}"
