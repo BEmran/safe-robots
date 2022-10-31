@@ -83,12 +83,11 @@ class Spinner {
   std::shared_ptr<ClockSource> clock_;
   /// @brief ptr to logger object
   std::shared_ptr<NodeLogger> logger_;
-  ///@brief sampling time, 1/rate
+  /// @brief sampling time, 1/rate
   Time sampling_time_{1.};
-  ///@brief previous spin time before sleep used to calculate actual sampling
-  /// time
+  /// @brief previous spin time used to calculate actual sampling time
   Time ptime_before_sleep_;
-  ///@brief previous running time needed as sleep_for function is not accurate
+  /// @brief previous running time needed as sleep_for function is not accurate
   Time ptime_;
   /// @brief used to store and print statistics information
   MinMaxStatistics<double> statics_;
