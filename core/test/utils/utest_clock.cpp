@@ -6,6 +6,7 @@
 
 #include "core/utils/clock.hpp"
 #include "gtest/gtest.h"
+#include "utest/utils_clock.hpp"
 
 using core::utils::ClockSource;
 using core::utils::HighResolutionClock;
@@ -17,29 +18,16 @@ using core::utils::ToChronoDuration;
 
 constexpr double ESTIMATED_INACCURACY_IN_SLEEP_FOR_SEC{0.0003};
 
-class MockClock : public ClockSource {
- public:
-  Time Now() const override {
-    return time_;
-  }
-  void Set(const Time& time) {
-    time_ = time;
-  }
-
- private:
-  Time time_;
-};
-
 TEST(MockClock, Construct) {
-  const Time time{6.7};
   MockClock clock;
+  const Time time{6.7};
   clock.Set(time);
   EXPECT_DOUBLE_EQ(time, clock.Now());
 }
 
 TEST(MockClock, AsPointer) {
-  const Time time{6.7};
   MockClock clock;
+  const Time time{6.7};
   clock.Set(time);
   ClockSource* clock_ptr = &clock;
   EXPECT_DOUBLE_EQ(time, clock_ptr->Now());
