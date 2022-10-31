@@ -78,6 +78,8 @@ class Spinner {
    */
   void PrintInfoIfTimer();
 
+  void UpdateStatistics(const double actual_sampling_time);
+
  private:
   /// @brief ptr to internal clock object
   std::shared_ptr<ClockSource> clock_;
@@ -93,6 +95,7 @@ class Spinner {
   MinMaxStatistics<double> statics_;
   /// @brief timer for debugging statistics information
   Timer debug_timer_;
+  bool first_statistics_{true};
 };
 
 }  // namespace core::utils

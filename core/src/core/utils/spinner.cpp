@@ -46,6 +46,7 @@ void Spinner::SetSamplingTime(const double st_sec) {
   }
   sampling_time_ = Time(st_sec);
   statics_.ResetMinMax();
+  first_statistics_ = true;
 }
 
 double Spinner::SpinOnce() {
@@ -55,12 +56,19 @@ double Spinner::SpinOnce() {
 
   SleepIfNeeded(ctime);
 
-  statics_.Update(actual_sampling_time);
+  UpdateStatistics(actual_sampling_time);
 
   PrintInfoIfTimer();
 
   ptime_ = clock_->Now();
   return actual_sampling_time;
+}
+
+void Spinner::UpdateStatistics(const double actual_sampling_time) {
+  if (!first_statistics_ && actual_sampling_time > 0) {
+    statics_.Update(1 / actual_sampling_time);
+  }
+  first_statistics_ = false;
 }
 
 double Spinner::CalculateActualSamplingTime(const Time& ctime) {
