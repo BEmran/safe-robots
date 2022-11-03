@@ -1,3 +1,6 @@
 [submodule "dependencies/yaml-cpp"]
 	path = dependencies/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
+[submodule "dependencies/librobotcontrol"]
+	path = dependencies/librobotcontrol
+	url = https://github.com/beagleboard/librobotcontrol.git
