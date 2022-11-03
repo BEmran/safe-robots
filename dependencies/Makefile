@@ -6,7 +6,8 @@ SHELL := /bin/bash
 .PHONY: build-all clean help
 .DEFAULT_GOAL := help
 
-YAML_CPP = yaml-cpp
+YAML_CPP = ${YAML_CPP}
+RCL = rcl
 ################################
 ## Display option information
 ################################
@@ -27,13 +28,21 @@ export PRINT_HELP_PYSCRIPT
 help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-build-all: ## build target
-	@if [ ! -d "./build/yaml-cpp" ]; then	\
-		mkdir -p ./build/yaml-cpp;				\
-		mkdir -p ./install/yaml-cpp;				\
+build-robot-control-library: ## build robot control library
+	@if [ ! -d "./build/${RCL}" ]; then	\
+		mkdir -p ./build/${RCL};				\
+		mkdir -p ./install/${RCL};				\
 	fi
-	@cmake -S ${YAML_CPP} -B ./build/yaml-cpp -DCMAKE_INSTALL_PREFIX=./install/yaml-cpp -DYAML_BUILD_SHARED_LIBS=OFF
-	@cd ./build/yaml-cpp; \
+	@cmake -S librobotcontrol -B ./build/${RCL} -DCMAKE_INSTALL_PREFIX=./install/${RCL}
+	@cd ./build/${RCL}
+
+build-yamal-cpp: ## build yamal-cpp
+	@if [ ! -d "./build/${YAML_CPP}" ]; then	\
+		mkdir -p ./build/${YAML_CPP};				\
+		mkdir -p ./install/${YAML_CPP};				\
+	fi
+	@cmake -S ${YAML_CPP} -B ./build/${YAML_CPP} -DCMAKE_INSTALL_PREFIX=./install/${YAML_CPP} -DYAML_BUILD_SHARED_LIBS=OFF
+	@cd ./build/${YAML_CPP}; \
 	make -j8 && make install
 
 clean: ## clean build file
