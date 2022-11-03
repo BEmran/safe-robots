@@ -34,7 +34,8 @@ build-robot-control-library: ## build robot control library
 		mkdir -p ./install/${RCL};				\
 	fi
 	@cmake -S librobotcontrol -B ./build/${RCL} -DCMAKE_INSTALL_PREFIX=./install/${RCL}
-	@cd ./build/${RCL}
+	@cd ./build/${RCL}; \
+	make -j8
 
 build-yamal-cpp: ## build yamal-cpp
 	@if [ ! -d "./build/${YAML_CPP}" ]; then	\
