@@ -2,11 +2,11 @@
 
 #include <gtest/gtest.h>
 
-#include <experimental/filesystem>
+#include <filesystem>
 
 #include "core/utils/system.hpp"
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 using core::utils::CreateDirectories;
 using core::utils::IsPathExists;
 
