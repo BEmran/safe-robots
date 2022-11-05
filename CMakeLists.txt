@@ -56,7 +56,7 @@ endif ()
 
 if (CMAKE_BUILD_TYPE STREQUAL Release)
     message(STATUS "Configure option for CMAKE_BUILD_TYPE of type Release")
-    set(ENABLE_DOXYGEN ON)
+    set(ENABLE_DOXYGEN OFF)
 
 elseif (CMAKE_BUILD_TYPE STREQUAL Debug)
     message(STATUS "Configure option for CMAKE_BUILD_TYPE of type Debug")
@@ -161,3 +161,4 @@ message(STATUS "BBB project is set ${BUILD_BBB_LIBRARY}")
 if (ENABLE_DOXYGEN)
     add_subdirectory(${CMAKE_SOURCE_DIR}/docs)
 endif ()
+message(STATUS "DOXYGEN is set ${ENABLE_DOXYGEN}")
