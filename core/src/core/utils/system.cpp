@@ -1,19 +1,20 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
+#include "core/utils/system.hpp"
+
 #include <sys/stat.h>
 
 #include <cstdlib>
-#include <experimental/filesystem>
+#include <filesystem>
 
 #include "core/utils/exception.hpp"
 
 namespace core::utils {
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
-void CreateDirectories(std::string_view full_path) {
-  fs::path path{full_path};
+void CreateDirectories(std::string_view path) {
   try {
-    fs::create_directories(path);
+    fs::create_directories(fs::path{path});
   } catch (fs::filesystem_error& e) {
     throw Exception(e.what());
   }

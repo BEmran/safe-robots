@@ -9,12 +9,12 @@
 namespace core::utils {
 /**
  * @brief Create a Directories by calling boost::filesystem::create_directory
- * for each element of full_path that does not exist.
+ * for each element of path that does not exist.
  *
- * @param full_path full path of the directory
+ * @param path full path of the directory
  * @throw CoreExcept if can not create directories
  */
-void CreateDirectories(std::string_view full_path);
+void CreateDirectories(std::string_view path);
 
 /**
  * @brief Checks if the given path exists
