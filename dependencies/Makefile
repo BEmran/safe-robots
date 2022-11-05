@@ -6,7 +6,7 @@ SHELL := /bin/bash
 .PHONY: build-all clean help
 .DEFAULT_GOAL := help
 
-YAML_CPP = ${YAML_CPP}
+YAML_CPP = yaml-cpp
 RCL = rcl
 ################################
 ## Display option information
