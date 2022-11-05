@@ -4,7 +4,6 @@
 
 #include <algorithm>
 #include <cstdio>
-#include <cstdlib>  // for system()
 #include <fstream>
 #include <map>
 #include <optional>
@@ -12,48 +11,58 @@
 #include <vector>
 
 #include "core/utils/logger_macros.hpp"
+#include "core/utils/system.hpp"
 
 namespace core::hardware {
 
 namespace {
-constexpr std::string_view kModelDir = "/proc/device-tree/model";
+/// @brief name and path of device tree file
+constexpr std::string_view kDeviceTreeFile = "/proc/device-tree/model";
 
-const std::unordered_map<std::string_view, ModelType> ModelTypeString{
-  {"Beagle", ModelType::BEAGLEBONE},
-  {"Raspberry Pi", ModelType::RPI},
-  {"PC", ModelType::PC}};
+/// @brief system command to run uname and check if it is of x86 architecture
+constexpr std::string_view kUnameCommand = "uname --machine | grep x86 --quiet";
 
-const std::vector<HardwareType> BBHardwareTypes{
-  HardwareType::BB_BLACK_RC, HardwareType::BB_BLACK_W, HardwareType::BB_BLACK_W,
-  HardwareType::BB_BLACK,    HardwareType::BB_GREEN_W, HardwareType::BB_GREEN,
-  HardwareType::BB_BLUE,     HardwareType::BB_BLACK_W};
+/// @brief list of all BeagleBone board type
+constexpr std::array BBHardwareTypes{
+  HardwareType::BB_BLACK,   HardwareType::BB_BLACK_RC,
+  HardwareType::BB_BLACK_W, HardwareType::BB_BLACK_W_RC,
+  HardwareType::BB_BLUE,    HardwareType::BB_GREEN,
+  HardwareType::BB_GREEN_W, HardwareType::BB_POCKET};
 
-const std::vector<HardwareType> RPIHardwareTypes{
-  HardwareType::RPI_B_PLUS,  HardwareType::RPI_B,   HardwareType::RPI2_B,
-  HardwareType::RPI3_B_PLUS, HardwareType::RPI3_B,  HardwareType::RPI0_W,
-  HardwareType::RPI0,        HardwareType::RPI_CM3, HardwareType::RPI_CM};
+/// @brief list of all Raspberry PI board type
+constexpr std::array RPIHardwareTypes{
+  HardwareType::RPI0,        HardwareType::RPI0_W, HardwareType::RPI_B,
+  HardwareType::RPI_B_PLUS,  HardwareType::RPI2_B, HardwareType::RPI3_B,
+  HardwareType::RPI3_B_PLUS, HardwareType::RPI_CM, HardwareType::RPI_CM3};
 
-const std::map<std::string_view, HardwareType> HardwareTypeString{
-  {"TI AM335x BeagleBone Black RoboticsCape", HardwareType::BB_BLACK_RC},
-  {"TI AM335x BeagleBone Black Wireless RoboticsCape",
-   HardwareType::BB_BLACK_W},
-  {"TI AM335x BeagleBone Black Wireless", HardwareType::BB_BLACK_W},
-  {"TI AM335x BeagleBone Black", HardwareType::BB_BLACK},
-  {"TI AM335x BeagleBone Green Wireless", HardwareType::BB_GREEN_W},
-  {"TI AM335x BeagleBone Green", HardwareType::BB_GREEN},
-  {"TI AM335x BeagleBone Blue", HardwareType::BB_BLUE},
-  {"TI AM335x PocketBeagle", HardwareType::BB_BLACK_W},
-  {"Raspberry Pi Model B+", HardwareType::RPI_B_PLUS},
-  {"Raspberry Pi Model B", HardwareType::RPI_B},
-  {"Raspberry Pi 2 Model B", HardwareType::RPI2_B},
-  {"Raspberry Pi 3 Model B+", HardwareType::RPI3_B_PLUS},
-  {"Raspberry Pi 3 Model", HardwareType::RPI3_B},
-  {"Raspberry Pi Zero W", HardwareType::RPI0_W},
-  {"Raspberry Pi Zero", HardwareType::RPI0},
-  {"Raspberry Pi Computer Module 3", HardwareType::RPI_CM3},
-  {"Raspberry Pi Compute Module", HardwareType::RPI_CM},
-  {"PC", HardwareType::PC}};
+/// @brief map of all hardware type and their actual name
+const std::map<std::string_view, HardwareType, std::greater<std::string_view>>
+  HardwareTypeMap{
+    {"BeagleBone Black RoboticsCape", HardwareType::BB_BLACK_RC},
+    {"BeagleBone Black Wireless RoboticsCape", HardwareType::BB_BLACK_W_RC},
+    {"BeagleBone Black Wireless", HardwareType::BB_BLACK_W},
+    {"BeagleBone Black", HardwareType::BB_BLACK},
+    {"BeagleBone Blue", HardwareType::BB_BLUE},
+    {"BeagleBone Green Wireless", HardwareType::BB_GREEN_W},
+    {"BeagleBone Green", HardwareType::BB_GREEN},
+    {"PocketBeagle", HardwareType::BB_BLACK_W},
+    {"Raspberry Pi Model B Plus", HardwareType::RPI_B_PLUS},
+    {"Raspberry Pi Model B", HardwareType::RPI_B},
+    {"Raspberry Pi 2 Model B", HardwareType::RPI2_B},
+    {"Raspberry Pi 3 Model B Plus", HardwareType::RPI3_B_PLUS},
+    {"Raspberry Pi 3 Model", HardwareType::RPI3_B},
+    {"Raspberry Pi Zero W", HardwareType::RPI0_W},
+    {"Raspberry Pi Zero", HardwareType::RPI0},
+    {"Raspberry Pi Computer Module 3", HardwareType::RPI_CM3},
+    {"Raspberry Pi Compute Module", HardwareType::RPI_CM},
+    {"PC", HardwareType::PC}};
 
+/**
+ * @brief Read all lines written in the passed filename
+ *
+ * @param filename name of the file to read
+ * @return std::vector<std::string> list of red lines
+ */
 std::vector<std::string> ReadAllLinesFromFile(std::string_view filename) {
   std::string line;
   std::vector<std::string> lines;
@@ -71,15 +80,51 @@ std::vector<std::string> ReadAllLinesFromFile(std::string_view filename) {
   return lines;
 }
 
-// check for x86/x86_64 personal computer
-int CheckForPersonalComputer() {
-  const auto ret = system("uname --machine | grep x86 --quiet");
-  return ret == 0;
+/**
+ * @brief check if current board is personal computer
+ * @details by reading the device name and search for x86/x86_64
+ *
+ * @return true if current board is personal computer
+ * @return false otherwise
+ */
+bool IsPersonalComputer() {
+  const auto ret = utils::ExecuteSystemCommand(kUnameCommand.data());
+  if (ret.has_value()) {
+    return ret.value() == 0;
+  } else {
+    return false;
+  }
 }
 
-template <template <typename...> class Map, typename ENUM, typename... Ts>
-std::optional<ENUM> Find(std::string txt,
-                         Map<std::string_view, ENUM, Ts...> map) {
+/**
+ * @brief Get the First Line from a File
+ *
+ * @param filename name of file to read
+ * @return std::optional<std::string> first line if exists
+ */
+std::optional<std::string> GetFirstLineFromFile(std::string_view filename) {
+  auto lines = ReadAllLinesFromFile(filename);
+  if (lines.size() != 1) {
+    SYS_LOG_WARN("unexpected data size");
+    return {};
+  }
+  return lines[0];
+}
+
+/**
+ * @brief Find a matched key to the passed text
+ * @details container assumed to be of type map<string_view, VALUE, ...>
+ *
+ * @tparam Map templated container
+ * @tparam VALUE value type
+ * @tparam Ts other templated types
+ * @param txt string to find match to
+ * @param map map to search its keys
+ * @return std::optional<VALUE> value if matched is found
+ */
+template <template <typename...> class Map, typename VALUE, typename... Ts>
+std::optional<VALUE> FindValue(const std::string& txt,
+                               Map<std::string_view, VALUE, Ts...> map) {
   const auto itr = std::find_if(map.begin(), map.end(), [txt](auto pair) {
     return txt.find(pair.first) != std::string::npos;
   });
@@ -89,16 +134,23 @@ std::optional<ENUM> Find(std::string txt,
   return itr->second;
 }
 
-HardwareType ExtractHardwareType(std::string str) {
-  const auto result = Find(str, HardwareTypeString);
+/**
+ * @brief Extract Hardware Type from passed string
+ *
+ * @param txt string contains hardware information
+ * @return HardwareType hardware type
+ */
+HardwareType ExtractHardwareType(std::string txt) {
+  const auto result = FindValue(txt, HardwareTypeMap);
   return result.value_or(HardwareType::UNKNOWN);
 }
 
-ModelType ExtractModelType(std::string str) {
-  const auto result = Find(str, ModelTypeString);
-  return result.value_or(ModelType::UNKNOWN);
-}
-}  // namespace
+/**
+ * @brief Get Model Type from passed Hardware Type
+ *
+ * @param type Hardware type
+ * @return ModelType model type
+ */
 
 ModelType GetModeType(const HardwareType type) {
   auto itr1 = std::find(BBHardwareTypes.begin(), BBHardwareTypes.end(), type);
@@ -114,51 +166,42 @@ ModelType GetModeType(const HardwareType type) {
   }
   return ModelType::UNKNOWN;
 }
+}  // namespace
 
 HardwareModel::HardwareModel(const HardwareType type) {
-  model_ = GetModeType(type);
-  hardware_ = type;
+  hardware = type;
+  model = GetModeType(type);
 }
 
-HardwareModel::HardwareModel(std::string_view str) {
-  model_ = ExtractModelType(str.data());
-  hardware_ = ExtractHardwareType(str.data());
+HardwareModel::HardwareModel(std::string_view str)
+  : HardwareModel(ExtractHardwareType(str.data())) {
+}
+
+std::string HardwareModel::ToString() {
+  auto itr =
+    std::find_if(HardwareTypeMap.begin(), HardwareTypeMap.end(),
+                 [this](const auto& pair) { return pair.second == hardware; });
+
+  if (itr == HardwareTypeMap.end()) {
+    SYS_LOG_WARN("undefined HardwareType");
+    return "";
+  }
+  return itr->first.data();
 }
 
 HardwareModel ExtractHardwareModel() {
-  if (CheckForPersonalComputer()) {
+  if (IsPersonalComputer()) {
     return HardwareModel(HardwareType::PC);
-  } else {
-    return ExtractHardwareModelFromFile(kModelDir);
   }
+  return ExtractHardwareModelFromFile(kDeviceTreeFile);
 }
 
 HardwareModel ExtractHardwareModelFromFile(std::string_view filename) {
-  // read model fom device tree
-  auto lines = ReadAllLinesFromFile(filename);
-  if (lines.size() != 1) {
-    SYS_LOG_ERROR("ERROR unexpected data size");
+  const auto line = GetFirstLineFromFile(filename);
+  if (line.has_value()) {
+    return HardwareModel(line.value());
+  } else {
+    return HardwareModel();
   }
-  return HardwareModel(lines[0]);
-}
-
-std::string HardwareTypeToString(const HardwareType type) {
-  auto itr =
-    std::find_if(HardwareTypeString.begin(), HardwareTypeString.end(),
-                 [type](const auto& pair) { return pair.second == type; });
-  if (itr == HardwareTypeString.end()) {
-    return "";
-  }
-  return std::string{itr->first};
-}
-
-std::string ModelTypeToString(const ModelType type) {
-  auto itr =
-    std::find_if(ModelTypeString.begin(), ModelTypeString.end(),
-                 [type](const auto& pair) { return pair.second == type; });
-  if (itr == ModelTypeString.end()) {
-    return "";
-  }
-  return std::string{itr->first};
 }
 }  // namespace core::hardware

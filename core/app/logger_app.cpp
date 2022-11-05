@@ -27,10 +27,7 @@ int main() {
   // node2.Error("this is a error message");
 
   auto hardware_model = core::hardware::ExtractHardwareModel();
-  node2.GetNodeLogger()->Debug(
-    core::hardware::HardwareTypeToString(hardware_model.hardware_));
-  node2.GetNodeLogger()->Debug(
-    core::hardware::ModelTypeToString(hardware_model.model_));
+  node2.GetNodeLogger()->Debug(hardware_model.ToString());
 
   return 0;
 }
