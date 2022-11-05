@@ -1,7 +1,10 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
+#include <fstream>
 #include <iostream>
+#include <list>
 
+#include "core/hardware/model.hpp"
 #include "core/utils/node.hpp"
 
 using core::utils::Node;
@@ -22,6 +25,12 @@ int main() {
   node2.GetNodeLogger()->Info("this is a info message");
   node2.GetNodeLogger()->Warn("this is a warn message");
   // node2.Error("this is a error message");
+
+  auto hardware_model = core::hardware::ExtractHardwareModel();
+  node2.GetNodeLogger()->Debug(
+    core::hardware::HardwareTypeToString(hardware_model.hardware_));
+  node2.GetNodeLogger()->Debug(
+    core::hardware::ModelTypeToString(hardware_model.model_));
 
   return 0;
 }

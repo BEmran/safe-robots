@@ -32,6 +32,7 @@ set(CORE_HEADER_LIST
     ${CORE_INCLUDE_DIR}/utils/modifier.hpp
     ${CORE_INCLUDE_DIR}/utils/writer_file.hpp
     ${CORE_INCLUDE_DIR}/utils/writer.hpp
+    ${CORE_INCLUDE_DIR}/hardware/model.hpp
     ${CORE_INCLUDE_DIR}/sensors/module_sensor_imu.hpp
     ${CORE_INCLUDE_DIR}/sensors/module_sensor.hpp)
 
@@ -62,6 +63,7 @@ set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/utils/timer.cpp
     ${CORE_SOURCE_DIR}/utils/writer_file.cpp
     ${CORE_SOURCE_DIR}/utils/writer.cpp
+    ${CORE_SOURCE_DIR}/hardware/model.cpp
     ${CORE_SOURCE_DIR}/sensors/module_sensor_imu.cpp
     ${CORE_SOURCE_DIR}/sensors/module_sensor.cpp)
 
