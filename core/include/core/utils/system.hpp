@@ -3,7 +3,8 @@
 #ifndef CORE_UTILS_SYSTEM_HPP_
 #define CORE_UTILS_SYSTEM_HPP_
 
-#include <string>
+#include <optional>
+#include <string_view>
 
 namespace core::utils {
 /**
@@ -13,7 +14,7 @@ namespace core::utils {
  * @param full_path full path of the directory
  * @throw CoreExcept if can not create directories
  */
-void CreateDirectories(const std::string& full_path);
+void CreateDirectories(std::string_view full_path);
 
 /**
  * @brief Checks if the given path exists
@@ -22,7 +23,23 @@ void CreateDirectories(const std::string& full_path);
  * @return true if exists
  * @return false otherwise
  */
-bool IsPathExists(const std::string& path);
+bool IsPathExists(std::string_view path);
+
+/**
+ * @brief Checking if processor is available
+ *
+ * @return true in case a command processor is available
+ * @return false otherwise
+ */
+bool IsProcessorAvailable();
+
+/**
+ * @brief Invokes the command processor if available to execute a command
+ *
+ * @param cmd command to be executed
+ * @return int the status code returned by the called command
+ */
+std::optional<int> ExecuteSystemCommand(std::string_view cmd);
 
 }  // namespace core::utils
 
