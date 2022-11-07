@@ -5,6 +5,7 @@ set(BBB_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/hardware/bbb/include)
 set(BBB_HEADER_LIST
     ${BBB_INCLUDE_DIR}/bbb/communication_abs.hpp
     ${BBB_INCLUDE_DIR}/bbb/hardware_utils.hpp
+    ${BBB_INCLUDE_DIR}/bbb/i2c.hpp
     ${BBB_INCLUDE_DIR}/bbb/spi.hpp
     ${BBB_INCLUDE_DIR}/sensors/common/calibrate.hpp
     ${BBB_INCLUDE_DIR}/sensors/common/utils.hpp
@@ -17,6 +18,7 @@ set(BBB_HEADER_LIST
 set(BBB_SOURCE_DIR ${PROJECT_SOURCE_DIR}/hardware/bbb/src)
 set(BBB_SOURCE_LIST
     ${BBB_SOURCE_DIR}/bbb/hardware_utils.cpp
+    ${BBB_SOURCE_DIR}/bbb/i2c.cpp
     ${BBB_SOURCE_DIR}/bbb/spi.cpp
     ${BBB_SOURCE_DIR}/sensors/common/calibrate.cpp
     ${BBB_SOURCE_DIR}/sensors/common/utils.cpp
