@@ -339,9 +339,9 @@ Mpu9250::ExtractFullBits(const std::vector<uint8_t>& data) {
   constexpr auto last_mpu_full_bits_idx = 7;
   for (size_t i = 0; i < full_bits.size() - 1; i++) {
     if (i < last_mpu_full_bits_idx) {
-      full_bits[i] = cu::To16Bit(data[i * 2], data[i * 2 + 1]);
+      full_bits[i] = cu::ToWord({data[i * 2], data[i * 2 + 1]});
     } else {
-      full_bits[i] = cu::To16Bit(data[i * 2 + 1], data[i * 2]);
+      full_bits[i] = cu::ToWord({data[i * 2 + 1], data[i * 2]});
     }
   }
   constexpr auto over_flow_bits_idx = 10;

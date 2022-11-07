@@ -12,11 +12,11 @@
 #include <utility>
 #include <vector>
 
+#include "../common/utils.hpp"
 #include "core/sensors/module_sensor.hpp"
 #include "core/utils/data.hpp"
 #include "core/utils/node.hpp"
 #include "navio/spi.hpp"
-#include "sensors/common/utils.hpp"
 #include "sensors/mpu/mpu9250_register_map.hpp"
 
 namespace sensors::mpu {

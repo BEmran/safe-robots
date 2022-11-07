@@ -7,11 +7,19 @@
 #include <iostream>
 
 namespace sensors::common::utils {
-int16_t To16Bit(uint8_t msb, uint8_t lsb) {
-  const auto high = static_cast<int>(msb);
-  const auto low = static_cast<int>(lsb);
+uint16_t ToWord(const Bytes bytes) {
+  const auto high = static_cast<int>(bytes.msb);
+  const auto low = static_cast<int>(bytes.lsb);
   constexpr auto bit_shift = 8;
-  return static_cast<int16_t>(high << bit_shift | low);
+  return static_cast<uint16_t>(high << bit_shift | low);
+}
+
+Bytes ToBytes(const uint16_t word) {
+  constexpr auto bit_shift = 8;
+  const uint8_t msb = static_cast<uint8_t>(word >> bit_shift);
+  constexpr auto mask = 0xFF;
+  const uint8_t lsb = static_cast<uint8_t>(word & mask);
+  return Bytes{msb, lsb};
 }
 
 Vec3 ArrayToVec3(const std::array<MATH_TYPE, 3>& array) {

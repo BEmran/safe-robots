@@ -141,13 +141,33 @@ struct SensorSpecs {
 };
 
 /**
- * @brief Turn the MSB and LSB into a signed 16-bit value
+ * @brief simple struct hold the MSB and LSB of a word
  *
- * @param msb most significant bits (High 8-bits)
- * @param lsb least significant bits (Low 8-bits)
+ */
+struct Bytes {
+  /// @brief most significant bits (High 8-bits)
+  uint8_t msb{0};
+  /// @brief least significant bits (Low 8-bits)
+  uint8_t lsb{0};
+  Bytes(const uint8_t msb_, const uint8_t lsb_) : msb{msb_}, lsb{lsb_} {
+  }
+};
+
+/**
+ * @brief Turn two bytes into a unsigned 16-bit value
+ *
+ * @param bytes 2 byte {msb, lsb}
  * @return int16_t full number
  */
-int16_t To16Bit(uint8_t msb, uint8_t lsb);
+uint16_t ToWord(const Bytes bytes);
+
+/**
+ * @brief Turn a uint16_t into two unsigned 8-bit value
+ *
+ * @param word full number
+ * @return Bytes decoded two bytes
+ */
+Bytes ToBytes(const uint16_t word);
 
 /**
  * @brief Convert a std::array data to Vec3
