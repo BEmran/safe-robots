@@ -20,7 +20,7 @@
 // #include <sys/types.h>  // for mkdir and chmod
 // #include <unistd.h>
 
-#include "../common.h"
+// #include "../common.h"
 #include "bbb/i2c.hpp"
 #include "dmpKey.h"
 #include "dmp_firmware.h"
@@ -674,52 +674,52 @@ int __mpu_set_bypass(uint8_t bypass_on) {
   return 0;
 }
 
-// int rc_mpu_power_off(void) {
-//   imu_shutdown_flag = 1;
-//   // wait for the interrupt thread to exit if it hasn't already
-//   // allow up to 1 second for thread cleanup
-//   if (thread_running_flag) {
-//     if (rc_pthread_timed_join(imu_interrupt_thread, NULL, 1.0) == 1) {
-//       SYS_LOG_ERROR("WARNING: mpu interrupt thread exit timeout");
-//     }
-//     // cleanup mutexes
-//     pthread_cond_destroy(&read_condition);
-//     pthread_mutex_destroy(&read_mutex);
-//     pthread_cond_destroy(&tap_condition);
-//     pthread_mutex_destroy(&tap_mutex);
-//   }
-//   // shutdown magnetometer first if on since that requires
-//   // the imu to the on for bypass to work
-//   if (config.enable_magnetometer)
-//     __power_off_magnetometer();
-//   // set the device address to write the shutdown register
-//   i2c->SetDeviceAddress(RC_MPU_DEFAULT_I2C_ADDR);
-//   // write the reset bit
-//   if (not i2c->WriteByte(PWR_MGMT_1, H_RESET)) {
-//     // wait and try again
-//     rc_usleep(1000);
-//     if (not i2c->WriteByte(PWR_MGMT_1, H_RESET)) {
-//       SYS_LOG_ERROR("I2C write to MPU9250 Failed");
-//       return -1;
-//     }
-//   }
-//   // write the sleep bit
-//   if (not i2c->WriteByte(PWR_MGMT_1, MPU_SLEEP)) {
-//     // wait and try again
-//     rc_usleep(1000);
-//     if (not i2c->WriteByte(PWR_MGMT_1, MPU_SLEEP)) {
-//       SYS_LOG_ERROR("I2C write to MPU9250 Failed");
-//       return -1;
-//     }
-//   }
+int rc_mpu_power_off(void) {
+  imu_shutdown_flag = 1;
+  // // wait for the interrupt thread to exit if it hasn't already
+  // // allow up to 1 second for thread cleanup
+  // if (thread_running_flag) {
+  //   if (rc_pthread_timed_join(imu_interrupt_thread, NULL, 1.0) == 1) {
+  //     SYS_LOG_ERROR("WARNING: mpu interrupt thread exit timeout");
+  //   }
+  //   // cleanup mutexes
+  //   pthread_cond_destroy(&read_condition);
+  //   pthread_mutex_destroy(&read_mutex);
+  //   pthread_cond_destroy(&tap_condition);
+  //   pthread_mutex_destroy(&tap_mutex);
+  // }
+  // shutdown magnetometer first if on since that requires
+  // the imu to the on for bypass to work
+  if (config.enable_magnetometer)
+    __power_off_magnetometer();
+  // set the device address to write the shutdown register
+  i2c->SetDeviceAddress(RC_MPU_DEFAULT_I2C_ADDR);
+  // write the reset bit
+  if (not i2c->WriteByte(PWR_MGMT_1, H_RESET)) {
+    // wait and try again
+    rc_usleep(1000);
+    if (not i2c->WriteByte(PWR_MGMT_1, H_RESET)) {
+      SYS_LOG_ERROR("I2C write to MPU9250 Failed");
+      return -1;
+    }
+  }
+  // write the sleep bit
+  if (not i2c->WriteByte(PWR_MGMT_1, MPU_SLEEP)) {
+    // wait and try again
+    rc_usleep(1000);
+    if (not i2c->WriteByte(PWR_MGMT_1, MPU_SLEEP)) {
+      SYS_LOG_ERROR("I2C write to MPU9250 Failed");
+      return -1;
+    }
+  }
 
-//   // if in dmp mode, also unexport the interrupt pin
-//   if (dmp_en) {
-//     rc_gpio_cleanup(config.gpio_interrupt_pin_chip,
-//     config.gpio_interrupt_pin);
-//   }
+  // // if in dmp mode, also unexport the interrupt pin
+  // if (dmp_en) {
+  //   rc_gpio_cleanup(config.gpio_interrupt_pin_chip,
+  //   config.gpio_interrupt_pin);
+  // }
 
-//   return 0;
-// }
+  return 0;
+}
 
 // Phew, that was a lot of code....
