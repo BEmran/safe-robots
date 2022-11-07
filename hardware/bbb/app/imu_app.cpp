@@ -12,10 +12,10 @@ int main(int argc, char* argv[]) {
   App app;
   app.node->GetNodeLogger()->Debug("running....");
 
-  if (bbb::hardware_utils::CheckApm()) {
-    app.node->GetNodeLogger()->Error("APM is busy. Can't launch the app");
-    return EXIT_FAILURE;
-  }
+  // if (bbb::hardware_utils::CheckApm()) {
+  //   app.node->GetNodeLogger()->Error("APM is busy. Can't launch the app");
+  //   return EXIT_FAILURE;
+  // }
 
   app.ExtractArgument(argc, argv);
 

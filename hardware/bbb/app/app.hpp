@@ -9,17 +9,15 @@
 #include <string>
 #include <utility>
 
-#include "core/utils/server_socket.hpp"
 #include "bbb/hardware_utils.hpp"
-#include "sensors/lsm/lsm9ds1.hpp"
+#include "core/utils/server_socket.hpp"
 #include "sensors/mpu/mpu9250.hpp"
 
+using bbb::SPI;
 using core::sensors::SensorModuleAbs;
 using core::utils::ImuData;
 using core::utils::Node;
 using core::utils::ServerSocket;
-using bbb::SPI;
-using sensors::lsm::Lsm9ds1;
 using sensors::mpu::Mpu9250;
 
 struct App {
@@ -43,16 +41,6 @@ struct App {
         std::make_unique<SPI>(bbb::hardware_utils::MPU_SPI_PATH, false);
       sensor =
         std::make_unique<Mpu9250>(config, std::move(spi), std::move(imu_node));
-    } else if (option == "lsm") {
-      node->GetNodeLogger()->Debug("Selected: LSM9DS1");
-      sensors::lsm::Config config;
-      auto spi_a_g =
-        std::make_unique<SPI>(bbb::hardware_utils::LSM_A_G_PATH, false);
-      auto spi_mag =
-        std::make_unique<SPI>(bbb::hardware_utils::LSM_MAG_PATH, false);
-      sensor = std::make_unique<Lsm9ds1>(config, std::move(spi_a_g),
-                                         std::move(spi_mag), std::move(node));
-
     } else {
       node->GetNodeLogger()->Error("Unknown Sensor");
     }

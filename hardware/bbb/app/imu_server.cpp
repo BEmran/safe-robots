@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
 #include "app.hpp"
-#include "core/utils/date_time.hpp"
+#include "core/utils/clock.hpp"
 
 constexpr auto MaximumClientTries = 5;
 
@@ -9,10 +9,10 @@ int main(int argc, char* argv[]) {
   App app;
   app.node->GetNodeLogger()->Debug("running....");
 
-  if (bbb::hardware_utils::CheckApm()) {
-    app.node->GetNodeLogger()->Error("APM is busy. Can't launch the app");
-    return EXIT_FAILURE;
-  }
+  // if (bbb::hardware_utils::CheckApm()) {
+  //   app.node->GetNodeLogger()->Error("APM is busy. Can't launch the app");
+  //   return EXIT_FAILURE;
+  // }
 
   app.ExtractArgument(argc, argv);
 
@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
   app.node->GetNodeLogger()->Debug("Sensor is initialized successfully");
 
   //-------------------------------------------------------------------------
-  const auto begin = core::utils::TimeInMilliSec();
+  const auto begin = core::utils::TimeInMicroSeconds();
   auto tries = MaximumClientTries;
   constexpr auto send_delay = 10;
   while (--tries > 0) {
@@ -38,9 +38,9 @@ int main(int argc, char* argv[]) {
       app.sensor->Update();
       const auto data = app.sensor->GetData();
       std::stringstream ss;
-      ss << core::utils::TimeInMilliSec() - begin << ", "  //
-         << data.accel.data << ", "                        //
-         << data.gyro.data << ", "                         //
+      ss << core::utils::TimeInMicroSeconds() - begin << ", "  //
+         << data.accel.data << ", "                            //
+         << data.gyro.data << ", "                             //
          << data.mag.data << ", " << data.tait_bryan.data << ";";
 
       (*app.server) << ss.str();
