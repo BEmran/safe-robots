@@ -1,6 +1,8 @@
 #include "sensors/mpu/mpu.hpp"
 
 #include <errno.h>
+
+#include "sensors/common/utils.hpp"
 // #include <math.h>
 // #include <poll.h>
 // #include <rc/gpio.h>
@@ -10,9 +12,11 @@
 // #include <rc/math/quaternion.h>
 // #include <rc/math/vector.h>
 // #include <rc/pthread.h>
+#include <bbb/hardware_utils.hpp>
 #include <bbb/time.hpp>
 #include <core/utils/logger_macros.hpp>
-// #include <stdint.h>
+#include <fstream>
+#include <optional>
 // #include <stdio.h>
 // #include <stdlib.h>
 // #include <string.h>
@@ -20,7 +24,6 @@
 // #include <sys/types.h>  // for mkdir and chmod
 // #include <unistd.h>
 
-// #include "../common.h"
 #include "bbb/i2c.hpp"
 #include "dmpKey.h"
 #include "dmp_firmware.h"
@@ -38,13 +41,13 @@
 #define RC_IMU_INTERRUPT_PIN_PIN 21  // gpio3.21 P9.25
 
 // macros
-#define ARRAY_SIZE(array) sizeof(array) / sizeof(array[0])
+// #define ARRAY_SIZE(array) sizeof(array) / sizeof(array[0])
 #define min(a, b) ((a < b) ? a : b)
 #define unlikely(x) __builtin_expect(!!(x), 0)
 #define __unused __attribute__((unused))
 
-#define DEG_TO_RAD 0.0174532925199
-#define RAD_TO_DEG 57.295779513
+// #define DEG_TO_RAD 0.0174532925199
+// #define RAD_TO_DEG 57.295779513
 #define PI M_PI
 #define TWO_PI (2.0 * M_PI)
 
@@ -64,10 +67,10 @@
 #define GYRO_OFFSET_THRESH 500
 
 // Thread control
-static pthread_mutex_t read_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t read_condition = PTHREAD_COND_INITIALIZER;
-static pthread_mutex_t tap_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t tap_condition = PTHREAD_COND_INITIALIZER;
+// static pthread_mutex_t read_mutex = PTHREAD_MUTEX_INITIALIZER;
+// static pthread_cond_t read_condition = PTHREAD_COND_INITIALIZER;
+// static pthread_mutex_t tap_mutex = PTHREAD_MUTEX_INITIALIZER;
+// static pthread_cond_t tap_condition = PTHREAD_COND_INITIALIZER;
 
 /**
  *	Local variables
@@ -75,23 +78,23 @@ static pthread_cond_t tap_condition = PTHREAD_COND_INITIALIZER;
 static rc_mpu_config_t config;
 static int bypass_en;
 static int dmp_en = 0;
-static int packet_len;
-static pthread_t imu_interrupt_thread;
-static int thread_running_flag;
-static void (*dmp_callback_func)() = NULL;
-static void (*tap_callback_func)(int dir, int cnt) = NULL;
+// static int packet_len;
+// static pthread_t imu_interrupt_thread;
+// static int thread_running_flag;
+// static void (*dmp_callback_func)() = NULL;
+// static void (*tap_callback_func)(int dir, int cnt) = NULL;
 static double mag_factory_adjust[3];
-static double mag_offsets[3];
-static double mag_scales[3];
-static double accel_lengths[3];
-static int last_read_successful;
-static uint64_t last_interrupt_timestamp_nanos;
-static uint64_t last_tap_timestamp_nanos;
-static rc_mpu_data_t* data_ptr;
+static int mag_offsets[3] = {0, 0, 0};
+static int mag_scales[3] = {1, 1, 1};
+static double accel_lengths[3] = {1.0, 1.0, 1.0};
+// static int last_read_successful;
+// static uint64_t last_interrupt_timestamp_nanos;
+// static uint64_t last_tap_timestamp_nanos;
+// static rc_mpu_data_t* data_ptr;
 static int imu_shutdown_flag = 0;
 // static rc_filter_t low_pass, high_pass;  // for magnetometer Yaw filtering
-static int was_last_steady = 0;
-static double startMagYaw = 0.0;
+// static int was_last_steady = 0;
+// static double startMagYaw = 0.0;
 static I2CManager i2c_manager;
 static std::shared_ptr<I2C> i2c{nullptr};
 
@@ -132,9 +135,9 @@ static int __mpu_set_bypass(unsigned char bypass_on);
 // static int __mpu_set_dmp_state(unsigned char enable);
 // static int __set_int_enable(unsigned char enable);
 // static int __dmp_set_interrupt_mode(unsigned char mode);
-// static int __load_gyro_calibration(void);
-// static int __load_mag_calibration(void);
-// static int __load_accel_calibration(void);
+static bool __load_gyro_calibration(void);
+static bool __load_mag_calibration(void);
+static bool __load_accel_calibration(void);
 // static int __write_gyro_cal_to_disk(int16_t offsets[3]);
 // static int __write_mag_cal_to_disk(double offsets[3], double scale[3]);
 // static int __write_accel_cal_to_disk(double* center, double* lengths);
@@ -191,7 +194,7 @@ int rc_mpu_initialize(rc_mpu_data_t* data, rc_mpu_config_t conf) {
 
   i2c = i2c_manager.CreateI2C(RC_IMU_BUS, RC_MPU_DEFAULT_I2C_ADDR);
   // if it is not claimed, start the i2c bus
-  if (i2c) {
+  if (not i2c) {
     SYS_LOG_ERROR("failed to initialize i2c bus");
     return -1;
   }
@@ -211,19 +214,19 @@ int rc_mpu_initialize(rc_mpu_data_t* data, rc_mpu_config_t conf) {
     return -1;
   }
 
-  // // load in gyro calibration offsets from disk
-  // if (__load_gyro_calibration() < 0) {
-  //   SYS_LOG_ERROR("ERROR: failed to load gyro calibration offsets");
-  //   return -1;
-  // }
-  // if (__load_accel_calibration() < 0) {
-  //   SYS_LOG_ERROR("ERROR: failed to load accel calibration offsets");
-  //   return -1;
-  // }
+  // load in gyro calibration offsets from disk
+  if (not __load_gyro_calibration()) {
+    SYS_LOG_ERROR("failed to load gyro calibration offsets");
+    return -1;
+  }
+  if (not __load_accel_calibration()) {
+    SYS_LOG_ERROR("failed to load accel calibration offsets");
+    return -1;
+  }
 
   // Set sample rate = 1000/(1 + SMPLRT_DIV)
   // here we use a divider of 0 for 1khz sample
-  if (i2c->WriteByte(SMPLRT_DIV, 0x00)) {
+  if (not i2c->WriteByte(SMPLRT_DIV, 0x00)) {
     SYS_LOG_ERROR("I2C bus write error");
     return -1;
   }
@@ -249,7 +252,7 @@ int rc_mpu_initialize(rc_mpu_data_t* data, rc_mpu_config_t conf) {
   // initialize the magnetometer too if requested in config
   if (conf.enable_magnetometer) {
     // start magnetometer NOT in cal mode (0)
-    if (__init_magnetometer(0)) {
+    if (__init_magnetometer(1)) {
       SYS_LOG_ERROR("failed to initialize magnetometer");
       return -1;
     }
@@ -269,14 +272,15 @@ int rc_mpu_read_accel(rc_mpu_data_t* data) {
   if (raw.size() < count) {
     return -1;
   }
-  // Turn the MSB and LSB into a signed 16-bit value
-  data->raw_accel[0] = (int16_t)(((uint16_t)raw[0] << 8) | raw[1]);
-  data->raw_accel[1] = (int16_t)(((uint16_t)raw[2] << 8) | raw[3]);
-  data->raw_accel[2] = (int16_t)(((uint16_t)raw[4] << 8) | raw[5]);
-  // Fill in real unit values and apply calibration
-  data->accel[0] = data->raw_accel[0] * data->accel_to_ms2 / accel_lengths[0];
-  data->accel[1] = data->raw_accel[1] * data->accel_to_ms2 / accel_lengths[1];
-  data->accel[2] = data->raw_accel[2] * data->accel_to_ms2 / accel_lengths[2];
+
+  for (size_t i = 0; i < 3; i++) {
+    // Turn the MSB and LSB into a signed 16-bit value
+    const size_t idx = i * 2;
+    data->raw_accel[i] =
+      sensors::common::utils::ToWord({raw[idx], raw[idx + 1]});
+    // Fill in real unit values
+    data->accel[i] = data->raw_accel[i] * data->accel_to_ms2 / accel_lengths[i];
+  }
   return 0;
 }
 
@@ -291,14 +295,14 @@ int rc_mpu_read_gyro(rc_mpu_data_t* data) {
     return -1;
   }
 
-  // Turn the MSB and LSB into a signed 16-bit value
-  data->raw_gyro[0] = (int16_t)(((int16_t)raw[0] << 8) | raw[1]);
-  data->raw_gyro[1] = (int16_t)(((int16_t)raw[2] << 8) | raw[3]);
-  data->raw_gyro[2] = (int16_t)(((int16_t)raw[4] << 8) | raw[5]);
-  // Fill in real unit values
-  data->gyro[0] = data->raw_gyro[0] * data->gyro_to_degs;
-  data->gyro[1] = data->raw_gyro[1] * data->gyro_to_degs;
-  data->gyro[2] = data->raw_gyro[2] * data->gyro_to_degs;
+  for (size_t i = 0; i < 3; i++) {
+    // Turn the MSB and LSB into a signed 16-bit value
+    const size_t idx = i * 2;
+    data->raw_gyro[i] =
+      sensors::common::utils::ToWord({raw[idx], raw[idx + 1]});
+    // Fill in real unit values
+    data->gyro[i] = data->raw_gyro[i] * data->gyro_to_degs;
+  }
   return 0;
 }
 
@@ -348,9 +352,10 @@ int rc_mpu_read_mag(rc_mpu_data_t* data) {
   // Turn the MSB and LSB into a signed 16-bit value
   // Data stored as little Endian
   int16_t adc[3];
-  adc[0] = (int16_t)(((int16_t)raw[1] << 8) | raw[0]);
-  adc[1] = (int16_t)(((int16_t)raw[3] << 8) | raw[2]);
-  adc[2] = (int16_t)(((int16_t)raw[5] << 8) | raw[4]);
+  for (size_t i = 0; i < 3; i++) {
+    const size_t idx = i * 2;
+    adc[i] = sensors::common::utils::ToWord({raw[idx + 1], raw[idx]});
+  }
 #ifdef DEBUG
   printf("raw mag:%d %d %d\n", adc[0], adc[1], adc[2]);
 #endif
@@ -377,8 +382,8 @@ int rc_mpu_read_temp(rc_mpu_data_t* data) {
   i2c->SetDeviceAddress(RC_MPU_DEFAULT_I2C_ADDR);
 
   // Read the six raw data registers into data array
-  size_t count{6};
-  uint16_t adc = i2c->ReadWord(TEMP_OUT_H);
+  // size_t count{6};
+  int16_t adc = i2c->ReadWord(TEMP_OUT_H);
 
   // convert to real units
   data->temp = 21.0 + adc / TEMP_SENSITIVITY;
@@ -554,17 +559,13 @@ int __init_magnetometer(int cal_mode) {
 
   // Power down magnetometer
   if (not i2c->WriteByte(AK8963_CNTL, MAG_POWER_DN)) {
-    fprintf(stderr,
-            "ERROR: in __init_magnetometer, failed to write to AK8963_CNTL "
-            "register to power down");
+    SYS_LOG_ERROR("failed to write to AK8963_CNTL register to power down");
     return -1;
   }
   rc_usleep(1000);
   // Enter Fuse ROM access mode
   if (not i2c->WriteByte(AK8963_CNTL, MAG_FUSE_ROM)) {
-    fprintf(stderr,
-            "ERROR: in __init_magnetometer, failed to write to AK8963_CNTL "
-            "register");
+    SYS_LOG_ERROR("failed to write to AK8963_CNTL register");
     return -1;
   }
   rc_usleep(1000);
@@ -584,9 +585,7 @@ int __init_magnetometer(int cal_mode) {
   }
   // Power down magnetometer again
   if (not i2c->WriteByte(AK8963_CNTL, MAG_POWER_DN)) {
-    fprintf(stderr,
-            "ERROR: in __init_magnetometer, failed to write to AK8963_CNTL "
-            "register to power on");
+    SYS_LOG_ERROR(" failed to write to AK8963_CNTL register to power on");
     return -1;
   }
   rc_usleep(100);
@@ -594,18 +593,17 @@ int __init_magnetometer(int cal_mode) {
   // and continuous sampling mode 2 (100hz)
   const uint8_t c = MSCALE_16 | MAG_CONT_MES_2;
   if (not i2c->WriteByte(AK8963_CNTL, c)) {
-    fprintf(stderr,
-            "ERROR: in __init_magnetometer, failed to write to AK8963_CNTL "
-            "register to set sampling mode");
+    SYS_LOG_ERROR(
+      "failed to write to AK8963_CNTL register to set sampling mode");
     return -1;
   }
   rc_usleep(100);
   // go back to configuring the IMU, leave bypass on
   i2c->SetDeviceAddress(RC_MPU_DEFAULT_I2C_ADDR);
   // load in magnetometer calibration
-  // if (!cal_mode) {
-  //   __load_mag_calibration();
-  // }
+  if (!cal_mode) {
+    __load_mag_calibration();
+  }
   return 0;
 }
 
@@ -651,8 +649,7 @@ int __mpu_set_bypass(uint8_t bypass_on) {
     tmp |= I2C_MST_EN;  // i2c master mode when not in bypass
   }
   if (not i2c->WriteByte(USER_CTRL, tmp)) {
-    fprintf(stderr,
-            "ERROR in mpu_set_bypass, failed to write USER_CTRL register");
+    SYS_LOG_ERROR("failed to write USER_CTRL register");
     return -1;
   }
   rc_usleep(3000);
@@ -662,8 +659,7 @@ int __mpu_set_bypass(uint8_t bypass_on) {
   if (bypass_on)
     tmp |= BYPASS_EN;
   if (not i2c->WriteByte(INT_PIN_CFG, tmp)) {
-    fprintf(stderr,
-            "ERROR in mpu_set_bypass, failed to write INT_PIN_CFG register");
+    SYS_LOG_ERROR("failed to write INT_PIN_CFG register");
     return -1;
   }
   if (bypass_on) {
@@ -722,4 +718,199 @@ int rc_mpu_power_off(void) {
   return 0;
 }
 
-// Phew, that was a lot of code....
+template <typename T>
+std::optional<std::vector<T>> ReadNumbers(std::ifstream& file, size_t n) {
+  if (not file.is_open()) {
+    return {};
+  }
+  std::vector<T> numbers;
+  while (not file.eof()) {
+    if (numbers.size() == n) {
+      return numbers;
+    }
+    T x;
+    file >> x;
+    numbers.push_back(x);
+  }
+  return {};
+}
+
+/**
+ * Loads steady state gyro offsets from the disk and puts them in the IMU's
+ * gyro offset register. If no calibration file exists then make a new one.
+ *
+ * @return true on success, false on failure
+ */
+bool __load_gyro_calibration(void) {
+  int16_t offset[3] = {0, 0, 0};
+  std::ifstream file;
+  std::string filename = CALIBRATION_DIR GYRO_CAL_FILE;
+  file.open(filename, std::ios_base::in);
+  if (file.is_open()) {
+    auto numbers = ReadNumbers<int16_t>(file, 3);
+    if (numbers) {
+      // copy red number to offset data if size is correct
+      std::copy(numbers.value().begin(), numbers.value().end(), offset);
+    } else {
+      SYS_LOG_WARN("Loading gyro offsets, calibration file empty or malformed");
+      SYS_LOG_WARN("Please run rc_calibrate_gyro to recalibrate");
+      SYS_LOG_WARN("using default offsets for now");
+    }
+    file.close();
+  } else {
+    // calibration file doesn't exist yet
+    SYS_LOG_WARN("no gyro calibration data found");
+    SYS_LOG_WARN("Please run rc_calibrate_gyro");
+  }
+
+  // print debug msg
+  std::string debug_msg = "gyro offsets: ";
+  for (size_t i = 0; i < 3; i++) {
+    debug_msg += std::to_string(offset[i]) + " ";
+  }
+  SYS_LOG_DEBUG(debug_msg);
+
+  // Divide by 4 to get 32.9 LSB per deg/s to conform to expected bias input
+  // format. also make negative since we wish to subtract out the steady
+  // state offset
+  std::vector<int16_t> data(3);
+  for (size_t i = 0; i < 3; i++) {
+    data[i] = -offset[i] / 4;
+  }
+
+  // Push gyro biases to hardware registers
+  if (not i2c->WriteWords(XG_OFFSET_H, data)) {
+    SYS_LOG_ERROR("failed to load gyro offsets into IMU register");
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Loads steady state magnetometer offsets and scale from the disk into global
+ * variables for correction later by read_magnetometer and FIFO read functions
+ *
+ * @return     true on success, false on failure
+ */
+bool __load_mag_calibration(void) {
+  std::ifstream file;
+  std::string filename = CALIBRATION_DIR MAG_CAL_FILE;
+  file.open(filename, std::ios_base::in);
+  if (file.is_open()) {
+    auto offset_numbers = ReadNumbers<int>(file, 3);
+    auto scale_numbers = ReadNumbers<int>(file, 3);
+    if (offset_numbers && scale_numbers) {
+      // copy red number to offset data if size is correct
+      std::copy(offset_numbers.value().begin(), offset_numbers.value().end(),
+                mag_offsets);
+      std::copy(scale_numbers.value().begin(), scale_numbers.value().end(),
+                mag_scales);
+    } else {
+      SYS_LOG_WARN(
+        "Loading magnetometer offsets, calibration file empty or malformed");
+      SYS_LOG_WARN("Please run rc_calibrate_mag to recalibrate");
+      SYS_LOG_WARN("using default offsets for now");
+    }
+    file.close();
+  } else {
+    // calibration file doesn't exist yet
+    SYS_LOG_WARN("no magnetometer calibration data found");
+    SYS_LOG_WARN("Please run rc_calibrate_mag");
+  }
+
+  // print debug msg
+  std::string offset_msg = "mag offsets: ";
+  std::string scale_msg = "mag scale: ";
+  for (size_t i = 0; i < 3; i++) {
+    offset_msg += std::to_string(mag_offsets[i]) + " ";
+    scale_msg += std::to_string(mag_scales[i]) + " ";
+  }
+  SYS_LOG_DEBUG(offset_msg);
+  SYS_LOG_DEBUG(scale_msg);
+
+  return true;
+}
+
+/**
+ * Loads steady state accel offsets from the disk and puts them in the IMU's
+ * accel offset register. If no calibration file exists then make a new one.
+ *
+ * @return     0 on success, -1 on failure
+ */
+bool __load_accel_calibration(void) {
+  int offset[3] = {0, 0, 0};
+  int scale[3] = {1, 1, 1};
+  std::ifstream file;
+  std::string filename = CALIBRATION_DIR ACCEL_CAL_FILE;
+  file.open(filename, std::ios_base::in);
+  if (file.is_open()) {
+    auto offset_numbers = ReadNumbers<int>(file, 3);
+    auto scale_numbers = ReadNumbers<int>(file, 3);
+    if (offset_numbers && scale_numbers) {
+      // copy red number to offset data if size is correct
+      std::copy(offset_numbers.value().begin(), offset_numbers.value().end(),
+                offset);
+      std::copy(scale_numbers.value().begin(), scale_numbers.value().end(),
+                scale);
+    } else {
+      SYS_LOG_WARN(
+        "Loading accel offsets, calibration file empty or malformed");
+      SYS_LOG_WARN("Please run rc_calibrate_accel to recalibrate");
+      SYS_LOG_WARN("using default offsets for now");
+    }
+  } else {
+    SYS_LOG_WARN("no accelerometer calibration data found");
+    SYS_LOG_WARN("Please run rc_calibrate_gyro");
+  }
+  file.close();
+
+  // print debug msg
+  std::string offset_msg = "accel offsets: ";
+  std::string scale_msg = "accel scale: ";
+  for (size_t i = 0; i < 3; i++) {
+    offset_msg += std::to_string(offset[i]) + " ";
+    scale_msg += std::to_string(scale[i]) + " ";
+  }
+  SYS_LOG_DEBUG(offset_msg);
+  SYS_LOG_DEBUG(scale_msg);
+
+  // save scales globally
+  for (size_t i = 0; i < 3; i++) {
+    accel_lengths[i] = scale[i];
+  }
+
+  // read factory bias
+  std::vector<uint8_t> raw = i2c->ReadBytes(XA_OFFSET_H, 6);
+  if (raw.size() != 6) {
+    SYS_LOG_WARN("failed to read factory bias");
+    return false;
+  }
+
+  int16_t factory[3];
+  // Turn the MSB and LSB into a signed 16-bit value
+  for (size_t i = 0; i < 3; i++) {
+    const size_t idx = i * 2;
+    const int16_t msb = static_cast<int16_t>(raw[idx]);
+    const int16_t lsb = static_cast<int16_t>(raw[idx + 1]);
+    factory[i] = static_cast<int16_t>((msb << 7) | (lsb >> 1));
+  }
+
+  constexpr double resolution = 0.0009765615;
+  for (size_t i = 0; i < 3; i++) {
+    // convert offset in g to bias register which is 15-bits, 16G FSR
+    const int16_t bias =
+      factory[i] - static_cast<int16_t>(std::round(offset[i] / resolution));
+    // convert 16-bit bias to characters to write
+    const size_t idx = i * 2;
+    raw[idx] = static_cast<uint8_t>((bias >> 7) & 0xFF);
+    raw[idx + 1] = static_cast<uint8_t>((bias << 1) & 0xFF);
+  }
+
+  // Push accel biases to hardware registers
+  if (not i2c->WriteBytes(XA_OFFSET_H, raw)) {
+    SYS_LOG_WARN("failed to write accel offsets into IMU register");
+    return false;
+  }
+
+  return true;
+}

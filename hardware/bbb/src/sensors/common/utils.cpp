@@ -7,17 +7,17 @@
 #include <iostream>
 
 namespace sensors::common::utils {
-uint16_t ToWord(const Bytes bytes) {
-  const auto high = static_cast<int>(bytes.msb);
-  const auto low = static_cast<int>(bytes.lsb);
+int16_t ToWord(const Bytes bytes) {
   constexpr auto bit_shift = 8;
-  return static_cast<uint16_t>(high << bit_shift | low);
+  const int high = static_cast<int>(bytes.msb) << bit_shift;
+  const int low = static_cast<int>(bytes.lsb);
+  return static_cast<int16_t>(high | low);
 }
 
-Bytes ToBytes(const uint16_t word) {
+Bytes ToBytes(const int16_t word) {
   constexpr auto bit_shift = 8;
-  const uint8_t msb = static_cast<uint8_t>(word >> bit_shift);
   constexpr auto mask = 0xFF;
+  const uint8_t msb = static_cast<uint8_t>((word >> bit_shift) & mask);
   const uint8_t lsb = static_cast<uint8_t>(word & mask);
   return Bytes{msb, lsb};
 }

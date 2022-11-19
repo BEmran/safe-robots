@@ -51,7 +51,7 @@
 #define QUAT_Y 2  ///< Third index of the dmp_quat[] quaternion vector
 #define QUAT_Z 3  ///< Fourth index of the dmp_quat[] quaternion vector
 
-#define DEG_TO_RAD 0.0174532925199  ///< multiply to convert degrees to radians
+// #define DEG_TO_RAD 0.0174532925199  ///< multiply to convert degrees to radians
 #define RAD_TO_DEG 57.295779513     ///< multiply to convert radians to degrees
 #define MS2_TO_G 0.10197162129      ///< multiply to convert m/s^2 to G
 #define G_TO_MS2                                                               \

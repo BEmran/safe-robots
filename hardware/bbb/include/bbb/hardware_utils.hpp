@@ -7,6 +7,8 @@
 
 #include <cstdint>
 
+#define CALIBRATION_DIR "/var/lib/robotcontrol/"
+
 #define ARRAY_SIZE(a) sizeof(a) / sizeof(a[0])  // NOLINT
 
 namespace bbb::hardware_utils {

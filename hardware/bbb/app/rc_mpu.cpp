@@ -3,8 +3,10 @@
 #include <stdio.h>
 
 #include "bbb/time.hpp"
+#include "sensors/common/utils.hpp"
 #include "sensors/mpu/mpu.hpp"
-
+const double DEG_TO_RAD_ =
+  static_cast<double>(sensors::common::utils::DEG_TO_RAD);
 // possible modes, user selected with command line arguments
 typedef enum g_mode_t { G_MODE_RAD, G_MODE_DEG, G_MODE_RAW } g_mode_t;
 
@@ -140,8 +142,8 @@ int main(int argc, char* argv[]) {
 
     switch (g_mode) {
       case G_MODE_RAD:
-        printf("%6.1f %6.1f %6.1f |", data.gyro[0] * DEG_TO_RAD,
-               data.gyro[1] * DEG_TO_RAD, data.gyro[2] * DEG_TO_RAD);
+        printf("%6.1f %6.1f %6.1f |", data.gyro[0] * DEG_TO_RAD_,
+               data.gyro[1] * DEG_TO_RAD_, data.gyro[2] * DEG_TO_RAD_);
         break;
       case G_MODE_DEG:
         printf("%6.1f %6.1f %6.1f |", data.gyro[0], data.gyro[1], data.gyro[2]);

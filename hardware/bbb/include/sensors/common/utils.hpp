@@ -159,15 +159,15 @@ struct Bytes {
  * @param bytes 2 byte {msb, lsb}
  * @return int16_t full number
  */
-uint16_t ToWord(const Bytes bytes);
+int16_t ToWord(const Bytes bytes);
 
 /**
- * @brief Turn a uint16_t into two unsigned 8-bit value
+ * @brief Turn a int16_t into two unsigned 8-bit value
  *
  * @param word full number
  * @return Bytes decoded two bytes
  */
-Bytes ToBytes(const uint16_t word);
+Bytes ToBytes(const int16_t word);
 
 /**
  * @brief Convert a std::array data to Vec3

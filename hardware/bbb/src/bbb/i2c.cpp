@@ -27,7 +27,7 @@ I2CManager::I2CManager() {
   }
 }
 
-std::shared_ptr<I2C> I2CManager::CreateI2C(const int bus,
+std::shared_ptr<I2C> I2CManager::CreateI2C(const size_t bus,
                                            const uint8_t devAddr) {
   // sanity check
   if (bus > I2Cs.size()) {
@@ -40,7 +40,7 @@ std::shared_ptr<I2C> I2CManager::CreateI2C(const int bus,
   return I2Cs[bus];
 }
 
-void I2CManager::SetDeviceAddress(const int bus, const uint8_t devAddr) {
+void I2CManager::SetDeviceAddress(const size_t bus, const uint8_t devAddr) {
   // sanity check
   if (bus > I2Cs.size()) {
     SYS_LOG_WARN("SetDeviceAddress, wrong bus number");
@@ -49,7 +49,7 @@ void I2CManager::SetDeviceAddress(const int bus, const uint8_t devAddr) {
   I2Cs[bus]->SetDeviceAddress(devAddr);
 }
 
-void I2CManager::Close(const int bus) {
+void I2CManager::Close(const size_t bus) {
   // sanity check
   if (bus > I2Cs.size()) {
     SYS_LOG_WARN("Close, wrong bus number");
@@ -58,7 +58,7 @@ void I2CManager::Close(const int bus) {
   I2Cs[bus]->Close();
 }
 
-I2C::I2C(const int bus) : state_{I2CState(bus)} {
+I2C::I2C(const size_t bus) : state_{I2CState(bus)} {
 }
 
 I2C::~I2C() {
@@ -86,7 +86,7 @@ void I2C::Configure() {
 
   // open file descriptor
   char str[16];
-  sprintf(str, "/dev/i2c-%d", state_.bus);
+  sprintf(str, "/dev/i2c-%zu", state_.bus);
   int fd = open(str, O_RDWR);
   if (fd == -1) {
     SYS_LOG_WARN("init, failed to open /dev/i2c");
@@ -144,14 +144,14 @@ std::vector<uint8_t> I2C::ReadBytes(const uint8_t regAddr, const size_t count) {
   // Read the response
   std::vector<uint8_t> data(count);
   ret = read(state_.fd, data.data(), count);
-  if (ret != count) {
+  if (ret != static_cast<long>(count)) {
     SYS_LOG_WARN("ReadBytes, received unexpected bytes from device");
     return {};
   }
   return data;
 }
 
-uint16_t I2C::ReadWord(const uint8_t regAddr) {
+int16_t I2C::ReadWord(const uint8_t regAddr) {
   auto data = ReadWords(regAddr, 1);
   if (data.size() == 0) {
     return 0;
@@ -159,14 +159,13 @@ uint16_t I2C::ReadWord(const uint8_t regAddr) {
   return data[0];
 }
 
-std::vector<uint16_t> I2C::ReadWords(const uint8_t regAddr,
-                                     const size_t count) {
+std::vector<int16_t> I2C::ReadWords(const uint8_t regAddr, const size_t count) {
   const auto buf = ReadBytes(regAddr, count * 2);
   if (buf.size() < count * 2) {
     return {};
   }
 
-  std::vector<uint16_t> data(count);
+  std::vector<int16_t> data(count);
   // form words from bytes and put into user's data array
   for (size_t i = 0; i < count; i++) {
     const size_t idx{i * 2};
@@ -190,11 +189,11 @@ bool I2C::WriteBytes(const uint8_t reg_addr, const std::vector<uint8_t>& data) {
   return SendBytes(write_data);
 }
 
-bool I2C::WriteWord(const uint8_t regAddr, const uint16_t data) {
+bool I2C::WriteWord(const uint8_t regAddr, const int16_t data) {
   return WriteWords(regAddr, {data});
 }
 
-bool I2C::WriteWords(const uint8_t regAddr, const std::vector<uint16_t>& data) {
+bool I2C::WriteWords(const uint8_t regAddr, const std::vector<int16_t>& data) {
   // assemble bytes to send
   std::vector<uint8_t> write_data((data.size() * 2) + 1);
   write_data[0] = regAddr;
@@ -226,7 +225,7 @@ bool I2C::SendBytes(const std::vector<uint8_t>& data) {
   auto ret = write(state_.fd, data.data(), data.size());
 
   // write should have returned the correct # bytes written
-  if (ret != data.size()) {
+  if (ret != static_cast<long>(data.size())) {
     SYS_LOG_WARN("SendBytes, failed to write to bus");
     return false;
   }
