@@ -2,9 +2,10 @@
 #include <signal.h>
 #include <stdio.h>
 
-#include "bbb/time.hpp"
-#include "sensors/common/utils.hpp"
-#include "sensors/mpu/mpu.hpp"
+#include <bbb/time.hpp>
+#include <sensors/common/utils.hpp>
+#include <sensors/mpu/mpu.hpp>
+
 const double DEG_TO_RAD_ =
   static_cast<double>(sensors::common::utils::DEG_TO_RAD);
 // possible modes, user selected with command line arguments
@@ -69,7 +70,7 @@ int main(int argc, char* argv[]) {
   conf.enable_magnetometer = true;
   conf.show_warnings = true;
 
-  if (rc_mpu_initialize(&data, conf)) {
+  if (not rc_mpu_initialize(&data, conf)) {
     fprintf(stderr, "rc_mpu_initialize_failed\n");
     return -1;
   }
@@ -119,7 +120,9 @@ int main(int argc, char* argv[]) {
     if (rc_mpu_read_gyro(&data) < 0) {
       printf("read gyro data failed\n");
     }
-    if (rc_mpu_read_mag(&data)) {
+    if (auto mag = rc_mpu_read_mag()) {
+      data.mag = mag.value();
+    } else {
       printf("read mag data failed\n");
     }
     if (rc_mpu_read_temp(&data)) {
