@@ -3,30 +3,36 @@
 # ##############################################################################
 set(BBB_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/hardware/bbb/include)
 set(BBB_HEADER_LIST
-    ${BBB_INCLUDE_DIR}/bbb/communication_abs.hpp
-    ${BBB_INCLUDE_DIR}/bbb/hardware_utils.hpp
-    ${BBB_INCLUDE_DIR}/bbb/i2c.hpp
-    ${BBB_INCLUDE_DIR}/bbb/spi.hpp
-    ${BBB_INCLUDE_DIR}/bbb/time.hpp
-    ${BBB_INCLUDE_DIR}/sensors/common/calibrate.hpp
-    ${BBB_INCLUDE_DIR}/sensors/common/utils.hpp
-    ${BBB_INCLUDE_DIR}/sensors/mpu/mpu9250_register_map.hpp
-    ${BBB_INCLUDE_DIR}/sensors/mpu/mpu.hpp
-    ${BBB_INCLUDE_DIR}/sensors/mpu/mpu9250.hpp)
+    # ${BBB_INCLUDE_DIR}/bbb/communication_abs.hpp
+    # ${BBB_INCLUDE_DIR}/bbb/hardware_utils.hpp
+    # ${BBB_INCLUDE_DIR}/bbb/i2c.hpp
+    # ${BBB_INCLUDE_DIR}/bbb/spi.hpp
+    # ${BBB_INCLUDE_DIR}/bbb/time.hpp
+    # ${BBB_INCLUDE_DIR}/sensors/common/calibrate.hpp
+    # ${BBB_INCLUDE_DIR}/sensors/common/utils.hpp
+    # ${BBB_INCLUDE_DIR}/sensors/mpu/mpu9250_register_map.hpp
+    # ${BBB_INCLUDE_DIR}/sensors/mpu/mpu.hpp
+    # ${BBB_INCLUDE_DIR}/sensors/mpu/mpu9250.hpp
+    ${BBB_INCLUDE_DIR}/sensors/rc/i2c.hpp
+    ${BBB_INCLUDE_DIR}/sensors/rc/mpu.hpp
+    )
 
 # ##############################################################################
 # Create source file list for BBB library
 # ##############################################################################
 set(BBB_SOURCE_DIR ${PROJECT_SOURCE_DIR}/hardware/bbb/src)
 set(BBB_SOURCE_LIST
-    ${BBB_SOURCE_DIR}/bbb/hardware_utils.cpp
-    ${BBB_SOURCE_DIR}/bbb/i2c.cpp
-    ${BBB_SOURCE_DIR}/bbb/spi.cpp
-    ${BBB_SOURCE_DIR}/bbb/time.cpp
-    ${BBB_SOURCE_DIR}/sensors/common/calibrate.cpp
-    ${BBB_SOURCE_DIR}/sensors/common/utils.cpp
-    ${BBB_SOURCE_DIR}/sensors/mpu/mpu.cpp
-    ${BBB_SOURCE_DIR}/sensors/mpu/mpu9250.cpp)
+    # ${BBB_SOURCE_DIR}/bbb/hardware_utils.cpp
+    # ${BBB_SOURCE_DIR}/bbb/i2c.cpp
+    # ${BBB_SOURCE_DIR}/bbb/spi.cpp
+    # ${BBB_SOURCE_DIR}/bbb/time.cpp
+    # ${BBB_SOURCE_DIR}/sensors/common/calibrate.cpp
+    # ${BBB_SOURCE_DIR}/sensors/common/utils.cpp
+    # ${BBB_SOURCE_DIR}/sensors/mpu/mpu.cpp
+    # ${BBB_SOURCE_DIR}/sensors/mpu/mpu9250.cpp
+    ${BBB_SOURCE_DIR}/sensors/rc/i2c.cpp
+    ${BBB_SOURCE_DIR}/sensors/rc/mpu.cpp
+    )
 
 # ##############################################################################
 # Build BBB library
@@ -41,6 +47,7 @@ target_include_directories(
     PUBLIC # $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/core/include>
            $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/hardware/bbb/include>
            # $<INSTALL_INTERFACE:${ABSOLUTE_INSTALL_INCLUDEDIR}>
+        #    ${ROBOT_CONTROL_LIBRARY_INCLUDE}
 )
 
 # Link required library
