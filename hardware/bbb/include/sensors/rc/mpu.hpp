@@ -372,16 +372,46 @@ class MPU {
   bool InitMagnetometer(int cal_mode);
   bool PowerOffMagnetometer();
 
-/**
- * configures the USER_CTRL and INT_PIN_CFG registers to turn on and off the
- * i2c bypass mode for talking to the magnetometer. In random read mode this
- * is used to turn on the bypass and left as is. In DMP mode bypass is turned
- * off after configuration and the MPU fetches magnetometer data
- automatically.
- * USER_CTRL - based on global variable dsp_en
- * INT_PIN_CFG based on requested bypass state
- **/
-bool SetBypass(const bool bypass_on);
+  /**
+   * @brief Loads steady state accel offsets from the disk and puts them in the
+   * IMU's accel offset register.
+   *
+   * @return true if success
+   * @return false otherwise
+   */
+  bool LoadAccelCalibration();
+
+  /**
+   * @brief Loads steady state gyro offsets from the disk and puts them in the
+   * IMU's accel offset register.
+   *
+   * @return true if success
+   * @return false otherwise
+   */
+  bool LoadGyroCalibration();
+
+  /**
+   * @brief Loads steady state magnetometer offsets and scale from the disk into
+   * global variables for correction later by read_magnetometer and FIFO read
+   * functions
+   *
+   * @return true if success
+   * @return false otherwise
+   */
+  bool LoadMagCalibration();
+
+  bool AdjustAccelFactoryBias(const uint8_t reg, const int offset);
+  /**
+   * configures the USER_CTRL and INT_PIN_CFG registers to turn on and off the
+   * i2c bypass mode for talking to the magnetometer. In random read mode this
+   * is used to turn on the bypass and left as is. In DMP mode bypass is
+   turned
+   * off after configuration and the MPU fetches magnetometer data
+   automatically.
+   * USER_CTRL - based on global variable dsp_en
+   * INT_PIN_CFG based on requested bypass state
+   **/
+  bool SetBypass(const bool bypass_on);
 
  private:
   I2C i2c_;
@@ -390,12 +420,12 @@ bool SetBypass(const bool bypass_on);
   double accel_to_ms2_{1.0};
   /// @brief conversion rate from raw gyroscope to degrees/s
   double gyro_to_degs_{1.0};
-  bool is_bypass_ {false};
+  bool is_bypass_{false};
 
   std::array<double, 3> mag_factory_adjust_;
   std::array<double, 3> mag_offsets_;
   std::array<double, 3> mag_scales_;
-  std::array<double, 3> accel_lengths_;
+  std::array<int, 3> accel_lengths_;
 };
 
 /**
@@ -462,7 +492,8 @@ void SetConfigToDefault(const MpuConfig conf);
 //  *
 //  * After calling this the user does not need to call the normal read
 //  functions
-//  * rc_mpu_read_accel(), rc_mpu_read_gyro(), or rc_mpu_read mag(). Instead the
+//  * rc_mpu_read_accel(), rc_mpu_read_gyro(), or rc_mpu_read mag(). Instead
+//  the
 //  * data will automatically be read into the user's data struct at the
 //  * dmp_sample_rate set in the config struct.
 //  *

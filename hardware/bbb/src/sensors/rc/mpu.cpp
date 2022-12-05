@@ -18,10 +18,13 @@
 #include <cerrno>
 #include <cmath>
 #include <core/utils/logger_macros.hpp>
+#include <core/utils/system.hpp>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <fstream>
 #include <string>
+#include <string_view>
 
 #include "common.hpp"
 // #include "dmpKey.h"
@@ -124,9 +127,95 @@ constexpr uint8_t RC_IMU_BUS = 2;
 // static int __data_fusion(rc_mpu_data_t* data);
 // static int __mag_correct_orientation(std::array<double, 3> mag_vec);
 
+namespace {
 void MicroSleep(uint32_t micro) {
   usleep(micro);
 }
+
+template <typename T, size_t SIZE>
+std::optional<std::array<T, SIZE>> ReadNumbers(std::ifstream& file) {
+  if (not file.is_open()) {
+    SYS_LOG_WARN("ReadNumbers: file is not open");
+    return {};
+  }
+  std::vector<T> numbers;
+  while (not file.eof()) {
+    T x;
+    file >> x;
+    numbers.push_back(x);
+  }
+
+  if (numbers.size() == SIZE) {
+    SYS_LOG_WARN("ReadNumbers: file doesn't have the correct numbers to read");
+    return {};
+  }
+  std::array<T, SIZE> array;
+  std::copy(numbers.begin(), numbers.end(), array.begin());
+  return array;
+}
+
+template <typename T, size_t SIZE>
+std::string ArrayToString(std::string_view header,
+                          const std::array<T, SIZE>& arr) {
+  std::string msg = header.data();
+  for (size_t i = 0; i < arr.size(); i++) {
+    msg += std::to_string(arr[i]) + " ";
+  }
+  return msg;
+}
+
+/**
+ * @brief Writes an array values to disk for a specific directory and filename
+ *
+ * @tparam T array type
+ * @tparam SIZE size of array
+ * @param directory directory path
+ * @param filename file name to write at
+ * @param array values to write
+ * @return true if success
+ * @return false otherwise
+ */
+template <typename T, size_t SIZE>
+bool WriteCalToDisk(std::string_view directory, std::string_view filename,
+                    std::array<T, SIZE> array) {
+  try {
+    core::utils::CreateDirectories(directory);
+  } catch (...) {
+    SYS_LOG_WARN("ERROR in WriteCalToDisk making calibration file directory");
+    return false;
+  }
+
+  // remove old file
+  std::string full_filename{directory};
+  full_filename += filename.data();
+  remove(full_filename.c_str());
+  std::ofstream file;
+  file.open(full_filename, std::ios_base::out);
+  if (not file.is_open()) {
+    SYS_LOG_WARN("ERROR in WriteCalToDisk cannot open file" +
+                 full_filename.c_str());
+    return false;
+  }
+
+  // write to the file, close, and exit
+  for (size_t i = 0; i < array.size(); i++) {
+    file << array[i] << " ";
+  }
+  file.close();
+
+  // now give proper permissions
+  if (chmod(full_filename.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) == -1) {
+    SYS_LOG_WARN(
+      "ERROR in WriteCalToDisk opening calibration file for writing");
+    SYS_LOG_WARN("most likely you ran this as root in the past and are now");
+    SYS_LOG_WARN("running it as a normal user. try deleting the file");
+    SYS_LOG_WARN("sudo rm /var/lib/robotcontrol/*.cal");
+    return false;
+  }
+
+  return true;
+}
+}  // namespace
 
 MpuConfig DefaultConfig() {
   MpuConfig conf;
@@ -2228,404 +2317,185 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   return 0;
 // }
 
-// /**
-//  * Loads steady state gyro offsets from the disk and puts them in the IMU's
-//  gyro
-//  * offset register. If no calibration file exists then make a new one.
-//  *
-//  * @return     0 on success, -1 on failure
-//  */
-// bool LoadGyroCalibration(void) {
-//   FILE* fd;
-//   uint8_t data[6];
-//   int x, y, z;
+bool MPU::LoadAccelCalibration() {
+  std::array<int, 3> offset{0, 0, 0};
+  constexpr size_t size{offset.size()};
 
-//   fd = fopen(CALIBRATION_DIR GYRO_CAL_FILE, "r");
+  const std::string filename = CALIBRATION_DIR ACCEL_CAL_FILE;
+  std::ifstream file;
+  file.open(filename, std::ios_base::in);
+  if (file.is_open()) {
+    const auto offset_numbers = ReadNumbers<int, size>(file);
+    const auto scale_numbers = ReadNumbers<int, size>(file);
+    if (not offset_numbers.has_value() || not scale_numbers.has_value()) {
+      // copy red number to offset data if size is correct
+      offset = offset_numbers.value();
+      accel_lengths_ = scale_numbers.value();
+    } else {
+      SYS_LOG_WARN(
+        "Loading accel offsets, calibration file empty or malformed");
+      SYS_LOG_WARN("Please run rc_calibrate_accel to recalibrate");
+      SYS_LOG_WARN("using default offsets for now");
+    }
+  } else {
+    SYS_LOG_WARN("no accelerometer calibration data found");
+    SYS_LOG_WARN("Please run rc_calibrate_gyro");
+  }
+  file.close();
 
-//   if (fd == NULL) {
-//     // calibration file doesn't exist yet
-//     SYS_LOG_WARN("WARNING: no gyro calibration data found");
-//     SYS_LOG_WARN("Please run rc_calibrate_gyro\n");
-//     // use zero offsets
-//     x = 0;
-//     y = 0;
-//     z = 0;
-//   } else {
-//     // read in data
-//     if (fscanf(fd, "%d\n%d\n%d\n", &x, &y, &z) != 3) {
-//       fprintf(stderr,
-//               "ERROR loading gyro offsets, calibration file empty or "
-//               "malformed");
-//       fprintf(stderr,
-//               "please run rc_calibrate_gyro to make a new calibration file");
-//       SYS_LOG_WARN("using default offsets for now");
-//       // use zero offsets
-//       x = 0;
-//       y = 0;
-//       z = 0;
-//     }
-//     fclose(fd);
-//   }
+  // print debug msg
+  SYS_LOG_DEBUG(ArrayToString("accel offsets", offset));
+  SYS_LOG_DEBUG(ArrayToString("accel scale", accel_lengths_));
 
-// #ifdef DEBUG
-//   printf("offsets: %d %d %d\n", x, y, z);
-// #endif
+  // write adjusted factory bias
+  const std::vector<uint8_t> registers{XA_OFFSET_H, YA_OFFSET_H, ZA_OFFSET_H};
+  for (size_t i = 0; i < registers.size(); i++) {
+    if (not AdjustAccelFactoryBias(registers[i], offset[i])) {
+      SYS_LOG_WARN("failed to read factory bias");
+    }
+  }
+  return true;
+}
 
-//   // Divide by 4 to get 32.9 LSB per deg/s to conform to expected bias input
-//   // format. also make negative since we wish to subtract out the steady
-//   // state offset
-//   data[0] = (-x / 4 >> 8) & 0xFF;
-//   data[1] = (-x / 4) & 0xFF;
-//   data[2] = (-y / 4 >> 8) & 0xFF;
-//   data[3] = (-y / 4) & 0xFF;
-//   data[4] = (-z / 4 >> 8) & 0xFF;
-//   data[5] = (-z / 4) & 0xFF;
+bool MPU::AdjustAccelFactoryBias(const uint8_t reg, const int offset) {
+  // read factory bias
+  const auto offset_raw = i2c_.ReadWord(reg, ByteOrder::BIG_ENDIAN_ORDER);
+  if (not offset_raw) {
+    SYS_LOG_WARN("failed to read factory bias");
+    return false;
+  }
 
-//   // Push gyro biases to hardware registers
-//   if (rc_i2c_write_bytes(config_.i2c_bus, XG_OFFSET_H, 6, &data[0])) {
-//     SYS_LOG_WARN("ERROR: failed to load gyro offsets into IMU register");
-//     return false;
-//   }
-//   return 0;
-// }
+  // convert offset in g to bias register which is 15-bits, 16G FSR
+  constexpr double resolution = 0.0009765615;
+  const int16_t bias =
+    offset_raw.value() - static_cast<int16_t>(std::round(offset / resolution));
 
-// /**
-//  * Loads steady state magnetometer offsets and scale from the disk into
-//  global
-//  * variables for correction later by read_magnetometer and FIFO read
-//  functions
-//  *
-//  * @return     0 on success, -1 on failure
-//  */
-// int __load_mag_calibration(void) {
-//   FILE* fd;
-//   double x, y, z, sx, sy, sz;
+  // Push accel biases to hardware registers
+  if (i2c_.WriteWord(reg, bias, ByteOrder::BIG_ENDIAN_ORDER)) {
+    SYS_LOG_WARN("failed to write accel offsets into IMU register");
+    return false;
+  }
+  return true;
+}
 
-//   fd = fopen(CALIBRATION_DIR MAG_CAL_FILE, "r");
-//   if (fd == NULL) {
-//     // calibration file doesn't exist yet
-//     SYS_LOG_WARN("WARNING: no magnetometer calibration data found");
-//     SYS_LOG_WARN("Please run rc_calibrate_mag\n");
-//     x = 0.0;
-//     y = 0.0;
-//     z = 0.0;
-//     sx = 1.0;
-//     sy = 1.0;
-//     sz = 1.0;
-//   } else {  // read in data
-//     if (fscanf(fd, "%lf\n%lf\n%lf\n%lf\n%lf\n%lf\n", &x, &y, &z, &sx, &sy,
-//                &sz) != 6) {
-//       fprintf(stderr,
-//               "ERROR loading magnetometer calibration file, empty or "
-//               "malformed");
-//       fprintf(stderr,
-//               "please run rc_calibrate_mag to make a new calibration file");
-//       SYS_LOG_WARN("using default offsets for now");
-//       x = 0.0;
-//       y = 0.0;
-//       z = 0.0;
-//       sx = 1.0;
-//       sy = 1.0;
-//       sz = 1.0;
-//     }
-//     fclose(fd);
-//   }
+bool MPU::LoadGyroCalibration() {
+  std::array<int, 3> offset{0, 0, 0};
+  constexpr size_t size{offset.size()};
 
-// #ifdef DEBUG
-//   printf("magcal: %lf %lf %lf %lf %lf %lf\n", x, y, z, sx, sy, sz);
-// #endif
+  const std::string filename = CALIBRATION_DIR GYRO_CAL_FILE;
+  std::ifstream file;
+  file.open(filename, std::ios_base::in);
+  if (file.is_open()) {
+    const auto numbers = ReadNumbers<int, size>(file);
+    if (not numbers.has_value()) {
+      // copy red number to offset data if size is correct
+      offset = numbers.value();
+    } else {
+      SYS_LOG_WARN("Loading gyro offsets, calibration file empty or malformed");
+      SYS_LOG_WARN("Please run rc_calibrate_gyro to recalibrate");
+      SYS_LOG_WARN("using default offsets for now");
+    }
+    file.close();
+  } else {
+    // calibration file doesn't exist yet
+    SYS_LOG_WARN("no gyro calibration data found");
+    SYS_LOG_WARN("Please run rc_calibrate_gyro");
+  }
 
-//   // write to global variables for use by rc_mpu_read_mag
-//   mag_offsets[0] = x;
-//   mag_offsets[1] = y;
-//   mag_offsets[2] = z;
-//   mag_scales[0] = sx;
-//   mag_scales[1] = sy;
-//   mag_scales[2] = sz;
+  // print debug msg
+  SYS_LOG_DEBUG(ArrayToString("gyro offsets", offset));
 
-//   return 0;
-// }
+  // Divide by 4 to get 32.9 LSB per deg/s to conform to expected bias input
+  // format. also make negative since we wish to subtract out the steady
+  // state offset
+  std::vector<int16_t> data(3);
+  for (size_t i = 0; i < 3; i++) {
+    data[i] = -static_cast<int16_t>(offset[i] / 4);
+  }
 
-// /**
-//  * Loads steady state accel offsets from the disk and puts them in the IMU's
-//  * accel offset register. If no calibration file exists then make a new one.
-//  *
-//  * @return     0 on success, -1 on failure
-//  */
-// int __load_accel_calibration(void) {
-//   FILE* fd;
-//   uint8_t raw[6] = {0, 0, 0, 0, 0, 0};
-//   double x, y, z, sx, sy, sz;  // offsets and scales in xyz
-//   int16_t bias[3], factory[3];
+  // Push gyro biases to hardware registers
+  if (not i2c_.WriteWords(XG_OFFSET_H, data, ByteOrder::BIG_ENDIAN_ORDER)) {
+    SYS_LOG_ERROR("failed to load gyro offsets into IMU register");
+    return false;
+  }
+  return true;
+}
 
-//   fd = fopen(CALIBRATION_DIR ACCEL_CAL_FILE, "r");
+bool MPU::LoadMagCalibration() {
+  constexpr size_t size{3};
+  const std::string filename = CALIBRATION_DIR MAG_CAL_FILE;
+  std::ifstream file;
+  file.open(filename, std::ios_base::in);
+  if (file.is_open()) {
+    const auto offset_numbers = ReadNumbers<double, size>(file);
+    const auto scale_numbers = ReadNumbers<double, size>(file);
+    if (not offset_numbers.has_value() && not scale_numbers.has_value()) {
+      // copy red number to offset data if size is correct
+      mag_offsets_ = offset_numbers.value();
+      mag_scales_ = scale_numbers.value();
+    } else {
+      SYS_LOG_WARN(
+        "Loading magnetometer offsets, calibration file empty or malformed");
+      SYS_LOG_WARN("Please run rc_calibrate_mag to recalibrate");
+      SYS_LOG_WARN("using default offsets for now");
+    }
+    file.close();
+  } else {
+    // calibration file doesn't exist yet
+    SYS_LOG_WARN("no magnetometer calibration data found");
+    SYS_LOG_WARN("Please run rc_calibrate_mag");
+  }
 
-//   if (fd == NULL) {
-//     // calibration file doesn't exist yet
-//     SYS_LOG_WARN("WARNING: no accelerometer calibration data found");
-//     SYS_LOG_WARN("Please run rc_calibrate_accel\n");
-//     // use zero offsets
-//     accel_lengths[0] = 1.0;
-//     accel_lengths[1] = 1.0;
-//     accel_lengths[2] = 1.0;
-//     return 0;
-//   }
-//   // read in data
-//   if (fscanf(fd, "%lf\n%lf\n%lf\n%lf\n%lf\n%lf\n", &x, &y, &z, &sx, &sy, &sz)
-//   !=
-//       6) {
-//     fprintf(stderr,
-//             "ERROR loading accel offsets, calibration file empty or "
-//             "malformed");
-//     fprintf(stderr,
-//             "please run rc_calibrate_accel to make a new calibration file");
-//     SYS_LOG_WARN("using default offsets for now");
-//     // use zero offsets
-//     accel_lengths[0] = 1.0;
-//     accel_lengths[1] = 1.0;
-//     accel_lengths[2] = 1.0;
-//     return 0;
-//   }
-//   fclose(fd);
+  // print debug msg
+  SYS_LOG_DEBUG(ArrayToString("mag offsets", mag_offsets_));
+  SYS_LOG_DEBUG(ArrayToString("mag scale", mag_scales_));
+  return true;
+}
 
-// #ifdef DEBUG
-//   printf("accel offsets: %lf %lf %lf\n", x, y, z);
-//   printf("accel scales:  %lf %lf %lf\n", sx, sy, sz);
-// #endif
+/**
+ * @brief Writes accelerometer scale and offsets to disk. This is basically the
+ * origin and dimensions of the ellipse made during calibration.
+ *
+ * @param center The center of ellipsoid in g
+ * @param lengths The lengths of ellipsoid in g
+ * @return true if success
+ * @return false otherwise
+ */
+bool WriteAccelCalToDisk(const std::array<int, 3>& center,
+                         const std::array<int, 3>& lengths) {
+  std::array<int, 6> array;
+  std::copy(center.begin(), center.end(), array.begin());
+  std::copy(lengths.begin(), lengths.end(), array.begin() + 3);
+  return WriteCalToDisk(CALIBRATION_DIR, MAG_CAL_FILE, array);
+}
 
-//   // save scales globally
-//   accel_lengths[0] = sx;
-//   accel_lengths[1] = sy;
-//   accel_lengths[2] = sz;
+/**
+ * @brief Writes gyro offsets to disk.
+ *
+ * @param offset offset values
+ * @return true if success
+ * @return false otherwise
+ */
+bool WriteGyroCalToDisk(std::array<int, 3> offset) {
+  return WriteCalToDisk(CALIBRATION_DIR, GYRO_CAL_FILE, offset);
+}
 
-//   // read factory bias
-//   if (rc_i2c_read_bytes(config_.i2c_bus, XA_OFFSET_H, 2, &raw[0]) < 0) {
-//     return false;
-//   }
-//   if (rc_i2c_read_bytes(config_.i2c_bus, YA_OFFSET_H, 2, &raw[2]) < 0) {
-//     return false;
-//   }
-//   if (rc_i2c_read_bytes(config_.i2c_bus, ZA_OFFSET_H, 2, &raw[4]) < 0) {
-//     return false;
-//   }
-//   // Turn the MSB and LSB into a signed 16-bit value
-//   factory[0] = (int16_t)(((uint16_t)raw[0] << 7) | (raw[1] >> 1));
-//   factory[1] = (int16_t)(((uint16_t)raw[2] << 7) | (raw[3] >> 1));
-//   factory[2] = (int16_t)(((uint16_t)raw[4] << 7) | (raw[5] >> 1));
-
-//   // convert offset in g to bias register which is 15-bits, 16G FSR
-//   bias[0] = factory[0] - round(x / 0.0009765615);
-//   bias[1] = factory[1] - round(y / 0.0009765615);
-//   bias[2] = factory[2] - round(z / 0.0009765615);
-
-//   // convert 16-bit bias to characters to write
-//   raw[0] = (bias[0] >> 7) & 0xFF;
-//   raw[1] = (bias[0] << 1) & 0xFF;
-//   raw[2] = (bias[1] >> 7) & 0xFF;
-//   raw[3] = (bias[1] << 1) & 0xFF;
-//   raw[4] = (bias[2] >> 7) & 0xFF;
-//   raw[5] = (bias[2] << 1) & 0xFF;
-
-//   // Push accel biases to hardware registers
-//   if (rc_i2c_write_bytes(config_.i2c_bus, XA_OFFSET_H, 2, &raw[0]) < 0) {
-//     fprintf(stderr, "ERROR: failed to write X accel offsets into IMU
-//     register"); return false;
-//   }
-//   if (rc_i2c_write_bytes(config_.i2c_bus, YA_OFFSET_H, 2, &raw[2]) < 0) {
-//     fprintf(stderr, "ERROR: failed to write Y accel offsets into IMU
-//     register"); return false;
-//   }
-//   if (rc_i2c_write_bytes(config_.i2c_bus, ZA_OFFSET_H, 2, &raw[4]) < 0) {
-//     fprintf(stderr, "ERROR: failed to write Z accel offsets into IMU
-//     register"); return false;
-//   }
-
-//   return 0;
-// }
-
-// /**
-//  * Reads steady state gyro offsets from the disk and puts them in the IMU's
-//  gyro
-//  * offset register. If no calibration file exists then make a new one.
-//  *
-//  * @param      offsets  The offsets
-//  *
-//  * @return     0 on success, -1 on failure
-//  */
-// int __write_gyro_cal_to_disk(int16_t offsets[3]) {
-//   FILE* fd;
-//   int ret;
-
-//   // make sure directory and calibration file exist and are writable first
-//   ret = mkdir(CALIBRATION_DIR, 0777);
-//   // error check, EEXIST is okay, we want directory to exist!
-//   if (ret == -1 && errno != EEXIST) {
-//     perror(
-//       "ERROR in rc_calibrate_gyro_routine making calibration file
-//       directory");
-//     return false;
-//   }
-
-//   // remove old file
-//   remove(CALIBRATION_DIR GYRO_CAL_FILE);
-
-//   fd = fopen(CALIBRATION_DIR GYRO_CAL_FILE, "w");
-//   if (fd == NULL) {
-//     perror(
-//       "ERROR in rc_calibrate_gyro_routine opening calibration file for "
-//       "writing");
-//     fprintf(stderr, "most likely you ran this as root in the past and are
-//     now"); SYS_LOG_WARN("running it as a normal user. try deleting the
-//     file"); SYS_LOG_WARN("sudo rm /var/lib/robotcontrol/gyro.cal"); return
-//     false;
-//   }
-
-//   // write to the file, close, and exit
-//   if (fprintf(fd, "%d\n%d\n%d\n", offsets[0], offsets[1], offsets[2]) < 0) {
-//     perror("ERROR in rc_calibrate_gyro_routine writing to file");
-//     fprintf(stderr, "most likely you ran this as root in the past and are
-//     now"); SYS_LOG_WARN("running it as a normal user. try deleting the
-//     file"); SYS_LOG_WARN("sudo rm /var/lib/robotcontrol/gyro.cal");
-//     fclose(fd);
-//     return false;
-//   }
-//   fclose(fd);
-
-//   // now give proper permissions
-//   if (chmod(CALIBRATION_DIR GYRO_CAL_FILE, S_IRWXU | S_IRWXG | S_IRWXO) ==
-//   -1) {
-//     perror(
-//       "ERROR in rc_calibrate_gyro_routine setting correct permissions for "
-//       "file");
-//     SYS_LOG_WARN("writing file anyway, will probably still work");
-//     fprintf(stderr, "most likely you ran this as root in the past and are
-//     now"); SYS_LOG_WARN("running it as a normal user. try deleting the
-//     file"); SYS_LOG_WARN("sudo rm /var/lib/robotcontrol/gyro.cal");
-//   }
-//   return 0;
-// }
-
-// /**
-//  * Writes magnetometer scale and offsets to disk. This is basically the
-//  origin
-//  * and dimensions of the ellipse made during calibration.
-//  *
-//  * @param      offsets  The offsets
-//  * @param      scale    The scale
-//  *
-//  * @return     0 on success, -1 on failure
-//  */
-// int __write_mag_cal_to_disk(double offsets[3], double scale[3]) {
-//   FILE* fd;
-//   int ret;
-
-//   // make sure directory and calibration file exist and are writable first
-//   ret = mkdir(CALIBRATION_DIR, 0777);
-//   // error check, EEXIST is okay, we want directory to exist!
-//   if (ret == -1 && errno != EEXIST) {
-//     perror(
-//       "ERROR in rc_calibrate_mag_routine making calibration file directory");
-//     return false;
-//   }
-//   // remove old file
-//   remove(CALIBRATION_DIR MAG_CAL_FILE);
-
-//   fd = fopen(CALIBRATION_DIR MAG_CAL_FILE, "w");
-//   if (fd == NULL) {
-//     perror(
-//       "ERROR in rc_calibrate_mag_routine opening calibration file for
-//       writing");
-//     fprintf(stderr, "most likely you ran this as root in the past and are
-//     now"); SYS_LOG_WARN("running it as a normal user. try deleting the
-//     file"); SYS_LOG_WARN("sudo rm /var/lib/robotcontrol/mag.cal"); return
-//     false;
-//   }
-
-//   // write to the file, close, and exit
-//   ret = fprintf(fd, "%.10f\n%.10f\n%.10f\n%.10f\n%.10f\n%.10f\n", offsets[0],
-//                 offsets[1], offsets[2], scale[0], scale[1], scale[2]);
-//   if (ret < 0) {
-//     perror("ERROR in rc_calibrate_mag_routine writing to file");
-//     fclose(fd);
-//     return false;
-//   }
-//   fclose(fd);
-
-//   // now give proper permissions
-//   if (chmod(CALIBRATION_DIR MAG_CAL_FILE, S_IRWXU | S_IRWXG | S_IRWXO) == -1)
-//   {
-//     perror(
-//       "ERROR in rc_calibrate_mag_routine setting correct permissions for "
-//       "file");
-//     SYS_LOG_WARN("writing file anyway, will probably still work");
-//     fprintf(stderr, "most likely you ran this as root in the past and are
-//     now"); SYS_LOG_WARN("running it as a normal user. try deleting the
-//     file"); SYS_LOG_WARN("sudo rm /var/lib/robotcontrol/mag.cal");
-//   }
-
-//   return 0;
-// }
-
-// /**
-//  * Writes accelerometer scale and offsets to disk. This is basically the
-//  origin
-//  * and dimensions of the ellipse made during calibration.
-//  *
-//  * @param      center   The center of ellipsoid in g
-//  * @param      lengths  The lengths of ellipsoid in g
-//  *
-//  * @return     0 on success, -1 on failure
-//  */
-// int __write_accel_cal_to_disk(double* center, double* lengths) {
-//   FILE* fd;
-//   int ret;
-
-//   // make sure directory and calibration file exist and are writable first
-//   ret = mkdir(CALIBRATION_DIR, 0777);
-//   // error check, EEXIST is okay, we want directory to exist!
-//   if (ret == -1 && errno != EEXIST) {
-//     perror(
-//       "ERROR in rc_mpu_calibrate_accel_routine making calibration file "
-//       "directory");
-//     return false;
-//   }
-//   // remove old file
-//   remove(CALIBRATION_DIR ACCEL_CAL_FILE);
-
-//   fd = fopen(CALIBRATION_DIR ACCEL_CAL_FILE, "w");
-//   if (fd == NULL) {
-//     perror(
-//       "ERROR in rc_mpu_calibrate_accel_routine opening calibration file for "
-//       "writing");
-//     fprintf(stderr, "most likely you ran this as root in the past and are
-//     now"); SYS_LOG_WARN("running it as a normal user. try deleting the
-//     file"); SYS_LOG_WARN("sudo rm /var/lib/robotcontrol/accel.cal"); return
-//     false;
-//   }
-
-//   // write to the file, close, and exit
-//   ret = fprintf(fd, "%.10f\n%.10f\n%.10f\n%.10f\n%.10f\n%.10f\n", center[0],
-//                 center[1], center[2], lengths[0], lengths[1], lengths[2]);
-//   if (ret < 0) {
-//     perror("ERROR in rc_mpu_calibrate_accel_routine writing to file");
-//     fclose(fd);
-//     return false;
-//   }
-//   fclose(fd);
-
-//   // now give proper permissions
-//   if (chmod(CALIBRATION_DIR ACCEL_CAL_FILE, S_IRWXU | S_IRWXG | S_IRWXO) ==
-//       -1) {
-//     perror(
-//       "WARNING in rc_calibrate_accel_routine setting correct permissions for
-//       " "file");
-//     SYS_LOG_WARN("writing file anyway, will probably still work");
-//     fprintf(stderr, "most likely you ran this as root in the past and are
-//     now"); SYS_LOG_WARN("running it as a normal user. try deleting the
-//     file"); SYS_LOG_WARN("sudo rm /var/lib/robotcontrol/accel.cal");
-//   }
-//   return 0;
-// }
+/**
+ * @brief Writes magnetometer scale and offsets to disk. This is basically the
+ * origin and dimensions of the ellipse made during calibration.
+ *
+ * @param offset The offsets values
+ * @param scale The scale values
+ * @return true if success
+ * @return false otherwise
+ */
+bool WriteMagCalToDisk(const std::array<double, 3>& offset,
+                       const std::array<double, 3>& scale) {
+  std::array<double, 6> array;
+  std::copy(offset.begin(), offset.end(), array.begin());
+  std::copy(scale.begin(), scale.end(), array.begin() + 3);
+  return WriteCalToDisk(CALIBRATION_DIR, MAG_CAL_FILE, array);
+}
 
 // int rc_mpu_calibrate_gyro_routine(rc_mpu_config_t conf) {
 //   uint8_t c, data[6];
