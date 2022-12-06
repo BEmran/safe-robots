@@ -157,6 +157,7 @@ class NodeLogger {
  */
 NodeLogger CreateNodeLoggerUsingSystemLogger(std::string_view header);
 
+std::shared_ptr<NodeLogger> SysLog();
 }  // namespace core::utils
 
 #endif  // CORE_UTILS_LOGGER_NODE_HPP_

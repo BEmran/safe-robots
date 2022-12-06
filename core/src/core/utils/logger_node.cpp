@@ -53,4 +53,9 @@ NodeLogger CreateNodeLoggerUsingSystemLogger(std::string_view header) {
   node_logger.SetLabel(header);
   return node_logger;
 }
+
+std::shared_ptr<NodeLogger> SysLog() {
+  static auto node_logger = std::make_shared<NodeLogger>(SystemLogger());
+  return node_logger;
+}
 }  // namespace core::utils
