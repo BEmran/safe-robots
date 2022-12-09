@@ -12,17 +12,19 @@
 #define I2C_BUS 2
 
 // possible modes, user selected with command line arguments
-typedef enum g_mode_t { G_MODE_RAD, G_MODE_DEG, G_MODE_RAW } g_mode_t;
+enum class GyroMode { G_MODE_RAD, G_MODE_DEG, G_MODE_RAW };
+enum class AccelMode { A_MODE_MS2, A_MODE_G, A_MODE_RAW };
 
-typedef enum a_mode_t { A_MODE_MS2, A_MODE_G, A_MODE_RAW } a_mode_t;
-
-static int enable_magnetometer = 1;
-static int enable_thermometer = 1;
-static int enable_warnings = 1;
-static int running = 0;
+// default values
+bool gRUNNING{true};
+bool gENABLE_MAG{true};
+bool gENABLE_THER{true};
+bool gENABLE_WARN{true};
+GyroMode gGMode = GyroMode::G_MODE_DEG;
+AccelMode gAMode = AccelMode::A_MODE_MS2;
 
 // printed if some invalid argument was given
-static void __print_usage(void) {
+void PrintHelpMessage() {
   printf("\n");
   printf("-a	print raw adc values instead of radians\n");
   printf("-r	print gyro in radians/s instead of degrees/s\n");
@@ -35,164 +37,174 @@ static void __print_usage(void) {
 }
 
 // interrupt handler to catch ctrl-c
-static void __signal_handler(__attribute__((unused)) int dummy) {
-  running = 0;
+void __signal_handler(__attribute__((unused)) int dummy) {
+  gRUNNING = false;
   return;
 }
 
-int main(int argc, char* argv[]) {
-  g_mode_t g_mode = G_MODE_DEG;  // gyro default to degree mode.
-  a_mode_t a_mode = A_MODE_MS2;  // accel default to m/s^2
+bool PrintHeaderMsg() {
+  // print the header
+  printf("\ntry 'rc_test_mpu -h' to see other options\n\n");
+  switch (gAMode) {
+    case AccelMode::A_MODE_MS2:
+      printf("   Accel XYZ(m/s^2)  |");
+      break;
+    case AccelMode::A_MODE_G:
+      printf("     Accel XYZ(G)    |");
+      break;
+    case AccelMode::A_MODE_RAW:
+      printf("  Accel XYZ(raw ADC) |");
+      break;
+    default:
+      printf("ERROR: invalid mode\n");
+      return false;
+  }
 
+  switch (gGMode) {
+    case GyroMode::G_MODE_RAD:
+      printf("   Gyro XYZ (rad/s)  |");
+      break;
+    case GyroMode::G_MODE_DEG:
+      printf("   Gyro XYZ (deg/s)  |");
+      break;
+    case GyroMode::G_MODE_RAW:
+      printf("  Gyro XYZ (raw ADC) |");
+      break;
+    default:
+      printf("ERROR: invalid mode\n");
+      return false;
+  }
+
+  if (gENABLE_MAG) {
+    printf("  Mag Field XYZ(uT)  |");
+  }
+
+  if (gENABLE_THER) {
+    printf(" Temp (C)");
+  }
+
+  printf("\n");
+  return true;
+}
+
+void PrintAccelValue(const MpuData data) {
+  switch (gAMode) {
+    case AccelMode::A_MODE_MS2:
+      printf("%6.2f %6.2f %6.2f |", data.accel[0], data.accel[1],
+             data.accel[2]);
+      break;
+    case AccelMode::A_MODE_G:
+      printf("%6.2f %6.2f %6.2f |", data.accel[0] * MS2_TO_G,
+             data.accel[1] * MS2_TO_G, data.accel[2] * MS2_TO_G);
+      break;
+    case AccelMode::A_MODE_RAW:
+      printf("%6d %6d %6d |", data.raw_accel[0], data.raw_accel[1],
+             data.raw_accel[2]);
+  }
+}
+
+void PrintGyroValue(const MpuData data) {
+  switch (gGMode) {
+    case GyroMode::G_MODE_RAD:
+      printf("%6.1f %6.1f %6.1f |", data.gyro[0] * DEG_TO_RAD,
+             data.gyro[1] * DEG_TO_RAD, data.gyro[2] * DEG_TO_RAD);
+      break;
+    case GyroMode::G_MODE_DEG:
+      printf("%6.1f %6.1f %6.1f |", data.gyro[0], data.gyro[1], data.gyro[2]);
+      break;
+    case GyroMode::G_MODE_RAW:
+      printf("%6d %6d %6d |", data.raw_gyro[0], data.raw_gyro[1],
+             data.raw_gyro[2]);
+  }
+}
+
+void PrintMagValue(const MpuData data) {
+  if (gENABLE_MAG) {
+    printf("%6.1f %6.1f %6.1f |", data.mag[0], data.mag[1], data.mag[2]);
+  }
+}
+
+void PrintTempValue(const MpuData data) {
+  if (gENABLE_THER) {
+    printf(" %4.1f    ", data.temp);
+  }
+}
+
+bool ParseOption(int argc, char* argv[]) {
   // parse arguments
   int c;
   opterr = 0;
   while ((c = getopt(argc, argv, "argmtwh")) != -1) {
     switch (c) {
       case 'a':
-        g_mode = G_MODE_RAW;
-        a_mode = A_MODE_RAW;
+        gGMode = GyroMode::G_MODE_RAW;
+        gAMode = AccelMode::A_MODE_RAW;
         printf("\nRaw values are from 16-bit ADC\n");
         break;
       case 'r':
-        g_mode = G_MODE_RAD;
+        gGMode = GyroMode::G_MODE_RAD;
         break;
       case 'g':
-        a_mode = A_MODE_G;
+        gAMode = AccelMode::A_MODE_G;
         break;
       case 'm':
-        enable_magnetometer = 1;
+        gENABLE_MAG = false;
         break;
       case 't':
-        enable_thermometer = 1;
+        gENABLE_THER = false;
         break;
       case 'w':
-        enable_warnings = 1;
+        gENABLE_WARN = false;
         break;
-      case 'h':
-        __print_usage();
-        return 0;
+      case 'h':  // __fall_through__
       default:
-        __print_usage();
-        return -1;
+        PrintHelpMessage();
+        return false;
     }
   }
+  return true;
+}
 
+int main(int argc, char* argv[]) {
   // set signal handler so the loop can exit cleanly
   signal(SIGINT, __signal_handler);
-  running = 1;
+
+  if (not ParseOption(argc, argv)) {
+    return -1;
+  }
 
   // use defaults for now, except also enable magnetometer.
-  MpuConfig conf = rc_mpu_default_config();
+  MpuConfig conf = MpuDefaultConfig();
   conf.i2c_bus = I2C_BUS;
-  conf.enable_magnetometer = enable_magnetometer;
-  conf.show_warnings = enable_warnings;
+  conf.enable_magnetometer = gENABLE_MAG;
+  conf.show_warnings = gENABLE_WARN;
 
   MPU mpu;
-  if (mpu.Initialize(conf)) {
+  if (not mpu.Initialize(conf)) {
     fprintf(stderr, "rc_mpu_initialize_failed\n");
     return -1;
   }
 
-  // print the header
-  printf("\ntry 'rc_test_mpu -h' to see other options\n\n");
-  switch (a_mode) {
-    case A_MODE_MS2:
-      printf("   Accel XYZ(m/s^2)  |");
-      break;
-    case A_MODE_G:
-      printf("     Accel XYZ(G)    |");
-      break;
-    case A_MODE_RAW:
-      printf("  Accel XYZ(raw ADC) |");
-      break;
-    default:
-      printf("ERROR: invalid mode\n");
-      return -1;
+  if (not PrintHeaderMsg()) {
+    return -1;
   }
-  switch (g_mode) {
-    case G_MODE_RAD:
-      printf("   Gyro XYZ (rad/s)  |");
-      break;
-    case G_MODE_DEG:
-      printf("   Gyro XYZ (deg/s)  |");
-      break;
-    case G_MODE_RAW:
-      printf("  Gyro XYZ (raw ADC) |");
-      break;
-    default:
-      printf("ERROR: invalid mode\n");
-      return -1;
-  }
-
-  if (enable_magnetometer)
-    printf("  Mag Field XYZ(uT)  |");
-  if (enable_thermometer)
-    printf(" Temp (C)");
-  printf("\n");
 
   // now just wait, print_data will run
-  while (running) {
+  while (gRUNNING) {
     printf("\r");
-
     // read sensor data
-    // struct to hold new data
     MpuData data = mpu.ReadData();
-    
-    // if (mpu.ReadAccel(&data) < 0) {
-    //   printf("read accel data failed\n");
-    // }
-    // if (mpu.ReadGyro(&data) < 0) {
-    //   printf("read gyro data failed\n");
-    // }
-    // if (enable_magnetometer && mpu.ReadMag(&data)) {
-    //   printf("read mag data failed\n");
-    // }
-    // if (enable_thermometer && mpu.ReadTemp(&data)) {
-    //   printf("read imu thermometer failed\n");
-    // }
-
-    switch (a_mode) {
-      case A_MODE_MS2:
-        printf("%6.2f %6.2f %6.2f |", data.accel[0], data.accel[1],
-               data.accel[2]);
-        break;
-      case A_MODE_G:
-        printf("%6.2f %6.2f %6.2f |", data.accel[0] * MS2_TO_G,
-               data.accel[1] * MS2_TO_G, data.accel[2] * MS2_TO_G);
-        break;
-      case A_MODE_RAW:
-        printf("%6d %6d %6d |", data.raw_accel[0], data.raw_accel[1],
-               data.raw_accel[2]);
-    }
-
-    switch (g_mode) {
-      case G_MODE_RAD:
-        printf("%6.1f %6.1f %6.1f |", data.gyro[0] * DEG_TO_RAD,
-               data.gyro[1] * DEG_TO_RAD, data.gyro[2] * DEG_TO_RAD);
-        break;
-      case G_MODE_DEG:
-        printf("%6.1f %6.1f %6.1f |", data.gyro[0], data.gyro[1], data.gyro[2]);
-        break;
-      case G_MODE_RAW:
-        printf("%6d %6d %6d |", data.raw_gyro[0], data.raw_gyro[1],
-               data.raw_gyro[2]);
-    }
-
-    // read magnetometer
-    if (enable_magnetometer) {
-      printf("%6.1f %6.1f %6.1f |", data.mag[0], data.mag[1], data.mag[2]);
-    }
-    // read temperature
-    if (enable_thermometer) {
-      printf(" %4.1f    ", data.temp);
-    }
-
+    // print data
+    PrintAccelValue(data);
+    PrintGyroValue(data);
+    PrintMagValue(data);
+    PrintTempValue(data);
+    // sleep 0.1 sec
     fflush(stdout);
-    rc_usleep(100000);
+    MicroSleep(100000);
   }
+
   printf("\n");
   mpu.PowerOff();
-  // Close();
   return 0;
 }

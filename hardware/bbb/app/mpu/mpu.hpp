@@ -8,44 +8,50 @@
 
 #include "i2c.hpp"
 
-#define RC_MPU_DEFAULT_I2C_ADDR                                                \
-  0x68  ///< default i2c address if AD0 is left low
-#define RC_MPU_ALT_I2C_ADDR                                                    \
-  0x69  ///< alternate i2c address if AD0 pin pulled high
+/*
+// defines for index location within TaitBryan and quaternion vectors
+/// @brief Index of the dmp_TaitBryan[] array corresponding to the Pitch (X)
+/// axis.
+constexpr uint8_t TB_PITCH_X = 0;
+/// @brief Index of the dmp_TaitBryan[] array corresponding to the Roll (Y)
+/// axis.
+constexpr uint8_t TB_ROLL_Y = 1;
+/// @brief Index of the dmp_TaitBryan[] array corresponding to the Yaw (Z) axis.
+constexpr uint8_t TB_YAW_Z = 2;
 
-// // defines for index location within TaitBryan and quaternion vectors
-// #define TB_PITCH_X \
-// 0 ///< Index of the dmp_TaitBryan[] array corresponding to the Pitch (X)
-// ///< axis.
-// #define TB_ROLL_Y \
-// 1 ///< Index of the dmp_TaitBryan[] array corresponding to the Roll (Y)
-// axis.
-// #define TB_YAW_Z \
-// 2 ///< Index of the dmp_TaitBryan[] array corresponding to the Yaw (Z)
-// axis.
-// #define QUAT_W 0 ///< First index of the dmp_quat[] quaternion vector
-// #define QUAT_X 1 ///< Second index of the dmp_quat[] quaternion vector
-// #define QUAT_Y 2 ///< Third index of the dmp_quat[] quaternion vector
-// #define QUAT_Z 3 ///< Fourth index of the dmp_quat[] quaternion vector
+/// @brief First index of the dmp_quat[] quaternion vector
+constexpr uint8_t QUAT_W = 0;
+/// @brief Second index of the dmp_quat[] quaternion vector
+constexpr uint8_t QUAT_X = 1;
+/// @brief Third index of the dmp_quat[] quaternion vector
+constexpr uint8_t QUAT_Y = 2;
+/// @brief Fourth index of the dmp_quat[] quaternion vector
+constexpr uint8_t QUAT_Z = 3;
+*/
 
-#define DEG_TO_RAD 0.0174532925199  ///< multiply to convert degrees to radians
-#define RAD_TO_DEG 57.295779513     ///< multiply to convert radians to degrees
-#define MS2_TO_G 0.10197162129      ///< multiply to convert m/s^2 to G
-#define G_TO_MS2                                                               \
-  9.80665  ///< multiply to convert G to m/s^2, standard gravity definition
+/// @brief multiply to convert degrees to radians
+constexpr double DEG_TO_RAD = 0.0174532925199;
+/// @brief multiply to convert radians to degrees
+constexpr double RAD_TO_DEG = 57.295779513;
+/// @brief multiply to convert radians to degrees
+constexpr double MS2_TO_G = 0.10197162129;
+/// @brief multiply to convert G to m/s^2, standard gravity definition
+constexpr double G_TO_MS2 = 9.80665;
 
-void rc_usleep(int sleep);
-
-void Close();
+/**
+ * @brief sleep the process for passed microseconds
+ *
+ * @param micro microseconds to sleep for
+ */
+void MicroSleep(const size_t micro);
 
 /**
  * @brief accelerometer full scale range options
  *
- * The user may choose from 4 full scale ranges of the accelerometer and
- * gyroscope. They have units of gravity (G) and degrees per second (DPS) The
- * defaults values are A_FSR_2G and G_FSR_2000DPS respectively.
+ * @details The full scale ranges of the accelerometer have units of gravity
+ * (G). The default values is ACCEL_FSR_2G.
  */
-enum MpuAccelFSR {
+enum class MpuAccelFSR {
   ACCEL_FSR_2G,  //
   ACCEL_FSR_4G,  //
   ACCEL_FSR_8G,  //
@@ -55,11 +61,10 @@ enum MpuAccelFSR {
 /**
  * @brief gyroscope full scale range options
  *
- * The user may choose from 4 full scale ranges of the accelerometer and
- * gyroscope. They have units of gravity (G) and degrees per second (DPS) The
- * defaults values are A_FSR_2G and G_FSR_2000DPS respectively.
+ * @details The full scale ranges of the gyroscope have units of degrees per
+ * second (DPS). The default values is GYRO_FSR_2000DPS.
  */
-enum MpuGyroFSR {
+enum class MpuGyroFSR {
   GYRO_FSR_250DPS,
   GYRO_FSR_500DPS,
   GYRO_FSR_1000DPS,
@@ -69,13 +74,12 @@ enum MpuGyroFSR {
 /**
  * @brief accelerometer digital low-pass filter options
  *
- * The user may choose from 7 digital low pass filter constants for the
- * accelerometer and gyroscope. The filter runs at 1kz and helps to reduce
- * sensor noise when sampling more slowly. The default values are ACCEL_DLPF_184
- * GYRO_DLPF_184. Lower cut-off frequencies incur phase-loss in measurements.
- * Number is cutoff frequency in hz.
+ * @details The filter runs at 1kz and helps to reduce sensor noise when
+ * sampling more slowly. The default values is ACCEL_DLPF_184. Lower cut-off
+ * frequencies incur phase-loss in measurements. Number is cutoff frequency in
+ * hz.
  */
-enum MpuAccelDLPF {
+enum class MpuAccelDLPF {
   ACCEL_DLPF_OFF,
   ACCEL_DLPF_460,
   ACCEL_DLPF_184,
@@ -89,13 +93,12 @@ enum MpuAccelDLPF {
 /**
  * @brief gyroscope digital low-pass filter options
  *
- * The user may choose from 7 digital low pass filter constants for the
- * accelerometer and gyroscope. The filter runs at 1kz and helps to reduce
- * sensor noise when sampling more slowly. The default values are ACCEL_DLPF_184
- * GYRO_DLPF_184. Lower cut-off frequencies incur phase-loss in measurements.
- * Number is cutoff frequency in hz.
+ * @details The filter runs at 1kz and helps to reduce
+ * sensor noise when sampling more slowly. The default values is GYRO_DLPF_184.
+ * Lower cut-off frequencies incur phase-loss in measurements. Number is cutoff
+ * frequency in hz.
  */
-enum MpuGyroDLPF {
+enum class MpuGyroDLPF {
   GYRO_DLPF_OFF,
   GYRO_DLPF_250,
   GYRO_DLPF_184,
@@ -109,10 +112,11 @@ enum MpuGyroDLPF {
 /**
  * @brief Orientation of the sensor.
  *
- * This is only applicable when operating in DMP mode. This is the orientation
- * that the DMP considers neutral, aka where roll/pitch/yaw are zero.
+ * @details This is only applicable when operating in DMP mode. This is the
+ * orientation that the DMP considers neutral, aka where roll/pitch/yaw are
+ * zero.
  */
-enum rc_mpu_orientation_t {
+enum class MpuOrientation {
   ORIENTATION_Z_UP = 136,
   ORIENTATION_Z_DOWN = 396,
   ORIENTATION_X_UP = 14,
@@ -126,144 +130,116 @@ enum rc_mpu_orientation_t {
 /**
  * @brief configuration of the mpu sensor
  *
- * Configuration struct passed to rc_mpu_initialize and rc_mpu_initialize_dmp.
- * It is best to get the default config with rc_mpu_default_config() function
- * first and modify from there.
+ * @details Configuration struct passed to MPU::Initialize() and
+ * MPU::InitializeDmp().
  */
 struct MpuConfig {
-  /** @name physical connection configuration */
-  ///@{
-  // int gpio_interrupt_pin_chip; ///< gpio pin, default 3 on Robotics Cape and
-  // BB
-  // ///< Blue
-  // int gpio_interrupt_pin; ///< gpio pin, default 21 on Robotics Cape and BB
-  // ///< Blue
-  int i2c_bus{0};  ///< which bus to use, default 2 on Robotics Cape
-  ///< and BB Blue
-  uint8_t i2c_addr{0};  ///< default is 0x68, pull pin ad0
-  ///< high to make it 0x69
-  int show_warnings{false};  ///< set to 1 to print i2c_bus warnings for debug
-  ///@}
+  /// @brief which bus to use, default 2 on BeagleBone Blue
+  int i2c_bus{0};
+  /// @brief which ship address to use default is 0x68 or 0x69
+  uint8_t i2c_addr{0};
+  /// @brief set to 1 to print i2c_bus warnings for debug
+  int show_warnings{false};
+  /// @brief accelerometer full scale range default ACCEL_FSR_8G
+  MpuAccelFSR accel_fsr{MpuAccelFSR::ACCEL_FSR_8G};
+  /// @brief gyroscope full scale range default GYRO_FSR_2000DPS
+  MpuGyroFSR gyro_fsr{MpuGyroFSR::GYRO_FSR_2000DPS};
+  /// @brief accel internal low pass filter cutoff default ACCEL_DLPF_184
+  MpuAccelDLPF accel_dlpf{MpuAccelDLPF::ACCEL_DLPF_184};
+  /// @brief gyro internal low pass filter cutoff default GYRO_DLPF_184
+  MpuGyroDLPF gyro_dlpf{MpuGyroDLPF::GYRO_DLPF_184};
+  /// @brief magnetometer use is optional, true to enable and false to disable,
+  /// default true
+  int enable_magnetometer{true};
 
-  /** @name accelerometer, gyroscope, and magnetometer configuration */
-  ///@{
-  MpuAccelFSR accel_fsr{ACCEL_FSR_8G};  ///< accelerometer full scale range,
-  ///< default ACCEL_FSR_8G
-  MpuGyroFSR gyro_fsr{GYRO_FSR_2000DPS};  ///< gyroscope full scale range,
-  ///< default GYRO_FSR_2000DPS
-  MpuAccelDLPF accel_dlpf{ACCEL_DLPF_184};  ///< internal low pass filter
-  ///< cutoff, default ACCEL_DLPF_184
-  MpuGyroDLPF gyro_dlpf{GYRO_DLPF_184};  ///< internal low pass filter cutoff,
-  ///< default GYRO_DLPF_184
-  int enable_magnetometer{true};  ///< magnetometer use is optional, set to 1 to
-                                  ///< enable, default 0 (off)
-                                  ///@}
-
-  // /** @name DMP settings, only used with DMP mode */
-  // ///@{
-  // int dmp_sample_rate; ///< sample rate in hertz,
-  // 200,100,50,40,25,20,10,8,5,4 int dmp_fetch_accel_gyro; ///< set to 1 to
-  // optionally raw accel/gyro when
-  // ///< reading DMP quaternion, default: 0 (off)
-  // int dmp_auto_calibrate_gyro; ///< set to 1 to let DMP auto calibrate the
-  // gyro
-  // ///< while in use, default: 0 (off)
-  // rc_mpu_orientation_t orient; ///< DMP orientation matrix, see
-  // ///< rc_mpu_orientation_t
-  // double compass_time_constant; ///< time constant (seconds) for filtering
-  // ///< compass with gyroscope yaw value,
-  // default
-  // ///< 25
-  // int dmp_interrupt_sched_policy; ///< Scheduler policy for DMP interrupt
-  // ///< handler and user callback, default
-  // ///< SCHED_OTHER
-  // int dmp_interrupt_priority; ///< scheduler priority for DMP interrupt
-  // handler
-  // ///< and user callback, default 0
-  // int read_mag_after_callback; ///< reads magnetometer after DMP callback
-  // ///< function to improve latency, default 1
-  // ///< (true)
-  // int mag_sample_rate_div; ///< magnetometer_sample_rate =
-  // ///< dmp_sample_rate/mag_sample_rate_div,
-  // default: 4
-  // int tap_threshold; ///< threshold impulse for triggering a tap in units of
-  // ///< mg/ms
-  // ///@}
+  /** @name DMP settings, only used with DMP mode */
+  /*
+  /// @brief gpio pin, default 3 on Robotics Cape and BB Blue
+  int gpio_interrupt_pin_chip{3};
+  /// @brief gpio pin, default 21 on Robotics Cape and BB Blue
+  int gpio_interrupt_pin{21};
+  /// @brief sample rate in hertz, 200, 100, 50, 40, 25, 20, 10, 8, 5, 4
+  int dmp_sample_rate;
+  /// @brief set to 1 to optionally raw accel / gyro when reading DMP
+  /// quaternion, default: 0 (off)
+  int dmp_fetch_accel_gyro;
+  /// @brief set to 1 to let DMP auto calibrate the gyro while in use, default:
+  /// 0 (off)
+  int dmp_auto_calibrate_gyro;
+  /// @brief DMP orientation matrix, see MpuOrientation
+  MpuOrientation orient;
+  /// @brief time constant (seconds) for filtering compass with gyroscope yaw
+  /// value, default 25
+  double compass_time_constant;
+  /// @brief Scheduler policy for DMP interrupt handler and user callback,
+  /// default SCHED_OTHER
+  int dmp_interrupt_sched_policy;
+  /// @brief scheduler priority for DMP interrupt handler and user callback,
+  /// default 0
+  int dmp_interrupt_priority;
+  /// @brief reads magnetometer after DMP callback function to improve latency,
+  /// default 1 (true)
+  int read_mag_after_callback;
+  /// @brief magnetometer_sample_rate = dmp_sample_rate/mag_sample_rate_div,
+  /// default: 4
+  int mag_sample_rate_div;
+  /// @brief threshold impulse for triggering a tap in units of mg/ms
+  int tap_threshold;
+  */
 };
 
 /**
  * @brief data struct populated with new sensor data
  *
- * This is the container for holding the sensor data. The user is intended to
- * make their own instance of this struct and pass its pointer to imu read
- * functions. new data will then be written back into the user's instance of the
- * data struct.
  */
 struct MpuData {
-  /** @name base sensor readings in real units */
-  ///@{
-  /// accelerometer (XYZ) in units of m/s^2
+  /// @brief accelerometer (XYZ) in units of m/s^2
   std::array<double, 3> accel{0., 0., 0.};
-  /// gyroscope (XYZ) in units of degrees/s
+  /// @brief gyroscope (XYZ) in units of degrees/s
   std::array<double, 3> gyro{0., 0., 0.};
-  /// magnetometer (XYZ) in units of uT
+  /// @brief magnetometer (XYZ) in units of uT
   std::array<double, 3> mag{0., 0., 0.};
-  /// thermometer, in units of degrees Celsius
+  /// @brief thermometer, in units of degrees Celsius
   double temp{0.};
-  ///@}
-
-  /** @name 16 bit raw adc readings and conversion rates*/
-  ///@{
-  ///< raw gyroscope (XYZ)from 16-bit ADC
+  /// @brief raw gyroscope (XYZ)from 16-bit ADC
   std::array<int16_t, 3> raw_gyro{0, 0, 0};
-  ///< raw accelerometer (XYZ) from 16-bit ADC
+  /// @brief raw accelerometer (XYZ) from 16-bit ADC
   std::array<int16_t, 3> raw_accel{0, 0, 0};
 
-  // /** @name DMP data */
-  // ///@{
-  // double dmp_quat[4]; ///< normalized quaternion from DMP based on ONLY
-  // ///< Accel/Gyro
-  // double dmp_TaitBryan[3]; ///< Tait-Bryan angles (roll pitch yaw) in
-  // radians
-  // ///< from DMP based on ONLY Accel/Gyro
-  // int tap_detected; ///< set to 1 if there was a tap detect on the last dmp
-  // ///< sample, reset to 0 on next sample
-  // int last_tap_direction; ///< direction of last tap, 1-6 corresponding to
-  // X+
-  // ///< X- Y+ Y- Z+ Z-
-  // int last_tap_count; ///< current counter of rapid consecutive taps
-  // ///@}
+  // /// @name DMP data
+  // /// @brief normalized quaternion from DMP based on ONLY Accel/Gyro
+  // std::array<double, 4> dmp_quat{1., 0., 0., 0.};
+  // /// @brief Tait-Bryan angles (roll pitch yaw) in radians from DMP based on
+  // /// ONLY Accel/Gyro
+  // std::array<double, 3> dmp_TaitBryan{0., 0., 0.};
+  // /// @brief set to 1 if there was a tap detect on the last dmp sample, reset
+  // to
+  // /// 0 on next sample
+  // bool tap_detected{false};
+  // /// @brief direction of last tap, 1-6 corresponding to X+ X- Y+ Y- Z+ Z-
+  // int last_tap_direction;
+  // /// @brief current counter of rapid consecutive taps
+  // int last_tap_count;
 
-  // /** @name fused DMP data filtered with magnetometer */
-  // ///@{
-  // double fused_quat[4]; ///< fused and normalized quaternion
-  // double fused_TaitBryan[3]; ///< fused Tait-Bryan angles (roll pitch yaw)
-  // in
-  // ///< radians
-  // double compass_heading; ///< fused heading filtered with gyro and accel
-  // data,
-  // ///< same as Tait-Bryan yaw
-  // double compass_heading_raw; ///< unfiltered heading from magnetometer
-  // ///@}
+  // /// @name fused DMP data filtered with magnetometer
+  // /// @brief fused and normalized quaternion
+  // std::array<double, 4> fused_quat{1., 0., 0., 0.};
+  // /// @brief fused Tait-Bryan angles (roll pitch yaw) in radians
+  // std::array<double, 3> fused_TaitBryan{0., 0., 0.};
+  // /// @brief fused heading filtered with gyro and accel data, same as
+  // Tait-Bryan
+  // /// yaw
+  // double compass_heading{0};
+  // /// @brief unfiltered heading from magnetometer
+  // double compass_heading_raw{0};
 };
 
 /**
  * @brief Returns an MpuConfig struct with default settings.
  *
- * Use this as a starting point and modify as you wish.
- *
- * @return Returns an MpuConfig struct with default settings.
+ * @return MpuConfig with default values.
  */
-MpuConfig rc_mpu_default_config(void);
-
-// /**
-// * @brief Resets a config struct to defaults.
-// *
-// * @param[out] conf Pointer to config struct to be overwritten
-// *
-// * @return 0 on success or -1 on failure.
-// */
-// int rc_mpu_set_config_to_default(MpuConfig* conf);
+MpuConfig MpuDefaultConfig();
 
 class MPU {
  public:
@@ -299,11 +275,12 @@ class MPU {
    *
    * @return 0 on success or -1 on failure.
    */
-  int Initialize(const MpuConfig& conf);
+  bool Initialize(const MpuConfig& conf);
 
-  int CheckWhoAmI();
-  int InitMagnetometer(const int cal_mode);
-  int SetBypass(const bool bypass_on);
+  bool CheckWhoAmI();
+  bool InitMagnetometer(const int cal_mode);
+  bool SetBypass(const bool bypass_on);
+
   /**
    * @brief Powers off the MPU
    *
@@ -313,10 +290,10 @@ class MPU {
    *
    * @return 0 on success or -1 on failure.
    */
-  int PowerOff();
+  bool PowerOff();
 
-  int PowerOffMagnetometer();
-  int ResetMpu();
+  bool PowerOffMagnetometer();
+  bool ResetMpu();
 
   /**
    * @brief Reads accelerometer data from the MPU
@@ -369,10 +346,10 @@ class MPU {
 
   MpuData ReadData();
 
-  int SetAccelFSR(const MpuAccelFSR fsr);
-  int SetGyroFSR(const MpuGyroFSR fsr);
-  int SetAccelDLPF(const MpuAccelDLPF dlpf);
-  int SetGyroDLPF(const MpuGyroDLPF dlpf);
+  bool SetAccelFSR(const MpuAccelFSR fsr);
+  bool SetGyroFSR(const MpuGyroFSR fsr);
+  bool SetAccelDLPF(const MpuAccelDLPF dlpf);
+  bool SetGyroDLPF(const MpuGyroDLPF dlpf);
 
  private:
   MpuConfig config_;
