@@ -140,6 +140,11 @@ struct MpuConfig {
   uint8_t i2c_addr{0};
   /// @brief set to 1 to print i2c_bus warnings for debug
   int show_warnings{false};
+  /// @brief sampling rate (Hz). Sampling rate must be between 4Hz and 1kHz.
+  uint16_t sample_rate{1000};
+  /// @brief compass sampling rate (Hz). Sampling rate must be between 1Hz and
+  /// 100Hz.
+  uint16_t compass_sample_rate{100};
   /// @brief accelerometer full scale range default ACCEL_FSR_8G
   MpuAccelFSR accel_fsr{MpuAccelFSR::ACCEL_FSR_8G};
   /// @brief gyroscope full scale range default GYRO_FSR_2000DPS
@@ -277,7 +282,9 @@ class MPU {
    */
   bool Initialize(const MpuConfig& conf);
 
-  bool CheckWhoAmI();
+  bool CheckWhoAmI(const uint8_t reg, const uint8_t expected_result);
+  bool CheckWhoAmIMPU();
+  bool CheckWhoAmIMagnetometer();
   bool InitMagnetometer(const int cal_mode);
   bool SetBypass(const bool bypass_on);
 
@@ -345,6 +352,27 @@ class MPU {
   std::array<double, 3> ReadMagCalibrated(const std::array<int16_t, 3>& raw);
 
   MpuData ReadData();
+
+  /**
+   * @brief Set sampling rate. Sampling rate must be between 4Hz and 1kHz.
+   *
+   * @param[in] rate Desired sampling rate (Hz)
+   * @return true if successful
+   * @return false otherwise
+   */
+  bool SetSampleRate(const uint16_t rate);
+
+  /**
+   * @brief Set compass sampling rate.
+   * @details The compass on the auxiliary I2C bus is read by the MPU hardware
+   * at a maximum of 100Hz. The actual rate can be set to a fraction of the gyro
+   * sampling rate.
+   *
+   * @param[in] rate Desired compass sampling rate (Hz).
+   * @return true if successful
+   * @return false otherwise
+   */
+  bool SetCompassSampleRate(const uint16_t rate);
 
   bool SetAccelFSR(const MpuAccelFSR fsr);
   bool SetGyroFSR(const MpuGyroFSR fsr);

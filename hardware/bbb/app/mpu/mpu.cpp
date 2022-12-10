@@ -17,6 +17,7 @@
 #include <sys/types.h>  // for mkdir and chmod
 #include <unistd.h>
 
+#include <algorithm>  // min max
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
@@ -137,6 +138,8 @@ MpuConfig MpuDefaultConfig() {
   conf.show_warnings = 0;
 
   // general stuff
+  conf.sample_rate = 100;
+  conf.compass_sample_rate = 10;
   conf.accel_fsr = MpuAccelFSR::ACCEL_FSR_8G;
   conf.gyro_fsr = MpuGyroFSR::GYRO_FSR_2000DPS;
   conf.accel_dlpf = MpuAccelDLPF::ACCEL_DLPF_184;
@@ -167,12 +170,12 @@ bool MPU::Initialize(const MpuConfig& conf) {
 
   // restart the device so we start with clean registers
   if (not ResetMpu()) {
-    fprintf(stderr, "ERROR: failed to reset_mpu9250\n");
+    fprintf(stderr, "ERROR: failed to reset mpu\n");
     i2c.Lock(false);
     return false;
   }
 
-  if (not CheckWhoAmI()) {
+  if (not CheckWhoAmIMPU()) {
     i2c.Lock(false);
     return false;
   }
@@ -189,10 +192,8 @@ bool MPU::Initialize(const MpuConfig& conf) {
   //   return false;
   // }
 
-  // Set sample rate = 1000/(1 + SMPLRT_DIV)
-  // here we use a divider of 0 for 1khz sample
-  if (not i2c.WriteByte(SMPLRT_DIV, 0x00)) {
-    fprintf(stderr, "I2C bus write error\n");
+  if (not SetSampleRate(config_.sample_rate)) {
+    fprintf(stderr, "failed to set sample rate\n");
     i2c.Lock(false);
     return false;
   }
@@ -236,25 +237,54 @@ bool MPU::Initialize(const MpuConfig& conf) {
   return true;
 }
 
-bool MPU::CheckWhoAmI(void) {
+bool MPU::CheckWhoAmI(const uint8_t reg, const uint8_t expected_result) {
   // check the who am i register to make sure the chip is alive
-  const std::optional<uint8_t> res = i2c.ReadByte(WHO_AM_I_MPU9250);
-  if (not res.has_value()) {
+  const std::optional<uint8_t> result = i2c.ReadByte(reg);
+  if (not result.has_value()) {
     fprintf(stderr, "i2c_read_byte failed reading who_am_i register\n");
     return false;
   }
-  const uint8_t c = res.value();
-  // check which chip we are looking at
-  // 0x71 for mpu9250, ox73 or 0x75 for mpu9255, or 0x68 for mpu9150
-  // 0x70 for mpu6500,  0x68 or 0x69 for mpu6050
-  if (c != 0x68 && c != 0x69 && c != 0x70 && c != 0x71 && c != 0x73 &&
-      c != 75) {
-    fprintf(stderr, "invalid who_am_i register: 0x%x\n", c);
-    fprintf(stderr,
-            "expected 0x68 or 0x69 for mpu6050/9150, 0x70 for mpu6500, 0x71 "
-            "for mpu9250, 0x75 for mpu9255,\n");
+  const uint8_t c = result.value();
+  // check result
+  if (result.value() != expected_result) {
+    fprintf(stderr, "invalid who_am_i register: expected 0x%x and got 0x%x\n",
+            expected_result, result.value());
     return false;
   }
+  return true;
+}
+
+bool MPU::CheckWhoAmIMPU() {
+  // switch to magnetometer address
+  if (not i2c.SetSlaveAddress(config_.i2c_addr)) {
+    fprintf(stderr,
+            "ERROR in CheckWhoAmIMPU: failed to select i2c device "
+            "address\n");
+    return false;
+  }
+
+  if (not CheckWhoAmI(WHO_AM_I_MPU9250, WHO_AM_I_MPU9250_RESULT)) {
+    fprintf(stderr, "Failed to prop MPU\n");
+    return false;
+  }
+  printf("Successfully prop MPU\n");
+  return true;
+}
+
+bool MPU::CheckWhoAmIMagnetometer() {
+  // switch to magnetometer address
+  if (not i2c.SetSlaveAddress(AK8963_ADDR)) {
+    fprintf(stderr,
+            "ERROR in CheckWhoAmIMagnetometer: failed to select i2c device "
+            "address\n");
+    return false;
+  }
+
+  if (not CheckWhoAmI(WHO_AM_I_AK8963, WHO_AM_I_AK8963_VALUE)) {
+    fprintf(stderr, "Failed to prop Magnetometer\n");
+    return false;
+  }
+  printf("Successfully prop Magnetometer\n");
   return true;
 }
 
@@ -269,7 +299,7 @@ bool MPU::InitMagnetometer(const int cal_mode) {
   // own address inside the mpu9250
   if (not i2c.SetSlaveAddress(AK8963_ADDR)) {
     fprintf(stderr,
-            "ERROR: in __init_magnetometer, failed to set i2c device "
+            "ERROR: in InitMagnetometer, failed to set i2c device "
             "address\n");
     return false;
   }
@@ -277,8 +307,21 @@ bool MPU::InitMagnetometer(const int cal_mode) {
   // Power down magnetometer
   if (not i2c.WriteByte(AK8963_CNTL, MAG_POWER_DN) < 0) {
     fprintf(stderr,
-            "ERROR: in __init_magnetometer, failed to write to AK8963_CNTL "
+            "ERROR: in InitMagnetometer, failed to write to AK8963_CNTL "
             "register to power down\n");
+    return false;
+  }
+  MicroSleep(1000);
+
+  // check who am I register
+  if (not CheckWhoAmIMagnetometer()) {
+    i2c.Lock(false);
+    return false;
+  }
+
+  // Power down
+  if (not i2c.WriteByte(AK8963_CNTL, MAG_POWER_DN)) {
+    fprintf(stderr, "ERROR: in InitMagnetometer, failed to power down\n");
     return false;
   }
   MicroSleep(1000);
@@ -286,8 +329,7 @@ bool MPU::InitMagnetometer(const int cal_mode) {
   // Enter Fuse ROM access mode
   if (not i2c.WriteByte(AK8963_CNTL, MAG_FUSE_ROM)) {
     fprintf(stderr,
-            "ERROR: in __init_magnetometer, failed to write to AK8963_CNTL "
-            "register\n");
+            "ERROR: in InitMagnetometer, failed to Fuse ROM access mode\n");
     return false;
   }
   MicroSleep(1000);
@@ -304,10 +346,11 @@ bool MPU::InitMagnetometer(const int cal_mode) {
   mag_factory_adjust[0] = (raw[0] - 128) / 256.0 + 1.0;
   mag_factory_adjust[1] = (raw[1] - 128) / 256.0 + 1.0;
   mag_factory_adjust[2] = (raw[2] - 128) / 256.0 + 1.0;
+
   // Power down magnetometer again
   if (not i2c.WriteByte(AK8963_CNTL, MAG_POWER_DN)) {
     fprintf(stderr,
-            "ERROR: in __init_magnetometer, failed to write to AK8963_CNTL "
+            "ERROR: in InitMagnetometer, failed to write to AK8963_CNTL "
             "register to power on\n");
     return false;
   }
@@ -318,7 +361,7 @@ bool MPU::InitMagnetometer(const int cal_mode) {
   uint8_t c = MSCALE_16 | MAG_CONT_MES_2;
   if (not i2c.WriteByte(AK8963_CNTL, c)) {
     fprintf(stderr,
-            "ERROR: in __init_magnetometer, failed to write to AK8963_CNTL "
+            "ERROR: in InitMagnetometer, failed to write to AK8963_CNTL "
             "register to set sampling mode\n");
     return false;
   }
@@ -326,10 +369,84 @@ bool MPU::InitMagnetometer(const int cal_mode) {
 
   // go back to configuring the IMU, leave bypass on
   i2c.SetSlaveAddress(config_.i2c_addr);
+
+  // Set up master mode, IIC 400KHz
+  constexpr auto i2c_clock = 0x0D;
+  constexpr uint8_t mstr_ctrl = i2c_clock;
+  if (not i2c.WriteByte(I2C_MST_CTRL, mstr_ctrl)) {
+    fprintf(stderr,
+            "ERROR: in InitMagnetometer, failed to write to I2C_MST_CTRL\n");
+    return false;
+  }
+
+  // Slave 0 reads from AKM data registers
+  constexpr uint8_t slav0_add = BIT_I2C_READ | AK8963_ADDR;
+  if (not i2c.WriteByte(I2C_SLV0_ADDR, slav0_add)) {
+    fprintf(stderr,
+            "ERROR: in InitMagnetometer, failed to write to I2C_SLV0_ADDR\n");
+    return false;
+  }
+
+  // Compass reads start at this register
+  constexpr uint8_t slav0_reg = AK8963_XOUT_L;
+  if (not i2c.WriteByte(I2C_SLV0_REG, slav0_reg)) {
+    fprintf(stderr,
+            "ERROR: in InitMagnetometer, failed to write to I2C_SLV0_REG\n");
+    return false;
+  }
+
+  // Enable slave 0, 7-byte reads
+  constexpr uint8_t num_of_bytes_to_read = 0x07;
+  constexpr uint8_t slav0_ctrl = BIT_SLAVE_EN | num_of_bytes_to_read;
+  if (not i2c.WriteByte(I2C_SLV0_CTRL, slav0_ctrl)) {
+    fprintf(stderr,
+            "ERROR: in InitMagnetometer, failed to write to I2C_SLV0_CTRL\n");
+    return false;
+  }
+
+  // Trigger slave 0 and slave 1 actions at each sample
+  constexpr uint8_t slv0_lay_en = 0x01;
+  if (not i2c.WriteByte(I2C_MST_DELAY_CTRL, slv0_lay_en)) {
+    fprintf(stderr,
+            "ERROR: in InitMagnetometer, failed to write to "
+            "I2C_MST_DELAY_CTRL\n");
+    return false;
+  }
+
+  if (not SetCompassSampleRate(config_.compass_sample_rate)) {
+    return false;
+  }
+
   // load in magnetometer calibration
   // if (!cal_mode) {
   //   __load_mag_calibration();
   // }
+  return true;
+}
+
+bool MPU::SetCompassSampleRate(const uint16_t rate) {
+  constexpr uint16_t MAX_COMPASS_SAMPLE_RATE = 100;
+  constexpr uint16_t MIN_COMPASS_SAMPLE_RATE = 1;
+
+  uint16_t max = std::max(MAX_COMPASS_SAMPLE_RATE, config_.sample_rate);
+  uint16_t adjusted_rate = rate;
+  if (adjusted_rate > max) {
+    adjusted_rate = max;
+    printf("WARNING SetCompassSampleRate: adjust sample rate to %d\n", max);
+  } else if (adjusted_rate <= MIN_COMPASS_SAMPLE_RATE) {
+    adjusted_rate = MIN_COMPASS_SAMPLE_RATE;
+    printf("WARNING SetCompassSampleRate: adjust sample rate to %d\n",
+           MIN_COMPASS_SAMPLE_RATE);
+  }
+
+  const uint8_t sample_div =
+    static_cast<uint8_t>(config_.sample_rate / adjusted_rate - 1);
+  if (not i2c.WriteByte(I2C_SLV4_CTRL, sample_div)) {
+    fprintf(stderr,
+            "ERROR SetCompassSampleRate: failed to write sample "
+            "rate\n");
+    return false;
+  }
   return true;
 }
 
@@ -399,6 +516,7 @@ bool MPU::PowerOffMagnetometer() {
   if (not i2c.SetSlaveAddress(AK8963_ADDR)) {
     return false;
   }
+
   // Power down magnetometer
   if (not i2c.WriteByte(AK8963_CNTL, MAG_POWER_DN) < 0) {
     fprintf(stderr, "failed to write to magnetometer\n");
@@ -419,135 +537,170 @@ bool MPU::ResetMpu(void) {
   // write the reset bit
   if (not i2c.WriteByte(PWR_MGMT_1, H_RESET)) {
     // wait and try again
+    fprintf(stderr,
+            "ERROR resetting MPU, I2C write to reset bit failed, try "
+            "again...\n");
     MicroSleep(10000);
     if (not i2c.WriteByte(PWR_MGMT_1, H_RESET)) {
       fprintf(stderr, "ERROR resetting MPU, I2C write to reset bit failed\n");
       return false;
     }
   }
-
   MicroSleep(10000);
+
+  // wake up chip
+  constexpr uint8_t wake_up = 0x00;
+  if (not i2c.WriteByte(PWR_MGMT_1, wake_up)) {
+    fprintf(stderr, "ERROR resetting MPU, I2C write to wake bit failed\n");
+    return false;
+  }
+
+  return true;
+}
+
+bool MPU::SetSampleRate(const uint16_t rate) {
+  constexpr uint16_t MAX_RATE = 1000;
+  constexpr uint16_t MIN_RATE = 4;
+  constexpr uint16_t INTERNAL_SAMPLE_RATE = 1000;
+
+  uint16_t adjusted_rate = rate;
+  if (adjusted_rate > MAX_RATE) {
+    adjusted_rate = MAX_RATE;
+    printf("WARNING SetSampleRate: adjust sample rate to 1000\n");
+  } else if (adjusted_rate < MIN_RATE) {
+    adjusted_rate = MIN_RATE;
+    printf("WARNING SetSampleRate: adjust sample rate to 4\n");
+  }
+
+  const uint8_t sample_div =
+    static_cast<uint8_t>(INTERNAL_SAMPLE_RATE / adjusted_rate - 1);
+  if (not i2c.WriteByte(SMPLRT_DIV, sample_div)) {
+    fprintf(stderr, "ERROR SetSampleRate: failed to write sample rate\n");
+    return false;
+  }
+
   return true;
 }
 
 bool MPU::SetAccelFSR(const MpuAccelFSR fsr) {
-  uint8_t c;
+  constexpr double scale = G_TO_MS2 / BIT_RESOLUTION;
+  uint8_t config;
   switch (fsr) {
     case MpuAccelFSR::ACCEL_FSR_2G:
-      c = ACCEL_FSR_CFG_2G;
-      accel_to_ms2 = 9.80665 * 2.0 / BIT_RESOLUTION;
+      config = ACCEL_FSR_CFG_2G;
+      accel_to_ms2 = 2 * scale;
       break;
     case MpuAccelFSR::ACCEL_FSR_4G:
-      c = ACCEL_FSR_CFG_4G;
-      accel_to_ms2 = 9.80665 * 4.0 / BIT_RESOLUTION;
+      config = ACCEL_FSR_CFG_4G;
+      accel_to_ms2 = 4 * scale;
       break;
     case MpuAccelFSR::ACCEL_FSR_8G:
-      c = ACCEL_FSR_CFG_8G;
-      accel_to_ms2 = 9.80665 * 8.0 / BIT_RESOLUTION;
+      config = ACCEL_FSR_CFG_8G;
+      accel_to_ms2 = 8 * scale;
       break;
     case MpuAccelFSR::ACCEL_FSR_16G:
-      c = ACCEL_FSR_CFG_16G;
-      accel_to_ms2 = 9.80665 * 16.0 / BIT_RESOLUTION;
+      config = ACCEL_FSR_CFG_16G;
+      accel_to_ms2 = 16 * scale;
       break;
     default:
-      fprintf(stderr, "invalid accel fsr\n");
+      fprintf(stderr, "ERROR SetAccelFSR: invalid accel fsr option\n");
       return false;
   }
-  return i2c.WriteByte(ACCEL_CONFIG, c);
+  return i2c.WriteByte(ACCEL_CONFIG, config);
 }
 
 bool MPU::SetGyroFSR(const MpuGyroFSR fsr) {
-  uint8_t c;
+  uint8_t config;
   switch (fsr) {
     case MpuGyroFSR::GYRO_FSR_250DPS:
-      c = GYRO_FSR_CFG_250 | FCHOICE_B_DLPF_EN;
+      config = GYRO_FSR_CFG_250 | FCHOICE_B_DLPF_EN;
       gyro_to_degs = 250.0 / BIT_RESOLUTION;
       break;
     case MpuGyroFSR::GYRO_FSR_500DPS:
-      c = GYRO_FSR_CFG_500 | FCHOICE_B_DLPF_EN;
+      config = GYRO_FSR_CFG_500 | FCHOICE_B_DLPF_EN;
       gyro_to_degs = 500.0 / BIT_RESOLUTION;
       break;
     case MpuGyroFSR::GYRO_FSR_1000DPS:
-      c = GYRO_FSR_CFG_1000 | FCHOICE_B_DLPF_EN;
+      config = GYRO_FSR_CFG_1000 | FCHOICE_B_DLPF_EN;
       gyro_to_degs = 1000.0 / BIT_RESOLUTION;
       break;
     case MpuGyroFSR::GYRO_FSR_2000DPS:
-      c = GYRO_FSR_CFG_2000 | FCHOICE_B_DLPF_EN;
+      config = GYRO_FSR_CFG_2000 | FCHOICE_B_DLPF_EN;
       gyro_to_degs = 2000.0 / BIT_RESOLUTION;
       break;
     default:
-      fprintf(stderr, "invalid gyro fsr\n");
+      fprintf(stderr, "ERROR SetGyroFSR: invalid gyro fsr option\n");
       return -1;
   }
-  return i2c.WriteByte(GYRO_CONFIG, c);
+  return i2c.WriteByte(GYRO_CONFIG, config);
 }
 
 bool MPU::SetAccelDLPF(const MpuAccelDLPF dlpf) {
-  uint8_t c = ACCEL_FCHOICE_1KHZ | BIT_FIFO_SIZE_1024;
+  uint8_t config = ACCEL_FCHOICE_1KHZ;
   switch (dlpf) {
     case MpuAccelDLPF::ACCEL_DLPF_OFF:
-      c = ACCEL_FCHOICE_4KHZ | BIT_FIFO_SIZE_1024;
+      config = ACCEL_FCHOICE_4KHZ;
       break;
     case MpuAccelDLPF::ACCEL_DLPF_460:
-      c |= 0;
+      config |= 0;
       break;
     case MpuAccelDLPF::ACCEL_DLPF_184:
-      c |= 1;
+      config |= 1;
       break;
     case MpuAccelDLPF::ACCEL_DLPF_92:
-      c |= 2;
+      config |= 2;
       break;
     case MpuAccelDLPF::ACCEL_DLPF_41:
-      c |= 3;
+      config |= 3;
       break;
     case MpuAccelDLPF::ACCEL_DLPF_20:
-      c |= 4;
+      config |= 4;
       break;
     case MpuAccelDLPF::ACCEL_DLPF_10:
-      c |= 5;
+      config |= 5;
       break;
     case MpuAccelDLPF::ACCEL_DLPF_5:
-      c |= 6;
+      config |= 6;
       break;
     default:
-      fprintf(stderr, "invalid config_.accel_dlpf\n");
+      fprintf(stderr, "ERROR SetAccelDLPF: invalid accel dlpf option\n");
       return -1;
   }
-  return i2c.WriteByte(ACCEL_CONFIG_2, c);
+  return i2c.WriteByte(ACCEL_CONFIG_2, config);
 }
 
 bool MPU::SetGyroDLPF(const MpuGyroDLPF dlpf) {
-  uint8_t c = FIFO_MODE_REPLACE_OLD;
+  uint8_t config = FIFO_MODE_REPLACE_OLD;
   switch (dlpf) {
     case MpuGyroDLPF::GYRO_DLPF_OFF:
-      c |= 7;  // not really off, but 3600Hz bandwidth
+      config |= 7;  // not really off, but 3600Hz bandwidth
       break;
     case MpuGyroDLPF::GYRO_DLPF_250:
-      c |= 0;
+      config |= 0;
       break;
     case MpuGyroDLPF::GYRO_DLPF_184:
-      c |= 1;
+      config |= 1;
       break;
     case MpuGyroDLPF::GYRO_DLPF_92:
-      c |= 2;
+      config |= 2;
       break;
     case MpuGyroDLPF::GYRO_DLPF_41:
-      c |= 3;
+      config |= 3;
       break;
     case MpuGyroDLPF::GYRO_DLPF_20:
-      c |= 4;
+      config |= 4;
       break;
     case MpuGyroDLPF::GYRO_DLPF_10:
-      c |= 5;
+      config |= 5;
       break;
     case MpuGyroDLPF::GYRO_DLPF_5:
-      c |= 6;
+      config |= 6;
       break;
     default:
-      fprintf(stderr, "invalid gyro_dlpf\n");
+      fprintf(stderr, "ERROR SetGyroDLPF: invalid gyro dlpf option\n");
       return -1;
   }
-  return i2c.WriteByte(CONFIG, c);
+  return i2c.WriteByte(CONFIG, config);
 }
 
 std::optional<std::array<int16_t, 3>> MPU::ReadAccelRaw() {
@@ -897,7 +1050,7 @@ MpuData MPU::ReadData() {
 
 //   // initialize the magnetometer too if requested in config
 //   if (conf.enable_magnetometer) {
-//     if (__init_magnetometer(0)) {
+//     if (InitMagnetometer(0)) {
 //       fprintf(stderr, "ERROR: failed to initialize_magnetometer\n");
 //       i2c.Lock(false);
 //       return -1;
@@ -1207,36 +1360,49 @@ MpuData MPU::ReadData() {
  * INT_PIN_CFG based on requested bypass state
  **/
 bool MPU::SetBypass(const bool bypass_on) {
-  uint8_t tmp = 0;
   if (not i2c.SetSlaveAddress(config_.i2c_addr)) {
     return false;
   }
 
-  // set up USER_CTRL first
-  // DONT USE FIFO_EN_BIT in DMP mode, or the MPU will generate lots of
-  // unwanted interruptss
-  if (dmp_en_) {
-    tmp |= FIFO_EN_BIT;  // enable fifo for dsp mode
-  }
-  if (!bypass_on) {
-    tmp |= I2C_MST_EN;  // i2c master mode when not in bypass
+  // read current USER_CTRL configuration
+  const auto current_config = i2c.ReadByte(USER_CTRL);
+  if (not current_config.has_value()) {
+    fprintf(stderr,
+            "ERROR in SetBypass, failed to read USER_CTRL "
+            "register\n");
+    return false;
   }
 
-  if (not i2c.WriteByte(USER_CTRL, tmp)) {
-    fprintf(stderr,
-            "ERROR in mpu_set_bypass, failed to write USER_CTRL register\n");
+  // set up USER_CTRL first
+  uint8_t user_config = current_config.value();
+  // DONT USE FIFO_EN_BIT in DMP mode, or the MPU will generate lots of
+  // unwanted interrupts
+  user_config &= ~BIT_AUX_IF_EN;
+  if (dmp_en_) {
+    user_config |= FIFO_EN_BIT;  // enable fifo for dsp mode
+  }
+  if (bypass_on) {
+    user_config &= ~I2C_MST_EN;  // disable i2c master mode when not in bypass
+  } else {
+    user_config |= I2C_MST_EN;  // enable i2c master mode when not in bypass
+  }
+
+  if (not i2c.WriteByte(USER_CTRL, user_config)) {
+    fprintf(stderr, "ERROR in SetBypass, failed to write USER_CTRL register\n");
     return false;
   }
   MicroSleep(3000);
 
+  uint8_t int_config{0};
+  if (bypass_on) {
+    int_config |= BIT_BYPASS_EN;
+  }
   // INT_PIN_CFG settings
-  tmp = LATCH_INT_EN | INT_ANYRD_CLEAR | ACTL_ACTIVE_LOW;  // latching
-  // tmp =  ACTL_ACTIVE_LOW;	// non-latching
-  if (bypass_on)
-    tmp |= BYPASS_EN;
-  if (not i2c.WriteByte(INT_PIN_CFG, tmp)) {
+  // int_config |= LATCH_INT_EN | INT_ANYRD_CLEAR | ACTL_ACTIVE_LOW;  //
+  // latching int_config =  ACTL_ACTIVE_LOW;	// non-latching
+  if (not i2c.WriteByte(INT_PIN_CFG, int_config)) {
     fprintf(stderr,
-            "ERROR in mpu_set_bypass, failed to write INT_PIN_CFG register\n");
+            "ERROR in SetBypass, failed to write INT_PIN_CFG register\n");
     return false;
   }
 
@@ -1249,7 +1415,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 //  *
 //  * Taken straight from the Invensense DMP code. This enabled the automatic
 //  gyro
-//  * calibration feature in the DMP. This this feature is fine for cell phones
+//  * calibration feature in the DMP. This this feature is fine for cell
+//  phones
 //  * but annoying in control systems we do not use it here and instead ask
 //  users
 //  * to run our own gyro_calibration routine.
@@ -1315,7 +1482,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 //  * allow magnetometer data to come in through the FIFO. This just turns off
 //  the
 //  * interrupt, resets fifo and DMP, then starts them again. Used once while
-//  * initializing (probably no necessary) then again if the fifo gets too full.
+//  * initializing (probably no necessary) then again if the fifo gets too
+//  full.
 //  **/
 // int __mpu_reset_fifo(void) {
 //   uint8_t data;
@@ -1361,8 +1529,10 @@ bool MPU::SetBypass(const bool bypass_on) {
 // /**
 //  * int __dmp_set_interrupt_mode(unsigned char mode)
 //  *
-//  * This is from the Invensense open source DMP code. It configures the DMP to
-//  * trigger an interrupt either every sample or only on gestures. Here we only
+//  * This is from the Invensense open source DMP code. It configures the DMP
+//  to
+//  * trigger an interrupt either every sample or only on gestures. Here we
+//  only
 //  * ever configure for continuous sampling.
 //  *
 //  * @param[in]  mode  The mode
@@ -1373,7 +1543,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   const unsigned char regs_continuous[11] = {0xd8, 0xb1, 0xb9, 0xf3, 0x8b,
 //   0xa3,
 //                                              0x91, 0xb6, 0x09, 0xb4, 0xd9};
-//   const unsigned char regs_gesture[11] = {0xda, 0xb1, 0xb9, 0xf3, 0x8b, 0xa3,
+//   const unsigned char regs_gesture[11] = {0xda, 0xb1, 0xb9, 0xf3, 0x8b,
+//   0xa3,
 //                                           0x91, 0xb6, 0xda, 0xb4, 0xda};
 //   switch (mode) {
 //     case DMP_INT_CONTINUOUS:
@@ -1538,7 +1709,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 //  *  @brief      Set shake rejection time.
 //  *  Sets the length of time that the gyro must be outside of the threshold
 //  set
-//  *  by @e gyro_set_shake_reject_thresh before taps are rejected. A mandatory
+//  *  by @e gyro_set_shake_reject_thresh before taps are rejected. A
+//  mandatory
 //  *  60 ms is added to this parameter.
 //  *  @param[in]  time    Time in milliseconds.
 //  *  @return     0 if successful.
@@ -1735,7 +1907,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   // disable all other FIFO features leaving just DMP
 //   if (not i2c.WriteByte( FIFO_EN, 0)) {
 //     fprintf(stderr,
-//             "ERROR: in set_int_enable, failed to write FIFO_EN register\n");
+//             "ERROR: in set_int_enable, failed to write FIFO_EN
+//             register\n");
 //     return -1;
 //   }
 //   return 0;
@@ -1768,7 +1941,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 // }
 
 // /**
-//  * This turns on and off the DMP interrupt and resets the FIFO. This probably
+//  * This turns on and off the DMP interrupt and resets the FIFO. This
+//  probably
 //  * isn't necessary as rc_mpu_initialize_dmp sets these registers but it
 //  remains
 //  * here as a vestige of the invensense open source dmp code.
@@ -1799,7 +1973,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 // }
 
 // /**
-//  * Here is where the magic happens. This function runs as its own thread and
+//  * Here is where the magic happens. This function runs as its own thread
+//  and
 //  * monitors the gpio pin config_.gpio_interrupt_pin with the blocking
 //  function
 //  * call poll(). If a valid interrupt is received from the IMU then mark the
@@ -1954,8 +2129,10 @@ bool MPU::SetBypass(const bool bypass_on) {
 // }
 
 // /**
-//  * Reads the FIFO buffer and populates the data struct. Here is where we see
-//  * bad/empty/double packets due to i2c bus errors and the IMU failing to have
+//  * Reads the FIFO buffer and populates the data struct. Here is where we
+//  see
+//  * bad/empty/double packets due to i2c bus errors and the IMU failing to
+//  have
 //  * data ready in time. enabling warnings in the config struct will let this
 //  * function print out warnings when these conditions are detected. If write
 //  * errors are detected then this function tries some i2c transfers a second
@@ -2123,10 +2300,10 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   if (packet_len == FIFO_LEN_QUAT_ACCEL_GYRO_TAP) {
 //     // Read Accel values and load into imu_data struct
 //     // Turn the MSB and LSB into a signed 16-bit value
-//     data->raw_accel[0] = (int16_t)(((uint16_t)raw[i + 0] << 8) | raw[i + 1]);
-//     data->raw_accel[1] = (int16_t)(((uint16_t)raw[i + 2] << 8) | raw[i + 3]);
-//     data->raw_accel[2] = (int16_t)(((uint16_t)raw[i + 4] << 8) | raw[i + 5]);
-//     i += 6;
+//     data->raw_accel[0] = (int16_t)(((uint16_t)raw[i + 0] << 8) | raw[i +
+//     1]); data->raw_accel[1] = (int16_t)(((uint16_t)raw[i + 2] << 8) | raw[i
+//     + 3]); data->raw_accel[2] = (int16_t)(((uint16_t)raw[i + 4] << 8) |
+//     raw[i + 5]); i += 6;
 //     // Fill in real unit values
 //     data->accel[0] = data->raw_accel[0] * data->accel_to_ms2 /
 //     accel_lengths[0]; data->accel[1] = data->raw_accel[1] *
@@ -2183,13 +2360,13 @@ bool MPU::SetBypass(const bool bypass_on) {
 // }
 
 /**
- * This fuses the magnetometer data with the quaternion straight from the DMP to
- * correct the yaw heading to a compass heading. Much thanks to Pansenti for
- * open sourcing this routine. In addition to the Pansenti implementation I also
- * correct the magnetometer data for DMP orientation, initialize yaw with the
- * magnetometer to prevent initial rise time, and correct the yaw_mixing_factor
- * with the sample rate so the filter rise time remains constant with different
- * sample rates.
+ * This fuses the magnetometer data with the quaternion straight from the DMP
+ * to correct the yaw heading to a compass heading. Much thanks to Pansenti
+ * for open sourcing this routine. In addition to the Pansenti implementation
+ * I also correct the magnetometer data for DMP orientation, initialize yaw
+ * with the magnetometer to prevent initial rise time, and correct the
+ * yaw_mixing_factor with the sample rate so the filter rise time remains
+ * constant with different sample rates.
  *
  * @param      data  The data pointer
  *
@@ -2295,8 +2472,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 // }
 
 /**
- * Loads steady state gyro offsets from the disk and puts them in the IMU's gyro
- * offset register. If no calibration file exists then make a new one.
+ * Loads steady state gyro offsets from the disk and puts them in the IMU's
+ * gyro offset register. If no calibration file exists then make a new one.
  *
  * @return     0 on success, -1 on failure
  */
@@ -2337,7 +2514,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   printf("offsets: %d %d %d\n", x, y, z);
 // #endif
 
-//   // Divide by 4 to get 32.9 LSB per deg/s to conform to expected bias input
+//   // Divide by 4 to get 32.9 LSB per deg/s to conform to expected bias
+//   input
 //   // format. also make negative since we wish to subtract out the steady
 //   // state offset
 //   data[0] = (-x / 4 >> 8) & 0xFF;
@@ -2436,7 +2614,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 //     return 0;
 //   }
 //   // read in data
-//   if (fscanf(fd, "%lf\n%lf\n%lf\n%lf\n%lf\n%lf\n", &x, &y, &z, &sx, &sy, &sz)
+//   if (fscanf(fd, "%lf\n%lf\n%lf\n%lf\n%lf\n%lf\n", &x, &y, &z, &sx, &sy,
+//   &sz)
 //   !=
 //       6) {
 //     fprintf(stderr,
@@ -2493,17 +2672,20 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   raw[5] = (bias[2] << 1) & 0xFF;
 
 //   // Push accel biases to hardware registers
-//   if (not rc_i2c_write_bytes(config_.i2c_bus, XA_OFFSET_H, 2, &raw[0]) < 0) {
+//   if (not rc_i2c_write_bytes(config_.i2c_bus, XA_OFFSET_H, 2, &raw[0]) < 0)
+//   {
 //     fprintf(stderr,
 //             "ERROR: failed to write X accel offsets into IMU register\n");
 //     return -1;
 //   }
-//   if (not rc_i2c_write_bytes(config_.i2c_bus, YA_OFFSET_H, 2, &raw[2]) < 0) {
+//   if (not rc_i2c_write_bytes(config_.i2c_bus, YA_OFFSET_H, 2, &raw[2]) < 0)
+//   {
 //     fprintf(stderr,
 //             "ERROR: failed to write Y accel offsets into IMU register\n");
 //     return -1;
 //   }
-//   if (not rc_i2c_write_bytes(config_.i2c_bus, ZA_OFFSET_H, 2, &raw[4]) < 0) {
+//   if (not rc_i2c_write_bytes(config_.i2c_bus, ZA_OFFSET_H, 2, &raw[4]) < 0)
+//   {
 //     fprintf(stderr,
 //             "ERROR: failed to write Z accel offsets into IMU register\n");
 //     return -1;
@@ -2513,8 +2695,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 // }
 
 /**
- * Reads steady state gyro offsets from the disk and puts them in the IMU's gyro
- * offset register. If no calibration file exists then make a new one.
+ * Reads steady state gyro offsets from the disk and puts them in the IMU's
+ * gyro offset register. If no calibration file exists then make a new one.
  *
  * @param      offsets  The offsets
  *
@@ -2544,18 +2726,19 @@ bool MPU::SetBypass(const bool bypass_on) {
 //       "writing");
 //     fprintf(stderr,
 //             "most likely you ran this as root in the past and are now\n");
-//     fprintf(stderr, "running it as a normal user. try deleting the file\n");
-//     fprintf(stderr, "sudo rm /var/lib/robotcontrol/gyro.cal\n");
+//     fprintf(stderr, "running it as a normal user. try deleting the
+//     file\n"); fprintf(stderr, "sudo rm /var/lib/robotcontrol/gyro.cal\n");
 //     return -1;
 //   }
 
 //   // write to the file, close, and exit
-//   if (fprintf(fd, "%d\n%d\n%d\n", offsets[0], offsets[1], offsets[2]) < 0) {
+//   if (fprintf(fd, "%d\n%d\n%d\n", offsets[0], offsets[1], offsets[2]) < 0)
+//   {
 //     perror("ERROR in rc_calibrate_gyro_routine writing to file");
 //     fprintf(stderr,
 //             "most likely you ran this as root in the past and are now\n");
-//     fprintf(stderr, "running it as a normal user. try deleting the file\n");
-//     fprintf(stderr, "sudo rm /var/lib/robotcontrol/gyro.cal\n");
+//     fprintf(stderr, "running it as a normal user. try deleting the
+//     file\n"); fprintf(stderr, "sudo rm /var/lib/robotcontrol/gyro.cal\n");
 //     fclose(fd);
 //     return -1;
 //   }
@@ -2570,8 +2753,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 //     fprintf(stderr, "writing file anyway, will probably still work\n");
 //     fprintf(stderr,
 //             "most likely you ran this as root in the past and are now\n");
-//     fprintf(stderr, "running it as a normal user. try deleting the file\n");
-//     fprintf(stderr, "sudo rm /var/lib/robotcontrol/gyro.cal\n");
+//     fprintf(stderr, "running it as a normal user. try deleting the
+//     file\n"); fprintf(stderr, "sudo rm /var/lib/robotcontrol/gyro.cal\n");
 //   }
 //   return 0;
 // }
@@ -2594,7 +2777,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   // error check, EEXIST is okay, we want directory to exist!
 //   if (ret == -1 && errno != EEXIST) {
 //     perror(
-//       "ERROR in rc_calibrate_mag_routine making calibration file directory");
+//       "ERROR in rc_calibrate_mag_routine making calibration file
+//       directory");
 //     return -1;
 //   }
 //   // remove old file
@@ -2607,13 +2791,14 @@ bool MPU::SetBypass(const bool bypass_on) {
 //       writing");
 //     fprintf(stderr,
 //             "most likely you ran this as root in the past and are now\n");
-//     fprintf(stderr, "running it as a normal user. try deleting the file\n");
-//     fprintf(stderr, "sudo rm /var/lib/robotcontrol/mag.cal\n");
+//     fprintf(stderr, "running it as a normal user. try deleting the
+//     file\n"); fprintf(stderr, "sudo rm /var/lib/robotcontrol/mag.cal\n");
 //     return -1;
 //   }
 
 //   // write to the file, close, and exit
-//   ret = fprintf(fd, "%.10f\n%.10f\n%.10f\n%.10f\n%.10f\n%.10f\n", offsets[0],
+//   ret = fprintf(fd, "%.10f\n%.10f\n%.10f\n%.10f\n%.10f\n%.10f\n",
+//   offsets[0],
 //                 offsets[1], offsets[2], scale[0], scale[1], scale[2]);
 //   if (ret < 0) {
 //     perror("ERROR in rc_calibrate_mag_routine writing to file\n");
@@ -2623,7 +2808,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   fclose(fd);
 
 //   // now give proper permissions
-//   if (chmod(CALIBRATION_DIR MAG_CAL_FILE, S_IRWXU | S_IRWXG | S_IRWXO) == -1)
+//   if (chmod(CALIBRATION_DIR MAG_CAL_FILE, S_IRWXU | S_IRWXG | S_IRWXO) ==
+//   -1)
 //   {
 //     perror(
 //       "ERROR in rc_calibrate_mag_routine setting correct permissions for "
@@ -2631,16 +2817,16 @@ bool MPU::SetBypass(const bool bypass_on) {
 //     fprintf(stderr, "writing file anyway, will probably still work\n");
 //     fprintf(stderr,
 //             "most likely you ran this as root in the past and are now\n");
-//     fprintf(stderr, "running it as a normal user. try deleting the file\n");
-//     fprintf(stderr, "sudo rm /var/lib/robotcontrol/mag.cal\n");
+//     fprintf(stderr, "running it as a normal user. try deleting the
+//     file\n"); fprintf(stderr, "sudo rm /var/lib/robotcontrol/mag.cal\n");
 //   }
 
 //   return 0;
 // }
 
 /**
- * Writes accelerometer scale and offsets to disk. This is basically the origin
- * and dimensions of the ellipse made during calibration.
+ * Writes accelerometer scale and offsets to disk. This is basically the
+ * origin and dimensions of the ellipse made during calibration.
  *
  * @param      center   The center of ellipsoid in g
  * @param      lengths  The lengths of ellipsoid in g
@@ -2666,17 +2852,18 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   fd = fopen(CALIBRATION_DIR ACCEL_CAL_FILE, "w");
 //   if (fd == NULL) {d
 //     perror(
-//       "ERROR in rc_mpu_calibrate_accel_routine opening calibration file for "
-//       "writing");
+//       "ERROR in rc_mpu_calibrate_accel_routine opening calibration file for
+//       " "writing");
 //     fprintf(stderr,
 //             "most likely you ran this as root in the past and are now\n");
-//     fprintf(stderr, "running it as a normal user. try deleting the file\n");
-//     fprintf(stderr, "sudo rm /var/lib/robotcontrol/accel.cal\n");
+//     fprintf(stderr, "running it as a normal user. try deleting the
+//     file\n"); fprintf(stderr, "sudo rm /var/lib/robotcontrol/accel.cal\n");
 //     return -1;
 //   }
 
 //   // write to the file, close, and exit
-//   ret = fprintf(fd, "%.10f\n%.10f\n%.10f\n%.10f\n%.10f\n%.10f\n", center[0],
+//   ret = fprintf(fd, "%.10f\n%.10f\n%.10f\n%.10f\n%.10f\n%.10f\n",
+//   center[0],
 //                 center[1], center[2], lengths[0], lengths[1], lengths[2]);
 //   if (ret < 0) {
 //     perror("ERROR in rc_mpu_calibrate_accel_routine writing to file\n");
@@ -2689,13 +2876,13 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   if (chmod(CALIBRATION_DIR ACCEL_CAL_FILE, S_IRWXU | S_IRWXG | S_IRWXO) ==
 //       -1) {
 //     perror(
-//       "WARNING in rc_calibrate_accel_routine setting correct permissions for
-//       " "file\n");
+//       "WARNING in rc_calibrate_accel_routine setting correct permissions
+//       for " "file\n");
 //     fprintf(stderr, "writing file anyway, will probably still work\n");
 //     fprintf(stderr,
 //             "most likely you ran this as root in the past and are now\n");
-//     fprintf(stderr, "running it as a normal user. try deleting the file\n");
-//     fprintf(stderr, "sudo rm /var/lib/robotcontrol/accel.cal\n");
+//     fprintf(stderr, "running it as a normal user. try deleting the
+//     file\n"); fprintf(stderr, "sudo rm /var/lib/robotcontrol/accel.cal\n");
 //   }
 //   return 0;
 // }
@@ -2757,8 +2944,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   interrupts rc_i2c_write_byte(conf.i2c_bus, FIFO_EN, 0x00);     // Disable
 //   FIFO rc_i2c_write_byte(conf.i2c_bus, PWR_MGMT_1,
 //                     0x00);  // Turn on internal clock source
-//   rc_i2c_write_byte(conf.i2c_bus, I2C_MST_CTRL, 0x00);  // Disable I2C master
-//   rc_i2c_write_byte(conf.i2c_bus, USER_CTRL,
+//   rc_i2c_write_byte(conf.i2c_bus, I2C_MST_CTRL, 0x00);  // Disable I2C
+//   master rc_i2c_write_byte(conf.i2c_bus, USER_CTRL,
 //                     0x00);  // Disable FIFO and I2C master
 //   rc_i2c_write_byte(conf.i2c_bus, USER_CTRL, 0x0C);  // Reset FIFO and DMP
 //   MicroSleep(15000);
@@ -2869,7 +3056,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   // write to disk
 //   if (__write_gyro_cal_to_disk(offsets) < 0) {
 //     fprintf(stderr,
-//             "ERROR in rc_calibrate_gyro_routine, failed to write to disk\n");
+//             "ERROR in rc_calibrate_gyro_routine, failed to write to
+//             disk\n");
 //     return -1;
 //   }
 //   return 0;
@@ -2923,7 +3111,7 @@ bool MPU::SetBypass(const bool bypass_on) {
 //     i2c.Lock(false);
 //     return -1;
 //   }
-//   if (__init_magnetometer(1)) {
+//   if (InitMagnetometer(1)) {
 //     fprintf(stderr, "ERROR: failed to initialize_magnetometer\n");
 //     i2c.Lock(false);
 //     return -1;
@@ -3021,7 +3209,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   printf("\n");
 //   printf("Offsets X: %7.3f Y: %7.3f Z: %7.3f\n", center.d[0], center.d[1],
 //          center.d[2]);
-//   printf("Scales  X: %7.3f Y: %7.3f Z: %7.3f\n", new_scale[0], new_scale[1],
+//   printf("Scales  X: %7.3f Y: %7.3f Z: %7.3f\n", new_scale[0],
+//   new_scale[1],
 //          new_scale[2]);
 //   // write to disk
 //   if (__write_mag_cal_to_disk(center.d, new_scale) < 0) {
@@ -3278,8 +3467,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 
 //   if (rc_matrix_alloc(&A, 6, 3)) {
 //     fprintf(stderr,
-//             "ERROR: in rc_mpu_calibrate_accel_routine, failed to alloc data "
-//             "matrix\n");
+//             "ERROR: in rc_mpu_calibrate_accel_routine, failed to alloc data
+//             " "matrix\n");
 //     return -1;
 //   }
 
@@ -3305,19 +3494,19 @@ bool MPU::SetBypass(const bool bypass_on) {
 //               "ERROR in rc_mpu_calibrate_accel_routine, center of fitted "
 //               "ellipsoid out of bounds\n");
 //       fprintf(stderr,
-//               "most likely the unit was held in incorrect orientation during
-//               " "data collection\n");
+//               "most likely the unit was held in incorrect orientation
+//               during " "data collection\n");
 //       rc_vector_free(&center);
 //       rc_vector_free(&lengths);
 //       return -1;
 //     }
 //     if (isnan(center.d[i]) || isnan(lengths.d[i])) {
 //       fprintf(stderr,
-//               "ERROR in rc_mpu_calibrate_accel_routine, data fitting produced
-//               " "NaN\n");
+//               "ERROR in rc_mpu_calibrate_accel_routine, data fitting
+//               produced " "NaN\n");
 //       fprintf(stderr,
-//               "most likely the unit was held in incorrect orientation during
-//               " "data collection\n");
+//               "most likely the unit was held in incorrect orientation
+//               during " "data collection\n");
 //       rc_vector_free(&center);
 //       rc_vector_free(&lengths);
 //       return -1;
@@ -3327,8 +3516,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 //               "ERROR in rc_mpu_calibrate_accel_routine, scale out of
 //               bounds\n");
 //       fprintf(stderr,
-//               "most likely the unit was held in incorrect orientation during
-//               " "data collection\n");
+//               "most likely the unit was held in incorrect orientation
+//               during " "data collection\n");
 //       rc_vector_free(&center);
 //       rc_vector_free(&lengths);
 //       return -1;
@@ -3339,7 +3528,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   printf("\n");
 //   printf("Offsets X: %7.3f Y: %7.3f Z: %7.3f\n", center.d[0], center.d[1],
 //          center.d[2]);
-//   printf("Scales  X: %7.3f Y: %7.3f Z: %7.3f\n", lengths.d[0], lengths.d[1],
+//   printf("Scales  X: %7.3f Y: %7.3f Z: %7.3f\n", lengths.d[0],
+//   lengths.d[1],
 //          lengths.d[2]);
 
 //   // write to disk
@@ -3390,14 +3580,14 @@ bool MPU::SetBypass(const bool bypass_on) {
 // int rc_mpu_block_until_dmp_data(void) {
 //   if (imu_shutdown_flag != 0) {
 //     fprintf(stderr,
-//             "ERROR: call to rc_mpu_block_until_dmp_data after shutting down "
-//             "mpu\n");
+//             "ERROR: call to rc_mpu_block_until_dmp_data after shutting down
+//             " "mpu\n");
 //     return -1;
 //   }
 //   if (!thread_running_flag) {
 //     fprintf(stderr,
-//             "ERROR: call to rc_mpu_block_until_dmp_data when DMP handler not
-//             " "running\n");
+//             "ERROR: call to rc_mpu_block_until_dmp_data when DMP handler
+//             not " "running\n");
 //     return -1;
 //   }
 //   // wait for condition signal which unlocks mutex
@@ -3482,8 +3672,8 @@ bool MPU::SetBypass(const bool bypass_on) {
 //       mag_vec[2] = data_ptr->mag[TB_YAW_Z];
 //       break;
 //     default:
-//       fprintf(stderr, "ERROR: reading magnetometer, invalid orientation\n");
-//       return -1;
+//       fprintf(stderr, "ERROR: reading magnetometer, invalid
+//       orientation\n"); return -1;
 //   }
 //   return 0;
 // }
