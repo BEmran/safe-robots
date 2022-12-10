@@ -35,6 +35,8 @@
     # rc mpu executables
 add_executable(rc_simple mpu/rc_mpu.cpp mpu/i2c.cpp mpu/mpu.cpp)                      
 # rc mpu executables
+add_executable(rc_simple mpu/rc_mpu.cpp mpu/i2c.cpp mpu/mpu.cpp mpu/utils.cpp mpu/logger.cpp)                      
+# rc mpu executables
 install(
     # TARGETS imu_app imu_server rc_mpu rc_calibrate_accel rc_calibrate_gyro rc_calibrate_mag
     TARGETS rc_lib_mpu rc_simple
