@@ -7,6 +7,8 @@
 #include <optional>
 #include <vector>
 
+#include "utils.hpp"
+
 /**
  * @brief Maximum I2C bus identifier. Default is 5 for a total of 6 busses.
  * This can be increased by the user for special cases.
@@ -113,20 +115,24 @@ class I2C {
    * @brief Reads a single word (16 bits) from a device register.
    *
    * @param[in] reg The register address
-   * @return std::optional<uint16_t> an optional contains the response if
+   * @param[in] order byte order to use when converting the response bytes
+   * @return std::optional<int16_t> an optional contains the response if
    * successful
    */
-  std::optional<uint16_t> ReadWord(const uint8_t reg) const;
+  std::optional<int16_t> ReadWord(const uint8_t reg,
+                                  const EndianByteOrder order) const;
 
   /**
    * @brief Reads multiple words (16 bytes each) from a device register.
    *
    * @param[in] reg The register address
    * @param[in] count number of words to read
-   * @return std::vector<uint16_t> a vector contains the response if
+   * @param[in] order byte order to use when converting the response bytes
+   * @return std::vector<int16_t> a vector contains the response if
    * successful or empty otherwise
    */
-  std::vector<uint16_t> ReadWords(const uint8_t reg, const size_t count) const;
+  std::vector<int16_t> ReadWords(const uint8_t reg, const size_t count,
+                                 const EndianByteOrder order) const;
 
   /**
    * @brief Writes a single byte to a specified register address.
@@ -153,10 +159,12 @@ class I2C {
    *
    * @param[in] reg The register address
    * @param[in] data a single 16-bit word to be written
+   * @param[in] order byte order to use when decoding passed word
    * @return true if the data is written successfully
    * @return false otherwise
    */
-  bool WriteWord(const uint8_t reg, const uint16_t data) const;
+  bool WriteWord(const uint8_t reg, const int16_t data,
+                 const EndianByteOrder order) const;
 
   /**
    * @brief Writes multiple words (16 bits each) to a specified register
@@ -164,10 +172,12 @@ class I2C {
    *
    * @param[in] reg The register address
    * @param[in] data a vector of 16-bit words to be written
+   * @param[in] order byte order to use when decoding passed words
    * @return true if the data is written successfully
    * @return false otherwise
    */
-  bool WriteWords(const uint8_t reg, const std::vector<uint16_t>& data) const;
+  bool WriteWords(const uint8_t reg, const std::vector<int16_t>& data,
+                  const EndianByteOrder order) const;
 
   /**
    * @brief Sends exactly user-defined data without prepending a register
@@ -200,15 +210,6 @@ class I2C {
    * @return false otherwise
    */
   bool SanityCheck() const;
-
-  /**
-   * @brief Internal function to write data to device
-   *
-   * @param[in] data a vector contains bytes of data to be written
-   * @return true if the data is written successfully
-   * @return false otherwise
-   */
-  bool Write(const std::vector<uint8_t>& data) const;
 
   /**
    * @brief Internal function to read data from device

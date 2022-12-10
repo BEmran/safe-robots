@@ -22,9 +22,12 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
 #include <string_view>
 
-#include "common.h"
+// #include "common.h"
+#include "logger.hpp"
 #include "mpu_defs.h"
 // #include "dmpKey.h"
 // #include "dmp_firmware.h"
@@ -34,6 +37,7 @@
 // #define RC_IMU_INTERRUPT_PIN_PIN 21  // gpio3.21 P9.25
 
 // Calibration File Locations
+constexpr std::string_view CALIB_DIR = "/var/lib/robotcontrol/";
 constexpr std::string_view ACCEL_CAL_FILE = "accel.cal";
 constexpr std::string_view GYRO_CAL_FILE = "gyro.cal";
 constexpr std::string_view MAG_CAL_FILE = "mag.cal";
@@ -125,6 +129,103 @@ constexpr double TWO_PI = (2.0 * M_PI);
 // static int __data_fusion(MpuData* data);
 // static int __mag_correct_orientation(double mag_vec[3]);
 
+namespace {
+
+template <typename T, size_t SIZE>
+std::optional<std::array<T, SIZE>> ReadNumbers(std::ifstream& file) {
+  if (not file.is_open()) {
+    SYS_LOG_WARN("ReadNumbers: file is not open");
+    return {};
+  }
+  std::vector<T> numbers;
+  while (not file.eof()) {
+    T x;
+    file >> x;
+    numbers.push_back(x);
+  }
+
+  if (numbers.size() == SIZE) {
+    SYS_LOG_WARN("ReadNumbers: file doesn't have the correct numbers to read");
+    return {};
+  }
+  std::array<T, SIZE> array;
+  std::copy(numbers.begin(), numbers.end(), array.begin());
+  return array;
+}
+
+template <typename T, size_t SIZE>
+std::string ArrayToString(std::string_view header,
+                          const std::array<T, SIZE>& arr) {
+  std::string msg = header.data();
+  for (size_t i = 0; i < arr.size(); i++) {
+    msg += std::to_string(arr[i]) + " ";
+  }
+  return msg;
+}
+
+template <typename T, size_t SIZE>
+std::array<T, SIZE> CopyVectorToArray(const std::vector<T>& vec) {
+  std::array<int16_t, 3> arr;
+  std::copy(vec.begin(), vec.end(), arr.begin());
+  return arr;
+}
+
+std::string CombineFilename(const std::string_view& directory,
+                            const std::string_view& filename) {
+  std::string combined{directory.data()};
+  combined += filename;
+  return combined;
+}
+
+/**
+ * @brief Writes an array values to disk for a specific directory and filename
+ *
+ * @tparam T array type
+ * @tparam SIZE size of array
+ * @param directory directory path
+ * @param filename file name to write at
+ * @param array values to write
+ * @return true if success
+ * @return false otherwise
+ */
+template <typename T, size_t SIZE>
+bool WriteCalToDisk(const std::string_view& directory,
+                    const std::string_view& filename,
+                    std::array<T, SIZE> array) {
+  // try {
+  //   core::utils::CreateDirectories(directory);
+  // } catch (...) {
+  //   SYS_LOG_WARN("ERROR in WriteCalToDisk making calibration file
+  //   directory"); return false;
+  // }
+
+  // remove old file
+  const std::string full_filename = CombineFilename(directory, filename);
+  remove(full_filename.c_str());
+  std::ofstream file;
+  file.open(full_filename.c_str(), std::ios_base::out);
+  if (not file.is_open()) {
+    SYS_LOG_WARN("ERROR in WriteCalToDisk cannot open file" + full_filename);
+    return false;
+  }
+
+  // write to the file, close, and exit
+  file << ArrayToString("", array);
+  file.close();
+
+  // now give proper permissions
+  if (chmod(full_filename.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) == -1) {
+    SYS_LOG_WARN(
+      "most likely you ran this as root in the past and now running it as "
+      "a normal user. try deleting the file using: sudo rm ")
+      << full_filename;
+    return false;
+  }
+
+  return true;
+}
+}  // namespace
+
 void MicroSleep(const size_t micro) {
   usleep(micro);
 }
@@ -186,6 +287,7 @@ bool MPU::Initialize(const MpuConfig& conf) {
   //   i2c.Lock(false);
   //   return false;
   // }
+
   // if (__load_accel_calibration() < 0) {
   //   fprintf(stderr, "ERROR: failed to load accel calibration offsets\n");
   //   i2c.Lock(false);
@@ -709,17 +811,12 @@ std::optional<std::array<int16_t, 3>> MPU::ReadAccelRaw() {
     return {};
   }
   // Read the six raw data registers into data array
-  const std::vector<uint8_t> raw = i2c.ReadBytes(ACCEL_XOUT_H, 6);
+  const std::vector<int16_t> raw =
+    i2c.ReadWords(ACCEL_XOUT_H, 6, EndianByteOrder::BIG);
   if (raw.empty()) {
     return {};
   }
-  // Turn the MSB and LSB into a signed 16-bit value
-  std::array<int16_t, 3> data;
-  for (size_t i = 0; i < data.size(); i++) {
-    size_t idx = i * 2;
-    data[i] = (int16_t)(((int16_t)raw[idx] << 8) | raw[idx + 1]);
-  }
-  return data;
+  return CopyVectorToArray<int16_t, 3>(raw);
 }
 
 std::array<double, 3>
@@ -738,17 +835,12 @@ std::optional<std::array<int16_t, 3>> MPU::ReadGyroRaw() {
     return {};
   }
   // Read the six raw data registers into data array
-  const std::vector<uint8_t> raw = i2c.ReadBytes(GYRO_XOUT_H, 6);
+  const std::vector<int16_t> raw =
+    i2c.ReadWords(GYRO_XOUT_H, 6, EndianByteOrder::BIG);
   if (raw.empty()) {
     return {};
   }
-  // Turn the MSB and LSB into a signed 16-bit value
-  std::array<int16_t, 3> data;
-  for (size_t i = 0; i < data.size(); i++) {
-    size_t idx = i * 2;
-    data[i] = (int16_t)(((int16_t)raw[idx] << 8) | raw[idx + 1]);
-  }
-  return data;
+  return CopyVectorToArray<int16_t, 3>(raw);
 }
 
 std::array<double, 3>
@@ -796,30 +888,26 @@ std::optional<std::array<int16_t, 3>> MPU::ReadMagRaw() {
     return {};
   }
   // Read the six raw data regs into data array
-  const std::vector<uint8_t> raw = i2c.ReadBytes(AK8963_XOUT_L, 7);
-  if (raw.empty()) {
+  const std::vector<int16_t> raw =
+    i2c.ReadWords(AK8963_XOUT_L, 6, EndianByteOrder::LITTLE);
+  const std::optional<uint8_t> st2 = i2c.ReadByte(AK8963_ST2);
+  if (raw.empty() || not st2.has_value()) {
     fprintf(stderr, "ERROR: rc_mpu_read_mag failed to read data register\n");
     return {};
   }
   // check if the readings saturated such as because
   // of a local field source, discard data if so
-  if (raw[6] & MAGNETOMETER_SATURATION) {
+  if (st2.value() & MAGNETOMETER_SATURATION) {
     if (config_.show_warnings) {
       printf("WARNING: magnetometer saturated, discarding data\n");
     }
     return {};
   }
-  // Turn the MSB and LSB into a signed 16-bit value
-  // Data stored as little Endian
-  std::array<int16_t, 3> adc;
-  for (size_t i = 0; i < adc.size(); i++) {
-    size_t idx = i * 2;
-    adc[i] = (int16_t)(((int16_t)raw[idx + 1] << 8) | raw[idx]);
-  }
+
 #ifdef DEBUG
-  printf("raw mag:%d %d %d\n", adc[0], adc[1], adc[2]);
+  printf("raw mag:%d %d %d\n", raw[0], raw[1], raw[2]);
 #endif
-  return adc;
+  return CopyVectorToArray<int16_t, 3>(raw);
 }
 
 std::array<int16_t, 3> AlignMagAxis(const std::array<int16_t, 3>& mag) {
@@ -854,13 +942,14 @@ std::optional<double> MPU::ReadTemp() {
     return {};
   }
   // Read the two raw data registers
-  const std::optional<uint16_t> adc = i2c.ReadWord(TEMP_OUT_H);
-  if (not adc.has_value()) {
+  const std::optional<int16_t> data =
+    i2c.ReadWord(TEMP_OUT_H, EndianByteOrder::BIG);
+  if (not data.has_value()) {
     fprintf(stderr, "failed to read IMU temperature registers\n");
     return {};
   }
   // convert to real units
-  const double temp = 21.0 + adc.value() / TEMP_SENSITIVITY;
+  const double temp = 21.0 + data.value() / TEMP_SENSITIVITY;
   return temp;
 }
 
@@ -1408,6 +1497,191 @@ bool MPU::SetBypass(const bool bypass_on) {
 
   bypass_enabled_ = bypass_on;
   return true;
+}
+
+// bool MPU::LoadAccelCalibration() {
+//   std::array<int, 3> offset{0, 0, 0};
+//   constexpr size_t size{offset.size()};
+
+//   const std::string filename = CombineFilename(CALIB_DIR,
+//   ACCEL_CAL_FILE);
+
+//   std::ifstream file;
+//   file.open(filename.c_str(), std::ios_base::in);
+//   if (file.is_open()) {
+//     const auto offset_numbers = ReadNumbers<int, size>(file);
+//     const auto scale_numbers = ReadNumbers<int, size>(file);
+//     if (not offset_numbers.has_value() || not scale_numbers.has_value()) {
+//       // copy red number to offset data if size is correct
+//       offset = offset_numbers.value();
+//       accel_lengths = scale_numbers.value();
+//     } else {
+//       SYS_LOG_WARN(
+//         "Loading accel offsets, calibration file empty or malformed. Please "
+//         "run rc_calibrate_accel to recalibrate. Using default offsets for
+//         now");
+//     }
+//   } else {
+//     SYS_LOG_WARN(
+//       "no accelerometer calibration data found. Please run
+//       rc_calibrate_accel");
+//   }
+//   file.close();
+
+//   // print debug msg
+//   SYS_LOG_DEBUG(ArrayToString("accel offsets", offset));
+//   SYS_LOG_DEBUG(ArrayToString("accel scale", accel_lengths_));
+
+//   // write adjusted factory bias
+//   const std::vector<uint8_t> registers{XA_OFFSET_H, YA_OFFSET_H,
+//   ZA_OFFSET_H}; for (size_t i = 0; i < registers.size(); i++) {
+//     if (not AdjustAccelFactoryBias(registers[i], offset[i])) {
+//       SYS_LOG_WARN("failed to read factory bias");
+//     }
+//   }
+//   return true;
+// }
+
+// bool MPU::AdjustAccelFactoryBias(const uint8_t reg, const int offset) {
+//   // read factory bias
+//   const auto offset_raw = i2c.ReadWord(reg, ByteOrder::BIG_ENDIAN_ORDER);
+//   if (not offset_raw) {
+//     SYS_LOG_WARN("failed to read factory bias");
+//     return false;
+//   }
+
+//   // convert offset in g to bias register which is 15-bits, 16G FSR
+//   constexpr double resolution = 0.0009765615;
+//   const int16_t bias =
+//     offset_raw.value() - static_cast<int16_t>(std::round(offset /
+//     resolution));
+
+//   // Push accel biases to hardware registers
+//   if (i2c_->WriteWord(reg, bias, ByteOrder::BIG_ENDIAN_ORDER)) {
+//     SYS_LOG_WARN("failed to write accel offsets into IMU register");
+//     return false;
+//   }
+//   return true;
+// }
+
+// bool MPU::LoadGyroCalibration() {
+//   std::array<int, 3> offset{0, 0, 0};
+//   constexpr size_t size{offset.size()};
+
+//   const std::string filename = CALIB_DIR GYRO_CAL_FILE;
+//   std::ifstream file;
+//   file.open(filename, std::ios_base::in);
+//   if (file.is_open()) {
+//     const auto numbers = ReadNumbers<int, size>(file);
+//     if (not numbers.has_value()) {
+//       // copy red number to offset data if size is correct
+//       offset = numbers.value();
+//     } else {
+//       SYS_LOG_WARN("Loading gyro offsets, calibration file empty or
+//       malformed"); SYS_LOG_WARN("Please run rc_calibrate_gyro to
+//       recalibrate"); SYS_LOG_WARN("using default offsets for now");
+//     }
+//     file.close();
+//   } else {
+//     // calibration file doesn't exist yet
+//     SYS_LOG_WARN("no gyro calibration data found");
+//     SYS_LOG_WARN("Please run rc_calibrate_gyro");
+//   }
+
+//   // print debug msg
+//   SYS_LOG_DEBUG(ArrayToString("gyro offsets", offset));
+
+//   // Divide by 4 to get 32.9 LSB per deg/s to conform to expected bias input
+//   // format. also make negative since we wish to subtract out the steady
+//   // state offset
+//   std::vector<int16_t> data(3);
+//   for (size_t i = 0; i < 3; i++) {
+//     data[i] = -static_cast<int16_t>(offset[i] / 4);
+//   }
+
+//   // Push gyro biases to hardware registers
+//   if (not i2c_->WriteWords(XG_OFFSET_H, data, ByteOrder::BIG_ENDIAN_ORDER)) {
+//     SYS_LOG_ERROR("failed to load gyro offsets into IMU register");
+//     return false;
+//   }
+//   return true;
+// }
+
+// bool MPU::LoadMagCalibration() {
+//   constexpr size_t size{3};
+//   const std::string filename = CALIB_DIR MAG_CAL_FILE;
+//   std::ifstream file;
+//   file.open(filename, std::ios_base::in);
+//   if (file.is_open()) {
+//     const auto offset_numbers = ReadNumbers<double, size>(file);
+//     const auto scale_numbers = ReadNumbers<double, size>(file);
+//     if (not offset_numbers.has_value() && not scale_numbers.has_value()) {
+//       // copy red number to offset data if size is correct
+//       mag_offsets_ = offset_numbers.value();
+//       mag_scales_ = scale_numbers.value();
+//     } else {
+//       SYS_LOG_WARN(
+//         "Loading magnetometer offsets, calibration file empty or malformed");
+//       SYS_LOG_WARN("Please run rc_calibrate_mag to recalibrate");
+//       SYS_LOG_WARN("using default offsets for now");
+//     }
+//     file.close();
+//   } else {
+//     // calibration file doesn't exist yet
+//     SYS_LOG_WARN("no magnetometer calibration data found");
+//     SYS_LOG_WARN("Please run rc_calibrate_mag");
+//   }
+
+//   // print debug msg
+//   SYS_LOG_DEBUG(ArrayToString("mag offsets", mag_offsets_));
+//   SYS_LOG_DEBUG(ArrayToString("mag scale", mag_scales_));
+//   return true;
+// }
+
+// /**
+//  * @brief Writes accelerometer scale and offsets to disk. This is basically
+//  the
+//  * origin and dimensions of the ellipse made during calibration.
+//  *
+//  * @param center The center of ellipsoid in g
+//  * @param lengths The lengths of ellipsoid in g
+//  * @return true if success
+//  * @return false otherwise
+//  */
+// bool WriteAccelCalToDisk(const std::array<int, 3>& center,
+//                          const std::array<int, 3>& lengths) {
+//   std::array<int, 6> array;
+//   std::copy(center.begin(), center.end(), array.begin());
+//   std::copy(lengths.begin(), lengths.end(), array.begin() + 3);
+//   return WriteCalToDisk(CALIB_DIR, MAG_CAL_FILE, array);
+// }
+
+/**
+ * @brief Writes gyro offsets to disk.
+ *
+ * @param offset offset values
+ * @return true if success
+ * @return false otherwise
+ */
+bool WriteGyroCalToDisk(std::array<int, 3> offset) {
+  return WriteCalToDisk(CALIB_DIR, GYRO_CAL_FILE, offset);
+}
+
+/**
+ * @brief Writes magnetometer scale and offsets to disk. This is basically the
+ * origin and dimensions of the ellipse made during calibration.
+ *
+ * @param offset The offsets values
+ * @param scale The scale values
+ * @return true if success
+ * @return false otherwise
+ */
+bool WriteMagCalToDisk(const std::array<double, 3>& offset,
+                       const std::array<double, 3>& scale) {
+  std::array<double, 6> array;
+  std::copy(offset.begin(), offset.end(), array.begin());
+  std::copy(scale.begin(), scale.end(), array.begin() + 3);
+  return WriteCalToDisk(CALIB_DIR, MAG_CAL_FILE, array);
 }
 
 // /**
@@ -2482,7 +2756,7 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   uint8_t data[6];
 //   int x, y, z;
 
-//   fd = fopen(CALIBRATION_DIR GYRO_CAL_FILE, "r");
+//   fd = fopen(CALIB_DIR GYRO_CAL_FILE, "r");
 
 //   if (fd == NULL) {
 //     // calibration file doesn't exist yet
@@ -2543,7 +2817,7 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   FILE* fd;
 //   double x, y, z, sx, sy, sz;
 
-//   fd = fopen(CALIBRATION_DIR MAG_CAL_FILE, "r");
+//   fd = fopen(CALIB_DIR MAG_CAL_FILE, "r");
 //   if (fd == NULL) {
 //     // calibration file doesn't exist yet
 //     fprintf(stderr, "WARNING: no magnetometer calibration data found\n");
@@ -2601,7 +2875,7 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   double x, y, z, sx, sy, sz;  // offsets and scales in xyz
 //   int16_t bias[3], factory[3];
 
-//   fd = fopen(CALIBRATION_DIR ACCEL_CAL_FILE, "r");
+//   fd = fopen(CALIB_DIR ACCEL_CAL_FILE, "r");
 
 //   if (fd == NULL) {
 //     // calibration file doesn't exist yet
@@ -2707,7 +2981,7 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   int ret;
 
 //   // make sure directory and calibration file exist and are writable first
-//   ret = mkdir(CALIBRATION_DIR, 0777);
+//   ret = mkdir(CALIB_DIR, 0777);
 //   // error check, EEXIST is okay, we want directory to exist!
 //   if (ret == -1 && errno != EEXIST) {
 //     perror(
@@ -2717,9 +2991,9 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   }
 
 //   // remove old file
-//   remove(CALIBRATION_DIR GYRO_CAL_FILE);
+//   remove(CALIB_DIR GYRO_CAL_FILE);
 
-//   fd = fopen(CALIBRATION_DIR GYRO_CAL_FILE, "w");
+//   fd = fopen(CALIB_DIR GYRO_CAL_FILE, "w");
 //   if (fd == NULL) {
 //     perror(
 //       "ERROR in rc_calibrate_gyro_routine opening calibration file for "
@@ -2745,7 +3019,7 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   fclose(fd);
 
 //   // now give proper permissions
-//   if (chmod(CALIBRATION_DIR GYRO_CAL_FILE, S_IRWXU | S_IRWXG | S_IRWXO) ==
+//   if (chmod(CALIB_DIR GYRO_CAL_FILE, S_IRWXU | S_IRWXG | S_IRWXO) ==
 //   -1) {
 //     perror(
 //       "ERROR in rc_calibrate_gyro_routine setting correct permissions for "
@@ -2773,7 +3047,7 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   int ret;
 
 //   // make sure directory and calibration file exist and are writable first
-//   ret = mkdir(CALIBRATION_DIR, 0777);
+//   ret = mkdir(CALIB_DIR, 0777);
 //   // error check, EEXIST is okay, we want directory to exist!
 //   if (ret == -1 && errno != EEXIST) {
 //     perror(
@@ -2782,9 +3056,9 @@ bool MPU::SetBypass(const bool bypass_on) {
 //     return -1;
 //   }
 //   // remove old file
-//   remove(CALIBRATION_DIR MAG_CAL_FILE);
+//   remove(CALIB_DIR MAG_CAL_FILE);
 
-//   fd = fopen(CALIBRATION_DIR MAG_CAL_FILE, "w");
+//   fd = fopen(CALIB_DIR MAG_CAL_FILE, "w");
 //   if (fd == NULL) {
 //     perror(
 //       "ERROR in rc_calibrate_mag_routine opening calibration file for
@@ -2808,7 +3082,7 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   fclose(fd);
 
 //   // now give proper permissions
-//   if (chmod(CALIBRATION_DIR MAG_CAL_FILE, S_IRWXU | S_IRWXG | S_IRWXO) ==
+//   if (chmod(CALIB_DIR MAG_CAL_FILE, S_IRWXU | S_IRWXG | S_IRWXO) ==
 //   -1)
 //   {
 //     perror(
@@ -2838,7 +3112,7 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   int ret;
 
 //   // make sure directory and calibration file exist and are writable first
-//   ret = mkdir(CALIBRATION_DIR, 0777);
+//   ret = mkdir(CALIB_DIR, 0777);
 //   // error check, EEXIST is okay, we want directory to exist!
 //   if (ret == -1 && errno != EEXIST) {
 //     perror(
@@ -2847,9 +3121,9 @@ bool MPU::SetBypass(const bool bypass_on) {
 //     return -1;
 //   }
 //   // remove old file
-//   remove(CALIBRATION_DIR ACCEL_CAL_FILE);
+//   remove(CALIB_DIR ACCEL_CAL_FILE);
 
-//   fd = fopen(CALIBRATION_DIR ACCEL_CAL_FILE, "w");
+//   fd = fopen(CALIB_DIR ACCEL_CAL_FILE, "w");
 //   if (fd == NULL) {d
 //     perror(
 //       "ERROR in rc_mpu_calibrate_accel_routine opening calibration file for
@@ -2873,7 +3147,7 @@ bool MPU::SetBypass(const bool bypass_on) {
 //   fclose(fd);
 
 //   // now give proper permissions
-//   if (chmod(CALIBRATION_DIR ACCEL_CAL_FILE, S_IRWXU | S_IRWXG | S_IRWXO) ==
+//   if (chmod(CALIB_DIR ACCEL_CAL_FILE, S_IRWXU | S_IRWXG | S_IRWXO) ==
 //       -1) {
 //     perror(
 //       "WARNING in rc_calibrate_accel_routine setting correct permissions
@@ -3545,21 +3819,21 @@ bool MPU::SetBypass(const bool bypass_on) {
 // }
 
 // int rc_mpu_is_gyro_calibrated(void) {
-//   if (!access(CALIBRATION_DIR GYRO_CAL_FILE, F_OK))
+//   if (!access(CALIB_DIR GYRO_CAL_FILE, F_OK))
 //     return 1;
 //   else
 //     return 0;
 // }
 
 // int rc_mpu_is_mag_calibrated(void) {
-//   if (!access(CALIBRATION_DIR MAG_CAL_FILE, F_OK))
+//   if (!access(CALIB_DIR MAG_CAL_FILE, F_OK))
 //     return 1;
 //   else
 //     return 0;
 // }
 
 // int rc_mpu_is_accel_calibrated(void) {
-//   if (!access(CALIBRATION_DIR ACCEL_CAL_FILE, F_OK))
+//   if (!access(CALIB_DIR ACCEL_CAL_FILE, F_OK))
 //     return 1;
 //   else
 //     return 0;

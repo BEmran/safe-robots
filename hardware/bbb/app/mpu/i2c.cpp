@@ -140,7 +140,7 @@ std::optional<uint8_t> I2C::ReadByte(const uint8_t reg) const {
 std::vector<uint8_t> I2C::ReadBytes(const uint8_t reg,
                                     const size_t count) const {
   // write register to device
-  if (not Write({reg})) {
+  if (not SendBytes({reg})) {
     return {};
   }
 
@@ -152,16 +152,17 @@ std::vector<uint8_t> I2C::ReadBytes(const uint8_t reg,
   return data;
 }
 
-std::optional<uint16_t> I2C::ReadWord(const uint8_t reg) const {
-  const std::vector<uint16_t> data = ReadWords(reg, 1);
+std::optional<int16_t> I2C::ReadWord(const uint8_t reg,
+                                     const EndianByteOrder order) const {
+  const std::vector<int16_t> data = ReadWords(reg, 1, order);
   if (data.empty()) {
     return {};
   }
   return data[0];
 }
 
-std::vector<uint16_t> I2C::ReadWords(const uint8_t reg,
-                                     const size_t count) const {
+std::vector<int16_t> I2C::ReadWords(const uint8_t reg, const size_t count,
+                                    const EndianByteOrder order) const {
   // then read the response
   const std::vector<uint8_t> data = ReadBytes(reg, count * 2);
   if (data.empty()) {
@@ -169,15 +170,7 @@ std::vector<uint16_t> I2C::ReadWords(const uint8_t reg,
   }
 
   // form words from bytes and put into user's data array
-  std::vector<uint16_t> words(count);
-  for (size_t i = 0; i < count; i++) {
-    const size_t idx = i * 2;
-    const uint16_t msb = static_cast<uint16_t>(data[idx]) << 8;
-    const uint16_t lsb = static_cast<uint16_t>(data[idx + 1]);
-    words[i] = static_cast<uint16_t>(msb | lsb);
-  }
-
-  return words;
+  return RegisterBytesToWords(data, order);
 }
 
 bool I2C::WriteByte(const uint8_t reg, const uint8_t data) const {
@@ -197,24 +190,18 @@ bool I2C::WriteBytes(const uint8_t reg,
   return SendBytes(writeData);
 }
 
-bool I2C::WriteWord(const uint8_t reg, const uint16_t data) const {
+bool I2C::WriteWord(const uint8_t reg, const int16_t data,
+                    const EndianByteOrder order) const {
   // send the bytes
-  return WriteWords(reg, {data});
+  return WriteWords(reg, {data}, order);
 }
 
-bool I2C::WriteWords(const uint8_t reg,
-                     const std::vector<uint16_t>& data) const {
+bool I2C::WriteWords(const uint8_t reg, const std::vector<int16_t>& data,
+                     const EndianByteOrder order) const {
   // assemble bytes to send from data casted as uint8_t*
-  std::vector<uint8_t> writeData(data.size() * 2 + 1);
-  writeData[0] = reg;
-  for (size_t i = 0; i < data.size(); i++) {
-    const size_t idx = i * 2 + 1;
-    writeData[idx] = static_cast<uint8_t>(data[i] >> 8);
-    writeData[idx + 1] = static_cast<uint8_t>(data[i] & 0xFF);
-  }
-
+  const std::vector<uint8_t> bytes = WordsToRegisterBytes(data, order);
   // send the bytes
-  return SendBytes(writeData);
+  return WriteBytes(reg, bytes);
 }
 
 bool I2C::SendByte(const uint8_t data) const {
@@ -222,11 +209,6 @@ bool I2C::SendByte(const uint8_t data) const {
 }
 
 bool I2C::SendBytes(const std::vector<uint8_t>& data) const {
-  return Write(data);
-}
-
-// write register to device
-bool I2C::Write(const std::vector<uint8_t>& data) const {
   if (not SanityCheck()) {
     return false;
   }
@@ -237,7 +219,7 @@ bool I2C::Write(const std::vector<uint8_t>& data) const {
   const size_t size = data.size();
   const ssize_t written = write(fd_, data.data(), size);
   if (written != static_cast<ssize_t>(size)) {
-    fprintf(stderr, "ERROR: in Write, write %d bytes, expected %zu: %s\n",
+    fprintf(stderr, "ERROR: in SendBytes, write %d bytes, expected %zu: %s\n",
             written, size, strerror(errno));
     // unlock after finish
     lock_ = false;
