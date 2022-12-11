@@ -1,36 +1,14 @@
-#ifndef RC_MAG_HPP
-#define RC_MAG_HPP
+#ifndef RC_MAG_SLAVE_HPP
+#define RC_MAG_SLAVE_HPP
 
 #include <array>
 #include <cstdint>
 
 #include "i2c.hpp"
+#include "mag.hpp"
 #include "mpu_defs.h"
 
-/**
- * @brief configuration of the mpu sensor
- *
- */
-struct MagConfig {
-  /// @brief compass sampling rate (Hz). Sampling rate must be between 1Hz and
-  /// 100Hz.
-  uint16_t sample_rate{100};
-};
-
-/**
- * @brief data struct populated with new sensor data
- *
- */
-struct MagData {
-  /// @brief magnetometer (XYZ) in units of uT
-  std::array<double, 3> calib{0., 0., 0.};
-  /// @brief raw (XYZ) from 16-bit ADC
-  std::array<int16_t, 3> raw{0, 0, 0};
-};
-
-enum class MagSelect { NONE, DIRECT, SLAVE };
-
-class Mag {
+class MagSLave {
  public:
   /**
    * @brief Sets up the MPU in normal one-shot sampling mode.
@@ -61,6 +39,7 @@ class Mag {
 
   bool Prop() const;
   bool Reset() const;
+
   bool ExtractFactoryCalibration();
   bool SetMode(const MagMode mode, const MagBitScale scale) const;
 
@@ -119,6 +98,7 @@ class Mag {
   bool WriteByte(const uint8_t reg, const uint8_t data) const;
   std::vector<uint8_t> ReadBytes(const uint8_t reg, const uint8_t count) const;
   std::optional<uint8_t> ReadByte(const uint8_t reg) const;
+  bool Prepare(const uint8_t reg, const bool is_read) const;
 
  private:
   MagConfig config_;
@@ -129,4 +109,4 @@ class Mag {
   std::array<double, 3> scales_{1., 1., 1.};
 };
 
-#endif  // RC_MAG_HPP
+#endif  // RC_MAG_SLAVE_HPP

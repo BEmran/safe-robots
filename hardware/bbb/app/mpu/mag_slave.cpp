@@ -1,4 +1,4 @@
-#include "mag.hpp"
+#include "mag_slave.hpp"
 
 #include <errno.h>
 #include <string.h>
@@ -17,7 +17,7 @@ std::array<double, 3> AlignMagAxis(const std::array<double, 3>& mag) {
 }
 }  // namespace
 
-bool Mag::Initialize(std::shared_ptr<I2C> i2c, const MagConfig& conf) {
+bool MagSLave::Initialize(std::shared_ptr<I2C> i2c, const MagConfig& conf) {
   i2c_ = i2c;
   if (not i2c_->Initialized()) {
     fprintf(stderr, "ERROR: in MAG::Initialize, I2C is not initialized\n");
@@ -26,6 +26,7 @@ bool Mag::Initialize(std::shared_ptr<I2C> i2c, const MagConfig& conf) {
 
   // check who am I register
   if (not Prop()) {
+    // i2c_->Lock(false);
     printf("failed to prop magnetometer\n");
     return false;
   }
@@ -85,8 +86,9 @@ bool Mag::Initialize(std::shared_ptr<I2C> i2c, const MagConfig& conf) {
   // }
 
   // // Trigger slave 0 actions at each sample
-  // constexpr uint8_t master_delay = BIT_DELAY_ES_SHADOW | BIT_S0_DELAY_EN;
-  // if (not i2c_->WriteByte(I2C_MST_DELAY_CTRL, master_delay)) {
+  // constexpr uint8_t master_MilliSleep = BIT_DELAY_ES_SHADOW |
+  // BIT_S0_DELAY_EN; if (not i2c_->WriteByte(I2C_MST_DELAY_CTRL,
+  // master_MilliSleep)) {
   //   fprintf(stderr,
   //           "ERROR: in InitMagnetometer, failed to write to "
   //           "I2C_MST_DELAY_CTRL\n");
@@ -99,7 +101,7 @@ bool Mag::Initialize(std::shared_ptr<I2C> i2c, const MagConfig& conf) {
   return true;
 }
 
-bool Mag::Prop() const {
+bool MagSLave::Prop() const {
   // check the who am i register
   const auto result = ReadByte(WHO_AM_I_AK8963);
   if (not result.has_value()) {
@@ -108,11 +110,22 @@ bool Mag::Prop() const {
 
   // check result
   const uint8_t c = result.value();
-  if (result.value() != WHO_AM_I_AK8963_VALUE) {
+
+  // // Set the I2C slave address of AK8963 and set for read.
+  // i2c_->WriteByte(I2C_SLV0_ADDR, AK8963_ADDR | 0x80);
+  // // I2C slave 0 register address from where to begin data transfer
+  // i2c_->WriteByte(I2C_SLV0_REG, WHO_AM_I_AK8963);
+  // // Enable I2C and read 3 bytes
+  // i2c_->WriteByte(I2C_SLV0_CTRL, 0x81);
+  // MilliSleep(10);
+  // // Read the x-, y-, and z-axis calibration values
+  // auto c = i2c_->ReadBytes(EXT_SENS_DATA_00, 1)[0];
+
+  if (c != WHO_AM_I_AK8963_VALUE) {
     fprintf(stderr,
             "Error in Prop: invalid who_am_i register: expected 0x%x and got "
             "0x%x\n",
-            WHO_AM_I_AK8963_VALUE, result.value());
+            WHO_AM_I_AK8963_VALUE, c);
     return false;
   }
 
@@ -120,15 +133,14 @@ bool Mag::Prop() const {
   return true;
 }
 
-bool Mag::Reset() const {
+bool MagSLave::Reset() const {
   if (not WriteByte(AK8963_CNTL2, 0x01)) {
     return false;
   }
   MilliSleep(10);
   return true;
 }
-
-// bool Mag::SetSampleRate(const uint16_t rate) {
+// bool MagSLave::SetSampleRate(const uint16_t rate) {
 //   constexpr uint16_t MAX_COMPASS_SAMPLE_RATE = 100;
 //   constexpr uint16_t MIN_COMPASS_SAMPLE_RATE = 1;
 
@@ -154,7 +166,7 @@ bool Mag::Reset() const {
 //   return true;
 // }
 
-bool Mag::ExtractFactoryCalibration() {
+bool MagSLave::ExtractFactoryCalibration() {
   // Power down
   if (not PowerOff()) {
     return false;
@@ -184,11 +196,11 @@ bool Mag::ExtractFactoryCalibration() {
   return PowerOff();
 }
 
-bool Mag::PowerOff() const {
+bool MagSLave::PowerOff() const {
   return SetMode(MagMode::POWER_DN, MagBitScale::SCALE_16);
 }
 
-bool Mag::SetMode(const MagMode mode, const MagBitScale scale) const {
+bool MagSLave::SetMode(const MagMode mode, const MagBitScale scale) const {
   const uint8_t ctrl = static_cast<uint8_t>(mode) | static_cast<uint8_t>(scale);
   if (not WriteByte(AK8963_CNTL, ctrl)) {
     return false;
@@ -198,23 +210,27 @@ bool Mag::SetMode(const MagMode mode, const MagBitScale scale) const {
   return true;
 }
 
-std::vector<uint8_t> Mag::ReadBytes(const uint8_t reg,
-                                    const uint8_t count) const {
-  // magnetometer is actually a separate device with its
-  // own address inside the mpu9250
-  if (not i2c_->SetSlaveAddress(AK8963_ADDR)) {
+std::vector<uint8_t> MagSLave::ReadBytes(const uint8_t reg,
+                                         const uint8_t count) const {
+  // prepare register data to be written
+  if (not Prepare(reg, true)) {
     return {};
   }
-  // Read from register
-  const std::vector<uint8_t> raw = i2c_->ReadBytes(reg, count);
-  if (raw.empty()) {
-    fprintf(stderr, "ERROR: in ReadBytes, failed to read register %x\n", reg);
+
+  // Enable I2C and read
+  const uint8_t number_of_bytes = 0x80 | count;
+  if (not i2c_->WriteByte(I2C_SLV0_CTRL, number_of_bytes)) {
+    fprintf(stderr, "ERROR: in ReadBytes, failed to enable reading: %s\n",
+            strerror(errno));
     return {};
   }
-  return raw;
+
+  MilliSleep(10);
+  // then read the response
+  return i2c_->ReadBytes(EXT_SENS_DATA_00, count);
 }
 
-std::optional<uint8_t> Mag::ReadByte(const uint8_t reg) const {
+std::optional<uint8_t> MagSLave::ReadByte(const uint8_t reg) const {
   const auto result = ReadBytes(reg, 1);
   if (result.empty()) {
     return {};
@@ -222,33 +238,70 @@ std::optional<uint8_t> Mag::ReadByte(const uint8_t reg) const {
   return result[0];
 }
 
-bool Mag::WriteByte(const uint8_t reg, const uint8_t data) const {
-  // magnetometer is actually a separate device with its
-  // own address inside the mpu9250
-  if (not i2c_->SetSlaveAddress(AK8963_ADDR)) {
+bool MagSLave::WriteByte(const uint8_t reg, const uint8_t data) const {
+  // prepare register data to be written
+  if (not Prepare(reg, false)) {
     return false;
   }
-  // write data to register
-  if (not i2c_->WriteByte(reg, data)) {
+
+  // data to be written
+  if (not i2c_->WriteByte(I2C_SLV0_DO, data)) {
     fprintf(stderr,
-            "ERROR: in WriteByte, failed to write data '0x%zx' to register "
-            "'0x%zx'\n",
-            data, reg);
+            "ERROR: in WriteByte, failed to write %0x byte to %0x: %s\n", data,
+            I2C_SLV0_DO, strerror(errno));
     return false;
   }
+
+  // Enable I2C and write 1 byte
+  const uint8_t number_of_bytes = 0x80 | 1;
+  if (not i2c_->WriteByte(I2C_SLV0_CTRL, number_of_bytes)) {
+    fprintf(stderr, "ERROR: in WriteByte, failed to enable writing: %s\n",
+            strerror(errno));
+    return false;
+  }
+
+  MilliSleep(10);
   return true;
 }
 
-std::optional<std::array<int16_t, 3>> Mag::ReadRaw() {
+bool MagSLave::Prepare(const uint8_t reg, const bool is_read) const {
+  // if (not SanityCheck()) {
+  //   return false;
+  // }
+
+  uint8_t address = AK8963_ADDR;
+  if (is_read) {
+    address |= 0x80;
+  }
+  // Set the I2C slave address of AK8963 and set for write.
+  if (not i2c_->WriteByte(I2C_SLV0_ADDR, address)) {
+    fprintf(stderr,
+            "ERROR: in Prepare, failed Set the I2C slave address of AK8963: "
+            "%s\n",
+            strerror(errno));
+    return false;
+  }
+
+  // I2C slave 0 register address from where to begin data transfer
+  if (not i2c_->WriteByte(I2C_SLV0_REG, reg)) {
+    fprintf(stderr, "ERROR: in SendByte, failed to write %0x byte to %0x: %s\n",
+            reg, I2C_SLV0_REG, strerror(errno));
+    return false;
+  }
+
+  return true;
+}
+
+std::optional<std::array<int16_t, 3>> MagSLave::ReadRaw() {
   // read the data ready bit to see if there is new data
-  const std::optional<uint8_t> st1 = ReadByte(AK8963_ST1);
-  if (not st1.has_value()) {
-    return {};
-  }
-  if (not(st1.value() & MAG_DATA_READY)) {
-    printf("no new magnetometer data ready, skipping read\n");
-    return {};
-  }
+  // const std::optional<uint8_t> st1 = ReadByte(AK8963_ST1);
+  // if (not st1.has_value()) {
+  //   return {};
+  // }
+  // if (not(st1.value() & MAG_DATA_READY)) {
+  //   printf("no new magnetometer data ready, skipping read\n");
+  //   return {};
+  // }
   // Read the six raw data regs into data array
   const std::vector<uint8_t> raw_bytes = ReadBytes(AK8963_XOUT_L, 6);
   const std::optional<uint8_t> st2 = ReadByte(AK8963_ST2);
@@ -267,7 +320,8 @@ std::optional<std::array<int16_t, 3>> Mag::ReadRaw() {
   return CopyVectorToArray<int16_t, 3>(raw_words);
 }
 
-std::array<double, 3> Mag::ReadCalibrated(const std::array<int16_t, 3>& raw) {
+std::array<double, 3>
+MagSLave::ReadCalibrated(const std::array<int16_t, 3>& raw) {
   // multiply by the sensitivity adjustment and convert to units of uT micro
   // Teslas.
   std::array<double, 3> mag;
@@ -284,7 +338,7 @@ std::array<double, 3> Mag::ReadCalibrated(const std::array<int16_t, 3>& raw) {
   return aligned;
 }
 
-MagData Mag::ReadData() {
+MagData MagSLave::ReadData() {
   MagData data;
 
   const auto mag_raw = ReadRaw();

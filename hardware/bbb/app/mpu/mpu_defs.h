@@ -257,6 +257,7 @@ constexpr uint8_t INTERNAL_CLK = 0x00;
 #define AK8963_ZOUT_H 0x08
 #define AK8963_ST2 0x09
 #define AK8963_CNTL 0x0A    // main mode control register
+#define AK8963_CNTL2 0x0B   // Control 2
 #define AK8963_ASTC 0x0C    // Self test control
 #define AK8963_I2CDIS 0x0F  // I2C disable
 #define AK8963_ASAX 0x10    // x-axis sensitivity adjustment value
