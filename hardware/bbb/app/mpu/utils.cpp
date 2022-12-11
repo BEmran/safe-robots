@@ -1,5 +1,7 @@
 #include "utils.hpp"
 
+#include <unistd.h>  // usleep
+
 #include "logger.hpp"
 
 namespace {
@@ -109,4 +111,12 @@ std::vector<uint8_t> WordsToRegisterBytes(const std::vector<int16_t> words,
     bytes[idx + 1] = reg1;
   }
   return bytes;
+}
+
+void MilliSleep(const size_t milli) {
+  MicroSleep(milli * 1000);
+}
+
+void MicroSleep(const size_t micro) {
+  usleep(micro);
 }

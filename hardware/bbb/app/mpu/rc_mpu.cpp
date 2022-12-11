@@ -4,12 +4,11 @@
 
 #include <cstdio>
 
+#include "common.hpp"
 #include "i2c.hpp"
+#include "logger.hpp"
 #include "mpu.hpp"
-
-// bus for Robotics Cape and BeagleboneBlue is 2
-// change this for your platform
-#define I2C_BUS 2
+#include "utils.hpp"
 
 // possible modes, user selected with command line arguments
 enum class GyroMode { G_MODE_RAD, G_MODE_DEG, G_MODE_RAW };
@@ -17,9 +16,6 @@ enum class AccelMode { A_MODE_MS2, A_MODE_G, A_MODE_RAW };
 
 // default values
 bool gRUNNING{true};
-bool gENABLE_MAG{true};
-bool gENABLE_THER{true};
-bool gENABLE_WARN{true};
 GyroMode gGMode = GyroMode::G_MODE_DEG;
 AccelMode gAMode = AccelMode::A_MODE_MS2;
 
@@ -29,9 +25,6 @@ void PrintHelpMessage() {
   printf("-a	print raw adc values instead of radians\n");
   printf("-r	print gyro in radians/s instead of degrees/s\n");
   printf("-g	print acceleration in G instead of m/s^2\n");
-  printf("-m	print magnetometer data as well as accel/gyro\n");
-  printf("-t	print thermometer data as well as accel/gyro\n");
-  printf("-w	print i2c warnings\n");
   printf("-h	print this help message\n");
   printf("\n");
 }
@@ -39,6 +32,7 @@ void PrintHelpMessage() {
 // interrupt handler to catch ctrl-c
 void __signal_handler(__attribute__((unused)) int dummy) {
   gRUNNING = false;
+  SYS_LOG_DEBUG("detected signal handler\n");
   return;
 }
 
@@ -56,7 +50,7 @@ bool PrintHeaderMsg() {
       printf("  Accel XYZ(raw ADC) |");
       break;
     default:
-      printf("ERROR: invalid mode\n");
+      SYS_LOG_WARN("ERROR: invalid accel mode\n");
       return false;
   }
 
@@ -71,19 +65,10 @@ bool PrintHeaderMsg() {
       printf("  Gyro XYZ (raw ADC) |");
       break;
     default:
-      printf("ERROR: invalid mode\n");
+      SYS_LOG_WARN("ERROR: invalid gyro mode\n");
       return false;
   }
-
-  if (gENABLE_MAG) {
-    printf("  Mag Field XYZ(uT)  |");
-  }
-
-  if (gENABLE_THER) {
-    printf(" Temp (C)");
-  }
-
-  printf("\n");
+  printf(" Temp (C)\n");
   return true;
 }
 
@@ -118,23 +103,15 @@ void PrintGyroValue(const MpuData data) {
   }
 }
 
-void PrintMagValue(const MpuData data) {
-  if (gENABLE_MAG) {
-    printf("%6.1f %6.1f %6.1f |", data.mag[0], data.mag[1], data.mag[2]);
-  }
-}
-
 void PrintTempValue(const MpuData data) {
-  if (gENABLE_THER) {
-    printf(" %4.1f    ", data.temp);
-  }
+  printf(" %4.1f    ", data.temp);
 }
 
 bool ParseOption(int argc, char* argv[]) {
   // parse arguments
   int c;
   opterr = 0;
-  while ((c = getopt(argc, argv, "argmtwh")) != -1) {
+  while ((c = getopt(argc, argv, "argh")) != -1) {
     switch (c) {
       case 'a':
         gGMode = GyroMode::G_MODE_RAW;
@@ -146,15 +123,6 @@ bool ParseOption(int argc, char* argv[]) {
         break;
       case 'g':
         gAMode = AccelMode::A_MODE_G;
-        break;
-      case 'm':
-        gENABLE_MAG = false;
-        break;
-      case 't':
-        gENABLE_THER = false;
-        break;
-      case 'w':
-        gENABLE_WARN = false;
         break;
       case 'h':  // __fall_through__
       default:
@@ -174,14 +142,10 @@ int main(int argc, char* argv[]) {
   }
 
   // use defaults for now, except also enable magnetometer.
-  MpuConfig conf = MpuDefaultConfig();
-  conf.i2c_bus = I2C_BUS;
-  conf.enable_magnetometer = gENABLE_MAG;
-  conf.show_warnings = gENABLE_WARN;
-
-  MPU mpu;
+  MpuConfig conf;
+  MPU mpu(MPU_BUS);
   if (not mpu.Initialize(conf)) {
-    fprintf(stderr, "rc_mpu_initialize_failed\n");
+    SYS_LOG_ERROR("Failed to initialize MPU sensor\n");
     return -1;
   }
 
@@ -197,7 +161,6 @@ int main(int argc, char* argv[]) {
     // print data
     PrintAccelValue(data);
     PrintGyroValue(data);
-    PrintMagValue(data);
     PrintTempValue(data);
     // sleep 0.1 sec
     fflush(stdout);

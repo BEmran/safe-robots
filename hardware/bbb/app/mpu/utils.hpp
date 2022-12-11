@@ -3,16 +3,24 @@
 #ifndef BBB_UTILS_HPP_
 #define BBB_UTILS_HPP_
 
+#include <algorithm>  // copy
+#include <array>
+#include <cmath>
 #include <cstdint>  // for uint8_t types etc
-#include <memory>
-#include <mutex>
 #include <optional>
 #include <vector>
 
-/**
- * @brief size of i2c buffer in bytes for writing to registers.
- */
-#define I2C_BUFFER_SIZE 128
+// constant numbers
+constexpr double PI = M_PI;
+constexpr double TWO_PI = 2 * M_PI;
+/// @brief multiply to convert degrees to radians
+constexpr double DEG_TO_RAD = 0.0174532925199;
+/// @brief multiply to convert radians to degrees
+constexpr double RAD_TO_DEG = 57.295779513;
+/// @brief multiply to convert radians to degrees
+constexpr double MS2_TO_G = 0.10197162129;
+/// @brief multiply to convert G to m/s^2, standard gravity definition
+constexpr double G_TO_MS2 = 9.80665;
 
 /**
  * @brief describes the order in which a sequence of bytes is stored in computer
@@ -36,5 +44,26 @@ std::pair<uint8_t, uint8_t> WordToRegisterBytes(const int16_t word,
 
 std::vector<uint8_t> WordsToRegisterBytes(const std::vector<int16_t> words,
                                           const EndianByteOrder order);
+
+/**
+ * @brief sleep the process for the passed time in  milliseconds
+ *
+ * @param milli duration to sleep for in milliseconds
+ */
+void MilliSleep(const size_t milli);
+
+/**
+ * @brief sleep the process for the passed time in microseconds
+ *
+ * @param micro duration to sleep for in microseconds
+ */
+void MicroSleep(const size_t micro);
+
+template <typename T, size_t SIZE>
+std::array<T, SIZE> CopyVectorToArray(const std::vector<T>& vec) {
+  std::array<int16_t, 3> arr;
+  std::copy(vec.begin(), vec.end(), arr.begin());
+  return arr;
+}
 
 #endif  // BBB_UTILS_HPP_

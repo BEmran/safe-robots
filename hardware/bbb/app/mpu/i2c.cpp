@@ -11,9 +11,7 @@
 #include <cstdlib>
 #include <memory>
 
-// preposessor macros
-#define unlikely(x) __builtin_expect(!!(x), 0)
-#define likely(x) __builtin_expect(!!(x), 1)
+#include "common.hpp"
 
 static I2C i2c[I2C_MAX_BUS + 1];
 

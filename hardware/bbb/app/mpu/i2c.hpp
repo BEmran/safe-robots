@@ -9,20 +9,6 @@
 
 #include "utils.hpp"
 
-/**
- * @brief Maximum I2C bus identifier. Default is 5 for a total of 6 busses.
- * This can be increased by the user for special cases.
- */
-#define I2C_MAX_BUS 5
-
-/**
- * @brief size of i2c buffer in bytes for writing to registers. Only
- * increase if you know what you are doing.
- */
-#define I2C_BUFFER_SIZE 128
-
-// std::unique_ptr<I2C> CreateI2C(const int bus);
-
 class I2C {
  public:
   I2C();

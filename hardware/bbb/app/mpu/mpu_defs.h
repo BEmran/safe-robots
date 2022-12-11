@@ -14,6 +14,14 @@ identical but the latter has a different register map
 #define IMU_POLL_TIMEOUT 300  // milliseconds
 
 /******************************************************************
+ * i2c address
+ ******************************************************************/
+///< default i2c address if AD0 is left low
+constexpr uint8_t MPU_DEFAULT_I2C_ADDR = 0x68;
+///< alternate i2c address if AD0 pin pulled high
+constexpr uint8_t MPU_ALT_I2C_ADDR = 0x69;
+
+/******************************************************************
  * register offsets
  ******************************************************************/
 #define SELF_TEST_X_GYRO 0x00
@@ -166,14 +174,14 @@ constexpr uint8_t ACCEL_FSR_CFG_16G = 0x03 << 3;
 /*******************************************************************
  * ACCEL_CONFIG2 register bits
  *******************************************************************/
-constexpr uint8_t ACCEL_FCHOICE_1KHZ = 0x00 << 3;
-constexpr uint8_t ACCEL_FCHOICE_4KHZ = 0x01 << 3;
+constexpr uint8_t ACCEL_FCHOICE_EN = 0x00 << 3;
+constexpr uint8_t ACCEL_FCHOICE_DISABLE = 0x01 << 3;
 
 /*******************************************************************
  * INT_PIN_CFG
  *******************************************************************/
 #define ACTL_ACTIVE_LOW 0x01 << 7
-#define ACTL_ACTIVE_HIGH 0
+#define ACTL_ACTIVE_HIGH 0x00 << 7
 #define INT_OPEN_DRAIN 0
 #define INT_PUSH_PULL 0x00 << 6
 #define LATCH_INT_EN 0x01 << 5
@@ -211,9 +219,11 @@ constexpr uint8_t ACCEL_FCHOICE_4KHZ = 0x01 << 3;
 /*******************************************************************
  * PWR_MGMT_1 register settings
  *******************************************************************/
-#define H_RESET 0x01 << 7
-#define MPU_SLEEP 0x01 << 6
-#define MPU_CYCLE 0x01 << 5
+constexpr uint8_t MPU_RESET = 0x01 << 7;
+constexpr uint8_t MPU_SLEEP = 0x01 << 6;
+constexpr uint8_t MPU_CYCLE = 0x01 << 5;
+constexpr uint8_t AUTO_CLK = 0x01;
+constexpr uint8_t INTERNAL_CLK = 0x00;
 
 /*******************************************************************
  * temperature reading constants
@@ -256,15 +266,16 @@ constexpr uint8_t ACCEL_FCHOICE_4KHZ = 0x01 << 3;
 /******************************************************************
  * Magnetometer AK8963_CNTL register Settings
  ******************************************************************/
-#define MAG_POWER_DN 0x00    // power down magnetometer
-#define MAG_SINGLE_MES 0x01  // powers down after 1 measurement
-#define MAG_CONT_MES_1 0x02  // 8hz continuous self-sampling
-#define MAG_CONT_MES_2 0x06  // 100hz continuous self-sampling
-#define MAG_EXT_TRIG 0x04    // external trigger mode
-#define MAG_SELF_TEST 0x08   // self test mode
-#define MAG_FUSE_ROM 0x0F    // ROM read only mode
-#define MSCALE_16 0x01 << 4
-#define MSCALE_14 0x00
+constexpr uint8_t MAG_POWER_DN = 0x00;    // power down magnetometer
+constexpr uint8_t MAG_SINGLE_MES = 0x01;  // powers down after 1 measurement
+constexpr uint8_t MAG_CONT_MES_1 = 0x02;  // 8hz continuous self-sampling
+constexpr uint8_t MAG_CONT_MES_2 = 0x06;  // 100hz continuous self-sampling
+constexpr uint8_t MAG_EXT_TRIG = 0x04;    // external trigger mode
+constexpr uint8_t MAG_SELF_TEST = 0x08;   // self test mode
+constexpr uint8_t MAG_FUSE_ROM = 0x0F;    // ROM read only mode
+
+constexpr uint8_t MAG_SCALE_16 = 0x01 << 4;
+constexpr uint8_t MAG_SCALE_14 = 0x00;
 
 /******************************************************************
  * Magnetometer AK8963_ST2 register definitions
@@ -299,6 +310,7 @@ constexpr uint8_t ACCEL_FCHOICE_4KHZ = 0x01 << 3;
 #define BIT_FIFO_SIZE_4096 (0xC0)
 #define BIT_RESET (0x80)
 #define BIT_SLEEP (0x40)
+#define BIT_DELAY_ES_SHADOW (0x80)
 #define BIT_S0_DELAY_EN (0x01)
 #define BIT_S2_DELAY_EN (0x04)
 #define BITS_SLAVE_LENGTH (0x0F)
@@ -306,6 +318,7 @@ constexpr uint8_t ACCEL_FCHOICE_4KHZ = 0x01 << 3;
 #define BIT_SLAVE_GROUP (0x10)
 #define BIT_SLAVE_EN (0x80)
 #define BIT_I2C_READ (0x80)
+#define BIT_I2C_400KHZ (0x0D)
 #define BITS_I2C_MASTER_DLY (0x1F)
 #define BIT_AUX_IF_EN (0x20)
 #define BIT_ACTL (0x80)
@@ -359,5 +372,20 @@ constexpr uint8_t ACCEL_FCHOICE_4KHZ = 0x01 << 3;
 #define ANDROID_ORIENT_REVERSE_LANDSCAPE (0x03)
 
 #define INV_WXYZ_QUAT (0x100)
+
+enum class MagMode : uint8_t {
+  POWER_DN = MAG_POWER_DN,
+  SINGLE_MES = MAG_SINGLE_MES,
+  CONT_MES_1 = MAG_CONT_MES_1,
+  CONT_MES_2 = MAG_CONT_MES_2,
+  EXT_TRIG = MAG_EXT_TRIG,
+  SELF_TEST = MAG_SELF_TEST,
+  FUSE_ROM = MAG_FUSE_ROM
+};
+
+enum class MagBitScale : uint8_t {
+  SCALE_14 = MAG_SCALE_14,
+  SCALE_16 = MAG_SCALE_16
+};
 
 #endif
