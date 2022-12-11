@@ -16,6 +16,7 @@ enum class AccelMode { A_MODE_MS2, A_MODE_G, A_MODE_RAW };
 
 // default values
 bool gRUNNING{true};
+bool gENABLE_MAG{true};
 GyroMode gGMode = GyroMode::G_MODE_DEG;
 AccelMode gAMode = AccelMode::A_MODE_MS2;
 
@@ -25,6 +26,7 @@ void PrintHelpMessage() {
   printf("-a	print raw adc values instead of radians\n");
   printf("-r	print gyro in radians/s instead of degrees/s\n");
   printf("-g	print acceleration in G instead of m/s^2\n");
+  printf("-m	print magnetometer data as well as accel/gyro\n");
   printf("-h	print this help message\n");
   printf("\n");
 }
@@ -68,6 +70,9 @@ bool PrintHeaderMsg() {
       SYS_LOG_WARN("ERROR: invalid gyro mode\n");
       return false;
   }
+  if (gENABLE_MAG) {
+    printf("  Mag Field XYZ(uT)  |");
+  }
   printf(" Temp (C)\n");
   return true;
 }
@@ -103,6 +108,12 @@ void PrintGyroValue(const MpuData data) {
   }
 }
 
+void PrintMagValue(const MpuData data) {
+  if (gENABLE_MAG) {
+    printf("%6.1f %6.1f %6.1f |", data.mag[0], data.mag[1], data.mag[2]);
+  }
+}
+
 void PrintTempValue(const MpuData data) {
   printf(" %4.1f    ", data.temp);
 }
@@ -111,7 +122,7 @@ bool ParseOption(int argc, char* argv[]) {
   // parse arguments
   int c;
   opterr = 0;
-  while ((c = getopt(argc, argv, "argh")) != -1) {
+  while ((c = getopt(argc, argv, "argmh")) != -1) {
     switch (c) {
       case 'a':
         gGMode = GyroMode::G_MODE_RAW;
@@ -123,6 +134,9 @@ bool ParseOption(int argc, char* argv[]) {
         break;
       case 'g':
         gAMode = AccelMode::A_MODE_G;
+        break;
+      case 'm':
+        gENABLE_MAG = false;
         break;
       case 'h':  // __fall_through__
       default:
@@ -143,6 +157,8 @@ int main(int argc, char* argv[]) {
 
   // use defaults for now, except also enable magnetometer.
   MpuConfig conf;
+  conf.enable_magnetometer = gENABLE_MAG;
+
   MPU mpu(MPU_BUS);
   if (not mpu.Initialize(conf)) {
     SYS_LOG_ERROR("Failed to initialize MPU sensor\n");
@@ -161,10 +177,11 @@ int main(int argc, char* argv[]) {
     // print data
     PrintAccelValue(data);
     PrintGyroValue(data);
+    PrintMagValue(data);
     PrintTempValue(data);
     // sleep 0.1 sec
     fflush(stdout);
-    MicroSleep(100000);
+    MilliSleep(100);
   }
 
   printf("\n");

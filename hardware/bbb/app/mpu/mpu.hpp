@@ -3,9 +3,11 @@
 
 #include <array>
 #include <cstdint>
+#include <memory>
 
 #include "i2c.hpp"
 #include "i2c_mag_slave.hpp"
+#include "mag.hpp"
 #include "mpu_defs.h"
 
 /**
@@ -79,7 +81,7 @@ struct MpuConfig {
   /// @brief which ship address to use default is 0x68 or 0x69
   uint8_t i2c_addr{MPU_DEFAULT_I2C_ADDR};
   /// @brief sampling rate (Hz). Sampling rate must be between 4Hz and 1kHz.
-  uint16_t sample_rate{1000};
+  uint16_t sample_rate{200};
   /// @brief accelerometer full scale range default ACCEL_FSR_8G
   MpuAccelFSR accel_fsr{MpuAccelFSR::ACCEL_FSR_8G};
   /// @brief gyroscope full scale range default GYRO_FSR_2000DPS
@@ -88,6 +90,9 @@ struct MpuConfig {
   MpuAccelDLPF accel_dlpf{MpuAccelDLPF::ACCEL_DLPF_184};
   /// @brief gyro internal low pass filter cutoff default GYRO_DLPF_184
   MpuGyroDLPF gyro_dlpf{MpuGyroDLPF::GYRO_DLPF_184};
+  /// @brief magnetometer use is optional, true to enable and false to disable,
+  /// default true
+  bool enable_magnetometer{true};
 };
 
 /**
@@ -99,21 +104,28 @@ struct MpuData {
   std::array<double, 3> accel{0., 0., 0.};
   /// @brief gyroscope (XYZ) in units of degrees/s
   std::array<double, 3> gyro{0., 0., 0.};
+  /// @brief magnetometer (XYZ) in units of uT
+  std::array<double, 3> mag{0., 0., 0.};
   /// @brief thermometer, in units of degrees Celsius
   double temp{0.};
   /// @brief raw gyroscope (XYZ)from 16-bit ADC
   std::array<int16_t, 3> raw_gyro{0, 0, 0};
   /// @brief raw accelerometer (XYZ) from 16-bit ADC
   std::array<int16_t, 3> raw_accel{0, 0, 0};
+  /// @brief raw magnetometer (XYZ) from 16-bit ADC
+  std::array<int16_t, 3> raw_mag{0, 0, 0};
 };
 
 class MPU {
  public:
-  MPU(const int i2c_bus) : i2c_bus_{i2c_bus} {
+  MPU(const int i2c_bus)
+    : i2c_{std::make_shared<I2C>()}
+    , mag_{std::make_shared<Mag>()}
+    , i2c_bus_{i2c_bus} {
   }
 
   ~MPU() {
-    i2c_.Close();
+    i2c_->Close();
   }
 
   /**
@@ -218,7 +230,9 @@ class MPU {
   MpuConfig config_;
   MpuData data_;
 
-  I2C i2c_;
+  std::shared_ptr<I2C> i2c_;
+  std::shared_ptr<Mag> mag_;
+
   /// @brief which bus to use, default 2 on BeagleBone Blue
   int i2c_bus_{0};
   double accel_lengths_[3]{1., 1., 1.};

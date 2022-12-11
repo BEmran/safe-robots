@@ -113,6 +113,7 @@ bool I2C::SetSlaveAddress(const uint8_t device_address) {
             device_address_, strerror(errno));
     return false;
   }
+  // printf("Switch slave address to 0x%zx\n", device_address);
 
   device_address_ = device_address;
   return true;
@@ -216,6 +217,8 @@ bool I2C::SendBytes(const std::vector<uint8_t>& data) const {
 
   const size_t size = data.size();
   const ssize_t written = write(fd_, data.data(), size);
+  // printf("fd:%d size:%d written:%d data[0]%zx\n", fd_, size, written,
+  // data[0]);
   if (written != static_cast<ssize_t>(size)) {
     fprintf(stderr, "ERROR: in SendBytes, write %d bytes, expected %zu: %s\n",
             written, size, strerror(errno));

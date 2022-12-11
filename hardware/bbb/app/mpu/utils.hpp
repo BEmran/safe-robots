@@ -61,9 +61,19 @@ void MicroSleep(const size_t micro);
 
 template <typename T, size_t SIZE>
 std::array<T, SIZE> CopyVectorToArray(const std::vector<T>& vec) {
-  std::array<int16_t, 3> arr;
-  std::copy(vec.begin(), vec.end(), arr.begin());
+  std::array<T, SIZE> arr;
+  std::copy_n(vec.begin(), SIZE, arr.begin());
   return arr;
+}
+
+template <typename T, size_t SIZE>
+std::string ArrayToString(std::string_view header,
+                          const std::array<T, SIZE>& arr) {
+  std::string msg = header.data();
+  for (size_t i = 0; i < arr.size(); i++) {
+    msg += std::to_string(arr[i]) + " ";
+  }
+  return msg;
 }
 
 #endif  // BBB_UTILS_HPP_
