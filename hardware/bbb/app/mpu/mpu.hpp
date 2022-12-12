@@ -6,9 +6,7 @@
 #include <memory>
 
 #include "i2c.hpp"
-#include "i2c_mag_slave.hpp"
 #include "mag.hpp"
-#include "mag_slave.hpp"
 #include "mpu_defs.h"
 
 /**
@@ -94,8 +92,8 @@ struct MpuConfig {
   /// @brief magnetometer use is optional, true to enable and false to disable,
   /// default true
   bool enable_magnetometer{true};
-  // select tye of magnetometer
-  MagSelect mag_select{MagSelect::NONE};
+  // magnetometer configuration
+  MagConfig mag_config;
 };
 
 /**
@@ -121,8 +119,7 @@ struct MpuData {
 
 class MPU {
  public:
-  MPU(const int i2c_bus)
-    : i2c_{std::make_shared<I2C>()}, mag_{nullptr}, i2c_bus_{i2c_bus} {
+  MPU(const int i2c_bus) : i2c_{std::make_shared<I2C>()}, i2c_bus_{i2c_bus} {
   }
 
   ~MPU() {
@@ -232,7 +229,7 @@ class MPU {
   MpuData data_;
 
   std::shared_ptr<I2C> i2c_;
-  std::shared_ptr<MagSLave> mag_;
+  Mag mag_;
 
   /// @brief which bus to use, default 2 on BeagleBone Blue
   int i2c_bus_{0};

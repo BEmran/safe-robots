@@ -9,6 +9,8 @@
 #include <cstdlib>
 
 #include "logger.hpp"
+#include "mag_direct.hpp"
+#include "mag_slave.hpp"
 #include "mpu_defs.h"
 
 namespace {
@@ -18,9 +20,21 @@ std::array<double, 3> AlignMagAxis(const std::array<double, 3>& mag) {
 }  // namespace
 
 bool Mag::Initialize(std::shared_ptr<I2C> i2c, const MagConfig& conf) {
-  i2c_ = i2c;
-  if (not i2c_->Initialized()) {
-    fprintf(stderr, "ERROR: in MAG::Initialize, I2C is not initialized\n");
+  config_ = conf;
+  switch (config_.select) {
+    case MagSelect::NONE:
+      connection_ = nullptr;
+      break;
+    case MagSelect::DIRECT:
+      connection_ = std::make_shared<MagDirect>();
+      break;
+    case MagSelect::SLAVE:
+      connection_ = std::make_shared<MagSlave>();
+      break;
+  }
+
+  if (not connection_ || not connection_->Initialize(i2c, config_)) {
+    printf("failed to create connection!!\n");
     return false;
   }
 
@@ -101,7 +115,7 @@ bool Mag::Initialize(std::shared_ptr<I2C> i2c, const MagConfig& conf) {
 
 bool Mag::Prop() const {
   // check the who am i register
-  const auto result = ReadByte(WHO_AM_I_AK8963);
+  const auto result = connection_->ReadByte(WHO_AM_I_AK8963);
   if (not result.has_value()) {
     return false;
   }
@@ -121,7 +135,7 @@ bool Mag::Prop() const {
 }
 
 bool Mag::Reset() const {
-  if (not WriteByte(AK8963_CNTL2, 0x01)) {
+  if (not connection_->WriteByte(AK8963_CNTL2, 0x01)) {
     return false;
   }
   MilliSleep(10);
@@ -166,7 +180,7 @@ bool Mag::ExtractFactoryCalibration() {
   }
 
   // Read the xyz sensitivity adjustment values
-  const std::vector<uint8_t> raw = ReadBytes(AK8963_ASAX, 3);
+  const std::vector<uint8_t> raw = connection_->ReadBytes(AK8963_ASAX, 3);
   if (raw.empty()) {
     return false;
   }
@@ -190,7 +204,7 @@ bool Mag::PowerOff() const {
 
 bool Mag::SetMode(const MagMode mode, const MagBitScale scale) const {
   const uint8_t ctrl = static_cast<uint8_t>(mode) | static_cast<uint8_t>(scale);
-  if (not WriteByte(AK8963_CNTL, ctrl)) {
+  if (not connection_->WriteByte(AK8963_CNTL, ctrl)) {
     return false;
   }
 
@@ -198,50 +212,9 @@ bool Mag::SetMode(const MagMode mode, const MagBitScale scale) const {
   return true;
 }
 
-std::vector<uint8_t> Mag::ReadBytes(const uint8_t reg,
-                                    const uint8_t count) const {
-  // magnetometer is actually a separate device with its
-  // own address inside the mpu9250
-  if (not i2c_->SetSlaveAddress(AK8963_ADDR)) {
-    return {};
-  }
-  // Read from register
-  const std::vector<uint8_t> raw = i2c_->ReadBytes(reg, count);
-  if (raw.empty()) {
-    fprintf(stderr, "ERROR: in ReadBytes, failed to read register %x\n", reg);
-    return {};
-  }
-  return raw;
-}
-
-std::optional<uint8_t> Mag::ReadByte(const uint8_t reg) const {
-  const auto result = ReadBytes(reg, 1);
-  if (result.empty()) {
-    return {};
-  }
-  return result[0];
-}
-
-bool Mag::WriteByte(const uint8_t reg, const uint8_t data) const {
-  // magnetometer is actually a separate device with its
-  // own address inside the mpu9250
-  if (not i2c_->SetSlaveAddress(AK8963_ADDR)) {
-    return false;
-  }
-  // write data to register
-  if (not i2c_->WriteByte(reg, data)) {
-    fprintf(stderr,
-            "ERROR: in WriteByte, failed to write data '0x%zx' to register "
-            "'0x%zx'\n",
-            data, reg);
-    return false;
-  }
-  return true;
-}
-
 std::optional<std::array<int16_t, 3>> Mag::ReadRaw() {
   // read the data ready bit to see if there is new data
-  const std::optional<uint8_t> st1 = ReadByte(AK8963_ST1);
+  const std::optional<uint8_t> st1 = connection_->ReadByte(AK8963_ST1);
   if (not st1.has_value()) {
     return {};
   }
@@ -250,8 +223,9 @@ std::optional<std::array<int16_t, 3>> Mag::ReadRaw() {
     return {};
   }
   // Read the six raw data regs into data array
-  const std::vector<uint8_t> raw_bytes = ReadBytes(AK8963_XOUT_L, 6);
-  const std::optional<uint8_t> st2 = ReadByte(AK8963_ST2);
+  const std::vector<uint8_t> raw_bytes =
+    connection_->ReadBytes(AK8963_XOUT_L, 6);
+  const std::optional<uint8_t> st2 = connection_->ReadByte(AK8963_ST2);
   if (raw_bytes.empty() || not st2.has_value()) {
     fprintf(stderr, "ERROR: ReadRaw failed to read data register\n");
     return {};

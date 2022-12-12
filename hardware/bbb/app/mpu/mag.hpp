@@ -5,30 +5,9 @@
 #include <cstdint>
 
 #include "i2c.hpp"
+#include "mag_connection.hpp"
+#include "mag_def.hpp"
 #include "mpu_defs.h"
-
-/**
- * @brief configuration of the mpu sensor
- *
- */
-struct MagConfig {
-  /// @brief compass sampling rate (Hz). Sampling rate must be between 1Hz and
-  /// 100Hz.
-  uint16_t sample_rate{100};
-};
-
-/**
- * @brief data struct populated with new sensor data
- *
- */
-struct MagData {
-  /// @brief magnetometer (XYZ) in units of uT
-  std::array<double, 3> calib{0., 0., 0.};
-  /// @brief raw (XYZ) from 16-bit ADC
-  std::array<int16_t, 3> raw{0, 0, 0};
-};
-
-enum class MagSelect { NONE, DIRECT, SLAVE };
 
 class Mag {
  public:
@@ -60,21 +39,26 @@ class Mag {
   bool Initialize(std::shared_ptr<I2C> i2c, const MagConfig& conf);
 
   bool Prop() const;
+
   bool Reset() const;
+
   bool ExtractFactoryCalibration();
+
   bool SetMode(const MagMode mode, const MagBitScale scale) const;
 
-  /**
-   * @brief Set compass sampling rate.
-   * @details The compass on the auxiliary I2C bus is read by the MPU hardware
-   * at a maximum of 100Hz. The actual rate can be set to a fraction of the gyro
-   * sampling rate.
-   *
-   * @param[in] rate Desired compass sampling rate (Hz).
-   * @return true if successful
-   * @return false otherwise
-   */
-  bool SetSampleRate(const uint16_t rate);
+  // /**
+  //  * @brief Set compass sampling rate.
+  //  * @details The compass on the auxiliary I2C bus is read by the MPU
+  //  hardware
+  //  * at a maximum of 100Hz. The actual rate can be set to a fraction of the
+  //  gyro
+  //  * sampling rate.
+  //  *
+  //  * @param[in] rate Desired compass sampling rate (Hz).
+  //  * @return true if successful
+  //  * @return false otherwise
+  //  */
+  // bool SetSampleRate(const uint16_t rate);
 
   /**
    * @brief Powers off the MPU
@@ -87,17 +71,20 @@ class Mag {
    */
   bool PowerOff() const;
 
-  /**
-   * int SetBypass(unsigned char bypass_on)
-   *
-   * configures the USER_CTRL and INT_PIN_CFG registers to turn on and off the
-   * i2c bypass mode for talking to the magnetometer. In random read mode this
-   * is used to turn on the bypass and left as is. In DMP mode bypass is turned
-   * off after configuration and the MPU fetches magnetometer data
-   *automatically. USER_CTRL - based on global variable dsp_en INT_PIN_CFG based
-   *on requested bypass state
-   **/
-  bool SetBypass(const bool enable);
+  // /**
+  //  * int SetBypass(unsigned char bypass_on)
+  //  *
+  //  * configures the USER_CTRL and INT_PIN_CFG registers to turn on and off
+  //  the
+  //  * i2c bypass mode for talking to the magnetometer. In random read mode
+  //  this
+  //  * is used to turn on the bypass and left as is. In DMP mode bypass is
+  //  turned
+  //  * off after configuration and the MPU fetches magnetometer data
+  //  *automatically. USER_CTRL - based on global variable dsp_en INT_PIN_CFG
+  //  based *on requested bypass state
+  //  **/
+  // bool SetBypass(const bool enable);
 
   /**
    * @brief Reads magnetometer data from the MPU
@@ -112,17 +99,13 @@ class Mag {
    *
    * @return 0 on success or -1 on failure.
    */
-  std::optional<std::array<int16_t, 3>> ReadRaw();
+  virtual std::optional<std::array<int16_t, 3>> ReadRaw();
   std::array<double, 3> ReadCalibrated(const std::array<int16_t, 3>& raw);
   MagData ReadData();
 
-  bool WriteByte(const uint8_t reg, const uint8_t data) const;
-  std::vector<uint8_t> ReadBytes(const uint8_t reg, const uint8_t count) const;
-  std::optional<uint8_t> ReadByte(const uint8_t reg) const;
-
  private:
   MagConfig config_;
-  std::shared_ptr<I2C> i2c_;
+  std::shared_ptr<MagConnection> connection_{nullptr};
   bool bypass_enabled_{false};
   std::array<double, 3> factory_adjust_{0., 0., 0.};
   std::array<double, 3> offsets_{0., 0., 0.};

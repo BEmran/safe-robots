@@ -156,9 +156,11 @@ int main(int argc, char* argv[]) {
   }
 
   // use defaults for now, except also enable magnetometer.
+  MagConfig mag_config;
+  mag_config.select = MagSelect::DIRECT;
   MpuConfig conf;
   conf.enable_magnetometer = gENABLE_MAG;
-  conf.mag_select = MagSelect::SLAVE;
+  conf.mag_config = mag_config;
   MPU mpu(MPU_BUS);
   if (not mpu.Initialize(conf)) {
     SYS_LOG_ERROR("Failed to initialize MPU sensor\n");

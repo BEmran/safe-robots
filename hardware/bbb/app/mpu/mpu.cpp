@@ -13,6 +13,8 @@
 
 #include "common.hpp"
 #include "logger.hpp"
+#include "mag_direct.hpp"
+#include "mag_slave.hpp"
 #include "mpu_defs.h"
 
 constexpr uint BIT_RESOLUTION = 1 << 15;
@@ -120,55 +122,42 @@ bool MPU::Initialize(const MpuConfig& conf) {
   }
 
   if (config_.enable_magnetometer) {
-    switch (config_.mag_select) {
-      case MagSelect::NONE:
-        mag_ = nullptr;
-        break;
-      case MagSelect::DIRECT:
-        mag_ = std::make_shared<MagSLave>();
-        break;
-      case MagSelect::SLAVE:
-        mag_ = std::make_shared<MagSLave>();
-        break;
-    }
-    if (mag_) {
-      // Enable I2C Master mode
-      i2c_->WriteByte(USER_CTRL, 0x20);
+    // Enable I2C Master mode
+    i2c_->WriteByte(USER_CTRL, 0x20);
 
-      // I2C configuration STOP after each transaction, master I2C bus at 400
-      // KHz
-      i2c_->WriteByte(I2C_MST_CTRL, 0x0D);
+    // I2C configuration STOP after each transaction, master I2C bus at 400
+    // KHz
+    i2c_->WriteByte(I2C_MST_CTRL, 0x0D);
 
-      // if (not SetBypass(i2c_, true)) {
-      //   fprintf(stderr, "ERROR in Initialize: failed to SetBypass\n");
-      //   return false;
-      //   // INT is 50 microsecond pulse and any read to clear
-      // }
+    // if (not SetBypass(i2c_, true)) {
+    //   fprintf(stderr, "ERROR in Initialize: failed to SetBypass\n");
+    //   return false;
+    //   // INT is 50 microsecond pulse and any read to clear
+    // }
 
-      // INT is 50 microsecond pulse and any read to clear
-      // i2c_->WriteByte(INT_PIN_CFG, 0x10);
+    // // INT is 50 microsecond pulse and any read to clear
+    // i2c_->WriteByte(INT_PIN_CFG, 0x10);
 
-      // // Enable data ready (bit 0) interrupt
-      // i2c_->WriteByte(INT_ENABLE, 0x01);
+    // // Enable data ready (bit 0) interrupt
+    // i2c_->WriteByte(INT_ENABLE, 0x01);
 
-      // MilliSleep(100);
-      // // Enable I2C Master mode
-      // i2c_->WriteByte(USER_CTRL, 0x20);
+    // MilliSleep(100);
+    // // Enable I2C Master mode
+    // i2c_->WriteByte(USER_CTRL, 0x20);
 
-      // // I2C configuration STOP after each transaction, master I2C bus at 400
-      // KHz i2c_->WriteByte(I2C_MST_CTRL, 0x0D);
+    // // I2C configuration STOP after each transaction, master I2C bus at 400
+    // KHz i2c_->WriteByte(I2C_MST_CTRL, 0x0D);
 
-      // // Use blocking data retreival and enable delay for mag sample rate
-      // mismatch i2c_->WriteByte(I2C_MST_DELAY_CTRL, 0x81);
+    // // Use blocking data retreival and enable delay for mag sample rate
+    // mismatch i2c_->WriteByte(I2C_MST_DELAY_CTRL, 0x81);
 
-      // // Delay mag data retrieval to once every other accel/gyro data sample
-      // i2c_->WriteByte(I2C_SLV4_CTRL, 0x01);
+    // // Delay mag data retrieval to once every other accel/gyro data sample
+    // i2c_->WriteByte(I2C_SLV4_CTRL, 0x01);
 
-      if (not mag_->Initialize(i2c_, MagConfig())) {
-        fprintf(stderr,
-                "ERROR in Initialize: failed to Initialize magnetometer\n");
-        return false;
-      }
+    if (not mag_.Initialize(i2c_, config_.mag_config)) {
+      fprintf(stderr,
+              "ERROR in Initialize: failed to Initialize magnetometer\n");
+      return false;
     }
   }
   i2c_->Lock(false);
@@ -476,8 +465,8 @@ MpuData MPU::ReadData() {
     printf("read imu thermometer failed\n");
   }
 
-  if (config_.enable_magnetometer && mag_) {
-    const auto mag_data = mag_->ReadData();
+  if (config_.enable_magnetometer) {
+    const auto mag_data = mag_.ReadData();
     data.mag = mag_data.calib;
     data.raw_mag = mag_data.raw;
   }
