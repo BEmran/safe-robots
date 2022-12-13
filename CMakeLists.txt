@@ -30,6 +30,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # generate compile_commands.json for clang
 option(WARNINGS_AS_ERRORS "Set warning as erros" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 option(BUILD_EXECTUABLES "Build executables and examples" ON)
+option(BUILD_HARDWARE_COMMON_LIBRARY "Build common hardware library" ON)
 option(BUILD_NAVIO_LIBRARY "Build navio library for Emlid Navio 2 board" OFF)
 option(BUILD_BBB_LIBRARY "Build bbb library for BeagleBone Blue board" OFF)
 option(BUILD_TESTING "Build tests" OFF)
@@ -127,11 +128,16 @@ if (yaml-cpp_FOUND)
     message(STATUS "Found yaml-cpp of version ${yaml-cpp_VERSION}")
 endif ()
 
+set(ROBOT_CONTROL_LIBRARY librobotcontrol)
+set(ROBOT_CONTROL_LIBRARY_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/librobotcontrol/library/include/)
+add_library(${ROBOT_CONTROL_LIBRARY} SHARED IMPORTED)
+set_target_properties(${ROBOT_CONTROL_LIBRARY} PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/build/rcl/library/librobotics_cape.a)
 # ##############################################################################
 # Library
 # ##############################################################################
 # define library name
 set(CORE_LIBRARY core)
+set(HARDWARE_COMMON_LIBRARY hardware_common)
 set(NAVIO_LIBRARY navio)
 set(BBB_LIBRARY bbb)
 set(DEPEN_LIBRARY dependencies)
@@ -143,17 +149,20 @@ if (CORE)
 endif ()
 message(STATUS "CORE project is set ${CORE}")
 
-
-if (BUILD_NAVIO_LIBRARY)
-    add_subdirectory(${PROJECT_SOURCE_DIR}/hardware/navio)
+if (BUILD_HARDWARE_COMMON_LIBRARY)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/hardware)
 endif ()
-message(STATUS "NAVIO project is set ${BUILD_NAVIO_LIBRARY}")
+message(STATUS "Hardware Common project is set ${BUILD_HARDWARE_COMMON_LIBRARY}")
 
+# if (BUILD_NAVIO_LIBRARY)
+#     add_subdirectory(${PROJECT_SOURCE_DIR}/hardware/navio)
+# endif ()
+# message(STATUS "NAVIO project is set ${BUILD_NAVIO_LIBRARY}")
 
-if (BUILD_BBB_LIBRARY)
-    add_subdirectory(${PROJECT_SOURCE_DIR}/hardware/bbb)
-endif ()
-message(STATUS "BBB project is set ${BUILD_BBB_LIBRARY}")
+# if (BUILD_BBB_LIBRARY)
+#     add_subdirectory(${PROJECT_SOURCE_DIR}/hardware/bbb)
+# endif ()
+# message(STATUS "BBB project is set ${BUILD_BBB_LIBRARY}")
 
 # ##############################################################################
 # Doxygen

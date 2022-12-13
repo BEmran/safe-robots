@@ -54,10 +54,10 @@ if (ENABLE_CPPCHECK)
             -I
             ${CMAKE_CURRENT_SOURCE_DIR}/core/test/include
             -I
-            ${CMAKE_CURRENT_SOURCE_DIR}/hardware/navio/include
+            ${CMAKE_CURRENT_SOURCE_DIR}/hardware/include
             ${CMAKE_CURRENT_SOURCE_DIR}/core/src
             ${CMAKE_CURRENT_SOURCE_DIR}/core/app
-            ${CMAKE_CURRENT_SOURCE_DIR}/hardware/navio/src
-            ${CMAKE_CURRENT_SOURCE_DIR}/hardware/navio/app)
+            ${CMAKE_CURRENT_SOURCE_DIR}/hardware/src
+            ${CMAKE_CURRENT_SOURCE_DIR}/hardware/app)
     endif ()
 endif ()

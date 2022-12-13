@@ -1,5 +1,6 @@
 ### Folders ###
 [Bb]uild/*
+hardware_old/*
 */CMakeCache.*
 */CMakeFiles/*
 dependencies/[Bb]uild/*
