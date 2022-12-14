@@ -16,7 +16,8 @@ class I2C : public CommunicationAbs {
    *
    * @param debug enable/disable internal debug messages
    */
-  explicit I2C(bool debug = false);
+  I2C(const uint8_t bus, const uint8_t device_address,
+      const bool debug = false);
 
   /**
    * @brief Destroy the I2C object
@@ -67,7 +68,7 @@ class I2C : public CommunicationAbs {
   }
 
  protected:
-  bool Open();
+  bool Open(const uint8_t bus);
 
   void CloseImpl();
   /**
@@ -91,7 +92,6 @@ class I2C : public CommunicationAbs {
 
  private:
   bool initialized_{false};
-  uint8_t bus_{0};
   uint8_t device_address_{0};
   int fd_{-1};
 };

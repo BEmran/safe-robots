@@ -311,9 +311,14 @@ void Mpu9250::Calibrate() {
 
 void Mpu9250::Update() {
   const auto raw = ReadRawData();
-  core::utils::ImuData imu = ApplySensorSpecs(raw);
+  ImuData imu = ApplySensorSpecs(raw);
   // imu.tait_bryan.data = EstimateRPY(imu.accel.data);
   SetData(imu);
+}
+
+ImuData Mpu9250::ReadData() const {
+  const auto raw = ReadRawData();
+  return ApplySensorSpecs(raw);
 }
 
 SensorRawData Mpu9250::ReadRawData() const {

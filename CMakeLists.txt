@@ -30,9 +30,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # generate compile_commands.json for clang
 option(WARNINGS_AS_ERRORS "Set warning as erros" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 option(BUILD_EXECTUABLES "Build executables and examples" ON)
-option(BUILD_HARDWARE_COMMON_LIBRARY "Build common hardware library" ON)
-option(BUILD_NAVIO_LIBRARY "Build navio library for Emlid Navio 2 board" OFF)
-option(BUILD_BBB_LIBRARY "Build bbb library for BeagleBone Blue board" OFF)
+option(BUILD_HARDWARE_COMMON "Build common hardware library" ON)
+option(BUILD_NAVIO "Build navio library for Emlid Navio 2 board" OFF)
+option(BUILD_BBB "Build bbb library for BeagleBone Blue board" OFF)
 option(BUILD_TESTING "Build tests" OFF)
 option(ENABLE_CPPCHECK "Enable static analysis with Cppcheck." OFF)
 option(ENABLE_CLANG_TIDY "Enable static analysis with Clang-Tidy." OFF)
@@ -149,20 +149,10 @@ if (CORE)
 endif ()
 message(STATUS "CORE project is set ${CORE}")
 
-if (BUILD_HARDWARE_COMMON_LIBRARY)
+if (BUILD_HARDWARE_COMMON OR BUILD_NAVIO OR BUILD_BBB)
     add_subdirectory(${PROJECT_SOURCE_DIR}/hardware)
 endif ()
-message(STATUS "Hardware Common project is set ${BUILD_HARDWARE_COMMON_LIBRARY}")
-
-# if (BUILD_NAVIO_LIBRARY)
-#     add_subdirectory(${PROJECT_SOURCE_DIR}/hardware/navio)
-# endif ()
-# message(STATUS "NAVIO project is set ${BUILD_NAVIO_LIBRARY}")
-
-# if (BUILD_BBB_LIBRARY)
-#     add_subdirectory(${PROJECT_SOURCE_DIR}/hardware/bbb)
-# endif ()
-# message(STATUS "BBB project is set ${BUILD_BBB_LIBRARY}")
+message(STATUS "Hardware Common project is set ${BUILD_HARDWARE_COMMON}")
 
 # ##############################################################################
 # Doxygen

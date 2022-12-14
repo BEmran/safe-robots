@@ -13,35 +13,33 @@
 
 namespace hardware::common::comm {
 
-I2C::I2C(const bool debug) : CommunicationAbs(debug) {
+I2C::I2C(const uint8_t bus, const uint8_t device_address, const bool debug)
+  : CommunicationAbs(debug) {
+  Initialize(bus, device_address);
 }
 
 I2C::~I2C() {
   CloseImpl();
 }
 
-bool I2C::Initialize(const uint8_t bus_num, const uint8_t device_address) {
-  bus_ = bus_num;
-
+bool I2C::Initialize(const uint8_t bus, const uint8_t device_address) {
   // if already initialized just set the device address
   if (IsInitialized()) {
     return SetSlaveAddress(device_address);
   }
   initialized_ = false;
 
-  if (not Open()) {
+  if (not Open(bus)) {
     return false;
   }
   initialized_ = true;
-
-  // set device address
   return SetSlaveAddress(device_address);
 }
 
-bool I2C::Open() {
+bool I2C::Open(const uint8_t bus) {
   constexpr int size = 16;
   char filename[size];
-  int len = snprintf(filename, sizeof(filename), "/dev/i2c-%d", bus_);
+  int len = snprintf(filename, sizeof(filename), "/dev/i2c-%d", bus);
   if (len >= size) {
     fprintf(stderr, "%s: path truncated\n", filename);
     return false;
@@ -72,7 +70,8 @@ bool I2C::SetSlaveAddress(const uint8_t device_address) {
   // if not, change it with ioctl
   if (ioctl(fd_, I2C_SLAVE, device_address) < 0) {
     fprintf(stderr,
-            "Error in SetSlaveAddress: failed to set address to 0x%02x: %s\n",
+            "Error in SetSlaveAddress: failed to set address to 0x%02x: "
+            "%s\n",
             device_address_, std::strerror(errno));
     return false;
   }
@@ -92,7 +91,6 @@ void I2C::CloseImpl() {
     printf("Warning: I2C already closed\n");
   }
   device_address_ = 0;
-  bus_ = 0;
   initialized_ = false;
   fd_ = -1;
 }
@@ -149,4 +147,4 @@ std::vector<uint8_t> I2C::GetResponse(const size_t count) const {
   }
   return buf;
 }
-}  // namespace hardware
+}  // namespace hardware::common::comm

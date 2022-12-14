@@ -3,13 +3,11 @@
 #ifndef NAVIO_HARDWARE_UTILS_HPP_
 #define NAVIO_HARDWARE_UTILS_HPP_
 
-#include <unistd.h>
-
+#include <cstdint>
 #include <string_view>
 
-namespace hardware::navio::utils {
+namespace hardware::navio {
 
-constexpr std::string_view MPU_SPI_PATH{"/dev/spidev0.1"};
 constexpr std::string_view LSM_MAG_PATH{"/dev/spidev0.2"};
 constexpr std::string_view LSM_A_G_PATH{"/dev/spidev0.3"};
 
@@ -20,5 +18,5 @@ bool CheckApm();
 
 int GetNavioVersion();
 
-}  // namespace hardware::navio::utils
+}  // namespace hardware::navio
 #endif  // NAVIO_HARDWARE_UTILS_HPP_

@@ -13,7 +13,7 @@
 
 namespace hardware::common::comm {
 
-class SPI : CommunicationAbs {
+class SPI : public CommunicationAbs {
  public:
   explicit SPI(std::string_view path, const bool debug = false);
   ~SPI();

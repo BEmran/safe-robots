@@ -9,7 +9,8 @@
 
 #include "common/utils.hpp"
 
-namespace hardware::navio::utils {
+namespace hardware::navio {
+
 constexpr const char* SCRIPT_PATH = "../../../check_apm.sh";
 
 bool CheckApm() {
@@ -25,9 +26,9 @@ bool CheckApm() {
 
 int GetNavioVersion() {
   int version;
-  hardware::utils::ReadFile("/sys/firmware/devicetree/base/hat/product_id",
-                            "%x", &version);
+  hardware::common::ReadFile("/sys/firmware/devicetree/base/hat/product_id",
+                             "%x", &version);
   return version;
 }
 
-}  // namespace hardware::navio::utils
+}  // namespace hardware::navio

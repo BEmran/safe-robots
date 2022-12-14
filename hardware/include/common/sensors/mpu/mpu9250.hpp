@@ -3,16 +3,14 @@
 #ifndef HARDWARE_COMMON_SENSORS_MPU_MPU9250_HPP_
 #define HARDWARE_COMMON_SENSORS_MPU_MPU9250_HPP_
 
-#include <unistd.h>
-
 #include <array>
 #include <cstdint>
-#include <map>
 #include <memory>
 #include <utility>
 #include <vector>
 
 #include "common/comm/communication_abs.hpp"
+#include "common/sensors/mpu/def.hpp"
 #include "common/sensors/mpu/mpu9250_register_map.hpp"
 #include "common/sensors/utils.hpp"
 #include "core/sensors/module_sensor.hpp"
@@ -20,25 +18,7 @@
 #include "core/utils/node.hpp"
 
 namespace hardware::common::sensors::mpu {
-// namespace cu = hardware::common::sensors;
-
-struct SensorRawData {
-  Vec3 accel = Vec3::Zero();
-  Vec3 gyro = Vec3::Zero();
-  Vec3 mag = Vec3::Zero();
-  MATH_TYPE temp = 0;
-  bool mag_over_flow = false;
-};
-
-struct Config {
-  AccelScale accel_scale = AccelScale::FS_16G;
-  AccelBandWidthHz accel_bw = AccelBandWidthHz::BW_44HZ;
-  GyroScale gyro_scale = GyroScale::FS_2000DPS;
-  GyroBandWidthHz gyro_bw = GyroBandWidthHz::BW_184HZ;
-  MagScale mag_scale = MagScale::FS_16BITS;
-  MagMode mag_mode = MagMode::CONTINUES_100HZ;
-  uint8_t sample_rate_divisor = 4;
-};
+using ImuData = core::utils::ImuData;
 
 class Mpu9250 : public ImuSensorModule {
   using AccelData = core::utils::AccelData;
@@ -69,6 +49,8 @@ class Mpu9250 : public ImuSensorModule {
   bool Test() override;
 
   void Update() override;
+
+  ImuData ReadData() const;
 
   void Calibrate() override;
 

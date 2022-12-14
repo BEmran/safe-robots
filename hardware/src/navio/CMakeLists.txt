@@ -1,69 +1,54 @@
 # ##############################################################################
-# Create header file list for HARDWARE_COMMON library
+# Create header file list for NAVIO library
 # ##############################################################################
-set(COMMON_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/hardware/include/common)
-set(COMMON_HEADER_LIST
-    ${COMMON_INCLUDE_DIR}/comm/communication_abs.hpp
-    ${COMMON_INCLUDE_DIR}/comm/i2c.hpp
-    ${COMMON_INCLUDE_DIR}/comm/spi.hpp
-    # ${COMMON_INCLUDE_DIR}/sensors/lsm/lsm9ds1_register_map.hpp
-    # ${COMMON_INCLUDE_DIR}/sensors/lsm/lsm9ds1.hpp
-    ${COMMON_INCLUDE_DIR}/sensors/mpu/mpu9250_register_map.hpp
-    ${COMMON_INCLUDE_DIR}/sensors/mpu/mpu9250.hpp
-    ${COMMON_INCLUDE_DIR}/sensors/calibrate.hpp
-    ${COMMON_INCLUDE_DIR}/sensors/utils.hpp
-    ${COMMON_INCLUDE_DIR}/literals.hpp
-    ${COMMON_INCLUDE_DIR}/utils.hpp)
+set(NAVIO_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/hardware/include/navio)
+set(NAVIO_HEADER_LIST
+    ${NAVIO_INCLUDE_DIR}/sensors/mpu/navio_mpu9250.hpp
+    ${NAVIO_INCLUDE_DIR}/utils.hpp)
 
 # ##############################################################################
 # Create source file list for NAVIO library
 # ##############################################################################
-set(COMMON_SOURCE_DIR ${PROJECT_SOURCE_DIR}/hardware/src/common)
-set(COMMON_SOURCE_LIST
-    ${COMMON_SOURCE_DIR}/comm/i2c.cpp
-    ${COMMON_SOURCE_DIR}/comm/spi.cpp
-    # ${COMMON_SOURCE_DIR}/sensors/lsm/lsm9ds1_register_map.hpp
-    # ${COMMON_SOURCE_DIR}/sensors/lsm/lsm9ds1.hpp
-    ${COMMON_SOURCE_DIR}/sensors/mpu/mpu9250.cpp
-    ${COMMON_SOURCE_DIR}/sensors/calibrate.cpp
-    ${COMMON_SOURCE_DIR}/sensors/utils.cpp
-    ${COMMON_SOURCE_DIR}/utils.cpp)
+set(NAVIO_SOURCE_DIR ${PROJECT_SOURCE_DIR}/hardware/src/navio)
+set(NAVIO_SOURCE_LIST
+    ${NAVIO_SOURCE_DIR}/sensors/mpu/navio_mpu9250.cpp
+    ${NAVIO_SOURCE_DIR}/utils.cpp)
 
 # ##############################################################################
 # Build NAVIO library
 # ##############################################################################
 # Declare a C++ library Make an automatic library - will be static or dynamic
 # based on user setting
-add_library(${HARDWARE_COMMON_LIBRARY} ${COMMON_SOURCE_LIST}) # ${COMMON_HEADER_LIST}
+add_library(${NAVIO_LIBRARY} ${NAVIO_SOURCE_LIST}) # ${NAVIO_HEADER_LIST}
 
 # Global includes
 target_include_directories(
-    ${HARDWARE_COMMON_LIBRARY}
+    ${NAVIO_LIBRARY}
     PUBLIC # $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/core/include>
            $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/hardware/include>
            # $<INSTALL_INTERFACE:${ABSOLUTE_INSTALL_INCLUDEDIR}>
 )
 
 # Link required library
-target_link_libraries(${HARDWARE_COMMON_LIBRARY} PRIVATE ${CORE_LIBRARY})
+target_link_libraries(${NAVIO_LIBRARY} PRIVATE ${CORE_LIBRARY} ${HARDWARE_COMMON_LIBRARY})
 
 # All users of this library will need at least C++17
-target_compile_features(${HARDWARE_COMMON_LIBRARY} PUBLIC cxx_std_17)
+target_compile_features(${NAVIO_LIBRARY} PUBLIC cxx_std_17)
 
-target_compile_options(${HARDWARE_COMMON_LIBRARY} PRIVATE ${PROJECT_WARNINGS})
+target_compile_options(${NAVIO_LIBRARY} PRIVATE ${PROJECT_WARNINGS})
 
 # IDEs should put the headers in a nice place
 source_group(
     TREE "${PROJECT_SOURCE_DIR}/hardware/include"
     PREFIX "Header Files"
-    FILES ${COMMON_HEADER_LIST})
+    FILES ${NAVIO_HEADER_LIST})
 
 # ##############################################################################
 # Install
 # ##############################################################################
 
 install(
-    TARGETS ${HARDWARE_COMMON_LIBRARY}
+    TARGETS ${NAVIO_LIBRARY}
     # IMPORTANT: Add the navio_library to the "export-set"
     EXPORT ${TARGETS_EXPORT_NAME}
     LIBRARY DESTINATION ${ABSOLUTE_INSTALL_LIBDIR} COMPONENT shlib
@@ -76,7 +61,7 @@ install(
 )
 
 install(
-    DIRECTORY ${COMMON_INCLUDE_DIR}/
+    DIRECTORY ${NAVIO_INCLUDE_DIR}/
     DESTINATION ${ABSOLUTE_INSTALL_INCLUDEDIR}
     COMPONENT PATTERN
-    "${COMMON_HEADER_LIST}")
+    "${NAVIO_HEADER_LIST}")

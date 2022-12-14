@@ -14,6 +14,7 @@
 #include <cstdio>   // printf
 #include <cstring>  // memset
 #include <iostream>
+#include <memory>
 
 namespace hardware::common::comm {
 namespace {

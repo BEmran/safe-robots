@@ -1,17 +1,21 @@
-# mpu executables
-add_executable(imu_app imu_app.cpp)
-target_include_directories(imu_app
-                           PRIVATE ${CMAKE_SOURCE_DIR}/hardware/navio/include)
-target_link_libraries(imu_app PRIVATE ${CORE_LIBRARY} ${NAVIO_LIBRARY} pthread)
+# ##############################################################################
+# Executables
+# ##############################################################################
+if (BUILD_EXECTUABLES)
 
-# mpu server executables
-add_executable(imu_server imu_server.cpp)
-target_include_directories(imu_server
-                           PRIVATE ${CMAKE_SOURCE_DIR}/hardware/navio/include)
-target_link_libraries(imu_server PRIVATE ${CORE_LIBRARY} ${NAVIO_LIBRARY}
-                                         pthread)
+    # if (BUILD_HARDWARE_COMMON)
+    #     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/app/common)
+    # endif ()
+    # message(STATUS "Build Common Hardware executables ${BUILD_HARDWARE_COMMON}")
 
-install(
-    TARGETS imu_app imu_server
-    EXPORT ${TARGETS_EXPORT_NAME}
-    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT bin)
+    # if (BUILD_NAVIO)
+    #     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/navio)
+    # endif ()
+    # message(STATUS "Build NAVIO executables ${BUILD_NAVIO}")
+
+    if (BUILD_BBB)
+        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/bbb)
+    endif ()
+    message(STATUS "Build BBB executables ${BUILD_BBB}")
+
+endif ()

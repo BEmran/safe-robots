@@ -26,6 +26,15 @@ using core::utils::Vec3;
 using ImuSensorModule = core::sensors::SensorModuleAbs<ImuData>;
 using core::utils::CreateScalar;
 
+/// @brief multiply to convert degrees to radians
+// constexpr double DEG_TO_RAD = 0.0174532925199;
+/// @brief multiply to convert radians to degrees
+constexpr double RAD_TO_DEG = 57.295779513;
+/// @brief multiply to convert radians to degrees
+constexpr double MS2_TO_G = 0.10197162129;
+/// @brief multiply to convert G to m/s^2, standard gravity definition
+constexpr double G_TO_MS2 = 9.80665;
+
 struct SpecInfo {
   float value;
   std::string name;

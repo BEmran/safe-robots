@@ -1,0 +1,10 @@
+# mpu executables
+add_executable(bbb_imu_app bbb_imu_app.cpp)
+target_include_directories(bbb_imu_app
+                           PRIVATE ${CMAKE_SOURCE_DIR}/hardware/include)
+target_link_libraries(bbb_imu_app PRIVATE ${CORE_LIBRARY} ${HARDWARE_COMMON_LIBRARY} ${BBB_LIBRARY} pthread)
+
+install(
+    TARGETS bbb_imu_app
+    EXPORT ${TARGETS_EXPORT_NAME}
+    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT bin)
