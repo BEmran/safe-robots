@@ -127,6 +127,9 @@ constexpr uint8_t ZA_OFFSET_H = 0x7D;
 constexpr uint8_t ZA_OFFSET_L = 0x7E;
 constexpr uint8_t I2C_SLV0_EN = 0x80;
 constexpr uint8_t I2C_READ_FLAG = 0x80;
+constexpr uint8_t RESET = 0x80;
+constexpr uint8_t AUTO_CLK_SRC = 0x01;
+constexpr uint8_t DISABLE_FIFO = 0x00;
 }  // namespace mpu9250
 
 // Magnetometer register map
@@ -143,13 +146,14 @@ constexpr uint8_t YOUT_H = 0x06;
 constexpr uint8_t ZOUT_L = 0x07;
 constexpr uint8_t ZOUT_H = 0x08;
 constexpr uint8_t ST2 = 0x09;
-constexpr uint8_t CNTL = 0x0A;
+constexpr uint8_t CNTL1 = 0x0A;
 constexpr uint8_t CNTL2 = 0x0B;
 constexpr uint8_t ASTC = 0x0C;
 constexpr uint8_t I2CDIS = 0x0F;
 constexpr uint8_t ASAX = 0x10;
 constexpr uint8_t ASAY = 0x11;
 constexpr uint8_t ASAZ = 0x12;
+constexpr uint8_t RESET = 0x01;
 }  // namespace ak8963
 }  // namespace hardware::common::sensors::mpu
 #endif  // HARDWARE_COMMON_SENSORS_MPU_MPU9250_REGISTER_MAP_HPP_

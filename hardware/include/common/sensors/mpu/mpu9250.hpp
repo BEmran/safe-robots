@@ -50,8 +50,6 @@ class Mpu9250 : public ImuSensorModule {
 
   void Update() override;
 
-  ImuData ReadData() const;
-
   void Calibrate() override;
 
   SensorRawData ReadRawData() const;
@@ -80,28 +78,30 @@ class Mpu9250 : public ImuSensorModule {
    * @brief reset sensor registers
    *
    */
-  void Reset() const;
+  bool Reset() const;
+  bool ResetMpu() const;
+  bool RestAk8963() const;
 
   /**
    * @brief Initialize accelerometer full-scale range and sample rate
    * configuration
    *
    */
-  void InitializeAccel() const;
+  bool InitializeAccel() const;
 
   /**
    * @brief Initialize Gyro and Thermometer bandwidths and gyroscope full scale
    * configuration range
    *
    */
-  void InitializeGyro() const;
+  bool InitializeGyro() const;
 
   /**
    * @brief Initialize the magnetometer for continuous mode data acquisition and
    * sample rates configuration
    *
    */
-  void InitializeMag() const;
+  bool InitializeMag() const;
 
   /**
    * @brief Apply sensor specs on the passed raw data
@@ -114,8 +114,7 @@ class Mpu9250 : public ImuSensorModule {
   static std::vector<int16_t> ExtractFullBits(const std::vector<uint8_t>& data);
   static SensorRawData FullBitsToRawData(const std::vector<int16_t>& full_bits);
 
-  ImuData ReadAccelGyroTemp() const;
-  MagData ReadMagnetometer() const;
+  bool EnableAutoRequest() const;
 
   AccelData ExtractAccelerometer(const SensorFullBits& full_bits) const;
   GyroData ExtractGyroscope(const SensorFullBits& full_bits) const;
@@ -123,12 +122,20 @@ class Mpu9250 : public ImuSensorModule {
                               bool over_flow) const;
   static Vec3 EstimateRPY(const ImuData& imu);
 
-  AccelBandWidthHz ReadAccelBandWidth() const;
-  AccelScale ReadAccelScale() const;
-  GyroBandWidthHz ReadGyroBandWidth() const;
-  GyroScale ReadGyroScale() const;
-  MagMode ReadMagMode() const;
-  MagScale ReadMagScale() const;
+  bool SetAccelBW() const;
+  bool SetAccelScale() const;
+  bool SetGyroBW() const;
+  bool SetGyroScale() const;
+  bool SetMagMode(const std::optional<MagMode> mag_mode) const;
+  bool SetMagScale() const;
+  uint8_t SetSampleRateDevisor() const;
+
+  std::optional<AccelBW> ReadAccelBW() const;
+  std::optional<AccelScale> ReadAccelScale() const;
+  std::optional<GyroBW> ReadGyroBW() const;
+  std::optional<GyroScale> ReadGyroScale() const;
+  std::optional<MagMode> ReadMagMode() const;
+  std::optional<MagScale> ReadMagScale() const;
   uint8_t ReadSampleRateDevisor() const;
   std::pair<bool, Config> ValidateConfiguration() const;
 
@@ -141,11 +148,12 @@ class Mpu9250 : public ImuSensorModule {
   uint8_t ReadRegister(uint8_t reg) const;
   std::vector<uint8_t> ReadRegisters(uint8_t reg, uint8_t count) const;
   uint8_t ReadAK8963Register(uint8_t reg) const;
-  void RequestReadAK8963Registers(uint8_t reg, uint8_t count) const;
+  bool RequestReadAK8963Registers(uint8_t reg, uint8_t count) const;
   std::vector<uint8_t> ReadAK8963Registers(uint8_t reg, uint8_t count) const;
-  void SetRegisterByte(uint8_t reg, uint8_t byte, uint8_t mask) const;
-  void WriteRegister(uint8_t reg, uint8_t data) const;
-  void WriteAK8963Register(uint8_t reg, uint8_t data) const;
+  bool SetRegisterByte(uint8_t reg, uint8_t byte, uint8_t mask) const;
+  bool SetAK8963RegisterByte(uint8_t reg, uint8_t byte, uint8_t mask) const;
+  bool WriteRegister(uint8_t reg, uint8_t data) const;
+  bool WriteAK8963Register(uint8_t reg, uint8_t data) const;
 
  private:
   Config config_;

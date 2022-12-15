@@ -28,6 +28,8 @@ Vec3 Vec3From16BitsVector(std::vector<int16_t>::const_iterator begin) {
 
 uint8_t SetFlags(uint8_t byte, uint8_t mask, uint8_t flag) {
   const auto updated = (byte & mask) | flag;
+  printf("current 0x%x, mask 0x%x, flag 0x%x, result 0x%x\n", byte, mask, flag,
+         static_cast<uint8_t>(updated));
   return static_cast<uint8_t>(updated);
 }
 

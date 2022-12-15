@@ -8,6 +8,7 @@
 #include <array>
 #include <cstdint>
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -35,25 +36,68 @@ constexpr double MS2_TO_G = 0.10197162129;
 /// @brief multiply to convert G to m/s^2, standard gravity definition
 constexpr double G_TO_MS2 = 9.80665;
 
-struct SpecInfo {
-  float value;
+struct SimpleSpecInfo {
   std::string name;
-  SpecInfo() : SpecInfo(0.F, "") {
+  SimpleSpecInfo() : name("") {
   }
-  SpecInfo(float value_, const std::string& name_)
-    : value(value_), name(name_) {
+  SimpleSpecInfo(std::string_view name_) : name(name_) {
+  }
+  std::string Name() const {
+    return name;
   }
 };
 
-template <typename T, typename N>
-inline T Find(const std::map<T, N>& map, uint8_t byte) {
-  const auto key = static_cast<T>(byte);
-  auto it = map.find(key);
-  if (it == map.end()) {
-    throw std::runtime_error("undefined specification");
+struct SpecInfo {
+  float value;
+  std::string name;
+  SpecInfo() : value{0.F}, name("") {
   }
-  return it->first;
-}
+  SpecInfo(const float value_, std::string_view name_)
+    : value(value_), name(name_) {
+  }
+  std::string Name() const {
+    return name;
+  }
+};
+
+template <typename Key, typename T>
+struct ConfigMap {
+  using PairType = std::pair<const Key, T>;
+  using UnderlingType = std::underlying_type_t<Key>;
+  std::map<Key, T> map;
+
+  ConfigMap(std::initializer_list<PairType> l) : map{l} {
+  }
+
+  std::optional<Key> FindKey(const UnderlingType key_value) const {
+    const auto it =
+      std::find_if(map.cbegin(), map.cend(), [key_value](const PairType p) {
+        return key_value == static_cast<UnderlingType>(p.first);
+      });
+    if (it == map.end()) {
+      std::cout << "failed to find key" << std::endl;
+      return {};
+    }
+    return it->first;
+  }
+
+  T& operator[](const Key& key) {
+    return map[key];
+  }
+
+  std::string Name(const std::optional<Key>& key) {
+    if (not key.has_value()) {
+      return "Undefined";
+    }
+    return map[key.value()].Name();
+  }
+};
+
+template <typename Key>
+using SpecInfoMap = ConfigMap<Key, SpecInfo>;
+
+template <typename Key>
+using SimpleSpecInfoMap = ConfigMap<Key, SimpleSpecInfo>;
 
 /**
  * @brief Hold sensor measurement specifications used to convert sensor raw
