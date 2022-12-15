@@ -1,6 +1,6 @@
 %% Default input
-DefaultAddress = '10.0.0.33';
-DefaultPort = 4000;
+DefaultAddress = '10.0.0.101';
+DefaultPort = 1234;
 MaxSize = 1000;
 RunInfity = true;
 
@@ -72,13 +72,13 @@ while (true)
         imu_string = splitted(i);
         imu_data = str2num(imu_string);
         % extract
-        if length(imu_data) == 11
+        if length(imu_data) == 10
             counter = counter + 1;
             t(counter) = imu_data(1)/1000;
             accel(counter, :) = imu_data(2:4) / acc_sen;
             gyro(counter, :) = imu_data(5:7) / gyro_sen;
             mag(counter, :) = imu_data(8:10) / mag_sen;
-            of(counter) = imu_data(11);
+%            of(counter) = imu_data(11);
         end
     end
 
