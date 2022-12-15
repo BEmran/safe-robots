@@ -12,7 +12,7 @@
 
 using ImuData = core::utils::ImuData;
 
-constexpr double RAD_TO_DEG = 1 / core::utils::DEG_TO_RAD;
+constexpr float RAD_TO_DEG = 1. / core::utils::DEG_TO_RAD;
 using hardware::common::sensors::MS2_TO_G;
 // constexpr double MS2_TO_G_ = 1.0 / GRAVITY;
 // possible modes, user selected with command line arguments
@@ -109,10 +109,10 @@ void PrintGyroValue(const ImuData data) {
   const double conv = static_cast<double>(RAD_TO_DEG);
   switch (gGMode) {
     case GyroMode::RAD:
-      printf("%6.1f %6.1f %6.1f |", x * conv, y * conv, z * conv);
+      printf("%6.1f %6.1f %6.1f |", x, y, z);
       break;
     case GyroMode::DEG:
-      printf("%6.1f %6.1f %6.1f |", x, y, z);
+      printf("%6.1f %6.1f %6.1f |", x * conv, y * conv, z * conv);
       break;
       // case GyroMode::RAW:
       // printf("%6d %6d %6d |", data.raw_gyro.data[0], data.raw_gyro.data[1],

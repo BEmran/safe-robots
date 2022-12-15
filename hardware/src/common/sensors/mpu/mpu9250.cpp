@@ -6,15 +6,10 @@
 #include "common/utils.hpp"
 
 namespace hardware::common::sensors::mpu {
-// namespace cu = common::utils;
 
 namespace {
 using SensorModuleType = core::sensors::SensorModuleType;
 constexpr auto ImuType = SensorModuleType::IMU;
-// constexpr auto GyroType = SensorModuleType::GYROSCOPE;
-// constexpr auto MagType = SensorModuleType::MAGNETOMETER;
-// constexpr auto AccelType = SensorModuleType::ACCELEROMETER;
-// constexpr auto TempType = SensorModuleType::TEMPERATURE;
 constexpr auto ShortDelay = 10;
 constexpr auto LongDelay = 100;
 
@@ -28,23 +23,6 @@ SensorSpecs<3> CreateSensorSpecs(const MATH_TYPE scale, const MATH_TYPE unit) {
   const auto sen = kMaxBitVal / scale;
   return SensorSpecs<3>(sen, unit);
 }
-
-// template <typename Key>
-// std::string ConfigMapName(SimpleSpecInfoMap<Key> map, std::optional<Key> key)
-// {
-//   if (not key.has_value()) {
-//     return "Undefined";
-//   }
-//   return map.Name(key.value());
-// }
-
-// template <typename Key>
-// std::string ConfigMapName(SpecInfoMap<Key> map, std::optional<Key> key) {
-//   if (not key.has_value()) {
-//     return "Undefined";
-//   }
-//   return map.Name(key.value());
-// }
 
 template <typename Config>
 Config ConfigValueOr(std::string_view config_name,
@@ -63,14 +41,14 @@ Config ConfigValueOr(std::string_view config_name,
 std::string ConfigToString(const Config& cfg) {
   std::stringstream ss;
   ss << "\tAccelerometer:"
-     << " Bandwidth " << AccelBWMap().Name(cfg.accel_bw)
-     << ", Full Scale: " << AccelScaleMap().Name(cfg.accel_scale)
+     << " Bandwidth " << AccelBWConfigMap.Name(cfg.accel_bw)
+     << ", Full Scale: " << AccelScaleConfigMap.Name(cfg.accel_scale)
      << "\n\tGyroscope:"
-     << " Bandwidth " << GyroBWMap().Name(cfg.gyro_bw)
-     << ", Full Scale: " << GyroScaleMap().Name(cfg.gyro_scale)
+     << " Bandwidth " << GyroBWConfigMap.Name(cfg.gyro_bw)
+     << ", Full Scale: " << GyroScaleConfigMap.Name(cfg.gyro_scale)
      << "\n\tMagnetometer:"
-     << " Mode " << MagModeMap().Name(cfg.mag_mode)
-     << ", Full Scale: " << MagScaleMap().Name(cfg.mag_scale)
+     << " Mode " << MagModeConfigMap.Name(cfg.mag_mode)
+     << ", Full Scale: " << MagScaleConfigMap.Name(cfg.mag_scale)
      << "\n\tSample rate devisor: "
      << static_cast<int>(cfg.sample_rate_divisor);
   return ss.str();
@@ -85,12 +63,11 @@ Mpu9250::Mpu9250(const Config& config,
   , config_(config)
   , comm_{std::move(comm)}
   , node_{std::move(node)}
-  , mag_spec_{CreateSensorSpecs(MagScaleMap()[config.mag_scale.value()].value,
-                                1.0F)}
-  , gyro_spec_{CreateSensorSpecs(
-      GyroScaleMap()[config.gyro_scale.value()].value, DEG_TO_RAD)}
-  , accel_spec_{CreateSensorSpecs(
-      AccelScaleMap()[config.accel_scale.value()].value, GRAVITY)}
+  , mag_spec_{CreateSensorSpecs(MagScaleMap.at(config.mag_scale.value()), 1.0F)}
+  , gyro_spec_{CreateSensorSpecs(GyroScaleMap.at(config.gyro_scale.value()),
+                                 DEG_TO_RAD)}
+  , accel_spec_{CreateSensorSpecs(AccelScaleMap.at(config.accel_scale.value()),
+                                  GRAVITY)}
   , temp_spec_{SensorSpecs<1>(TempSensitivity, 1.0F)} {
   temp_spec_.SetCalibration(CreateScalar(1), CreateScalar(kTempBias),
                             CreateScalar(kTempOffset));
@@ -299,7 +276,7 @@ std::optional<AccelScale> Mpu9250::ReadAccelScale() const {
   constexpr uint8_t mask = 0x18;  // mask bits [4:3]
   const uint8_t fs = static_cast<uint8_t>(data & mask);
   printf("AccelScale 0x%x\n", fs);
-  return AccelScaleMap().FindKey(fs);
+  return AccelScaleConfigMap.FindKey(fs);
 }
 
 std::optional<AccelBW> Mpu9250::ReadAccelBW() const {
@@ -312,7 +289,7 @@ std::optional<AccelBW> Mpu9250::ReadAccelBW() const {
   if (f_inv != 0) {
     node_->GetNodeLogger()->Error("Accelerometer fChoice is disabled");
   }
-  return AccelBWMap().FindKey(bw);
+  return AccelBWConfigMap.FindKey(bw);
 }
 
 std::optional<GyroBW> Mpu9250::ReadGyroBW() const {
@@ -320,7 +297,7 @@ std::optional<GyroBW> Mpu9250::ReadGyroBW() const {
   constexpr uint8_t mask_bw = 0x07;  // mask bits [2:0]
   const uint8_t bw = static_cast<uint8_t>(data & mask_bw);
   printf("GyroBW 0x%x\n", bw);
-  return GyroBWMap().FindKey(bw);
+  return GyroBWConfigMap.FindKey(bw);
 }
 
 std::optional<GyroScale> Mpu9250::ReadGyroScale() const {
@@ -333,7 +310,7 @@ std::optional<GyroScale> Mpu9250::ReadGyroScale() const {
     node_->GetNodeLogger()->Error("Gyroscope fChoice is disabled");
   }
   printf("GyroScale 0x%x\n", fs);
-  return GyroScaleMap().FindKey(fs);
+  return GyroScaleConfigMap.FindKey(fs);
 }
 
 std::optional<MagMode> Mpu9250::ReadMagMode() const {
@@ -341,7 +318,7 @@ std::optional<MagMode> Mpu9250::ReadMagMode() const {
   constexpr uint8_t mask = 0x0F;  // mask bits[3:0]
   const uint8_t mode = static_cast<uint8_t>(data & mask);
   printf("MagMode 0x%x\n", mode);
-  return MagModeMap().FindKey(mode);
+  return MagModeConfigMap.FindKey(mode);
 }
 
 std::optional<MagScale> Mpu9250::ReadMagScale() const {
@@ -349,24 +326,13 @@ std::optional<MagScale> Mpu9250::ReadMagScale() const {
   constexpr uint8_t mask = 0x10;  // mask res bit[4]
   const uint8_t scale = static_cast<uint8_t>(data & mask);
   printf("MagScale 0x%x\n", scale);
-  return MagScaleMap().FindKey(scale);
+  return MagScaleConfigMap.FindKey(scale);
 }
 
 std::pair<bool, Config> Mpu9250::ValidateConfiguration() const {
   Config actual_cfg;
 
   bool valid = true;
-  // std::stringstream ss;
-  // ss << "\tAccelerometer:";
-
-  //    << ", Full Scale: " << AccelScaleMap()[cfg.accel_scale].name
-  // const auto accel_scale = ReadAccelScale();
-  // if (accel_scale.has_value()) {
-  //   actual_cfg.accel_scale = accel_scale.value();
-  //   << " Bandwidth " << AccelBWMap()[cfg.accel_bw]
-  // } else {
-  //   << " Bandwidth " << AccelBWMap()[cfg.accel_bw]
-  // }
 
   actual_cfg.accel_scale = ReadAccelScale();
   actual_cfg.accel_bw = ReadAccelBW();
@@ -423,21 +389,6 @@ SensorRawData Mpu9250::ReadRawData() const {
   const auto full_bits = ExtractFullBits(data);
   return FullBitsToRawData(full_bits);
 }
-
-// bool EnableAutoRequest() const {
-//   // Trigger slave 0 actions at each sample
-//   constexpr uint8_t master_delay = BIT_DELAY_ES_SHADOW | BIT_S0_DELAY_EN;
-//   if (not i2c_->WriteByte(I2C_MST_DELAY_CTRL, master_delay)) {
-//     fprintf(stderr,
-//             "ERROR: in InitMagnetometer, failed to write to "
-//             "I2C_MST_DELAY_CTRL\n");
-//     return false;
-//   }
-
-//   // if (not SetCompassSampleRate(config_.compass_sample_rate)) {
-//   //   return false;
-//   // }  bool EnableAutoRequest() const;
-// }
 
 std::vector<int16_t>
 Mpu9250::ExtractFullBits(const std::vector<uint8_t>& data) {

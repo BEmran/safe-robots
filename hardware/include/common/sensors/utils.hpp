@@ -36,35 +36,11 @@ constexpr double MS2_TO_G = 0.10197162129;
 /// @brief multiply to convert G to m/s^2, standard gravity definition
 constexpr double G_TO_MS2 = 9.80665;
 
-struct SimpleSpecInfo {
-  std::string name;
-  SimpleSpecInfo() : name("") {
-  }
-  SimpleSpecInfo(std::string_view name_) : name(name_) {
-  }
-  std::string Name() const {
-    return name;
-  }
-};
-
-struct SpecInfo {
-  float value;
-  std::string name;
-  SpecInfo() : value{0.F}, name("") {
-  }
-  SpecInfo(const float value_, std::string_view name_)
-    : value(value_), name(name_) {
-  }
-  std::string Name() const {
-    return name;
-  }
-};
-
-template <typename Key, typename T>
+template <typename Key>
 struct ConfigMap {
-  using PairType = std::pair<const Key, T>;
+  using PairType = std::pair<const Key, std::string>;
   using UnderlingType = std::underlying_type_t<Key>;
-  std::map<Key, T> map;
+  std::map<Key, std::string> map;
 
   ConfigMap(std::initializer_list<PairType> l) : map{l} {
   }
@@ -81,23 +57,21 @@ struct ConfigMap {
     return it->first;
   }
 
-  T& operator[](const Key& key) {
-    return map[key];
+  std::string operator[](const Key& key) const {
+    const auto it = map.find(key);
+    if (it == map.end()) {
+      return "Undefined";
+    }
+    return it->second;
   }
 
-  std::string Name(const std::optional<Key>& key) {
+  std::string Name(const std::optional<Key>& key) const {
     if (not key.has_value()) {
       return "Undefined";
     }
-    return map[key.value()].Name();
+    return this->operator[](key.value());
   }
 };
-
-template <typename Key>
-using SpecInfoMap = ConfigMap<Key, SpecInfo>;
-
-template <typename Key>
-using SimpleSpecInfoMap = ConfigMap<Key, SimpleSpecInfo>;
 
 /**
  * @brief Hold sensor measurement specifications used to convert sensor raw

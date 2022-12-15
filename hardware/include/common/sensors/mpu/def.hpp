@@ -69,64 +69,63 @@ enum class MagMode : uint8_t {
   FUSE_ROM_ACCESS = 0x0F
 };
 
-inline auto AccelBWMap() {
-  const static SimpleSpecInfoMap<AccelBW> map{
-    {AccelBW::BW_218HZ, {"218 HZ"}},  //
-    {AccelBW::BW_99HZ, {"99 HZ"}},    //
-    {AccelBW::BW_44HZ, {"44 HZ"}},    //
-    {AccelBW::BW_21HZ, {"21 HZ"}},    //
-    {AccelBW::BW_10HZ, {"10 HZ"}},    //
-    {AccelBW::BW_5HZ, {"5 HZ"}}};
-  return map;
-}
+const static ConfigMap<AccelBW> AccelBWConfigMap{
+  {AccelBW::BW_218HZ, "218 HZ"},  //
+  {AccelBW::BW_99HZ, "99 HZ"},    //
+  {AccelBW::BW_44HZ, "44 HZ"},    //
+  {AccelBW::BW_21HZ, "21 HZ"},    //
+  {AccelBW::BW_10HZ, "10 HZ"},    //
+  {AccelBW::BW_5HZ, "5 HZ"}};
 
-inline auto AccelScaleMap() {
-  const static SpecInfoMap<AccelScale> map{{AccelScale::FS_2G, {2.F, "2G"}},
-                                           {AccelScale::FS_4G, {4.F, "4G"}},
-                                           {AccelScale::FS_8G, {8.F, "8G"}},
-                                           {AccelScale::FS_16G, {16.F, "16G"}}};
-  return map;
-}
+const static ConfigMap<AccelScale> AccelScaleConfigMap{
+  {AccelScale::FS_2G, "2G"},  //
+  {AccelScale::FS_4G, "4G"},  //
+  {AccelScale::FS_8G, "8G"},  //
+  {AccelScale::FS_16G, "16G"}};
 
-inline auto GyroBWMap() {
-  const static SimpleSpecInfoMap<GyroBW> map{{GyroBW::BW_250HZ, {"250 HZ"}},  //
-                                             {GyroBW::BW_184HZ, {"184 HZ"}},  //
-                                             {GyroBW::BW_92HZ, {"92 HZ"}},    //
-                                             {GyroBW::BW_41HZ, {"41 HZ"}},    //
-                                             {GyroBW::BW_20HZ, {"20 HZ"}},    //
-                                             {GyroBW::BW_10HZ, {"10 HZ"}},    //
-                                             {GyroBW::BW_5HZ, {"5 HZ"}},      //
-                                             {GyroBW::BW_3600HZ, {"3600 HZ"}}};
-  return map;
-}
+const static ConfigMap<GyroBW> GyroBWConfigMap{{GyroBW::BW_250HZ, "250 HZ"},  //
+                                               {GyroBW::BW_184HZ, "184 HZ"},  //
+                                               {GyroBW::BW_92HZ, "92 HZ"},    //
+                                               {GyroBW::BW_41HZ, "41 HZ"},    //
+                                               {GyroBW::BW_20HZ, "20 HZ"},    //
+                                               {GyroBW::BW_10HZ, "10 HZ"},    //
+                                               {GyroBW::BW_5HZ, "5 HZ"},      //
+                                               {GyroBW::BW_3600HZ, "3600 HZ"}};
 
-inline auto GyroScaleMap() {
-  const static SpecInfoMap<GyroScale> map{
-    {GyroScale::FS_250DPS, {250.F, "250 DPS"}},
-    {GyroScale::FS_500DPS, {500.F, "500 DPS"}},
-    {GyroScale::FS_1000DPS, {1000.F, "1000 DPS"}},
-    {GyroScale::FS_2000DPS, {2000.F, "2000 DPS"}}};
-  return map;
-}
+const static ConfigMap<GyroScale> GyroScaleConfigMap{
+  {GyroScale::FS_250DPS, "250 DPS"},    //
+  {GyroScale::FS_500DPS, "500 DPS"},    //
+  {GyroScale::FS_1000DPS, "1000 DPS"},  //
+  {GyroScale::FS_2000DPS, "2000 DPS"}};
 
-inline auto MagScaleMap() {
-  const static SpecInfoMap<MagScale> map{
-    {MagScale::FS_14BITS, {0.25F * kMaxUTesla, "14 BITS"}},
-    {MagScale::FS_16BITS, {1.00F * kMaxUTesla, "16 BITS"}}};
-  return map;
-}
+const static ConfigMap<MagScale> MagScaleConfigMap{
+  {MagScale::FS_14BITS, "14 BITS"},
+  {MagScale::FS_16BITS, "16 BITS"}};
 
-inline auto MagModeMap() {
-  const static SimpleSpecInfoMap<MagMode> map{
-    {MagMode::POWER_DOWN, {"POWER DOWN"}},
-    {MagMode::SINGLE_MEASURE, {"SINGLE MEASUREMENT"}},
-    {MagMode::CONTINUES_8HZ, {"CONTINUES 8HZ"}},
-    {MagMode::EXTERNAL_TRIGGER, {"EXTERNAL TRIGGER"}},
-    {MagMode::CONTINUES_100HZ, {"CONTINUES 100HZ"}},
-    {MagMode::SELF_TEST, {"SELF TEST"}},
-    {MagMode::FUSE_ROM_ACCESS, {"FUSE ROM ACCESS"}}};
-  return map;
-}
+const static ConfigMap<MagMode> MagModeConfigMap{
+  {MagMode::POWER_DOWN, "POWER DOWN"},              //
+  {MagMode::SINGLE_MEASURE, "SINGLE MEASUREMENT"},  //
+  {MagMode::CONTINUES_8HZ, "CONTINUES 8HZ"},        //
+  {MagMode::EXTERNAL_TRIGGER, "EXTERNAL TRIGGER"},  //
+  {MagMode::CONTINUES_100HZ, "CONTINUES 100HZ"},    //
+  {MagMode::SELF_TEST, "SELF TEST"},                //
+  {MagMode::FUSE_ROM_ACCESS, "FUSE ROM ACCESS"}};
+
+const static std::map<AccelScale, float> AccelScaleMap{
+  {AccelScale::FS_2G, 2.F},  //
+  {AccelScale::FS_4G, 4.F},  //
+  {AccelScale::FS_8G, 8.F},  //
+  {AccelScale::FS_16G, 16.F}};
+
+const static std::map<GyroScale, float> GyroScaleMap{
+  {GyroScale::FS_250DPS, 250.F},    //
+  {GyroScale::FS_500DPS, 500.F},    //
+  {GyroScale::FS_1000DPS, 1000.F},  //
+  {GyroScale::FS_2000DPS, 2000.F}};
+
+const static std::map<MagScale, float> MagScaleMap{
+  {MagScale::FS_14BITS, 0.25F * kMaxUTesla},
+  {MagScale::FS_16BITS, 1.00F * kMaxUTesla}};
 
 struct SensorRawData {
   Vec3 accel = Vec3::Zero();
