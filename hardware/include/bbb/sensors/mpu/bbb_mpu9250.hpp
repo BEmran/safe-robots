@@ -11,8 +11,8 @@
 #include "core/utils/node.hpp"
 
 namespace hardware::bbb::sensors::mpu {
-using Mpu9250 = hardware::common::sensors::mpu::Mpu9250;
-using Config = hardware::common::sensors::mpu::Config;
+using hardware::common::sensors::mpu::Config;
+using hardware::common::sensors::mpu::Mpu9250;
 
 constexpr uint8_t I2C_MPU_BUS = 0x02;
 constexpr uint8_t I2C_MPU_ADDRESS = common::sensors::mpu::mpu9250::I2C_ADDRESS1;
