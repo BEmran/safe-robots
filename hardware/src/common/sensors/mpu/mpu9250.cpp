@@ -457,16 +457,15 @@ uint8_t Mpu9250::ReadAK8963Register(uint8_t reg) const {
 bool Mpu9250::RequestReadAK8963Registers(uint8_t reg, uint8_t count) const {
   // set slave 0 to the AK8963 and set for read
   constexpr uint8_t read_address = ak8963::I2C_ADDR | mpu9250::I2C_READ_FLAG;
-  if (not comm_->WriteByte(mpu9250::I2C_SLV0_ADDR, read_address)) {
+  if (not WriteRegister(mpu9250::I2C_SLV0_ADDR, read_address)) {
     return false;
   }
   // set the register to the desired AK8963 sub address
-  if (not comm_->WriteByte(mpu9250::I2C_SLV0_REG, reg)) {
+  if (not WriteRegister(mpu9250::I2C_SLV0_REG, reg)) {
     return false;
   }
   // enable I2C and request the bytes
-  if (not comm_->WriteByte(mpu9250::I2C_SLV0_CTRL,
-                           mpu9250::I2C_SLV0_EN | count)) {
+  if (not WriteRegister(mpu9250::I2C_SLV0_CTRL, mpu9250::I2C_SLV0_EN | count)) {
     return false;
   }
   MilliDelay(5);
@@ -477,7 +476,7 @@ std::vector<uint8_t> Mpu9250::ReadAK8963Registers(uint8_t reg,
                                                   uint8_t count) const {
   RequestReadAK8963Registers(reg, count);
   // read the bytes off the MPU9250 EXT_SENS_DATA registers
-  return comm_->ReadBytes(mpu9250::EXT_SENS_DATA_00, count);
+  return ReadRegisters(mpu9250::EXT_SENS_DATA_00, count);
 }
 
 bool Mpu9250::SetRegisterByte(uint8_t reg, uint8_t byte, uint8_t mask) const {
@@ -497,25 +496,26 @@ bool Mpu9250::SetAK8963RegisterByte(uint8_t reg, uint8_t byte,
 
 bool Mpu9250::WriteRegister(uint8_t reg, uint8_t data) const {
   return comm_->WriteByte(reg, data);
+  MicroDelay(10);
 }
 
 bool Mpu9250::WriteAK8963Register(uint8_t reg, uint8_t data) const {
   // set slave 0 to the AK8963 and set for write
-  if (not comm_->WriteByte(mpu9250::I2C_SLV0_ADDR, ak8963::I2C_ADDR)) {
+  if (not WriteRegister(mpu9250::I2C_SLV0_ADDR, ak8963::I2C_ADDR)) {
     return false;
   }
   // set the register to the desired AK8963 sub address
-  if (not comm_->WriteByte(mpu9250::I2C_SLV0_REG, reg)) {
+  if (not WriteRegister(mpu9250::I2C_SLV0_REG, reg)) {
     return false;
   }
   // store the data for write
-  if (not comm_->WriteByte(mpu9250::I2C_SLV0_DO, data)) {
+  if (not WriteRegister(mpu9250::I2C_SLV0_DO, data)) {
     return false;
   }
   // enable I2C and send 1 byte
   constexpr uint8_t count = 1;
   const bool res =
-    comm_->WriteByte(mpu9250::I2C_SLV0_CTRL, mpu9250::I2C_SLV0_EN | count);
+    WriteRegister(mpu9250::I2C_SLV0_CTRL, mpu9250::I2C_SLV0_EN | count);
   MilliDelay(5);
   printf("write reg: 0x%x data: 0x%x\n", reg, data);
   return res;

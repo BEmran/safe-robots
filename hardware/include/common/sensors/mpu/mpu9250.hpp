@@ -54,6 +54,12 @@ class Mpu9250 : public ImuSensorModule {
 
   SensorRawData ReadRawData() const;
 
+  /**
+   * @brief reset sensor registers
+   *
+   */
+  bool Reset() const;
+
  protected:
   void ReadCalibrationFile();
 
@@ -74,11 +80,6 @@ class Mpu9250 : public ImuSensorModule {
    */
   bool ProbeAk8963() const;
 
-  /**
-   * @brief reset sensor registers
-   *
-   */
-  bool Reset() const;
   bool ResetMpu() const;
   bool RestAk8963() const;
 
