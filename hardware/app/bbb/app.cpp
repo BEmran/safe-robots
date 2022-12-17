@@ -79,15 +79,21 @@ bool App::ParseOption(int argc, char* argv[]) {
         break;
       case 'a':
         SYS_LOG_INFO("Calibrate accelerometer sensor...");
-        sensor->CalibrateAccelerometer();
+        if (sensor) {
+          sensor->CalibrateAccelerometer();
+        }
         break;
       case 'w':
         SYS_LOG_INFO("Calibrate gyroscope sensor...");
-        sensor->CalibrateGyroscope();
+        if (sensor) {
+          sensor->CalibrateGyroscope();
+        }
         break;
       case 'm':
         SYS_LOG_INFO("Calibrate magnetometer sensor...");
-        sensor->CalibrateMagnetometer();
+        if (sensor) {
+          sensor->CalibrateMagnetometer();
+        }
         break;
       case 'p':
         port_number = std::atoi(optarg);
@@ -125,9 +131,8 @@ bool App::IsOk() const {
 std::vector<std::string> ToString(core::utils::InputMat mat) {
   std::vector<float> vec(mat.data(), mat.data() + mat.size());
   std::vector<std::string> str(vec.size());
-  for (size_t idx = 0; idx < vec.size(); idx++) {
-    str[idx] = std::to_string(vec[idx]);
-  }
+  std::transform(vec.begin(), vec.end(), str.begin(),
+                 [](const float v) { return std::to_string(v); });
   return str;
 }
 

@@ -8,9 +8,10 @@ constexpr auto MaximumClientTries = 5;
 int main(int argc, char* argv[]) {
   App app;
   app.Create();
-  app.ParseOption(argc, argv);
   hardware::common::sensors::mpu::Config config;
   app.InitializeSensor(config);
+  app.ParseOption(argc, argv);
+
   app.InitializeServer();
 
   //-------------------------------------------------------------------------

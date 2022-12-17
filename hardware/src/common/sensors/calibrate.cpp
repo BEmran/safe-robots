@@ -45,8 +45,8 @@ bool ExpectNear(const Vec3& v1, const Vec3& v2) {
 
 Eigen::Matrix<MATH_TYPE, kNumSamples, 3> CollectData(const ReadFunc& cb) {
   Eigen::Matrix<MATH_TYPE, kNumSamples, 3> data;
-  std::cout << "Collecting data, process will take "
-            << kNumSamples * ShortDelay * 0.001 << " seconds";
+  SYS_LOG_DEBUG("Collecting data, process will take ")
+    << kNumSamples * ShortDelay * 0.001 << " seconds";
   constexpr auto packet_size = 10;
   for (Eigen::Index i = 0; i < data.rows(); i++) {
     data.row(i) << cb().transpose();
@@ -92,7 +92,7 @@ RobustlyCollectAverageDataForEachFace(const ReadFunc& cb,
   Eigen::Index idx = 0;
   // loop through each face and collect average data
   while (idx < y.rows()) {
-    if (!GetUserApproval(kFaceMsg[idx])) {
+    if (not GetUserApproval(kFaceMsg[idx])) {
       return {};
     }
 
@@ -191,7 +191,7 @@ std::optional<SensorSpecs<3>> CalibrateGyroscope(const ReadFunc& cb,
                                                  const SensorSpecs<3>& spec) {
   SYS_LOG_INFO("Process of calibrating gyroscope");
 
-  if (!GetUserApproval("Sit the sensor still")) {
+  if (not GetUserApproval("Sit the sensor still")) {
     return {};
   }
 
@@ -205,8 +205,8 @@ std::optional<SensorSpecs<3>>
 CalibrateMagnetometer(const ReadFunc& cb, const SensorSpecs<3>& spec) {
   SYS_LOG_INFO("Process of calibrating Magnetometer");
 
-  if (!GetUserApproval("Wave device in a figure eight until done! To "
-                       "start")) {
+  if (not GetUserApproval("Wave device in a figure eight until done! To "
+                          "start")) {
     return {};
   }
 

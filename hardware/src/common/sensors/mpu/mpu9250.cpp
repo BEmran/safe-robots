@@ -163,6 +163,7 @@ void Mpu9250::Initialize() {
   InitializeMag();
 
   ValidateConfiguration();
+  initialized_ = true;
 }
 
 bool Mpu9250::Test() {
@@ -353,6 +354,11 @@ bool Mpu9250::Calibrate() {
 }
 
 bool Mpu9250::CalibrateAccelerometer() {
+  if (not initialized_) {
+    SYS_LOG_WARN("Failed to calibrate Accelerometer: Sensor not initalized");
+    return false;
+  }
+
   auto read_accel_data = [this]() { return ReadRawData().accel; };
   const auto result = hardware::common::sensors::CalibrateAccelerometer(
     read_accel_data, accel_spec_);
@@ -365,6 +371,11 @@ bool Mpu9250::CalibrateAccelerometer() {
 }
 
 bool Mpu9250::CalibrateGyroscope() {
+  if (not initialized_) {
+    SYS_LOG_WARN("Failed to calibrate gyroscope: Sensor not initalized");
+    return false;
+  }
+
   auto read_gyro_data = [this]() { return ReadRawData().gyro; };
 
   const auto result =
@@ -378,6 +389,11 @@ bool Mpu9250::CalibrateGyroscope() {
 }
 
 bool Mpu9250::CalibrateMagnetometer() {
+  if (not initialized_) {
+    SYS_LOG_WARN("Failed to calibrate magnetometer: Sensor not initalized");
+    return false;
+  }
+
   auto read_mag_data = [this]() { return ReadRawData().mag; };
   const auto result =
     hardware::common::sensors::CalibrateMagnetometer(read_mag_data, mag_spec_);

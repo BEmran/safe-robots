@@ -161,6 +161,7 @@ class Mpu9250 : public ImuSensorModule {
 
  private:
   Config config_;
+  bool initialized_{false};
   std::unique_ptr<comm::CommunicationAbs> comm_;
   std::unique_ptr<core::utils::Node> node_;
   SensorSpecs<3> mag_spec_;
