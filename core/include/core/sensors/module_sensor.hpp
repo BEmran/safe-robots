@@ -84,7 +84,8 @@ class SensorModuleAbs : public utils::ModuleAbs {
     SetData();
   }
 
-  virtual void Calibrate() {
+  virtual bool Calibrate() {
+    return false;
   }
 
   T GetData() const {
