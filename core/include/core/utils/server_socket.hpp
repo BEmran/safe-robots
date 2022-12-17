@@ -69,7 +69,7 @@ class ServerSocket {
   mutable bool ready_;          // ready to send and receive
   uint16_t port_;               // port number
   int client_sock_;             // client socket number set when call Accept()
-  std::unique_ptr<Node> node_;  // node object
+  std::shared_ptr<Node> node_;  // node object
   std::unique_ptr<Socket> socket_;  // socket object
 };
 }  // namespace core::utils

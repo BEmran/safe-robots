@@ -10,8 +10,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <optional>
 #include <string>
-#include <utility>
+
+#include "core/utils/node.hpp"
 
 namespace core::utils {
 /**
@@ -26,6 +28,13 @@ class Socket {
    *
    */
   Socket();
+
+  /**
+   * @brief Construct a new Socket object
+   *
+   * @param node node object to use for logging
+   */
+  Socket(std::shared_ptr<Node> node);
 
   /**
    * @brief Destroy the Socket object
@@ -66,9 +75,9 @@ class Socket {
    * for accepting new connections while the new socket file descriptor is used
    * for communicating with the connected client.
    *
-   * @return std::pair<bool, int> accept status and new socket file descriptor
+   * @return std::optional<int> new socket file descriptor if successful
    */
-  std::pair<bool, int> Accept();
+  std::optional<int> Accept();
 
   // // Client initialization
   // bool Connect(const std::string& host, int port);
@@ -81,16 +90,15 @@ class Socket {
    * @return true if msg is sent successfully
    * @return false otherwise
    */
-  static bool Send(int client_sock, const std::string& msg);
+  bool Send(int client_sock, const std::string& msg);
 
   /**
    * @brief Read a msg from socket FD.
    *
    * @param client_sock client socket file descriptor
-   * @param msg received message
-   * @return int
+   * @return std::optional<std::string>> received message
    */
-  static int Recv(int client_sock, std::string* msg);
+  std::optional<std::string> Recv(int client_sock);
 
   // void SetNonBlocking(bool block);
 
@@ -111,9 +119,18 @@ class Socket {
    */
   bool SetSocketOpt() const;
 
+  /**
+   * @brief wait for connection to be available for some time
+   *
+   * @return true if connection is available
+   * @return false if error occurred or timeout
+   */
+  bool WaitForConnection();
+
  private:
   int sock_{-1};
   sockaddr_in address_;
+  std::shared_ptr<Node> node_;  // node object
 };
 }  // namespace core::utils
 #endif  // CORE_UTILS_SOCKET_HPP_
