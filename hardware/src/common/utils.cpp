@@ -13,7 +13,11 @@
 namespace hardware::common {
 
 void MilliDelay(const uint32_t msec) {
-  usleep(msec * 1000);
+  MicroDelay(msec * 1000);
+}
+
+void MicroDelay(const uint32_t usec) {
+  usleep(usec);
 }
 
 int WriteFile(const char* path, const char* fmt, ...) {

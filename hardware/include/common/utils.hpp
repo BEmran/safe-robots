@@ -15,6 +15,13 @@ namespace hardware::common {
  */
 void MilliDelay(const uint32_t msec);
 
+/**
+ * @brief Sleep for some microseconds, calls linux usleep function
+ *
+ * @param usec micro seconds to put thread in sleep
+ */
+void MicroDelay(const uint32_t usec);
+
 int WriteFile(const char* path, const char* fmt, ...);
 
 int ReadFile(const char* path, const char* fmt, ...);
