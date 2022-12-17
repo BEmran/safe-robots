@@ -4,6 +4,7 @@
 
 #include "common/sensors/calibrate.hpp"
 #include "common/utils.hpp"
+#include "core/utils/logger_macros.hpp"
 
 namespace hardware::common::sensors::mpu {
 
@@ -54,6 +55,12 @@ std::string ConfigToString(const Config& cfg) {
   return ss.str();
 }
 
+core::utils::StreamLogger& operator<<(core::utils::StreamLogger& logger,
+                                      const uint8_t byte) {
+  return logger << "0x" << std::setfill('0') << std::setw(2) << std::hex
+                << static_cast<int>(byte);
+}
+
 }  // namespace
 
 Mpu9250::Mpu9250(const Config& config,
@@ -72,29 +79,6 @@ Mpu9250::Mpu9250(const Config& config,
   temp_spec_.SetCalibration(CreateScalar(1), CreateScalar(kTempBias),
                             CreateScalar(kTempOffset));
   ReadCalibrationFile();
-}
-
-void Mpu9250::ReadCalibrationFile() {
-  // TODO(Bara) read from config file instead
-  Mat3 accel_misalignment;
-
-  accel_misalignment << (Mat3() << 0.998122F, 0.00794836F, 0.000548448F,
-                         -0.00552448F, 0.998181F, -0.00669443F, 0.0189156F,
-                         0.00407755F, 0.993244F)
-                          .finished();
-  Vec3 accel_bias(-0.00387028F, -0.0128085F, 0.0108167F);
-  Vec3 gyro_bias(12.629F, 7.572F, -9.618F);
-
-  accel_spec_.SetCalibration(accel_misalignment, accel_bias,
-                             Vec3::Zero());  //
-  gyro_spec_.SetCalibration(Mat3::Identity(), gyro_bias,
-                            Vec3::Zero());  //
-}
-
-core::utils::StreamLogger& operator<<(core::utils::StreamLogger& logger,
-                                      const uint8_t byte) {
-  return logger << "0x" << std::setfill('0') << std::setw(2) << std::hex
-                << static_cast<int>(byte);
 }
 
 bool Mpu9250::ProbeMpu() const {
@@ -363,20 +347,68 @@ std::pair<bool, Config> Mpu9250::ValidateConfiguration() const {
   return {valid, actual_cfg};
 }
 
-void Mpu9250::Calibrate() {
-  ExtractMagnetometerSensitivityAdjustmentValues();
-  auto read_gyro_data = [this]() { return ReadRawData().gyro; };
-  auto read_accel_data = [this]() { return ReadRawData().accel; };
-  auto read_mag_data = [this]() { return ReadRawData().mag; };
+bool Mpu9250::Calibrate() {
+  return CalibrateAccelerometer() && CalibrateGyroscope() &&
+         CalibrateMagnetometer();
+}
 
-  gyro_spec_ = CalibrateGyroscope(read_gyro_data, gyro_spec_);
-  accel_spec_ = CalibrateAccelerometer(read_accel_data, accel_spec_);
-  mag_spec_ = CalibrateMagnetometer(read_mag_data, mag_spec_);
+bool Mpu9250::CalibrateAccelerometer() {
+  auto read_accel_data = [this]() { return ReadRawData().accel; };
+  const auto result = hardware::common::sensors::CalibrateAccelerometer(
+    read_accel_data, accel_spec_);
+  if (not result.has_value()) {
+    SYS_LOG_WARN("Failed to calibrate Accelerometer");
+    return false;
+  }
+  accel_spec_ = result.value();
+  return true;
+}
+
+bool Mpu9250::CalibrateGyroscope() {
+  auto read_gyro_data = [this]() { return ReadRawData().gyro; };
+
+  const auto result =
+    hardware::common::sensors::CalibrateGyroscope(read_gyro_data, gyro_spec_);
+  if (not result.has_value()) {
+    SYS_LOG_WARN("Failed to calibrate gyroscope");
+    return false;
+  }
+  gyro_spec_ = result.value();
+  return true;
+}
+
+bool Mpu9250::CalibrateMagnetometer() {
+  auto read_mag_data = [this]() { return ReadRawData().mag; };
+  const auto result =
+    hardware::common::sensors::CalibrateMagnetometer(read_mag_data, mag_spec_);
+  if (not result.has_value()) {
+    SYS_LOG_WARN("Failed to calibrate magnetometer");
+    return false;
+  }
+  mag_spec_ = result.value();
+  return true;
+}
+
+void Mpu9250::ReadCalibrationFile() {
+  // TODO(Bara) read from config file instead
+  Mat3 accel_misalignment;
+
+  accel_misalignment << (Mat3() << 0.998122F, 0.00794836F, 0.000548448F,
+                         -0.00552448F, 0.998181F, -0.00669443F, 0.0189156F,
+                         0.00407755F, 0.993244F)
+                          .finished();
+  Vec3 accel_bias(-0.00387028F, -0.0128085F, 0.0108167F);
+  Vec3 gyro_bias(12.629F, 7.572F, -9.618F);
+
+  accel_spec_.SetCalibration(accel_misalignment, accel_bias,
+                             Vec3::Zero());  //
+  gyro_spec_.SetCalibration(Mat3::Identity(), gyro_bias,
+                            Vec3::Zero());  //
 }
 
 void Mpu9250::Update() {
-  const auto raw = ReadRawData();
-  ImuData imu = ApplySensorSpecs(raw);
+  const SensorRawData raw = ReadRawData();
+  const ImuData imu = ApplySensorSpecs(raw);
   // imu.tait_bryan.data = EstimateRPY(imu.accel.data);
   SetData(imu);
 }

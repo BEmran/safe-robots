@@ -50,7 +50,10 @@ class Mpu9250 : public ImuSensorModule {
 
   void Update() override;
 
-  void Calibrate() override;
+  bool Calibrate() override;
+  bool CalibrateAccelerometer();
+  bool CalibrateGyroscope();
+  bool CalibrateMagnetometer();
 
   SensorRawData ReadRawData() const;
 

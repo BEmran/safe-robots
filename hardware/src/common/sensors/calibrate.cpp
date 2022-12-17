@@ -171,13 +171,13 @@ CalculateMagnetometer(Eigen::Matrix<MATH_TYPE, kNumSamples, 3> data) {
 }
 }  // namespace
 
-SensorSpecs<3> CalibrateAccelerometer(const ReadFunc& cb,
-                                      const SensorSpecs<3>& spec) {
+std::optional<SensorSpecs<3>>
+CalibrateAccelerometer(const ReadFunc& cb, const SensorSpecs<3>& spec) {
   SYS_LOG_INFO("Process of calibrating accelerometer");
 
   auto average_data = RobustlyCollectAverageDataForEachFace(cb, spec);
   if (not average_data.has_value()) {
-    return spec;
+    return {};
   }
 
   const CalibrationResult solution =
@@ -187,12 +187,12 @@ SensorSpecs<3> CalibrateAccelerometer(const ReadFunc& cb,
                               Vec3::Zero());
 }
 
-SensorSpecs<3> CalibrateGyroscope(const ReadFunc& cb,
-                                  const SensorSpecs<3>& spec) {
+std::optional<SensorSpecs<3>> CalibrateGyroscope(const ReadFunc& cb,
+                                                 const SensorSpecs<3>& spec) {
   SYS_LOG_INFO("Process of calibrating gyroscope");
 
   if (!GetUserApproval("Sit the sensor still")) {
-    return spec;
+    return {};
   }
 
   const Vec3 bias = GetAverage(cb);
@@ -201,12 +201,13 @@ SensorSpecs<3> CalibrateGyroscope(const ReadFunc& cb,
   return UpdateOldCalibration(spec, Mat3::Identity(), bias, Vec3::Zero());
 }
 
-SensorSpecs<3> CalibrateMagnetometer(const ReadFunc& cb,
-                                     const SensorSpecs<3>& spec) {
+std::optional<SensorSpecs<3>>
+CalibrateMagnetometer(const ReadFunc& cb, const SensorSpecs<3>& spec) {
   SYS_LOG_INFO("Process of calibrating Magnetometer");
 
-  if (!GetUserApproval("Wave device in a figure eight until done! To start")) {
-    return spec;
+  if (!GetUserApproval("Wave device in a figure eight until done! To "
+                       "start")) {
+    return {};
   }
 
   const Eigen::Matrix<MATH_TYPE, kNumSamples, 3> data = CollectData(cb);

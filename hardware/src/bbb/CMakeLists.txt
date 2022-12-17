@@ -2,17 +2,15 @@
 # Create header file list for NAVIO library
 # ##############################################################################
 set(BBB_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/hardware/include/bbb)
-set(BBB_HEADER_LIST
-    ${BBB_INCLUDE_DIR}/sensors/mpu/bbb_mpu9250.hpp
-    ${BBB_INCLUDE_DIR}/utils.hpp)
+set(BBB_HEADER_LIST ${BBB_INCLUDE_DIR}/sensors/mpu/bbb_mpu9250.hpp
+                    ${BBB_INCLUDE_DIR}/utils.hpp)
 
 # ##############################################################################
 # Create source file list for NAVIO library
 # ##############################################################################
 set(BBB_SOURCE_DIR ${PROJECT_SOURCE_DIR}/hardware/src/bbb)
-set(BBB_SOURCE_LIST
-    ${BBB_SOURCE_DIR}/sensors/mpu/bbb_mpu9250.cpp
-    ${BBB_SOURCE_DIR}/utils.cpp)
+set(BBB_SOURCE_LIST ${BBB_SOURCE_DIR}/sensors/mpu/bbb_mpu9250.cpp
+                    ${BBB_SOURCE_DIR}/utils.cpp)
 
 # ##############################################################################
 # Build NAVIO library
@@ -30,7 +28,8 @@ target_include_directories(
 )
 
 # Link required library
-target_link_libraries(${BBB_LIBRARY} PRIVATE ${CORE_LIBRARY} ${HARDWARE_COMMON_LIBRARY})
+target_link_libraries(${BBB_LIBRARY} PRIVATE ${CORE_LIBRARY}
+                                             ${HARDWARE_COMMON_LIBRARY})
 
 # All users of this library will need at least C++17
 target_compile_features(${BBB_LIBRARY} PUBLIC cxx_std_17)

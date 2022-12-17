@@ -4,6 +4,7 @@
 #define HARDWARE_COMMON_SENSORS_CALIBRATE_HPP_
 
 #include <functional>
+#include <optional>
 
 #include "common/sensors/utils.hpp"
 #include "core/utils/math.hpp"
@@ -14,14 +15,14 @@ using ReadFunc = std::function<core::utils::Vec3(void)>;
 // initialization. It calculates the average of the at-rest readings and then
 // loads the resulting offsets into accelerometer and gyro bias registers.
 
-SensorSpecs<3> CalibrateAccelerometer(const ReadFunc& cb,
-                                      const SensorSpecs<3>& spec);
+std::optional<SensorSpecs<3>>
+CalibrateAccelerometer(const ReadFunc& cb, const SensorSpecs<3>& spec);
 
-SensorSpecs<3> CalibrateGyroscope(const ReadFunc& cb,
-                                  const SensorSpecs<3>& spec);
+std::optional<SensorSpecs<3>> CalibrateGyroscope(const ReadFunc& cb,
+                                                 const SensorSpecs<3>& spec);
 
-SensorSpecs<3> CalibrateMagnetometer(const ReadFunc& cb,
-                                     const SensorSpecs<3>& spec);
+std::optional<SensorSpecs<3>> CalibrateMagnetometer(const ReadFunc& cb,
+                                                    const SensorSpecs<3>& spec);
 
-}  // namespace hardware::sensors::calibrate
+}  // namespace hardware::common::sensors
 #endif  // HARDWARE_COMMON_SENSORS_CALIBRATE_HPP_
