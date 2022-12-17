@@ -122,8 +122,8 @@ bool I2C::SendData(const std::vector<uint8_t>& data) const {
 
   const size_t size = data.size();
   const ssize_t written = write(fd_, data.data(), size);
-  // printf("fd:%d size:%d written:%d data[0]%zx\n", fd_, size, written,
-  // data[0]);
+  // printf("send: fd:%d size:%d written:%d data[0]%zx\n", fd_, size, written,
+  //        data[0]);
   if (written != static_cast<ssize_t>(size)) {
     fprintf(stderr, "ERROR: in SendBytes, write %ld bytes, expected %zu: %s\n",
             written, size, strerror(errno));
@@ -140,6 +140,9 @@ std::vector<uint8_t> I2C::GetResponse(const size_t count) const {
   // then read the response
   std::vector<uint8_t> buf(count);
   const ssize_t red = read(fd_, buf.data(), count);
+  // printf("received fd:%d expect:%d red:%d data[0]%zx\n", fd_, count, red,
+  //        buf[0]);
+
   if (red != static_cast<ssize_t>(count)) {
     fprintf(stderr, "ERROR: in Read, received %ld bytes, expected %zu: %s\n",
             red, count, strerror(errno));
