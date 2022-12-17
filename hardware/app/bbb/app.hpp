@@ -96,6 +96,9 @@ struct App {
 
   void InitializeSensor(const Config& config) {
     sensor = std::make_unique<BbbMpu9250>(config);
+    if (not sensor->Reset()) {
+      SYS_LOG_ERROR("Failed to reset MPU sensor\n");
+    }
     if (not sensor->Probe()) {
       SYS_LOG_ERROR("Failed to prop MPU sensor\n");
     }

@@ -13,6 +13,7 @@ int main(int argc, char* argv[]) {
   hardware::common::sensors::mpu::Config config;
   app.InitializeSensor(config);
 
+  HeaderMsg(app.modes);
   core::utils::Spinner spinner(10);
   // now just wait, print_data will run
   while (RUNNING) {

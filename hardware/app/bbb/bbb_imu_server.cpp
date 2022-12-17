@@ -7,7 +7,6 @@ constexpr auto MaximumClientTries = 5;
 int main(int argc, char* argv[]) {
   App app;
   app.ParseOption(argc, argv);
-  HeaderMsg(app.modes);
 
   hardware::common::sensors::mpu::Config config;
   app.InitializeSensor(config);
@@ -17,7 +16,8 @@ int main(int argc, char* argv[]) {
   auto tries = MaximumClientTries;
   constexpr double hz = 10.;
   core::utils::Spinner spinner(hz);
-  while (--tries > 0) {
+  // HeaderMsg(app.modes);
+  while (--tries > 0 && RUNNING) {
     app.server->Accept();
     while (app.server->IsReady() && RUNNING) {
       // read sensor data

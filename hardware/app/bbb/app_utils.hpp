@@ -28,7 +28,7 @@ struct Modes {
   MagMode mag{MagMode::UTesla};
 };
 
-std::string AccelHeaderMsg(const AccelMode mode) {
+void AccelHeaderMsg(const AccelMode mode) {
   switch (mode) {
     case AccelMode::MS2:
       printf("  Accel XYZ(m/s^2)  |");
@@ -44,7 +44,7 @@ std::string AccelHeaderMsg(const AccelMode mode) {
   }
 }
 
-std::string GyroHeaderMsg(const GyroMode mode) {
+void GyroHeaderMsg(const GyroMode mode) {
   switch (mode) {
     case GyroMode::RAD:
       printf("  Gyro XYZ(rad/s)  |");
@@ -60,7 +60,7 @@ std::string GyroHeaderMsg(const GyroMode mode) {
   }
 }
 
-std::string MagHeaderMsg(const MagMode mode) {
+void MagHeaderMsg(const MagMode mode) {
   switch (mode) {
     case MagMode::RAW:
       printf(" Mag Field XYZ(raw ADC)  |");
@@ -78,7 +78,7 @@ void HeaderMsg(const Modes modes) {
   AccelHeaderMsg(modes.accel);
   GyroHeaderMsg(modes.gyro);
   MagHeaderMsg(modes.mag);
-  printf(" Temp (C)");
+  printf(" Temp (C)\n");
 }
 
 void PrintAccelValue(const AccelMode mode, const Vec3& accel, const Vec3& raw) {
@@ -164,6 +164,7 @@ void PrintValues(const Modes modes, const ImuData imu,
   PrintGyroValue(modes.gyro, imu.gyro.data, raw.gyro);
   PrintMagValue(modes.mag, imu.mag.data, raw.mag);
   PrintTempValue(imu.temp.value);
+  fflush(stdout);
 }
 
 std::string ExtractData(const Modes /*modes*/, const ImuData imu,
