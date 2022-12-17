@@ -1,9 +1,8 @@
 
 
-#include <core/utils/logger_macros.hpp>
-#include <core/utils/spinner.hpp>
-
 #include "app.hpp"
+#include "core/utils/logger_macros.hpp"
+#include "core/utils/spinner.hpp"
 
 int main(int argc, char* argv[]) {
   App app;
@@ -16,7 +15,7 @@ int main(int argc, char* argv[]) {
   HeaderMsg(app.modes);
   core::utils::Spinner spinner(10);
   // now just wait, print_data will run
-  while (RUNNING) {
+  while (app.IsOk()) {
     printf("\r");
     // read sensor data
     app.sensor->Update();
