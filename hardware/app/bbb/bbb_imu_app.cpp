@@ -20,8 +20,11 @@ int main(int argc, char* argv[]) {
     // read sensor data
     app.sensor->Update();
     ImuData data = app.sensor->GetData();
+    SensorRawData raw = app.sensor->GetRawData();
     // print data
-    PrintValues(app.modes, data, SensorRawData());
+    std::string str = PrintValues(app.modes, data, raw);
+    printf("%s", str.c_str());
+    fflush(stdout);
     // sleep 0.1 sec
     spinner.SpinOnce();
   }

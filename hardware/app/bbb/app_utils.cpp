@@ -63,90 +63,112 @@ void HeaderMsg(const Modes modes) {
   printf(" Temp (C)\n");
 }
 
-void PrintAccelValue(const AccelMode mode, const Vec3& accel, const Vec3& raw) {
-  const double x = static_cast<double>(accel[0]);
-  const double y = static_cast<double>(accel[1]);
-  const double z = static_cast<double>(accel[2]);
-  const int xr = static_cast<int>(raw[0]);
-  const int yr = static_cast<int>(raw[1]);
-  const int zr = static_cast<int>(raw[2]);
+std::string PrintAccelValue(const AccelMode mode, const Vec3& accel,
+                            const Vec3& raw) {
+  const double x = static_cast<double>(accel.x());
+  const double y = static_cast<double>(accel.y());
+  const double z = static_cast<double>(accel.z());
+  const int xr = static_cast<int>(raw.x());
+  const int yr = static_cast<int>(raw.y());
+  const int zr = static_cast<int>(raw.z());
 
+  constexpr std::size_t size = 100;
+  // std::string buffer;
+  char buffer[size];
+  // buffer.resize(size);
   switch (mode) {
     case AccelMode::MS2:
-      printf("%6.2f %6.2f %6.2f |", x, y, z);
+      snprintf(buffer, size, "%6.2f %6.2f %6.2f |", x, y, z);
       break;
     case AccelMode::G:
-      printf("%6.2f %6.2f %6.2f |", x * MS2_TO_G, y * MS2_TO_G, z * MS2_TO_G);
+      snprintf(buffer, size, "%6.2f %6.2f %6.2f |", x * MS2_TO_G, y * MS2_TO_G,
+               z * MS2_TO_G);
       break;
     case AccelMode::RAW:
-      printf("%6d %6d %6d |", xr, yr, zr);
+      snprintf(buffer, size, "%6d %6d %6d |", xr, yr, zr);
       break;
     default:
       SYS_LOG_ERROR("invalid accel mode\n");
   }
+  // printf("%s", buffer.c_str());
+  return buffer;
 }
 
-void PrintGyroValue(const GyroMode mode, const Vec3& gyro, const Vec3& raw) {
-  const double x = static_cast<double>(gyro[0]);
-  const double y = static_cast<double>(gyro[1]);
-  const double z = static_cast<double>(gyro[2]);
-  const int xr = static_cast<int>(raw[0]);
-  const int yr = static_cast<int>(raw[1]);
-  const int zr = static_cast<int>(raw[2]);
+std::string PrintGyroValue(const GyroMode mode, const Vec3& gyro,
+                           const Vec3& raw) {
+  const double x = static_cast<double>(gyro.x());
+  const double y = static_cast<double>(gyro.y());
+  const double z = static_cast<double>(gyro.z());
+  const int xr = static_cast<int>(raw.x());
+  const int yr = static_cast<int>(raw.y());
+  const int zr = static_cast<int>(raw.z());
   const double conv = static_cast<double>(RAD_TO_DEG);
 
   constexpr std::size_t size = 100;
-  std::string buffer;
-  buffer.resize(size);
+  // std::string buffer;
+  char buffer[size];
+  // buffer.resize(size);
   switch (mode) {
     case GyroMode::RAD:
-      printf("%6.1f %6.1f %6.1f |", x, y, z);
+      snprintf(buffer, size, "%6.1f %6.1f %6.1f |", x, y, z);
       break;
     case GyroMode::DEG:
-      printf("%6.1f %6.1f %6.1f |", x * conv, y * conv, z * conv);
+      snprintf(buffer, size, "%6.1f %6.1f %6.1f |", x * conv, y * conv,
+               z * conv);
       break;
     case GyroMode::RAW:
-      printf("%6d %6d %6d |", xr, yr, zr);
+      snprintf(buffer, size, "%6d %6d %6d |", xr, yr, zr);
       break;
     default:
       SYS_LOG_ERROR("invalid accel mode\n");
   }
+  // printf("%s", buffer.c_str());
+  return buffer;
 }
 
-void PrintMagValue(const MagMode mode, const Vec3& mag, const Vec3& raw) {
-  const double x = static_cast<double>(mag[0]);
-  const double y = static_cast<double>(mag[1]);
-  const double z = static_cast<double>(mag[2]);
-  const int xr = static_cast<int>(raw[0]);
-  const int yr = static_cast<int>(raw[1]);
-  const int zr = static_cast<int>(raw[2]);
+std::string PrintMagValue(const MagMode mode, const Vec3& mag,
+                          const Vec3& raw) {
+  const double x = static_cast<double>(mag.x());
+  const double y = static_cast<double>(mag.y());
+  const double z = static_cast<double>(mag.z());
+  const int xr = static_cast<int>(raw.x());
+  const int yr = static_cast<int>(raw.y());
+  const int zr = static_cast<int>(raw.z());
 
   constexpr std::size_t size = 100;
-  std::string buffer;
-  buffer.resize(size);
+  // std::string buffer;
+  char buffer[size];
+  // buffer.resize(size);
   switch (mode) {
     case MagMode::UTesla:
-      printf("%6.1f %6.1f %6.1f |", x, y, z);
+      snprintf(buffer, size, "%6.1f %6.1f %6.1f |", x, y, z);
       break;
     case MagMode::RAW:
-      printf("%6d %6d %6d |", xr, yr, zr);
+      snprintf(buffer, size, "%6d %6d %6d |", xr, yr, zr);
       break;
     default:
       SYS_LOG_ERROR("invalid mag mode\n");
   }
+  // printf("%s", buffer.c_str());
+  return buffer;
 }
 
-void PrintTempValue(const double temp) {
-  printf("  %4.1f", temp);
+std::string PrintTempValue(const double temp) {
+  constexpr std::size_t size = 100;
+  char buffer[size];
+  // buffer.resize(size);
+  snprintf(buffer, size, "  %4.1f", temp);
+  // printf("%s", buffer.c_str());
+  return buffer;
 }
 
-void PrintValues(const Modes modes, const ImuData imu,
-                 const SensorRawData raw) {
-  PrintAccelValue(modes.accel, imu.accel.data, raw.accel);
-  PrintGyroValue(modes.gyro, imu.gyro.data, raw.gyro);
-  PrintMagValue(modes.mag, imu.mag.data, raw.mag);
-  PrintTempValue(imu.temp.value);
-  fflush(stdout);
+std::string PrintValues(const Modes modes, const ImuData imu,
+                        const SensorRawData raw) {
+  std::string str = PrintAccelValue(modes.accel, imu.accel.data, raw.accel) +
+                    PrintGyroValue(modes.gyro, imu.gyro.data, raw.gyro) +
+                    PrintMagValue(modes.mag, imu.mag.data, raw.mag) +
+                    PrintTempValue(imu.temp.value);
+  return str;
 }
 
 std::string PrepareData(const ImuData imu) {

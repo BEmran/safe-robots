@@ -42,15 +42,12 @@ void App::InitializeServer() {
 }
 
 std::string App::ExtractData() const {
+  sensor->Update();
   if (modes.accel == AccelMode::RAW && modes.gyro == GyroMode::RAW &&
       modes.mag == MagMode::RAW) {
-    const SensorRawData raw = sensor->ReadRawData();
-    return PrepareData(raw);
-    // todo: check what unit the user selected
+    return PrepareData(sensor->GetRawData());
   } else {
-    sensor->Update();
-    const ImuData data = sensor->GetData();
-    return PrepareData(data);
+    return PrepareData(sensor->GetData());
   }
 }
 

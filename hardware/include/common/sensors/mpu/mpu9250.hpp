@@ -56,6 +56,7 @@ class Mpu9250 : public ImuSensorModule {
   bool CalibrateMagnetometer();
 
   SensorRawData ReadRawData() const;
+  SensorRawData GetRawData() const;
 
   /**
    * @brief reset sensor registers
@@ -168,7 +169,7 @@ class Mpu9250 : public ImuSensorModule {
   SensorSpecs<3> gyro_spec_;
   SensorSpecs<3> accel_spec_;
   SensorSpecs<1> temp_spec_;
-
+  SensorRawData raw_;
   Vec3 mag_sensitivity_calibration_{1.0F, 1.0F, 1.0F};  // factory calibration
 };
 }  // namespace hardware::common::sensors::mpu

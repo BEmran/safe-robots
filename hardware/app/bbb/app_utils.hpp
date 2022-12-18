@@ -30,15 +30,15 @@ void MagHeaderMsg(const MagMode mode);
 
 void HeaderMsg(const Modes modes);
 
-void PrintAccelValue(const AccelMode mode, const Vec3& accel, const Vec3& raw);
+std::string PrintAccelValue(const AccelMode mode, const Vec3& accel, const Vec3& raw);
 
-void PrintGyroValue(const GyroMode mode, const Vec3& gyro, const Vec3& raw);
+std::string PrintGyroValue(const GyroMode mode, const Vec3& gyro, const Vec3& raw);
 
-void PrintMagValue(const MagMode mode, const Vec3& mag, const Vec3& raw);
+std::string PrintMagValue(const MagMode mode, const Vec3& mag, const Vec3& raw);
 
-void PrintTempValue(const double temp);
+std::string PrintTempValue(const double temp);
 
-void PrintValues(const Modes modes, const ImuData imu, const SensorRawData raw);
+std::string PrintValues(const Modes modes, const ImuData imu, const SensorRawData raw);
 
 std::string PrepareData(const ImuData imu);
 

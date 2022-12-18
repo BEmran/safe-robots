@@ -12,22 +12,22 @@ int main(int argc, char* argv[]) {
   app.InitializeSensor(config);
   app.ParseOption(argc, argv);
 
-  app.InitializeServer();
+  // app.InitializeServer();
 
   //-------------------------------------------------------------------------
   auto tries = MaximumClientTries;
   constexpr double hz = 10.;
   core::utils::Spinner spinner(hz);
   // HeaderMsg(app.modes);
-  while (--tries > 0 && app.IsOk()) {
-    app.server->Accept();
-    while (app.server->IsReady() && app.IsOk()) {
+  while (app.IsOk()) {
+    // app.server->Accept();
+    while (app.IsOk()) {
       // prepare data
       const std::string msg = app.ExtractData();
       // print data
       SYS_LOG_INFO(msg);
-      // send data through server
-      (*app.server) << msg;
+      // // send data through server
+      // (*app.server) << msg;
       // delay
       spinner.SpinOnce();
     }

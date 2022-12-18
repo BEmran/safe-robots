@@ -416,15 +416,13 @@ void Mpu9250::ReadCalibrationFile() {
   Vec3 accel_bias(-0.00387028F, -0.0128085F, 0.0108167F);
   Vec3 gyro_bias(12.629F, 7.572F, -9.618F);
 
-  accel_spec_.SetCalibration(accel_misalignment, accel_bias,
-                             Vec3::Zero());  //
-  gyro_spec_.SetCalibration(Mat3::Identity(), gyro_bias,
-                            Vec3::Zero());  //
+  accel_spec_.SetCalibration(accel_misalignment, accel_bias, Vec3::Zero());
+  gyro_spec_.SetCalibration(Mat3::Identity(), gyro_bias, Vec3::Zero());
 }
 
 void Mpu9250::Update() {
-  const SensorRawData raw = ReadRawData();
-  const ImuData imu = ApplySensorSpecs(raw);
+  raw_ = ReadRawData();
+  const ImuData imu = ApplySensorSpecs(raw_);
   // imu.tait_bryan.data = EstimateRPY(imu.accel.data);
   SetData(imu);
 }
@@ -436,6 +434,10 @@ SensorRawData Mpu9250::ReadRawData() const {
   const auto data = ReadRegisters(mpu9250::ACCEL_XOUT_H, mpu_data_size);
   const auto full_bits = ExtractFullBits(data);
   return FullBitsToRawData(full_bits);
+}
+
+SensorRawData Mpu9250::GetRawData() const {
+  return raw_;
 }
 
 std::vector<int16_t>
