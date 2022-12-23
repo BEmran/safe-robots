@@ -19,7 +19,14 @@ target_include_directories(
                            ${CMAKE_SOURCE_DIR}/hardware/app/bbb)
 target_link_libraries(bbb_imu_server PRIVATE ${CORE_LIBRARY} app pthread)
 
+# recorder
+add_executable(bbb_imu_recorder bbb_imu_recorder.cpp)
+target_include_directories(
+    bbb_imu_server PRIVATE ${CMAKE_SOURCE_DIR}/hardware/include
+                           ${CMAKE_SOURCE_DIR}/hardware/app/bbb)
+target_link_libraries(bbb_imu_recorder PRIVATE ${CORE_LIBRARY} ${BBB_LIBRARY} app pthread)
+
 install(
-    TARGETS bbb_imu_app bbb_imu_server
+    TARGETS bbb_imu_app bbb_imu_server bbb_imu_recorder
     EXPORT ${TARGETS_EXPORT_NAME}
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT bin)

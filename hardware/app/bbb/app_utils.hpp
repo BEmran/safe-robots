@@ -30,18 +30,27 @@ void MagHeaderMsg(const MagMode mode);
 
 void HeaderMsg(const Modes modes);
 
-std::string PrintAccelValue(const AccelMode mode, const Vec3& accel, const Vec3& raw);
+std::string PrintAccelValue(const AccelMode mode, const Vec3& accel,
+                            const Vec3& raw);
 
-std::string PrintGyroValue(const GyroMode mode, const Vec3& gyro, const Vec3& raw);
+std::string PrintGyroValue(const GyroMode mode, const Vec3& gyro,
+                           const Vec3& raw);
 
 std::string PrintMagValue(const MagMode mode, const Vec3& mag, const Vec3& raw);
 
 std::string PrintTempValue(const double temp);
 
-std::string PrintValues(const Modes modes, const ImuData imu, const SensorRawData raw);
+std::string PrintValues(const Modes modes, const ImuData imu,
+                        const SensorRawData raw);
 
 std::string PrepareData(const ImuData imu);
 
 std::string PrepareData(const SensorRawData raw);
 
+std::string HeaderMsgWithUnit(const std::string accel_unit,
+                              const std::string gyro_unit,
+                              const std::string mag_unit);
+std::string AccelUnit(const AccelMode mode);
+std::string GyroUnit(const GyroMode mode);
+std::string MagUnit(const MagMode mode);
 #endif  // NAVIO_APP_APP_HPP

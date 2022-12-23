@@ -34,6 +34,8 @@ struct App {
 
   std::string ExtractData() const;
 
+  std::string HeaderMsg() const;
+
   bool ParseOption(int argc, char* argv[]);
 
   void InitializeSensor(const Config& config);

@@ -51,6 +51,12 @@ std::string App::ExtractData() const {
   }
 }
 
+std::string App::HeaderMsg() const {
+  return HeaderMsgWithUnit(AccelUnit(modes.accel),  //
+                           GyroUnit(modes.gyro),    //
+                           MagUnit(modes.mag));
+}
+
 bool App::ParseOption(int argc, char* argv[]) {
   // prevent the error message
   opterr = 0;

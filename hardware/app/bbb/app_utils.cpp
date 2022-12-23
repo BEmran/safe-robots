@@ -184,7 +184,8 @@ std::string PrepareData(const ImuData imu) {
      << imu.gyro.data.z() << ", "   //
      << imu.mag.data.x() << ", "    //
      << imu.mag.data.y() << ", "    //
-     << imu.mag.data.z() << ";";    //
+     << imu.mag.data.z() << ","     //
+     << imu.overflow << ";";        //
   return ss.str();
 }
 
@@ -192,15 +193,77 @@ std::string PrepareData(const SensorRawData raw) {
   const static uint64_t begin = core::utils::TimeInMicroSeconds();
   const uint64_t dt = core::utils::TimeInMicroSeconds() - begin;
   std::stringstream ss;
-  ss << dt << ", "             //
-     << raw.accel.x() << ", "  //
-     << raw.accel.y() << ", "  //
-     << raw.accel.z() << ", "  //
-     << raw.gyro.x() << ", "   //
-     << raw.gyro.y() << ", "   //
-     << raw.gyro.z() << ", "   //
-     << raw.mag.x() << ", "    //
-     << raw.mag.y() << ", "    //
-     << raw.mag.z() << ";";    //
+  ss << dt << ", "                 //
+     << raw.accel.x() << ", "      //
+     << raw.accel.y() << ", "      //
+     << raw.accel.z() << ", "      //
+     << raw.gyro.x() << ", "       //
+     << raw.gyro.y() << ", "       //
+     << raw.gyro.z() << ", "       //
+     << raw.mag.x() << ", "        //
+     << raw.mag.y() << ", "        //
+     << raw.mag.z() << ","         //
+     << raw.mag_over_flow << ";";  //
   return ss.str();
+}
+
+std::string HeaderMsgWithUnit(const std::string accel_unit,
+                              const std::string gyro_unit,
+                              const std::string mag_unit) {
+  ImuData imu;
+  std::stringstream ss;
+  ss << "dt (ms), "                                        //
+     << imu.accel.Header() << " (" << accel_unit << "), "  //
+     << imu.gyro.Header() << " (" << gyro_unit << "), "    //
+     << imu.mag.Header() << " (" << mag_unit << "),"
+     << "over-flow (bit);";  //
+  return ss.str();
+}
+
+std::string AccelUnit(const AccelMode mode) {
+  switch (mode) {
+    case AccelMode::G:
+      return "G";
+      break;
+    case AccelMode::MS2:
+      return "m/s2";
+      break;
+    case AccelMode::RAW:
+      return "bits";
+      break;
+    default:
+      SYS_LOG_WARN("invalid accel mode\n");
+      return "";
+  }
+}
+
+std::string GyroUnit(const GyroMode mode) {
+  switch (mode) {
+    case GyroMode::DEG:
+      return "deg/s";
+      break;
+    case GyroMode::RAD:
+      return "rad/s";
+      break;
+    case GyroMode::RAW:
+      return "bits";
+      break;
+    default:
+      SYS_LOG_WARN("invalid gyro mode\n");
+      return "";
+  }
+}
+
+std::string MagUnit(const MagMode mode) {
+  switch (mode) {
+    case MagMode::UTesla:
+      return "uTesla";
+      break;
+    case MagMode::RAW:
+      return "bits";
+      break;
+    default:
+      SYS_LOG_WARN("invalid mag mode\n");
+      return "";
+  }
 }

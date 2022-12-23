@@ -78,7 +78,7 @@ Mpu9250::Mpu9250(const Config& config,
   , temp_spec_{SensorSpecs<1>(TempSensitivity, 1.0F)} {
   temp_spec_.SetCalibration(CreateScalar(1), CreateScalar(kTempBias),
                             CreateScalar(kTempOffset));
-  ReadCalibrationFile();
+  // ReadCalibrationFile();
 }
 
 bool Mpu9250::ProbeMpu() const {
@@ -484,6 +484,7 @@ ImuData Mpu9250::ApplySensorSpecs(const SensorRawData& raw) const {
   imu.accel.data = accel_spec_.Apply(raw.accel);
   imu.gyro.data = gyro_spec_.Apply(raw.gyro);
   imu.mag.data = mag_spec_.Apply(raw.mag);
+  imu.overflow = raw.mag_over_flow;
   imu.temp.value = static_cast<double>(temp_spec_.Apply(raw.temp));
   if (raw.mag_over_flow) {
     node_->GetNodeLogger()->Debug("detect over flow");

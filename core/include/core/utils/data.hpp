@@ -172,6 +172,7 @@ struct ImuData : public Data {
   MagData mag;           ///< magnetometer (XYZ) in units of uT
   QuatData quat;         ///< normalized quaternion
   RPYData tait_bryan;    ///< Tait-Bryan angles (roll pitch yaw) in radians
+  bool overflow{false};  /// M=< TODO need better assigning
 
   std::vector<Data*> vec{&accel,      &gyro,    &mag, &quat,
                          &tait_bryan, &heading, &temp};
