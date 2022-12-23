@@ -1,3 +1,5 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #ifndef CORE_ALGORITHM_COMPLEMENTARY_FILTER_HPP_
 #define CORE_ALGORITHM_COMPLEMENTARY_FILTER_HPP_
 

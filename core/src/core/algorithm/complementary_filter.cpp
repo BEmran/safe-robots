@@ -1,3 +1,5 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #include "core/algorithm/complementary_filter.hpp"
 
 #include <cmath>

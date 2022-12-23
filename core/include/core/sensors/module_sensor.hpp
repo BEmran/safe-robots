@@ -1,9 +1,9 @@
+// Copyright (C) 2022 Bara Emran - All Rights Reserved
+
 #ifndef CORE_SENSORS_MODULE_SENSOR_HPP_
 #define CORE_SENSORS_MODULE_SENSOR_HPP_
 
 #include <string>
-
-// Copyright (C) 2022 Bara Emran - All Rights Reserved
 
 #include "core/utils/cash.hpp"
 #include "core/utils/module.hpp"
