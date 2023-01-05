@@ -7,7 +7,7 @@ macro (package_add_test_with_libraries TESTNAME FILES LIBRARIES
 
     # create an exectuable in which the tests will be stored
     add_executable(${TESTNAME} "${FILES}")
-
+    
     # add the binary tree to the search path for include files so that we will
     # find include files
     target_include_directories(

@@ -24,6 +24,12 @@ Scalar CreateScalar(MATH_TYPE val) {
   return s;
 }
 
+Quat UnitQuaternion(const float scalar, const Vec3 vec) {
+  Quat q(scalar, vec.x(), vec.y(), vec.z());
+  q.normalize();
+  return q;
+}
+
 }  // namespace core::utils
 
 std::ostream& operator<<(std::ostream& os, const core::utils::Vec3& vec) {

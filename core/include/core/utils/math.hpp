@@ -19,6 +19,7 @@ constexpr MATH_TYPE DEG_TO_RAD = PI / 180.F;
 
 using Vec3 = Eigen::Matrix<MATH_TYPE, 3, 1>;
 using Mat3 = Eigen::Matrix<MATH_TYPE, 3, 3>;
+using Mat4 = Eigen::Matrix<MATH_TYPE, 4, 4>;
 using Rot2 = Eigen::Rotation2D<MATH_TYPE>;
 using Quat = Eigen::Quaternion<MATH_TYPE>;
 using Transform = Eigen::Transform<MATH_TYPE, 3, Eigen::Affine>;
@@ -37,7 +38,37 @@ static const Eigen::IOFormat kVecFmtSimple(Eigen::FullPrecision, 0, ", ", ", ",
                                            "", "", "", "");
 
 Scalar CreateScalar(MATH_TYPE val);
+Quat UnitQuaternion(const float scalar, const Vec3 vec);
 
+/**
+ * @brief simple structure to hold RPY data in radian
+ *
+ */
+struct RPY {
+  /// @brief angle around x-axis in radian
+  MATH_TYPE roll{0.f};
+  /// @brief angle around y-axis in radian
+  MATH_TYPE pitch{0.f};
+  /// @brief angle around z-axis in radian
+  MATH_TYPE yaw{0.f};
+
+  /**
+   * @brief Default Construct for RPY object
+   *
+   */
+  RPY() = default;
+
+  /**
+   * @brief Construct a new RPY object
+   *
+   * @param r roll angle in radian
+   * @param p pitch angle in radian
+   * @param y yaw angle in radian
+   */
+  RPY(const MATH_TYPE r, const MATH_TYPE p, const MATH_TYPE y)
+    : roll(r), pitch(p), yaw(y) {
+  }
+};
 }  // namespace core::utils
 
 // need to be unscoped in namespace to be called from any file when include
