@@ -40,14 +40,14 @@ class Quaternion {
     return Quaternion(scalar_ / norm, vec_ / norm);
   }
 
-  void SetIdentity() {
-    scalar_ = 1.f;
-    vec_ = Vec3::Zero();
-  }
-
   float Norm() const {
     const float square = scalar_ * scalar_ + vec_.dot(vec_);
     return std::sqrt(square);
+  }
+
+  void SetIdentity() {
+    scalar_ = 1.f;
+    vec_ = Vec3::Zero();
   }
 
   float Angle() const {
@@ -70,16 +70,8 @@ class Quaternion {
     return vec_;
   }
 
-  Quaternion Inverse() {
-    return Conjugate();
-  }
-
   Quaternion Conjugate() const {
     return Quaternion(scalar_, -vec_);
-  }
-
-  Quaternion Mirror() const {
-    return Quaternion(-scalar_, -vec_);
   }
 
   Vec3 Cross(const Quaternion& rhs) const {
@@ -91,7 +83,9 @@ class Quaternion {
   }
 
   float AngularDistance(const Quaternion& rhs) const {
-    const float cos_angle = Dot(rhs) / Norm() / rhs.Norm();
+    const Vec3 qa_vec = vec_.normalized();
+    const Vec3 qb_vec = rhs.Vec().normalized();
+    const float cos_angle = qa_vec.dot(qb_vec);
     return std::acos(cos_angle);
   }
 
@@ -118,11 +112,11 @@ class Quaternion {
   }
 
   float Y() const {
-    return vec_.x();
+    return vec_.y();
   }
 
   float Z() const {
-    return vec_.x();
+    return vec_.z();
   }
 
   float& W() {
@@ -134,11 +128,11 @@ class Quaternion {
   }
 
   float& Y() {
-    return vec_.x();
+    return vec_.y();
   }
 
   float& Z() {
-    return vec_.x();
+    return vec_.z();
   }
 
  protected:
@@ -146,6 +140,12 @@ class Quaternion {
   float scalar_;
   Vec3 vec_;
 };
+
+Quaternion QuaternionFromRotation(const float angle, const Vec3 axis) {
+  const float half_angle = angle / 2.f;
+  const float sin_half_angle = std::sin(half_angle);
+  return Quaternion(std::cos(half_angle), axis * sin_half_angle);
+}
 
 Quaternion operator+(const Quaternion lhs, const Quaternion rhs) {
   const float scalar = lhs.Scalar() + rhs.Scalar();
