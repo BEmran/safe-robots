@@ -1,137 +1,91 @@
 #ifndef CORE_MATH_QUATERNION_HPP_
 #define CORE_MATH_QUATERNION_HPP_
 
-// #include <algorithm>  // clamp
-// #include <iostream>   // cout
-#include <cmath>  // acos
-
 #include "core/utils/math.hpp"
 
+namespace my {
 using core::utils::Quat;
 using core::utils::Vec3;
 
 class Quaternion {
  public:
-  Quaternion() : Quaternion(1.f, Vec3::Zero()) {
-  }
+  Quaternion();
 
-  Quaternion(const Quat q) : Quaternion(q.w(), q.vec()) {
-  }
+  Quaternion(const Quat q);
 
-  Quaternion(const float w, const float x, const float y, const float z)
-    : Quaternion{w, Vec3(x, y, z)} {
-  }
+  Quaternion(const float w, const float x, const float y, const float z);
 
-  Quaternion(const float scalar, const Vec3 vec) : scalar_{scalar}, vec_{vec} {
-  }
+  Quaternion(const float scalar, const Vec3 vec);
 
-  void Normalize() {
-    const Quaternion quat = Normalized();
-    scalar_ = quat.Scalar();
-    vec_ = quat.Vec();
-  }
+  void Normalize();
 
-  Quaternion Normalized() const {
-    constexpr float EPS = 0.001f;
-    const float norm = Norm();
-    if (norm < EPS) {
-      Quaternion(1.f, Vec3::Zero());
-    }
-    return Quaternion(scalar_ / norm, vec_ / norm);
-  }
+  Quaternion Normalized() const;
 
-  float Norm() const {
-    const float square = scalar_ * scalar_ + vec_.dot(vec_);
-    return std::sqrt(square);
-  }
+  float Norm() const;
 
-  void SetIdentity() {
-    scalar_ = 1.f;
-    vec_ = Vec3::Zero();
-  }
+  void SetIdentity();
 
-  float Angle() const {
-    return 2 * std::acos(scalar_);
-  }
+  float Angle() const;
 
-  float Scalar() const {
+  Quaternion Conjugate() const;
+
+  Vec3 Cross(const Quaternion& rhs) const;
+
+  float Dot(const Quaternion& rhs) const;
+
+  float Dot2(const Quaternion& rhs) const;
+
+  float AngularDistance(const Quaternion& rhs) const;
+
+  float operator[](const size_t idx) const;
+
+  float& operator[](const size_t idx);
+
+  inline float Scalar() const {
     return scalar_;
   }
 
-  float& Scalar() {
+  inline float& Scalar() {
     return scalar_;
   }
 
-  Vec3 Vec() const {
+  inline Vec3 Vec() const {
     return vec_;
   }
 
-  Vec3& Vec() {
+  inline Vec3& Vec() {
     return vec_;
   }
 
-  Quaternion Conjugate() const {
-    return Quaternion(scalar_, -vec_);
-  }
-
-  Vec3 Cross(const Quaternion& rhs) const {
-    return Vec().cross(rhs.Vec());
-  }
-
-  float Dot(const Quaternion& rhs) const {
-    return Vec().dot(rhs.Vec());
-  }
-
-  float AngularDistance(const Quaternion& rhs) const {
-    const Vec3 qa_vec = vec_.normalized();
-    const Vec3 qb_vec = rhs.Vec().normalized();
-    const float cos_angle = qa_vec.dot(qb_vec);
-    return std::acos(cos_angle);
-  }
-
-  float operator[](const size_t idx) const {
-    if (idx == 0) {
-      return scalar_;
-    }
-    return vec_[static_cast<Eigen::Index>(idx + 1)];
-  }
-
-  float& operator[](const size_t idx) {
-    if (idx == 0) {
-      return scalar_;
-    }
-    return vec_[static_cast<Eigen::Index>(idx + 1)];
-  }
-
-  float W() const {
+  inline float W() const {
     return scalar_;
   }
 
-  float X() const {
+  inline float X() const {
     return vec_.x();
   }
 
-  float Y() const {
+  inline float Y() const {
     return vec_.y();
   }
 
-  float Z() const {
+  inline float Z() const {
     return vec_.z();
   }
 
-  float& W() {
+  inline float& W() {
     return scalar_;
   }
 
-  float& X() {
+  inline float& X() {
     return vec_.x();
   }
 
-  float& Y() {
+  inline float& Y() {
     return vec_.y();
   }
 
-  float& Z() {
+  inline float& Z() {
     return vec_.z();
   }
 
@@ -141,47 +95,14 @@ class Quaternion {
   Vec3 vec_;
 };
 
-Quaternion QuaternionFromRotation(const float angle, const Vec3 axis) {
-  const float half_angle = angle / 2.f;
-  const float sin_half_angle = std::sin(half_angle);
-  return Quaternion(std::cos(half_angle), axis * sin_half_angle);
-}
+Quaternion QuaternionFromRotation(const float angle, const Vec3 axis);
 
-Quaternion operator+(const Quaternion lhs, const Quaternion rhs) {
-  const float scalar = lhs.Scalar() + rhs.Scalar();
-  const Vec3 vec = lhs.Vec() + rhs.Vec();
-  return Quaternion(scalar, vec);
-}
-
-Quaternion operator-(const Quaternion lhs, const Quaternion rhs) {
-  const float scalar = lhs.Scalar() - rhs.Scalar();
-  const Vec3 vec = lhs.Vec() - rhs.Vec();
-  return Quaternion(scalar, vec);
-}
-
-Quaternion operator*(const Quaternion lhs, const Quaternion rhs) {
-  const float scalar = lhs.Scalar() * rhs.Scalar() - rhs.Dot(lhs);
-  const Vec3 vec = lhs.Scalar() * rhs.Vec() +  //
-                   rhs.Scalar() * lhs.Vec() +  //
-                   rhs.Cross(lhs);
-  return Quaternion(scalar, vec);
-}
-
-Quaternion operator*(const Quaternion quat, const Vec3& point) {
-  return quat * Quaternion(0, point) * quat.Conjugate();
-}
-
-Quaternion operator*(const Quaternion quat, const float scale) {
-  const float scalar = quat.Scalar() * scale;
-  const Vec3 vec = quat.Vec() * scale;
-  return Quaternion(scalar, vec);
-}
-
-Quaternion operator/(const Quaternion quat, const float scale) {
-  const float scalar = quat.Scalar() / scale;
-  const Vec3 vec = quat.Vec() / scale;
-  return Quaternion(scalar, vec);
-}
+Quaternion operator+(const Quaternion lhs, const Quaternion rhs);
+Quaternion operator-(const Quaternion lhs, const Quaternion rhs);
+Quaternion operator*(const Quaternion lhs, const Quaternion rhs);
+Quaternion operator*(const Quaternion quat, const Vec3& point);
+Quaternion operator*(const Quaternion quat, const float scale);
+Quaternion operator/(const Quaternion quat, const float scale);
 
 // /**
 //  * @brief Interpolate linearly (LERP)
@@ -253,5 +174,5 @@ Quaternion operator/(const Quaternion quat, const float scale) {
 //   }
 //   return quat;
 // }
-
+}  // namespace my
 #endif  // CORE_MATH_QUATERNION_HPP_

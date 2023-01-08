@@ -3,36 +3,22 @@
 #include <gtest/gtest.h>
 
 #include <array>
+#include <eigen3/Eigen/Geometry>
 #include <string_view>
 
 #include "core/utils/math.hpp"
 #include "my_math/quaternion.hpp"
+#include "my_math/transformation.hpp"
+#include "utest_utils.hpp"
 
 using core::utils::Mat3;
 using core::utils::MATH_TYPE;
+using core::utils::PI;
 using core::utils::Quat;
 using core::utils::Vec3;
-
-constexpr float EPS = 0.00001f;
-
-::testing::AssertionResult operator&&(const ::testing::AssertionResult& res1,
-                                      const ::testing::AssertionResult& res2) {
-  if (res1) {
-    return res2;
-  } else {
-    return res1;
-  }
-}
-
-::testing::AssertionResult ExpectEq(const float expect, const float actual,
-                                    std::string_view msg = "") {
-  if (std::abs(expect - actual) > EPS) {
-    return ::testing::AssertionFailure()
-           << "Failure test " << msg << " -> "
-           << "expect (" << expect << ") and actual (" << actual << ")";
-  }
-  return ::testing::AssertionSuccess();
-}
+using my::Quaternion;
+constexpr float PI_2 = PI / 2.f;
+constexpr float PI_4 = PI / 4.f;
 
 // [[nodiscard]] ::testing::AssertionResult ExpectEqVec(const Vec3& expect,
 //                                                      const Vec3& actual) {
@@ -43,6 +29,14 @@ constexpr float EPS = 0.00001f;
 //   }
 //   return result;
 // }
+
+[[nodiscard]] ::testing::AssertionResult
+ExpectEqEigenQuat(const Eigen::Quaternionf& expect, const Quaternion& actual) {
+  return ExpectEq(expect.w(), actual.W(), "W component") &&
+         ExpectEq(expect.x(), actual.X(), "X component") &&
+         ExpectEq(expect.y(), actual.Y(), "Y component") &&
+         ExpectEq(expect.z(), actual.Z(), "Z component");
+}
 
 [[nodiscard]] ::testing::AssertionResult
 ExpectEqQuat(const Quaternion& expect, const Quaternion& actual) {
@@ -245,14 +239,16 @@ TEST(Quaternion, CrossForPerpendicularVector) {
 }
 
 TEST(Quaternion, AngularDistance) {
-  const float scalar{0.1f};
-  const Vec3 vec1{0.2f, 0.3f, 0.4f};
-  const Vec3 vec2{0.6f, 0.7f, 0.8f};
-  const Quaternion q1(scalar, vec1);
-  const Quaternion q2(scalar, vec2);
-  const float expect = q1.AngularDistance(q2);
-  const float actual = std::acos(vec1.normalized().dot(vec2.normalized()));
-  EXPECT_TRUE(ExpectEq(actual, expect));
+  const float pi_4 = PI / 4.f;
+  const Quaternion q1;
+  const std::array<float, 5> angles{PI_4, PI_2, PI, -PI_2, PI_4};
+  for (const auto ang : angles) {
+    const Quaternion q2{
+      Eigen::Quaternionf(Eigen::AngleAxisf(ang, Vec3::UnitY()))};
+    const float expect = q1.AngularDistance(q2);
+    const float actual = std::abs(ang);
+    EXPECT_TRUE(ExpectEq(actual, expect));
+  }
 }
 
 TEST(Quaternion, AngularDistanceForSameQuaternionIsZero) {
@@ -261,6 +257,14 @@ TEST(Quaternion, AngularDistanceForSameQuaternionIsZero) {
   const Quaternion q(scalar, vec);
   const float expect = q.AngularDistance(q);
   EXPECT_TRUE(ExpectEq(0.f, expect));
+}
+
+TEST(Quaternion, AngularDistanceForMirrorQuaternionIsZero) {
+  const Quaternion q =
+    Eigen::Quaternionf(Eigen::AngleAxisf(PI_4, Vec3::UnitY()));
+  const Quaternion mirror(-q.Scalar(), -q.Vec());
+  const float expect = q.AngularDistance(mirror);
+  EXPECT_TRUE(ExpectEq(0, expect));
 }
 
 TEST(Quaternion, AddTwoQuaternion) {
@@ -299,7 +303,7 @@ TEST(Quaternion, MultiplyTwoQuaternions) {
 
   const Quaternion expect = q1 * q2;
   const Quaternion actual(scalar1 * scalar2 - vec1.dot(vec2),
-                          scalar1 * vec2 + scalar2 * vec1 + vec2.cross(vec1));
+                          scalar1 * vec2 + scalar2 * vec1 + vec1.cross(vec2));
   EXPECT_TRUE(ExpectEqQuat(actual, expect));
 }
 
@@ -345,4 +349,66 @@ TEST(Quaternion, DivideByConstant) {
   const Quaternion expect = q / constant;
   const Quaternion actual(scalar / constant, vec / constant);
   EXPECT_TRUE(ExpectEqQuat(actual, expect));
+}
+
+/*****************************************************************************/
+class QuaternionVsEigen : public testing::Test {
+ public:
+  void SetUp() override {
+    e1 = Eigen::Quaternionf(scalar1, vec1.x(), vec1.y(), vec1.z());
+    e2 = Eigen::Quaternionf(scalar2, vec2.x(), vec2.y(), vec2.z());
+    q1 = Quaternion(e1);
+    q2 = Quaternion(e2);
+  }
+
+  float scalar1{0.1f};
+  float scalar2{0.2f};
+  Vec3 vec1{0.2f, 0.3f, 0.4f};
+  Vec3 vec2{0.6f, 0.7f, 0.8f};
+  Quaternion q1;
+  Quaternion q2;
+  Eigen::Quaternionf e1;
+  Eigen::Quaternionf e2;
+};
+
+TEST_F(QuaternionVsEigen, Norm) {
+  const float expect = q1.Norm();
+  const float actual = e1.norm();
+  EXPECT_TRUE(ExpectEq(actual, expect));
+}
+
+TEST_F(QuaternionVsEigen, Normalize) {
+  q1.Normalize();
+  e1.normalize();
+  EXPECT_TRUE(ExpectEqEigenQuat(e1, q1));
+}
+
+TEST_F(QuaternionVsEigen, Normalized) {
+  const Quaternion expect = q1.Normalized();
+  const Eigen::Quaternionf actual = e1.normalized();
+  EXPECT_TRUE(ExpectEqEigenQuat(actual, expect));
+}
+
+TEST_F(QuaternionVsEigen, Dot) {
+  const float expect = q1.Dot2(q2);
+  const float actual = e1.dot(e2);
+  EXPECT_TRUE(ExpectEq(actual, expect));
+}
+
+TEST_F(QuaternionVsEigen, AngularDistance) {
+  const float expect = q1.AngularDistance(q2);
+  const float actual = e1.angularDistance(e2);
+  EXPECT_TRUE(ExpectEq(actual, expect));
+}
+
+TEST_F(QuaternionVsEigen, Conjugate) {
+  const Quaternion expect = q1.Conjugate();
+  const Eigen::Quaternionf actual = e1.conjugate();
+  EXPECT_TRUE(ExpectEqEigenQuat(actual, expect));
+}
+
+TEST_F(QuaternionVsEigen, MultiplyTwoQuaternions) {
+  const Quaternion expect = q1 * q2;
+  const Eigen::Quaternionf actual = e1 * e2;
+  EXPECT_TRUE(ExpectEqEigenQuat(actual, expect));
 }
