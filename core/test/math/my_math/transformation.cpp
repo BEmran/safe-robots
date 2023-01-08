@@ -90,7 +90,7 @@ RPY DCMToEuler(const DCM& dcm, const EulerOrder order) {
   }
 }
 
-Quat Shepperd2(const DCM dcm) {
+Quaternion Shepperd2(const DCM dcm) {
   const Mat3& mat{dcm.Matrix()};
   const float trace = dcm.Trace();
   const Vec3 diag = mat.diagonal();
@@ -134,10 +134,10 @@ Quat Shepperd2(const DCM dcm) {
     default:
       std::cerr << "Undefined index" << std::endl;
   }
-  return Quat(w / gain, x / gain, y / gain, z / gain);
+  return Quaternion(w / gain, x / gain, y / gain, z / gain);
 }
 
-Quat Shepperd(const DCM dcm) {
+Quaternion Shepperd(const DCM dcm) {
   const Mat3& mat{dcm.Matrix()};
   const Vec3 diag = mat.diagonal();
   std::array<float, 4> b{dcm.Trace(), diag[0], diag[1], diag[2]};
@@ -171,17 +171,17 @@ Quat Shepperd(const DCM dcm) {
       break;
     default:
       std::cerr << "wrong index" << std::endl;
-      return Quat();
+      return Quaternion();
   }
   const float gain = 0.5f / std::sqrt(q[static_cast<size_t>(idx)]);
-  Quat quat(q[0] / gain, q[1] / gain, q[2] / gain, q[3] / gain);
-  quat.normalize();
+  Quaternion quat(q[0] / gain, q[1] / gain, q[2] / gain, q[3] / gain);
+  quat.Normalize();
   // TODO: use the conjugate quaternion. not sure if it is correct but the unit
   // test returns the same quaternion used to generate the dcm matrix!!!
-  return quat.conjugate();
+  return quat.Conjugate();
 }
 
-Quat Sarabandi(const DCM dcm) {
+Quaternion Sarabandi(const DCM dcm) {
   const float eta = 1;
   const Mat3& mat{dcm.Matrix()};
 
@@ -236,10 +236,10 @@ Quat Sarabandi(const DCM dcm) {
     const float denom = 3.f - dz;
     qz = 0.5f * std::sqrt(nom / denom);
   }
-  return Quat(qw, qx, qy, qz);
+  return Quaternion(qw, qx, qy, qz);
 }
 
-Quat Chiaverini(const DCM dcm) {
+Quaternion Chiaverini(const DCM dcm) {
   const Mat3& mat{dcm.Matrix()};
   const float qx_tmp = std::clamp(mat(0, 0) - mat(1, 1) - mat(2, 2), -1.f, 1.f);
   const float qy_tmp = std::clamp(mat(1, 1) - mat(2, 2) - mat(0, 0), -1.f, 1.f);
@@ -248,10 +248,10 @@ Quat Chiaverini(const DCM dcm) {
   const float qx = 0.5f * Sign(mat(2, 1) - mat(1, 2)) * std::sqrt(qx_tmp + 1.f);
   const float qy = 0.5f * Sign(mat(0, 2) - mat(2, 0)) * std::sqrt(qy_tmp + 1.f);
   const float qz = 0.5f * Sign(mat(1, 0) - mat(0, 1)) * std::sqrt(qz_tmp + 1.f);
-  return Quat(qw, qx, qy, qz).normalized();
+  return Quaternion(qw, qx, qy, qz).Normalized();
 }
 
-Quat DCMToQuaternion(const DCM& dcm, const QuaternionMethod method) {
+Quaternion DCMToQuaternion(const DCM& dcm, const QuaternionMethod method) {
   switch (method) {
     case QuaternionMethod::SHEPPERD:
       return Shepperd(dcm.Matrix());
@@ -261,22 +261,22 @@ Quat DCMToQuaternion(const DCM& dcm, const QuaternionMethod method) {
       return Chiaverini(dcm.Matrix());
     default:
       std::cerr << "Undefined Quaternion Method" << std::endl;
-      return Quat::Identity();
+      return Quaternion();
   }
 }
 
-DCM QuatToDCM(const Quat quat) {
-  const Quat q = quat.normalized();
+DCM QuatToDCM(const Quaternion quat) {
+  const Quaternion q = quat.Normalized();
   Mat3 R = Mat3::Identity();
-  R(0, 0) = 1.f - 2.f * (q.y() * q.y() + q.z() * q.z());
-  R(0, 1) = 2.f * (q.x() * q.y() - q.w() * q.z());
-  R(0, 2) = 2.f * (q.x() * q.z() + q.w() * q.y());
-  R(1, 0) = 2.f * (q.x() * q.y() + q.w() * q.z());
-  R(1, 1) = 1.f - 2.f * (q.x() * q.x() + q.z() * q.z());
-  R(1, 2) = 2.f * (q.y() * q.z() - q.w() * q.x());
-  R(2, 0) = 2.f * (q.x() * q.z() - q.w() * q.y());
-  R(2, 1) = 2.f * (q.w() * q.x() + q.y() * q.z());
-  R(2, 2) = 1.f - 2.f * (q.x() * q.x() + q.y() * q.y());
+  R(0, 0) = 1.f - 2.f * (q.Y() * q.Y() + q.Z() * q.Z());
+  R(0, 1) = 2.f * (q.X() * q.Y() - q.W() * q.Z());
+  R(0, 2) = 2.f * (q.X() * q.Z() + q.W() * q.Y());
+  R(1, 0) = 2.f * (q.X() * q.Y() + q.W() * q.Z());
+  R(1, 1) = 1.f - 2.f * (q.X() * q.X() + q.Z() * q.Z());
+  R(1, 2) = 2.f * (q.Y() * q.Z() - q.W() * q.X());
+  R(2, 0) = 2.f * (q.X() * q.Z() - q.W() * q.Y());
+  R(2, 1) = 2.f * (q.W() * q.X() + q.Y() * q.Z());
+  R(2, 2) = 1.f - 2.f * (q.X() * q.X() + q.Y() * q.Y());
   return R;
 }
 }  // namespace my

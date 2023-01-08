@@ -19,6 +19,7 @@ using my::DCMToEuler;
 using my::DCMToQuaternion;
 using my::EulerOrder;
 using my::EulerToDCM;
+using my::Quaternion;
 using my::QuaternionMethod;
 using my::QuatToDCM;
 using my::Skew;
@@ -49,32 +50,25 @@ TEST(Skew, CheckVectorValues) {
   EXPECT_FLOAT_EQ(vec.z(), s(1, 0));
 }
 
-TEST(QuatToRotation, Random) {
-  const Quat q1 = Quat::UnitRandom();
-  EXPECT_TRUE(ExpectEqMat3(q1.toRotationMatrix(), QuatToDCM(q1)));
-  const Quat q2 = q1.conjugate();
-  EXPECT_TRUE(ExpectEqMat3(q2.toRotationMatrix(), QuatToDCM(q2)));
-}
-
-TEST(AxisAngleToRotation, Quarter1AngleRandomVector) {
+TEST(AxisAngleToRotation, FirstQuarterAngleRandomVector) {
   Eigen::AngleAxisf aa(0.2f, Vec3::Random().normalized());
   EXPECT_TRUE(
     ExpectEqMat3(aa.toRotationMatrix(), AxisAngleToDCM(aa.angle(), aa.axis())));
 }
 
-TEST(AxisAngleToRotation, Quarter2AngleRandomVector) {
+TEST(AxisAngleToRotation, SecondQuarterAngleRandomVector) {
   Eigen::AngleAxisf aa(1.7f, Vec3::Random().normalized());
   EXPECT_TRUE(
     ExpectEqMat3(aa.toRotationMatrix(), AxisAngleToDCM(aa.angle(), aa.axis())));
 }
 
-TEST(AxisAngleToRotation, Quarter3AngleRandomVector) {
+TEST(AxisAngleToRotation, ThirdQuarterAngleRandomVector) {
   Eigen::AngleAxisf aa(-2.f, Vec3::Random().normalized());
   EXPECT_TRUE(
     ExpectEqMat3(aa.toRotationMatrix(), AxisAngleToDCM(aa.angle(), aa.axis())));
 }
 
-TEST(AxisAngleToRotation, Quarter4AngleRandomVector) {
+TEST(AxisAngleToRotation, FourthQuarterAngleRandomVector) {
   Eigen::AngleAxisf aa(-0.4f, Vec3::Random().normalized());
   EXPECT_TRUE(
     ExpectEqMat3(aa.toRotationMatrix(), AxisAngleToDCM(aa.angle(), aa.axis())));
@@ -123,7 +117,7 @@ TEST(EulerToDCM, Insanity2) {
 }
 
 TEST(DCMToEuler, QuaternionToEulerXYZ) {
-  const Mat3 rot = Quat::UnitRandom().toRotationMatrix();
+  const Mat3 rot = RandomRotationMatrix();
   const DCM dcm(rot);
   const RPY actual_rpy = DCMToEuler(dcm, EulerOrder::XYZ);
   // Not working due to non unique solution, so check rotation instead
@@ -135,7 +129,7 @@ TEST(DCMToEuler, QuaternionToEulerXYZ) {
 }
 
 TEST(DCMToEuler, QuaternionToEulerZYX) {
-  const Mat3 rot = Quat::UnitRandom().toRotationMatrix();
+  const Mat3 rot = RandomRotationMatrix();
   const DCM dcm(rot);
   const RPY actual_rpy = DCMToEuler(dcm, EulerOrder::ZYX);
   // Not working due to non unique solution, so check rotation instead
@@ -160,12 +154,20 @@ TEST(EulerToDCM, EulerZYX) {
   EXPECT_TRUE(ExpectEqRPY(expect_rpy, actual_rpy));
 }
 
-TEST(QuatToDCM, ToQuaternion) {
+TEST(QuatToDCM, Random) {
   for (size_t i = 0; i < 1000; i++) {
-    Quat expect_quat = Quat::UnitRandom();
-    DCM dcm = QuatToDCM(expect_quat);
-    const Quat actual_quat =
-      my::DCMToQuaternion(dcm, QuaternionMethod::SHEPPERD);
-    EXPECT_TRUE(ExpectEqQuat(expect_quat, actual_quat));
+    const Quat q = Quat::UnitRandom();
+    const Mat3 expect = q.toRotationMatrix();
+    const DCM actual = QuatToDCM(q);
+    EXPECT_TRUE(ExpectEqMat3(expect, actual.Matrix()));
+  }
+}
+
+TEST(DCMToQuaternion, ToQuaternion) {
+  for (size_t i = 0; i < 1000; i++) {
+    const Quat expect = Quat::UnitRandom();
+    const DCM dcm = QuatToDCM(expect);
+    const Quaternion actual = DCMToQuaternion(dcm, QuaternionMethod::SHEPPERD);
+    EXPECT_TRUE(ExpectEqQuaternion(expect, actual));
   }
 }

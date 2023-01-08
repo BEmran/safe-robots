@@ -1,6 +1,7 @@
 #include "quaternion.hpp"
 
-#include <cmath>  // acos
+#include <cmath>      // acos
+#include <stdexcept>  // out_of_range
 
 namespace my {
 Quaternion::Quaternion() : Quaternion(1.f, Vec3::Zero()) {
@@ -28,7 +29,7 @@ Quaternion Quaternion::Normalized() const {
   constexpr float EPS = 0.001f;
   const float norm = Norm();
   if (norm < EPS) {
-    Quaternion(1.f, Vec3::Zero());
+    return Quaternion(1.f, Vec3::Zero());
   }
   return Quaternion(scalar_ / norm, vec_ / norm);
 }
@@ -72,11 +73,15 @@ float Quaternion::AngularDistance(const Quaternion& rhs) const {
   // return std::acos(2 * dot - 1);
 
   const Quaternion relative_rotation = a.Conjugate() * b;
-  // return 2 * std::atan2(relative_rotation.Vec().norm(), relative_rotation.W());
+  // return 2 * std::atan2(relative_rotation.Vec().norm(),
+  // relative_rotation.W());
   return relative_rotation.Angle();
 }
 
 float Quaternion::operator[](const size_t idx) const {
+  if (idx > 4) {
+    throw std::out_of_range("expected index values in range of [0, 4)");
+  }
   if (idx == 0) {
     return scalar_;
   }
@@ -84,6 +89,9 @@ float Quaternion::operator[](const size_t idx) const {
 }
 
 float& Quaternion::operator[](const size_t idx) {
+  if (idx > 4) {
+    throw std::out_of_range("expected index values in range of [0, 4)");
+  }
   if (idx == 0) {
     return scalar_;
   }

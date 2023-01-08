@@ -1,5 +1,7 @@
 #include "dcm.hpp"
 
+#include <stdexcept>
+
 namespace my {
 DCM::DCM() : mat{Mat3::Identity()} {
 }
@@ -53,5 +55,41 @@ Mat3 DCM::Log() const {
 
 Mat3 DCM::Adjugate() const {
   return Det() * T().Matrix();
+}
+
+MATH_TYPE DCM::operator[](const size_t idx) const {
+  if (idx > 8) {
+    throw std::out_of_range("expected index value in range of [0, 9)");
+  }
+  return mat(static_cast<Eigen::Index>(idx));
+}
+
+MATH_TYPE& DCM::operator[](const size_t idx) {
+  if (idx > 8) {
+    throw std::out_of_range("expected index value in range of [0, 9)");
+  }
+  return mat(static_cast<Eigen::Index>(idx));
+}
+
+MATH_TYPE DCM::At(const size_t idx) const {
+  return this->operator[](idx);
+}
+
+MATH_TYPE& DCM::At(const size_t idx) {
+  return this->operator[](idx);
+}
+
+MATH_TYPE DCM::At(const size_t row, const size_t col) const {
+  if (row > 3 || col > 3) {
+    throw std::out_of_range("expected row and col values in range of [0, 3)");
+  }
+  return this->operator[](row * 3 + col);
+}
+
+MATH_TYPE& DCM::At(const size_t row, const size_t col) {
+  if (row > 3 || col > 3) {
+    throw std::out_of_range("expected row and col values in range of [0, 3)");
+  }
+  return this->operator[](row * 3 + col);
 }
 }  // namespace my

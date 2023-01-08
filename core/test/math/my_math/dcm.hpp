@@ -5,6 +5,7 @@
 
 namespace my {
 using core::utils::Mat3;
+using core::utils::MATH_TYPE;
 
 /**
  * @brief Class to represent a Direction Cosine Rotation.It is built from a 3x3
@@ -50,6 +51,18 @@ class DCM {
    * @return Mat3 adjugate matrix of DCM
    */
   Mat3 Adjugate() const;
+
+  MATH_TYPE operator[](const size_t idx) const;
+
+  MATH_TYPE& operator[](const size_t idx);
+
+  MATH_TYPE At(const size_t idx) const;
+
+  MATH_TYPE& At(const size_t idx);
+
+  MATH_TYPE At(const size_t row, const size_t col) const;
+
+  MATH_TYPE& At(const size_t row, const size_t col);
 
  private:
   Mat3 mat;

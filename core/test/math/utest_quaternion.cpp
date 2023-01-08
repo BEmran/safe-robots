@@ -20,32 +20,6 @@ using my::Quaternion;
 constexpr float PI_2 = PI / 2.f;
 constexpr float PI_4 = PI / 4.f;
 
-// [[nodiscard]] ::testing::AssertionResult ExpectEqVec(const Vec3& expect,
-//                                                      const Vec3& actual) {
-//   auto result = ::testing::AssertionSuccess();
-//   for (size_t idx = 0; idx < expect.size(); idx++) {
-//     result = result && ExpectEq(expect[idx], actual[idx],
-//                                 "idx [" + std::to_string(idx) + "]");
-//   }
-//   return result;
-// }
-
-[[nodiscard]] ::testing::AssertionResult
-ExpectEqEigenQuat(const Eigen::Quaternionf& expect, const Quaternion& actual) {
-  return ExpectEq(expect.w(), actual.W(), "W component") &&
-         ExpectEq(expect.x(), actual.X(), "X component") &&
-         ExpectEq(expect.y(), actual.Y(), "Y component") &&
-         ExpectEq(expect.z(), actual.Z(), "Z component");
-}
-
-[[nodiscard]] ::testing::AssertionResult
-ExpectEqQuat(const Quaternion& expect, const Quaternion& actual) {
-  return ExpectEq(expect.W(), actual.W(), "W component") &&
-         ExpectEq(expect.X(), actual.X(), "X component") &&
-         ExpectEq(expect.Y(), actual.Y(), "Y component") &&
-         ExpectEq(expect.Z(), actual.Z(), "Z component");
-}
-
 float Norm(const float w, const float x, const float y, const float z) {
   return std::sqrt(w * w + x * x + y * y + z * z);
 }
@@ -56,14 +30,14 @@ float Norm(const Quaternion& quat) {
 
 TEST(Quaternion, DefaultConstructConstructIdentityQuaternion) {
   Quaternion q;
-  EXPECT_TRUE(ExpectEqQuat({1.f, 0.f, 0.f, 0.f}, q));
+  EXPECT_TRUE(ExpectEqQuaternion({1.f, 0.f, 0.f, 0.f}, q));
 }
 
 TEST(Quaternion, ConstructWithScalarAndVector) {
   const float scalar{0.1f};
   const Vec3 vec{0.2f, 0.3f, 0.4f};
   Quaternion q(scalar, vec);
-  EXPECT_TRUE(ExpectEqQuat({scalar, vec.x(), vec.y(), vec.z()}, q));
+  EXPECT_TRUE(ExpectEqQuaternion({scalar, vec.x(), vec.y(), vec.z()}, q));
 }
 
 TEST(Quaternion, ConstructWithWXYZ) {
@@ -72,7 +46,7 @@ TEST(Quaternion, ConstructWithWXYZ) {
   const float y{+0.6f};
   const float z{-0.8f};
   Quaternion q(w, x, y, z);
-  EXPECT_TRUE(ExpectEqQuat({w, x, y, z}, q));
+  EXPECT_TRUE(ExpectEqQuaternion({w, x, y, z}, q));
 }
 
 TEST(Quaternion, NormForIdentity) {
@@ -99,13 +73,13 @@ TEST(Quaternion, Normalize) {
   const float expect_norm = Norm(w, x, y, z);
   const Quaternion expect_quat(w / expect_norm, x / expect_norm,
                                y / expect_norm, z / expect_norm);
-  EXPECT_TRUE(ExpectEqQuat(expect_quat, actual_quat));
+  EXPECT_TRUE(ExpectEqQuaternion(expect_quat, actual_quat));
 }
 
 TEST(Quaternion, NormalizeZeroQuaternion) {
-  Quaternion actual_quat(0, 0, 0, 0);
-  actual_quat.Normalize();
-  EXPECT_TRUE(ExpectEqQuat({1.f, 0.f, 0.f, 0.f}, actual_quat));
+  Quaternion quat(0, 0, 0, 0);
+  quat.Normalize();
+  EXPECT_TRUE(ExpectEqQuaternion({1.f, 0.f, 0.f, 0.f}, quat));
 }
 
 TEST(Quaternion, Normalized) {
@@ -118,23 +92,24 @@ TEST(Quaternion, Normalized) {
   const float expect_norm = Norm(w, x, y, z);
   const Quaternion expect_quat(w / expect_norm, x / expect_norm,
                                y / expect_norm, z / expect_norm);
-  EXPECT_TRUE(ExpectEqQuat(expect_quat, actual_quat.Normalized()));
-  EXPECT_TRUE(ExpectEqQuat({w, x, y, z}, actual_quat));
+  EXPECT_TRUE(ExpectEqQuaternion(expect_quat, actual_quat.Normalized()));
+  EXPECT_TRUE(ExpectEqQuaternion({w, x, y, z}, actual_quat));
 }
 
 TEST(Quaternion, NormalizedZeroQuaternion) {
   Quaternion actual_quat(0.f, 0.f, 0.f, 0.f);
-  EXPECT_TRUE(ExpectEqQuat({1.f, 0.f, 0.f, 0.f}, actual_quat.Normalized()));
-  EXPECT_TRUE(ExpectEqQuat({0.f, 0.f, 0.f, 0.f}, actual_quat));
+  EXPECT_TRUE(
+    ExpectEqQuaternion({1.f, 0.f, 0.f, 0.f}, actual_quat.Normalized()));
+  EXPECT_TRUE(ExpectEqQuaternion({0.f, 0.f, 0.f, 0.f}, actual_quat));
 }
 
 TEST(Quaternion, SetIdentity) {
   const float scalar{0.1f};
   const Vec3 vec{0.2f, 0.3f, 0.4f};
   Quaternion q(scalar, vec);
-  EXPECT_TRUE(ExpectEqQuat({scalar, vec.x(), vec.y(), vec.z()}, q));
+  EXPECT_TRUE(ExpectEqQuaternion({scalar, vec.x(), vec.y(), vec.z()}, q));
   q.SetIdentity();
-  EXPECT_TRUE(ExpectEqQuat({1.f, 0.f, 0.f, 0.f}, q));
+  EXPECT_TRUE(ExpectEqQuaternion({1.f, 0.f, 0.f, 0.f}, q));
 }
 
 TEST(Quaternion, GetComponents) {
@@ -168,7 +143,7 @@ TEST(Quaternion, Conjugate) {
   const Quaternion q(scalar, vec);
   const Quaternion expect = q.Conjugate();
   const Quaternion actual(scalar, -vec);
-  EXPECT_TRUE(ExpectEqQuat(actual, expect));
+  EXPECT_TRUE(ExpectEqQuaternion(actual, expect));
 }
 
 TEST(Quaternion, DoubleConjugateIsTheSameQuaternion) {
@@ -176,7 +151,7 @@ TEST(Quaternion, DoubleConjugateIsTheSameQuaternion) {
   const Vec3 vec{0.2f, 0.3f, 0.4f};
   const Quaternion q(scalar, vec);
   const Quaternion expect = q.Conjugate().Conjugate();
-  EXPECT_TRUE(ExpectEqQuat(q, expect));
+  EXPECT_TRUE(ExpectEqQuaternion(q, expect));
 }
 
 TEST(Quaternion, Dot) {
@@ -277,7 +252,7 @@ TEST(Quaternion, AddTwoQuaternion) {
 
   const Quaternion expect = q1 + q2;
   const Quaternion actual(scalar1 + scalar2, vec1 + vec2);
-  EXPECT_TRUE(ExpectEqQuat(actual, expect));
+  EXPECT_TRUE(ExpectEqQuaternion(actual, expect));
 }
 
 TEST(Quaternion, SubtractTwoQuaternion) {
@@ -290,7 +265,7 @@ TEST(Quaternion, SubtractTwoQuaternion) {
 
   const Quaternion expect = q1 - q2;
   const Quaternion actual(scalar1 - scalar2, vec1 - vec2);
-  EXPECT_TRUE(ExpectEqQuat(actual, expect));
+  EXPECT_TRUE(ExpectEqQuaternion(actual, expect));
 }
 
 TEST(Quaternion, MultiplyTwoQuaternions) {
@@ -304,7 +279,7 @@ TEST(Quaternion, MultiplyTwoQuaternions) {
   const Quaternion expect = q1 * q2;
   const Quaternion actual(scalar1 * scalar2 - vec1.dot(vec2),
                           scalar1 * vec2 + scalar2 * vec1 + vec1.cross(vec2));
-  EXPECT_TRUE(ExpectEqQuat(actual, expect));
+  EXPECT_TRUE(ExpectEqQuaternion(actual, expect));
 }
 
 TEST(Quaternion, MultiplySameQuaternion) {
@@ -315,7 +290,7 @@ TEST(Quaternion, MultiplySameQuaternion) {
   const Quaternion expect = q * q;
   const Quaternion actual(scalar * scalar - vec.squaredNorm(),
                           2 * scalar * vec);
-  EXPECT_TRUE(ExpectEqQuat(actual, expect));
+  EXPECT_TRUE(ExpectEqQuaternion(actual, expect));
 }
 
 TEST(Quaternion, RotateAVector) {
@@ -326,7 +301,7 @@ TEST(Quaternion, RotateAVector) {
 
   const Quaternion expect = q * Vector;
   const Quaternion actual = q * Quaternion(0, Vector) * q.Conjugate();
-  EXPECT_TRUE(ExpectEqQuat(actual, expect));
+  EXPECT_TRUE(ExpectEqQuaternion(actual, expect));
 }
 
 TEST(Quaternion, MultiplyByConstant) {
@@ -337,7 +312,7 @@ TEST(Quaternion, MultiplyByConstant) {
 
   const Quaternion expect = q * constant;
   const Quaternion actual(scalar * constant, vec * constant);
-  EXPECT_TRUE(ExpectEqQuat(actual, expect));
+  EXPECT_TRUE(ExpectEqQuaternion(actual, expect));
 }
 
 TEST(Quaternion, DivideByConstant) {
@@ -348,7 +323,7 @@ TEST(Quaternion, DivideByConstant) {
 
   const Quaternion expect = q / constant;
   const Quaternion actual(scalar / constant, vec / constant);
-  EXPECT_TRUE(ExpectEqQuat(actual, expect));
+  EXPECT_TRUE(ExpectEqQuaternion(actual, expect));
 }
 
 /*****************************************************************************/
@@ -380,13 +355,13 @@ TEST_F(QuaternionVsEigen, Norm) {
 TEST_F(QuaternionVsEigen, Normalize) {
   q1.Normalize();
   e1.normalize();
-  EXPECT_TRUE(ExpectEqEigenQuat(e1, q1));
+  EXPECT_TRUE(ExpectEqQuaternion(e1, q1));
 }
 
 TEST_F(QuaternionVsEigen, Normalized) {
   const Quaternion expect = q1.Normalized();
   const Eigen::Quaternionf actual = e1.normalized();
-  EXPECT_TRUE(ExpectEqEigenQuat(actual, expect));
+  EXPECT_TRUE(ExpectEqQuaternion(actual, expect));
 }
 
 TEST_F(QuaternionVsEigen, Dot) {
@@ -404,11 +379,11 @@ TEST_F(QuaternionVsEigen, AngularDistance) {
 TEST_F(QuaternionVsEigen, Conjugate) {
   const Quaternion expect = q1.Conjugate();
   const Eigen::Quaternionf actual = e1.conjugate();
-  EXPECT_TRUE(ExpectEqEigenQuat(actual, expect));
+  EXPECT_TRUE(ExpectEqQuaternion(actual, expect));
 }
 
 TEST_F(QuaternionVsEigen, MultiplyTwoQuaternions) {
   const Quaternion expect = q1 * q2;
   const Eigen::Quaternionf actual = e1 * e2;
-  EXPECT_TRUE(ExpectEqEigenQuat(actual, expect));
+  EXPECT_TRUE(ExpectEqQuaternion(actual, expect));
 }

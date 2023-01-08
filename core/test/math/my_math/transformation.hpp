@@ -3,10 +3,10 @@
 
 #include "core/utils/math.hpp"
 #include "dcm.hpp"
+#include "quaternion.hpp"
 
 namespace my {
 using core::utils::Mat3;
-using core::utils::Quat;
 using core::utils::RPY;
 using core::utils::Vec3;
 
@@ -65,29 +65,29 @@ RPY DCMToEuler(const DCM& dcm, const EulerOrder order);
  * @brief Quaternion from a Direction Cosine Matrix with Shepperd's method
  *
  * @param dcm Direction Cosine Matrix
- * @return Quat quaternion
+ * @return Quaternion quaternion
  */
-Quat Shepperd2(const DCM dcm);
-Quat Shepperd(const DCM dcm);
+Quaternion Shepperd2(const DCM dcm);
+Quaternion Shepperd(const DCM dcm);
 
 /**
  * @brief Quaternion from a Direction Cosine Matrix with Sarabandi's method.
  *
  * @param dcm Direction Cosine Matrix
- * @return Quat quaternion
+ * @return Quaternion quaternion
  */
-Quat Sarabandi(const DCM dcm);
+Quaternion Sarabandi(const DCM dcm);
 
 /**
  * @brief Quaternion from a Direction Cosine Matrix with Chiaverini's algebraic
  * method.
  *
  * @param dcm Direction Cosine Matrix
- * @return Quat quaternion
+ * @return Quaternion quaternion
  */
-Quat Chiaverini(const DCM dcm);
+Quaternion Chiaverini(const DCM dcm);
 
-Quat DCMToQuaternion(
+Quaternion DCMToQuaternion(
   const DCM& dcm, const QuaternionMethod method = QuaternionMethod::SHEPPERD);
 
 /**
@@ -96,6 +96,6 @@ Quat DCMToQuaternion(
  * @param quat quaternion vector
  * @return DCM rotation matrix
  */
-DCM QuatToDCM(const Quat quat);
+DCM QuatToDCM(const Quaternion quat);
 }  // namespace my
 #endif  // CORE_MATH_TRANSFORMATION_HPP_

@@ -1,6 +1,8 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 #include "utest_utils.hpp"
 
+#include <eigen3/Eigen/Core>
+
 constexpr float EPS = 0.00001f;
 
 [[nodiscard]] ::testing::AssertionResult
@@ -27,11 +29,9 @@ operator&&(const ::testing::AssertionResult& res1,
 [[nodiscard]] ::testing::AssertionResult ExpectEqMat3(const Mat3& expect,
                                                       const Mat3& actual) {
   ::testing::AssertionResult result = ::testing::AssertionSuccess();
-  for (Eigen::Index i = 0; i < expect.size(); i++) {
+  for (Eigen::Index i = 0; i < 9; i++) {
     std::stringstream msg;
-    const long row = i / expect.cols();
-    const long col = i % expect.cols();
-    msg << "idx(" << i << ") at Mat[" << row << "," << col << "]";
+    msg << "idx(" << i << ") at Mat[" << i / 3 << "," << i % 3l << "]";
     result = result && ExpectEq(expect(i), actual(i), msg.str());
   }
   return result;
@@ -59,16 +59,20 @@ ExpectEqRPY(const core::utils::RPY& expect, const core::utils::RPY& actual) {
          ExpectEq(expect.yaw, actual.yaw, "yaw Component");
 }
 
-[[nodiscard]] ::testing::AssertionResult ExpectEqQuat(const Quat& expect,
-                                                      const Quat& actual) {
-  if (std::abs(expect.w() - actual.w()) < EPS) {
-    return ExpectEqVec3(Vec3(expect.vec()), Vec3(actual.vec()));
-  } else if (std::abs(expect.w()) - std::abs(actual.w()) < EPS) {
-    return ExpectEqVec3(Vec3(expect.vec()), Vec3(-1.f * actual.vec()))  //
-           << " needed to flip angle";
+[[nodiscard]] ::testing::AssertionResult
+ExpectEqQuaternion(const my::Quaternion& expect, const my::Quaternion& actual) {
+  if (std::abs(expect.W() - actual.W()) < EPS) {
+    return ExpectEqVec3(expect.Vec(), actual.Vec());
+  } else if (std::abs(expect.W()) - std::abs(actual.W()) < EPS) {
+    return ExpectEqVec3(expect.Vec(), Vec3(-1.f * actual.Vec()))  //
+           << " needed to flip real part";
   } else {
     return ::testing::AssertionFailure()
-           << "error angle -> "
-           << "expect (" << expect.w() << ") and actual (" << actual.w() << ")";
+           << "error real part -> "
+           << "expect (" << expect.W() << ") and actual (" << actual.W() << ")";
   }
+}
+
+Mat3 RandomRotationMatrix() {
+  return core::utils::Quat::UnitRandom().toRotationMatrix();
 }

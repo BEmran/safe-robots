@@ -6,6 +6,7 @@
 
 #include "core/utils/math.hpp"
 #include "my_math/dcm.hpp"
+#include "my_math/quaternion.hpp"
 
 using core::utils::Mat3;
 using core::utils::MATH_TYPE;
@@ -35,4 +36,8 @@ ExpectEqRPY(const core::utils::RPY& expect, const core::utils::RPY& actual);
 [[nodiscard]] ::testing::AssertionResult ExpectEqQuat(const Quat& expect,
                                                       const Quat& actual);
 
+[[nodiscard]] ::testing::AssertionResult
+ExpectEqQuaternion(const my::Quaternion& expect, const my::Quaternion& actual);
+
+Mat3 RandomRotationMatrix();
 #endif  // CORE_MATH_UTILS_HPP_
