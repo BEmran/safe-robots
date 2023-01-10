@@ -1,9 +1,9 @@
-#include "transformation.hpp"
+#include "core/math/transformation.hpp"
 
 #include <algorithm>  // clamp
 #include <iostream>   // cerr
 
-namespace my {
+namespace math {
 Mat3 Skew(const Vec3 vec) {
   Mat3 mat = Mat3::Zero();
   mat(2, 1) = +vec.x();
@@ -279,4 +279,4 @@ DCM QuatToDCM(const Quaternion quat) {
   R(2, 2) = 1.f - 2.f * (q.X() * q.X() + q.Y() * q.Y());
   return R;
 }
-}  // namespace my
+}  // namespace math

@@ -11,7 +11,7 @@
 #include <stdexcept>
 #include <vector>
 
-namespace my {
+namespace math {
 
 template <typename T>
 class Vec {
@@ -125,5 +125,5 @@ class Vec3 : public Vec<T> {
   }
 };
 
-}  // namespace my
+}  // namespace math
 #endif  // MY_MATH_VECTOR_HPP_

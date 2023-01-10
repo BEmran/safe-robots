@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 
-#include "core/utils/math.hpp"
-#include "my_math/dcm.hpp"
-#include "my_math/quaternion.hpp"
+#include "core/math/dcm.hpp"
+#include "core/math/quaternion.hpp"
+#include "core/math/math.hpp"
 
 using core::utils::Mat3;
 using core::utils::MATH_TYPE;
@@ -24,8 +24,8 @@ operator&&(const ::testing::AssertionResult& res1,
 [[nodiscard]] ::testing::AssertionResult ExpectEqMat3(const Mat3& expect,
                                                       const Mat3& actual);
 
-[[nodiscard]] ::testing::AssertionResult ExpectEqMat3(const my::DCM& expect,
-                                                      const my::DCM& actual);
+[[nodiscard]] ::testing::AssertionResult ExpectEqMat3(const math::DCM& expect,
+                                                      const math::DCM& actual);
 
 [[nodiscard]] ::testing::AssertionResult ExpectEqVec3(const Vec3& expect,
                                                       const Vec3& actual);
@@ -36,8 +36,8 @@ ExpectEqRPY(const core::utils::RPY& expect, const core::utils::RPY& actual);
 [[nodiscard]] ::testing::AssertionResult ExpectEqQuat(const Quat& expect,
                                                       const Quat& actual);
 
-[[nodiscard]] ::testing::AssertionResult
-ExpectEqQuaternion(const my::Quaternion& expect, const my::Quaternion& actual);
+[[nodiscard]] ::testing::AssertionResult ExpectEqQuaternion(
+  const math::Quaternion& expect, const math::Quaternion& actual);
 
 Mat3 RandomRotationMatrix();
 #endif  // CORE_MATH_UTILS_HPP_

@@ -2,9 +2,9 @@
 
 #include <gtest/gtest.h>
 
-#include "core/utils/math.hpp"
-#include "my_math/dcm.hpp"
-#include "my_math/transformation.hpp"
+#include "core/math/math.hpp"
+#include "core/math/dcm.hpp"
+#include "core/math/transformation.hpp"
 #include "utest_utils.hpp"
 
 using core::utils::Mat3;
@@ -12,17 +12,17 @@ using core::utils::MATH_TYPE;
 using core::utils::Quat;
 using core::utils::RPY;
 using core::utils::Vec3;
-using my::AxisAngleToDCM;
-using my::DCM;
-using my::DCMToAxisAngle;
-using my::DCMToEuler;
-using my::DCMToQuaternion;
-using my::EulerOrder;
-using my::EulerToDCM;
-using my::Quaternion;
-using my::QuaternionMethod;
-using my::QuatToDCM;
-using my::Skew;
+using math::AxisAngleToDCM;
+using math::DCM;
+using math::DCMToAxisAngle;
+using math::DCMToEuler;
+using math::DCMToQuaternion;
+using math::EulerOrder;
+using math::EulerToDCM;
+using math::Quaternion;
+using math::QuaternionMethod;
+using math::QuatToDCM;
+using math::Skew;
 
 TEST(Skew, SkewSymmetric) {
   const Vec3 vec(0.2f, -0.4f, 0.8f);

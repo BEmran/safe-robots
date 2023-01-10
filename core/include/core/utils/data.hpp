@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#include "core/utils/math.hpp"
+#include "core/math/math.hpp"
 
 namespace core::utils {
 constexpr int FULL_PRECISION = 10;

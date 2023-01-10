@@ -1,8 +1,8 @@
-#include "dcm.hpp"
+#include "core/math/dcm.hpp"
 
 #include <stdexcept>
 
-namespace my {
+namespace math {
 DCM::DCM() : mat{Mat3::Identity()} {
 }
 
@@ -92,4 +92,4 @@ MATH_TYPE& DCM::At(const size_t row, const size_t col) {
   }
   return this->operator[](row * 3 + col);
 }
-}  // namespace my
+}  // namespace math

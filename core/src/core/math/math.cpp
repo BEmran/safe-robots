@@ -1,6 +1,6 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#include "core/utils/math.hpp"
+#include "core/math/math.hpp"
 
 namespace core::utils {
 static const Eigen::IOFormat kMatFmt(Eigen::FullPrecision, 0, ", ", ";\n", "[",

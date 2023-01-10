@@ -8,7 +8,7 @@
 #include <string>
 #include <string_view>
 
-#include "core/utils/math.hpp"
+#include "core/math/math.hpp"
 #include "math/quaternion.h"
 
 using core::utils::Mat3;

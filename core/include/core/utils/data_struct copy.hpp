@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "core/utils/math.hpp"
+#include "core/math/math.hpp"
 
 namespace {
 constexpr const char QUAT_LABEL[] = "quat";

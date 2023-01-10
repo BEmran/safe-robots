@@ -1,9 +1,9 @@
 #ifndef CORE_MATH_DCM_HPP_
 #define CORE_MATH_DCM_HPP_
 
-#include "core/utils/math.hpp"
+#include "core/math/math.hpp"
 
-namespace my {
+namespace math {
 using core::utils::Mat3;
 using core::utils::MATH_TYPE;
 
@@ -67,5 +67,5 @@ class DCM {
  private:
   Mat3 mat;
 };
-}  // namespace my
+}  // namespace math
 #endif  // CORE_MATH_DCM_HPP_

@@ -37,8 +37,8 @@ operator&&(const ::testing::AssertionResult& res1,
   return result;
 }
 
-[[nodiscard]] ::testing::AssertionResult ExpectEqMat3(const my::DCM& expect,
-                                                      const my::DCM& actual) {
+[[nodiscard]] ::testing::AssertionResult ExpectEqMat3(const math::DCM& expect,
+                                                      const math::DCM& actual) {
   return ExpectEqMat3(expect.Matrix(), actual.Matrix());
 }
 
@@ -60,7 +60,7 @@ ExpectEqRPY(const core::utils::RPY& expect, const core::utils::RPY& actual) {
 }
 
 [[nodiscard]] ::testing::AssertionResult
-ExpectEqQuaternion(const my::Quaternion& expect, const my::Quaternion& actual) {
+ExpectEqQuaternion(const math::Quaternion& expect, const math::Quaternion& actual) {
   if (std::abs(expect.W() - actual.W()) < EPS) {
     return ExpectEqVec3(expect.Vec(), actual.Vec());
   } else if (std::abs(expect.W()) - std::abs(actual.W()) < EPS) {

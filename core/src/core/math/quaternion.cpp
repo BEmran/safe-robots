@@ -1,9 +1,9 @@
-#include "quaternion.hpp"
+#include "core/math/quaternion.hpp"
 
 #include <cmath>      // acos
 #include <stdexcept>  // out_of_range
 
-namespace my {
+namespace math {
 Quaternion::Quaternion() : Quaternion(1.f, Vec3::Zero()) {
 }
 
@@ -197,4 +197,4 @@ Quaternion operator/(const Quaternion quat, const float scale) {
 //   return quat;
 // }
 
-}  // namespace my
+}  // namespace math

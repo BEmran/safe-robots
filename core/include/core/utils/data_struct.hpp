@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "core/utils/data_struct_template.hpp"
-#include "core/utils/math.hpp"
+#include "core/math/math.hpp"
 
 /* data structure labels */
 
@@ -105,38 +105,6 @@ std::string DataStruct<Quat>::ToString() const {
   ss << data_.w() << ", " << data_.vec().format(kVecFmtSimple);
   return ss.str();
 }
-
-// Custom data needs to have default constructor
-
-/**
- * @brief simple structure to hold RPY data in radian
- *
- */
-struct RPY {
-  /// @brief angle around x-axis in radian
-  MATH_TYPE roll;
-  /// @brief angle around y-axis in radian
-  MATH_TYPE pitch;
-  /// @brief angle around z-axis in radian
-  MATH_TYPE yaw;
-
-  /**
-   * @brief Default Construct for RPY object
-   *
-   */
-  RPY() : RPY(0.0, 0.0, 0.0) {
-  }
-
-  /**
-   * @brief Construct a new RPY object
-   *
-   * @param r roll angle in radian
-   * @param p pitch angle in radian
-   * @param y yaw angle in radian
-   */
-  RPY(MATH_TYPE r, MATH_TYPE p, MATH_TYPE y) : roll(r), pitch(p), yaw(y) {
-  }
-};
 
 // RPY Partial Specialization -------------------------------------------------
 template <>

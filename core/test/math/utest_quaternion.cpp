@@ -6,9 +6,9 @@
 #include <eigen3/Eigen/Geometry>
 #include <string_view>
 
-#include "core/utils/math.hpp"
-#include "my_math/quaternion.hpp"
-#include "my_math/transformation.hpp"
+#include "core/math/quaternion.hpp"
+#include "core/math/transformation.hpp"
+#include "core/math/math.hpp"
 #include "utest_utils.hpp"
 
 using core::utils::Mat3;
@@ -16,7 +16,7 @@ using core::utils::MATH_TYPE;
 using core::utils::PI;
 using core::utils::Quat;
 using core::utils::Vec3;
-using my::Quaternion;
+using math::Quaternion;
 constexpr float PI_2 = PI / 2.f;
 constexpr float PI_4 = PI / 4.f;
 

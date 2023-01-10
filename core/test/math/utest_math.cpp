@@ -7,7 +7,7 @@
 
 #include <sstream>
 
-#include "core/utils/math.hpp"
+#include "core/math/math.hpp"
 #include "utest/utils_data.hpp"
 
 using core::utils::InputMat;

@@ -52,7 +52,6 @@ set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/utils/logger_node.cpp
     ${CORE_SOURCE_DIR}/utils/logger_stream.cpp
     ${CORE_SOURCE_DIR}/utils/logger.cpp
-    ${CORE_SOURCE_DIR}/utils/math.cpp
     ${CORE_SOURCE_DIR}/utils/module.cpp
     ${CORE_SOURCE_DIR}/utils/node.cpp
     ${CORE_SOURCE_DIR}/utils/server_socket.cpp
@@ -64,6 +63,11 @@ set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/utils/writer_file.cpp
     ${CORE_SOURCE_DIR}/utils/writer.cpp
     ${CORE_SOURCE_DIR}/hardware/model.cpp
+    ${CORE_SOURCE_DIR}/math/dcm.cpp
+    ${CORE_SOURCE_DIR}/math/quaternion.cpp
+    ${CORE_SOURCE_DIR}/math/math.cpp
+    ${CORE_SOURCE_DIR}/math/transformation.cpp
+    ${CORE_SOURCE_DIR}/math/vector.cpp
     ${CORE_SOURCE_DIR}/sensors/module_sensor_imu.cpp
     ${CORE_SOURCE_DIR}/sensors/module_sensor.cpp)
 

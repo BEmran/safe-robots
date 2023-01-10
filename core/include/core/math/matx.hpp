@@ -3,7 +3,7 @@
 
 #include <eigen3/Eigen/Core>
 
-#include "core/utils/math.hpp"
+#include "core/math/math.hpp"
 using core::utils::MATH_TYPE;
 
 /**

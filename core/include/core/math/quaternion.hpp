@@ -1,9 +1,9 @@
 #ifndef CORE_MATH_QUATERNION_HPP_
 #define CORE_MATH_QUATERNION_HPP_
 
-#include "core/utils/math.hpp"
+#include "core/math/math.hpp"
 
-namespace my {
+namespace math {
 using core::utils::Quat;
 using core::utils::Vec3;
 
@@ -170,5 +170,5 @@ Quaternion operator/(const Quaternion quat, const float scale);
 //   }
 //   return quat;
 // }
-}  // namespace my
+}  // namespace math
 #endif  // CORE_MATH_QUATERNION_HPP_

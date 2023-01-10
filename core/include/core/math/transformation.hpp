@@ -1,11 +1,11 @@
 #ifndef CORE_MATH_TRANSFORMATION_HPP_
 #define CORE_MATH_TRANSFORMATION_HPP_
 
-#include "core/utils/math.hpp"
+#include "core/math/math.hpp"
 #include "dcm.hpp"
 #include "quaternion.hpp"
 
-namespace my {
+namespace math {
 using core::utils::Mat3;
 using core::utils::RPY;
 using core::utils::Vec3;
@@ -97,5 +97,5 @@ Quaternion DCMToQuaternion(
  * @return DCM rotation matrix
  */
 DCM QuatToDCM(const Quaternion quat);
-}  // namespace my
+}  // namespace math
 #endif  // CORE_MATH_TRANSFORMATION_HPP_
