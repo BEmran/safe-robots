@@ -7,10 +7,10 @@
 #include <optional>
 
 #include "common/sensors/utils.hpp"
-#include "core/utils/math.hpp"
+#include "core/math/math.hpp"
 
 namespace hardware::common::sensors {
-using ReadFunc = std::function<core::utils::Vec3(void)>;
+using ReadFunc = std::function<core::math::Vec3(void)>;
 // Function which accumulates gyro and accelerometer data after device
 // initialization. It calculates the average of the at-rest readings and then
 // loads the resulting offsets into accelerometer and gyro bias registers.

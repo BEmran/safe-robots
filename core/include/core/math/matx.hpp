@@ -4,7 +4,7 @@
 #include <eigen3/Eigen/Core>
 
 #include "core/math/math.hpp"
-using core::utils::MATH_TYPE;
+using core::math::MATH_TYPE;
 
 /**
  * @brief Class to represent a square matrix

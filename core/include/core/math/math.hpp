@@ -1,7 +1,7 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_UTILS_MATH_HPP_
-#define CORE_UTILS_MATH_HPP_
+#ifndef CORE_MATH_MATH_HPP_
+#define CORE_MATH_MATH_HPP_
 
 #include <eigen3/Eigen/Dense>
 #include <iomanip>
@@ -9,7 +9,7 @@
 #undef EIGEN_DEFAULT_DENSE_INDEX_TYPE
 #define EIGEN_DEFAULT_DENSE_INDEX_TYPE size_t
 
-namespace core::utils {
+namespace core::math {
 using MATH_TYPE = float;
 
 constexpr MATH_TYPE GRAVITY = 9.80665F;
@@ -69,12 +69,12 @@ struct RPY {
     : roll(r), pitch(p), yaw(y) {
   }
 };
-}  // namespace core::utils
+}  // namespace core::math
 
 // need to be unscoped in namespace to be called from any file when include
 // header
-std::ostream& operator<<(std::ostream& os, const core::utils::Vec3& vec);
-std::ostream& operator<<(std::ostream& os, const core::utils::Transpose& vec);
-std::ostream& operator<<(std::ostream& os, const core::utils::Quat& quat);
+std::ostream& operator<<(std::ostream& os, const core::math::Vec3& vec);
+std::ostream& operator<<(std::ostream& os, const core::math::Transpose& vec);
+std::ostream& operator<<(std::ostream& os, const core::math::Quat& quat);
 
-#endif  // CORE_UTILS_MATH_HPP_
+#endif  // CORE_MATH_MATH_HPP_

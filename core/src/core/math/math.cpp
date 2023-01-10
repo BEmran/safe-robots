@@ -2,7 +2,7 @@
 
 #include "core/math/math.hpp"
 
-namespace core::utils {
+namespace core::math {
 static const Eigen::IOFormat kMatFmt(Eigen::FullPrecision, 0, ", ", ";\n", "[",
                                      "]", "[", "]");
 static const Eigen::IOFormat kVecFmt(Eigen::FullPrecision, 0, ", ", ";\n", "",
@@ -30,18 +30,18 @@ Quat UnitQuaternion(const float scalar, const Vec3 vec) {
   return q;
 }
 
-}  // namespace core::utils
+}  // namespace core::math
 
-std::ostream& operator<<(std::ostream& os, const core::utils::Vec3& vec) {
-  return os << vec.format(core::utils::kVecFmt);
+std::ostream& operator<<(std::ostream& os, const core::math::Vec3& vec) {
+  return os << vec.format(core::math::kVecFmt);
 }
 
-std::ostream& operator<<(std::ostream& os, const core::utils::Transpose& vec) {
-  return os << vec.format(core::utils::kVecFmt);
+std::ostream& operator<<(std::ostream& os, const core::math::Transpose& vec) {
+  return os << vec.format(core::math::kVecFmt);
 }
 
-std::ostream& operator<<(std::ostream& os, const core::utils::Quat& quat) {
-  os << "ang = " << quat.w() << ", "                         /* angle */
-     << quat.vec().transpose().format(core::utils::kVecFmt); /* axis */
+std::ostream& operator<<(std::ostream& os, const core::math::Quat& quat) {
+  os << "ang = " << quat.w() << ", "                        /* angle */
+     << quat.vec().transpose().format(core::math::kVecFmt); /* axis */
   return os;
 }

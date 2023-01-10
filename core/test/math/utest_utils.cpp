@@ -53,7 +53,7 @@ operator&&(const ::testing::AssertionResult& res1,
 }
 
 [[nodiscard]] ::testing::AssertionResult
-ExpectEqRPY(const core::utils::RPY& expect, const core::utils::RPY& actual) {
+ExpectEqRPY(const core::math::RPY& expect, const core::math::RPY& actual) {
   return ExpectEq(expect.roll, actual.roll, "roll Component") &&
          ExpectEq(expect.pitch, actual.pitch, "pitch Component") &&
          ExpectEq(expect.yaw, actual.yaw, "yaw Component");
@@ -74,5 +74,5 @@ ExpectEqQuaternion(const math::Quaternion& expect, const math::Quaternion& actua
 }
 
 Mat3 RandomRotationMatrix() {
-  return core::utils::Quat::UnitRandom().toRotationMatrix();
+  return core::math::Quat::UnitRandom().toRotationMatrix();
 }

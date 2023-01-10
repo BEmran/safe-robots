@@ -7,6 +7,8 @@
 #include <iostream>
 
 namespace hardware::common::sensors {
+using core::math::DEG_TO_RAD;
+
 int16_t To16Bit(uint8_t msb, uint8_t lsb) {
   const auto high = static_cast<int>(msb);
   const auto low = static_cast<int>(lsb);
@@ -39,9 +41,9 @@ Vec3 EstimateRPY(const Vec3& accel) {
   const auto az2 = accel_normalized.z() * accel_normalized.z();
 
   const auto rx =
-    std::atan2(accel_normalized.y(), accel_normalized.z()) / cu::DEG_TO_RAD;
+    std::atan2(accel_normalized.y(), accel_normalized.z()) / DEG_TO_RAD;
   const auto ry =
-    std::atan2(-accel_normalized.x(), std::sqrt(ay2 + az2)) / cu::DEG_TO_RAD;
+    std::atan2(-accel_normalized.x(), std::sqrt(ay2 + az2)) / DEG_TO_RAD;
   const auto rz = 0.F;
   return Vec3(rx, ry, rz);
 }

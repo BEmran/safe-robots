@@ -10,12 +10,12 @@
 #include "core/math/math.hpp"
 #include "utest/utils_data.hpp"
 
-using core::utils::InputMat;
-using core::utils::Matrix;
-using core::utils::MatrixX;
-using core::utils::OutputMat;
-using core::utils::Scalar;
-using core::utils::Vector;
+using core::math::InputMat;
+using core::math::Matrix;
+using core::math::MatrixX;
+using core::math::OutputMat;
+using core::math::Scalar;
+using core::math::Vector;
 
 float Sum(InputMat mat) {
   return mat.sum();
@@ -75,7 +75,7 @@ TEST(Scalar, Scalar) {
 }
 
 TEST(Scalar, CreateScalar) {
-  const auto scalar = core::utils::CreateScalar(3);
+  const auto scalar = core::math::CreateScalar(3);
   ASSERT_EQ(1, scalar.size());
   ExpectEq(static_cast<MATH_TYPE>(3), scalar[0]);
 }

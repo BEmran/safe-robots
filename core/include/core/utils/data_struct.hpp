@@ -7,8 +7,8 @@
 #include <string>
 #include <vector>
 
-#include "core/utils/data_struct_template.hpp"
 #include "core/math/math.hpp"
+#include "core/utils/data_struct_template.hpp"
 
 /* data structure labels */
 
@@ -32,6 +32,10 @@ const char* TEMP_LABEL = "temp";
 const char* IMU_LABEL = "imu";
 
 /* Define General Data Struct types */
+using Vec3 = math::Vec3;
+using Quat = math::Quat;
+using RPY = math::RPY;
+using MATH_TYPE = math::MATH_TYPE;
 using Vec3DataStruct = DataStruct<Vec3>;
 using QuatDataStruct = DataStruct<Quat>;
 using MathTypeDataStruct = DataStruct<MATH_TYPE>;
@@ -77,7 +81,7 @@ std::string DataStruct<Vec3>::Header() const {
 template <>
 std::string DataStruct<Vec3>::ToString() const {
   std::stringstream ss;
-  ss << data_.format(kVecFmtSimple);
+  ss << data_.format(math::kVecFmtSimple);
   return ss.str();
 }
 
@@ -102,7 +106,7 @@ std::string DataStruct<Quat>::Header() const {
 template <>
 std::string DataStruct<Quat>::ToString() const {
   std::stringstream ss;
-  ss << data_.w() << ", " << data_.vec().format(kVecFmtSimple);
+  ss << data_.w() << ", " << data_.vec().format(math::kVecFmtSimple);
   return ss.str();
 }
 

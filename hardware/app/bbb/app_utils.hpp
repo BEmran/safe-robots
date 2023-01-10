@@ -7,10 +7,10 @@
 #include "common/sensors/mpu/def.hpp"
 #include "common/utils.hpp"
 #include "core/utils/data.hpp"
-#include "core/utils/math.hpp"
+#include "core/math/math.hpp"
 
 using core::utils::ImuData;
-using core::utils::Vec3;
+using core::math::Vec3;
 using hardware::common::sensors::mpu::SensorRawData;
 
 enum class GyroMode { RAD, DEG, RAW };

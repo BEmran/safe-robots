@@ -6,9 +6,9 @@
 #include "quaternion.hpp"
 
 namespace math {
-using core::utils::Mat3;
-using core::utils::RPY;
-using core::utils::Vec3;
+using core::math::Mat3;
+using core::math::RPY;
+using core::math::Vec3;
 
 enum class EulerOrder { XYZ, ZYX };
 enum class QuaternionMethod { SHEPPERD, SARABANDI, CHIAVERINI };

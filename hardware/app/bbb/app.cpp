@@ -131,7 +131,7 @@ bool App::IsOk() const {
   return RUNNING;
 }
 
-std::vector<std::string> ToString(core::utils::InputMat mat) {
+std::vector<std::string> ToString(core::math::InputMat mat) {
   std::vector<float> vec(mat.data(), mat.data() + mat.size());
   std::vector<std::string> str(vec.size());
   std::transform(vec.begin(), vec.end(), str.begin(),
@@ -141,9 +141,9 @@ std::vector<std::string> ToString(core::utils::InputMat mat) {
 
 void App::Create() {
   hardware::common::sensors::SensorSpecs<3> spec1;
-  spec1.bias = core::utils::Vec3(1.2f, 3.44f, 5.666f);
-  spec1.offset = core::utils::Vec3(-7.8f, -8.99f, -10.11111f);
-  spec1.misalignment = core::utils::Mat3::Random();
+  spec1.bias = core::math::Vec3(1.2f, 3.44f, 5.666f);
+  spec1.offset = core::math::Vec3(-7.8f, -8.99f, -10.11111f);
+  spec1.misalignment = core::math::Mat3::Random();
   yaml::Sequence bias("bias", yaml::EntreeType::FLOAT, ToString(spec1.bias));
   yaml::Sequence offset("offset", yaml::EntreeType::FLOAT,
                         ToString(spec1.offset));

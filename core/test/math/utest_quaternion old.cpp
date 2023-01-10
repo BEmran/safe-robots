@@ -11,10 +11,10 @@
 #include "core/math/math.hpp"
 #include "math/quaternion.h"
 
-using core::utils::Mat3;
-using core::utils::MATH_TYPE;
-using core::utils::Quat;
-using core::utils::Vec3;
+using core::math::Mat3;
+using core::math::MATH_TYPE;
+using core::math::Quat;
+using core::math::Vec3;
 
 std::string ToString(const Quat quat) {
   std::stringstream ss;

@@ -10,14 +10,14 @@
 #include "core/utils/data.hpp"
 #include "utest/utils.hpp"
 
+using core::math::Mat3;
+using core::math::MATH_TYPE;
+using core::math::Quat;
+using core::math::Vec3;
 using core::utils::DoubleData;
 using core::utils::GpsData;
 using core::utils::ImuData;
-using core::utils::Mat3;
-using core::utils::MATH_TYPE;
-using core::utils::Quat;
 using core::utils::QuatData;
-using core::utils::Vec3;
 using core::utils::Vec3Data;
 
 /**

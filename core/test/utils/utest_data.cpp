@@ -4,6 +4,7 @@
 
 #include "utest/utils_data.hpp"
 
+using core::math::Vec3;
 using core::utils::AccelData;
 using core::utils::AdcData;
 using core::utils::BarData;
@@ -15,7 +16,6 @@ using core::utils::MagData;
 using core::utils::QuatData;
 using core::utils::RPYData;
 using core::utils::TemperatureData;
-using core::utils::Vec3;
 using core::utils::Vec3Data;
 // AdcData --------------------------------------------------------------------
 

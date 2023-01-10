@@ -11,13 +11,13 @@
 #include "core/math/math.hpp"
 #include "utest_utils.hpp"
 
-using core::utils::Mat3;
-using core::utils::MATH_TYPE;
-using core::utils::PI;
-using core::utils::Quat;
-using core::utils::Vec3;
+using core::math::Mat3;
+using core::math::MATH_TYPE;
+using core::math::PI;
+using core::math::PI_2;
+using core::math::Quat;
+using core::math::Vec3;
 using math::Quaternion;
-constexpr float PI_2 = PI / 2.f;
 constexpr float PI_4 = PI / 4.f;
 
 float Norm(const float w, const float x, const float y, const float z) {

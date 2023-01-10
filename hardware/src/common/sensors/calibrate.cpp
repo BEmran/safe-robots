@@ -119,9 +119,9 @@ struct CalibrationResult {
 };
 
 SensorSpecs<3> UpdateOldCalibration(SensorSpecs<3> old,
-                                    core::utils::InputMat misalignment,
-                                    core::utils::InputMat bias,
-                                    core::utils::InputMat offset) {
+                                    core::math::InputMat misalignment,
+                                    core::math::InputMat bias,
+                                    core::math::InputMat offset) {
   // create new sensor calibration and copy result
   SensorSpecs<3> spec(old);
   spec.SetCalibration(misalignment, bias, offset);

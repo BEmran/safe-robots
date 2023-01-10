@@ -4,8 +4,8 @@
 #include "core/math/math.hpp"
 
 namespace math {
-using core::utils::Mat3;
-using core::utils::MATH_TYPE;
+using core::math::Mat3;
+using core::math::MATH_TYPE;
 
 /**
  * @brief Class to represent a Direction Cosine Rotation.It is built from a 3x3

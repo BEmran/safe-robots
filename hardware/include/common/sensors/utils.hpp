@@ -12,20 +12,20 @@
 #include <string>
 #include <vector>
 
+#include "core/math/math.hpp"
 #include "core/sensors/module_sensor.hpp"
 #include "core/utils/data.hpp"
-#include "core/utils/math.hpp"
 
 namespace hardware::common::sensors {
-using core::utils::DEG_TO_RAD;
-using core::utils::GRAVITY;
+using core::math::CreateScalar;
+using core::math::DEG_TO_RAD;
+using core::math::GRAVITY;
+using core::math::Mat3;
+using core::math::MATH_TYPE;
+using core::math::PI;
+using core::math::Vec3;
 using core::utils::ImuData;
-using core::utils::Mat3;
-using core::utils::MATH_TYPE;
-using core::utils::PI;
-using core::utils::Vec3;
 using ImuSensorModule = core::sensors::SensorModuleAbs<ImuData>;
-using core::utils::CreateScalar;
 
 /// @brief multiply to convert degrees to radians
 // constexpr double DEG_TO_RAD = 0.0174532925199;
@@ -77,10 +77,10 @@ struct ConfigMap {
  * @brief Hold sensor measurement specifications used to convert sensor raw
  * reading to usable data (scalded and in iso unit)
  * @details apply the equation
- * Res = ((misalignment * (raw - bias) / sensitivity) + offset) *
- * unit_conversion; Res = A * raw + b; A = (misalignment / sensitivity *
- * unit_conversion; b = (- misalignment * bias / sensitivity + offset) *
- * unit_conversion;
+ * Res = ((misalignment * (raw - bias) / sensitivity) + offset)
+ * Res = A * raw + b;
+ * A = (misalignment / sensitivity
+ * b = (- misalignment * bias / sensitivity + offset)
  */
 template <int Size>
 struct SensorSpecs {
@@ -88,11 +88,11 @@ struct SensorSpecs {
                           // detected by a measurement = max_bit_count / scale
   MATH_TYPE unit_conversion;  // convert a raw value into iso unit
 
-  core::utils::Vector<Size> bias;
-  core::utils::Vector<Size> offset;
-  core::utils::Matrix<Size, Size> misalignment;
-  core::utils::Matrix<Size, Size> A;
-  core::utils::Vector<Size> b;
+  core::math::Vector<Size> bias;
+  core::math::Vector<Size> offset;
+  core::math::Matrix<Size, Size> misalignment;
+  core::math::Matrix<Size, Size> A;
+  core::math::Vector<Size> b;
   /**
    * @brief Construct a new Sensor Specs object
    *
@@ -124,9 +124,8 @@ struct SensorSpecs {
     return A(0) * raw + b[0];
   }
 
-  inline void SetCalibration(core::utils::InputMat m,
-                             core::utils::InputMat bias_,
-                             core::utils::InputMat offset_) {
+  inline void SetCalibration(core::math::InputMat m, core::math::InputMat bias_,
+                             core::math::InputMat offset_) {
     misalignment << m;
     bias << bias_;
     offset << offset_;
@@ -134,8 +133,8 @@ struct SensorSpecs {
   }
 
   inline void UpdateEquation() {
-    A << misalignment * unit_conversion / sensitivity;
-    b << (offset - misalignment * bias / sensitivity) * unit_conversion;
+    A << misalignment / sensitivity;
+    b << (offset - misalignment * bias / sensitivity);
   }
 
   /**
@@ -144,8 +143,8 @@ struct SensorSpecs {
    * @param raw raw data vector
    * @return Vec3 the post proceeded data
    */
-  inline Vec3 Apply(core::utils::InputMat raw) const {
-    return A * raw + b;
+  inline Vec3 Apply(core::math::InputMat raw) const {
+    return (A * raw + b) * unit_conversion;
   }
 };
 

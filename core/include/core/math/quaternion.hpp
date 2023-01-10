@@ -4,8 +4,8 @@
 #include "core/math/math.hpp"
 
 namespace math {
-using core::utils::Quat;
-using core::utils::Vec3;
+using core::math::Quat;
+using core::math::Vec3;
 
 class Quaternion {
  public:
@@ -152,7 +152,7 @@ Quaternion operator/(const Quaternion quat, const float scale);
 //   float angular_distance = qf.angularDistance(qs);
 
 //   // Ensure SLERP takes the shortest path
-//   if (angular_distance > core::utils::PI) {
+//   if (angular_distance > core::math::PI) {
 //     std::cout << "flip Second endpoint quaternion to takes the shortest path"
 //               << std::endl;
 //     angular_distance *= -1;

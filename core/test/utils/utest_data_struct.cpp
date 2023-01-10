@@ -7,18 +7,18 @@
 #include "core/utils/data_struct.hpp"
 #include "utest/utils_data.hpp"
 
+using core::math::Quat;
+using core::math::RPY;
+using core::math::Vec3;
 using core::utils::AccelDataStruct;
 using core::utils::GyroDataStruct;
 using core::utils::HeadingDataStruct;
 using core::utils::ImuDataStruct;
 using core::utils::MagDataStruct;
 using core::utils::MathTypeDataStruct;
-using core::utils::Quat;
 using core::utils::QuatDataStruct;
-using core::utils::RPY;
 using core::utils::RPYDataStruct;
 using core::utils::TemperatureDataStruct;
-using core::utils::Vec3;
 using core::utils::Vec3DataStruct;
 
 // MathTypeDataStruct

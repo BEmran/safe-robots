@@ -15,6 +15,11 @@ namespace core::utils {
 constexpr int FULL_PRECISION = 10;
 constexpr int HALF_PRECISION = 4;
 
+using Quat = math::Quat;
+using Vec3 = math::Vec3;
+using MATH_TYPE = math::MATH_TYPE;
+using RPY = math::RPY;
+
 struct Data {
  public:
   virtual ~Data() = default;
@@ -40,7 +45,7 @@ struct AdcData : public Data {
   }
   inline std::string ToString() const override {
     std::stringstream ss;
-    ss << values.format(kVecFmtSimple);
+    ss << values.format(math::kVecFmtSimple);
     return ss.str();
   }
 };
@@ -113,7 +118,7 @@ struct Vec3Data : public Data {
   }
   inline std::string ToString() const override {
     std::stringstream ss;
-    ss << data.format(kVecFmtSimple);
+    ss << data.format(math::kVecFmtSimple);
     return ss.str();
   }
 };
@@ -152,7 +157,7 @@ struct QuatData : public Data {
   }
   inline std::string ToString() const override {
     std::stringstream ss;
-    ss << data.w() << ", " << data.vec().format(kVecFmtSimple);
+    ss << data.w() << ", " << data.vec().format(math::kVecFmtSimple);
     return ss.str();
   }
 };
