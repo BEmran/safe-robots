@@ -35,8 +35,8 @@ Quaternion Quaternion::Normalized() const {
 }
 
 float Quaternion::Norm() const {
-  const float square = scalar_ * scalar_ + vec_.dot(vec_);
-  return std::sqrt(square);
+  const float dot = scalar_ * scalar_ + vec_.dot(vec_);
+  return std::sqrt(dot);
 }
 
 void Quaternion::SetIdentity() {
@@ -53,15 +53,7 @@ Quaternion Quaternion::Conjugate() const {
   return Quaternion(scalar_, -vec_);
 }
 
-Vec3 Quaternion::Cross(const Quaternion& rhs) const {
-  return Vec().cross(rhs.Vec());
-}
-
 float Quaternion::Dot(const Quaternion& rhs) const {
-  return Vec().dot(rhs.Vec());
-}
-
-float Quaternion::Dot2(const Quaternion& rhs) const {
   return scalar_ * rhs.Scalar() + Vec().dot(rhs.Vec());
 }
 
@@ -73,8 +65,6 @@ float Quaternion::AngularDistance(const Quaternion& rhs) const {
   // return std::acos(2 * dot - 1);
 
   const Quaternion relative_rotation = a.Conjugate() * b;
-  // return 2 * std::atan2(relative_rotation.Vec().norm(),
-  // relative_rotation.W());
   return relative_rotation.Angle();
 }
 
@@ -117,10 +107,10 @@ Quaternion operator-(const Quaternion lhs, const Quaternion rhs) {
 }
 
 Quaternion operator*(const Quaternion lhs, const Quaternion rhs) {
-  const float scalar = lhs.Scalar() * rhs.Scalar() - rhs.Dot(lhs);
+  const float scalar = lhs.Scalar() * rhs.Scalar() - lhs.Vec().dot(rhs.Vec());
   const Vec3 vec = lhs.Scalar() * rhs.Vec() +  //
                    rhs.Scalar() * lhs.Vec() +  //
-                   lhs.Cross(rhs);
+                   lhs.Vec().cross(rhs.Vec());
   return Quaternion(scalar, vec);
 }
 
@@ -129,15 +119,11 @@ Quaternion operator*(const Quaternion quat, const Vec3& point) {
 }
 
 Quaternion operator*(const Quaternion quat, const float scale) {
-  const float scalar = quat.Scalar() * scale;
-  const Vec3 vec = quat.Vec() * scale;
-  return Quaternion(scalar, vec);
+  return Quaternion(quat.Scalar() * scale, quat.Vec() * scale);
 }
 
 Quaternion operator/(const Quaternion quat, const float scale) {
-  const float scalar = quat.Scalar() / scale;
-  const Vec3 vec = quat.Vec() / scale;
-  return Quaternion(scalar, vec);
+  return Quaternion(quat.Scalar() / scale, quat.Vec() / scale);
 }
 
 // /**

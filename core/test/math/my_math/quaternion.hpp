@@ -29,11 +29,7 @@ class Quaternion {
 
   Quaternion Conjugate() const;
 
-  Vec3 Cross(const Quaternion& rhs) const;
-
   float Dot(const Quaternion& rhs) const;
-
-  float Dot2(const Quaternion& rhs) const;
 
   float AngularDistance(const Quaternion& rhs) const;
 
