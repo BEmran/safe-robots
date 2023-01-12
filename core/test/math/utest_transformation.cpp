@@ -21,7 +21,7 @@ using core::math::EulerOrder;
 using core::math::EulerToDCM;
 using core::math::Quaternion;
 using core::math::QuaternionMethod;
-using core::math::QuatToDCM;
+using core::math::QuaternionToDCM;
 using core::math::Skew;
 
 TEST(Skew, SkewSymmetric) {
@@ -90,9 +90,9 @@ TEST(Euler, ZYXToRotationMatrix) {
   EXPECT_TRUE(ExpectEqMat3(rot, EulerToDCM(rpy, EulerOrder::ZYX)));
 }
 
-TEST(QuatToDCM, Insanity) {
+TEST(QuaternionToDCM, Insanity) {
   const Quat q = Quat::UnitRandom();
-  const DCM dcm = QuatToDCM(q);
+  const DCM dcm = QuaternionToDCM(q);
   EXPECT_TRUE(ExpectEqMat3(q.toRotationMatrix(), dcm.Matrix()));
 }
 
@@ -154,11 +154,11 @@ TEST(EulerToDCM, EulerZYX) {
   EXPECT_TRUE(ExpectEqRPY(expect_rpy, actual_rpy));
 }
 
-TEST(QuatToDCM, Random) {
+TEST(QuaternionToDCM, Random) {
   for (size_t i = 0; i < 1000; i++) {
     const Quat q = Quat::UnitRandom();
     const Mat3 expect = q.toRotationMatrix();
-    const DCM actual = QuatToDCM(q);
+    const DCM actual = QuaternionToDCM(q);
     EXPECT_TRUE(ExpectEqMat3(expect, actual.Matrix()));
   }
 }
@@ -166,7 +166,7 @@ TEST(QuatToDCM, Random) {
 TEST(DCMToQuaternion, ToQuaternion) {
   for (size_t i = 0; i < 1000; i++) {
     const Quat expect = Quat::UnitRandom();
-    const DCM dcm = QuatToDCM(expect);
+    const DCM dcm = QuaternionToDCM(expect);
     const Quaternion actual = DCMToQuaternion(dcm, QuaternionMethod::SHEPPERD);
     EXPECT_TRUE(ExpectEqQuaternion(expect, actual));
   }

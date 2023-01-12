@@ -45,3 +45,9 @@ std::ostream& operator<<(std::ostream& os, const core::math::Quat& quat) {
      << quat.vec().transpose().format(core::math::kVecFmt); /* axis */
   return os;
 }
+
+std::ostream& operator<<(std::ostream& os, const core::math::RPY& rpy) {
+  return os << "roll = " << rpy.roll << ", "
+            << "pitch = " << rpy.pitch << ", "
+            << "yaw = " << rpy.yaw;
+}

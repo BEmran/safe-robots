@@ -30,7 +30,7 @@ T Square(const T val) {
  * @param vec vector to be used
  * @return Mat3 skew skew-symmetric matrix
  */
-Mat3 Skew(const Vec3 vec);
+Mat3 Skew(const Vec3& vec);
 
 /**
  * @brief Construct a DCM from axis-angle representation. Use
@@ -38,7 +38,7 @@ Mat3 Skew(const Vec3 vec);
  *
  * @return DCM dcm matrix
  */
-DCM AxisAngleToDCM(const float angle, const Vec3 axis);
+DCM AxisAngleToDCM(const float angle, const Vec3& axis);
 
 /**
  * @brief  Return axis-angle representation of the DCM.
@@ -48,17 +48,17 @@ DCM AxisAngleToDCM(const float angle, const Vec3 axis);
  */
 std::pair<float, Vec3> DCMToAxisAngle(const DCM& dcm);
 
-DCM EulerXYZToDCM(const RPY rpy);
-DCM EulerZYXToDCM(const RPY rpy);
-DCM EulerToDCM(const RPY rpy, const EulerOrder order);
+DCM EulerXYZToDCM(const RPY& rpy);
+DCM EulerZYXToDCM(const RPY& rpy);
+DCM EulerToDCM(const RPY& rpy, const EulerOrder order);
 
 /**
  * @brief Roll-Pitch-Yaw Angles from DCM
  *
  * @return Vec3 a vector with [roll, pitch, yaw] angles
  */
-RPY DCMToEulerXYZ(const DCM dcm);
-RPY DCMToEulerZYX(const DCM dcm);
+RPY DCMToEulerXYZ(const DCM& dcm);
+RPY DCMToEulerZYX(const DCM& dcm);
 RPY DCMToEuler(const DCM& dcm, const EulerOrder order);
 
 /**
@@ -67,8 +67,8 @@ RPY DCMToEuler(const DCM& dcm, const EulerOrder order);
  * @param dcm Direction Cosine Matrix
  * @return Quaternion quaternion
  */
-Quaternion Shepperd2(const DCM dcm);
-Quaternion Shepperd(const DCM dcm);
+Quaternion Shepperd2(const DCM& dcm);
+Quaternion Shepperd(const DCM& dcm);
 
 /**
  * @brief Quaternion from a Direction Cosine Matrix with Sarabandi's method.
@@ -76,7 +76,7 @@ Quaternion Shepperd(const DCM dcm);
  * @param dcm Direction Cosine Matrix
  * @return Quaternion quaternion
  */
-Quaternion Sarabandi(const DCM dcm);
+Quaternion Sarabandi(const DCM& dcm);
 
 /**
  * @brief Quaternion from a Direction Cosine Matrix with Chiaverini's algebraic
@@ -85,7 +85,7 @@ Quaternion Sarabandi(const DCM dcm);
  * @param dcm Direction Cosine Matrix
  * @return Quaternion quaternion
  */
-Quaternion Chiaverini(const DCM dcm);
+Quaternion Chiaverini(const DCM& dcm);
 
 Quaternion DCMToQuaternion(
   const DCM& dcm, const QuaternionMethod method = QuaternionMethod::SHEPPERD);
@@ -96,6 +96,10 @@ Quaternion DCMToQuaternion(
  * @param quat quaternion vector
  * @return DCM rotation matrix
  */
-DCM QuatToDCM(const Quaternion quat);
-}  // namespace math
+DCM QuaternionToDCM(const Quaternion& quat);
+
+RPY QuaternionToEulerXYZ(const Quaternion& quat);
+RPY QuaternionToEulerZYX(const Quaternion& quat);
+RPY QuaternionToEuler(const Quaternion& quat, const EulerOrder order);
+}  // namespace core::math
 #endif  // CORE_MATH_TRANSFORMATION_HPP_

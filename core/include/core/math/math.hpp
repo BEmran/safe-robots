@@ -76,5 +76,6 @@ struct RPY {
 std::ostream& operator<<(std::ostream& os, const core::math::Vec3& vec);
 std::ostream& operator<<(std::ostream& os, const core::math::Transpose& vec);
 std::ostream& operator<<(std::ostream& os, const core::math::Quat& quat);
+std::ostream& operator<<(std::ostream& os, const core::math::RPY& rpy);
 
 #endif  // CORE_MATH_MATH_HPP_

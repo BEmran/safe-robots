@@ -308,29 +308,31 @@ TEST(Quaternion, DivideByConstant) {
   EXPECT_TRUE(ExpectEq(q.Z() / constant, actual.Z()));
 }
 
-TEST(LinearInterpolation, Linear) {
-  SYS_LOG_INFO("0: ") << Quaternion().AngularDistance({0.0f, 0.2f, 0.3f, 0.4f});
-  SYS_LOG_INFO("1: ") << Quaternion().AngularDistance({0.1f, 0.2f, 0.3f, 0.4f});
-  SYS_LOG_INFO("2: ") << Quaternion().AngularDistance({0.2f, 0.1f, 0.3f, 0.4f});
-  SYS_LOG_INFO("3: ") << Quaternion().AngularDistance({0.3f, 0.1f, 0.2f, 0.4f});
-  SYS_LOG_INFO("4: ") << Quaternion().AngularDistance({0.4f, 0.1f, 0.2f, 0.3f});
-  SYS_LOG_INFO("5: ") << Quaternion().AngularDistance({0.5f, 0.1f, 0.2f, 0.3f});
-  SYS_LOG_INFO("6: ") << Quaternion().AngularDistance({0.6f, 0.1f, 0.2f, 0.3f});
+std::string write(const core::math::RPY& rpy) {
+  std::stringstream ss;
+  ss << "[" << rpy.roll << ", " << rpy.pitch << ", " << rpy.yaw << "]";
+  return ss.str();
+}
 
-  SYS_LOG_INFO("-0: ") << Quaternion().AngularDistance(
-    {-0.0f, 0.2f, 0.3f, 0.4f});
-  SYS_LOG_INFO("-1: ") << Quaternion().AngularDistance(
-    {-0.1f, 0.2f, 0.3f, 0.4f});
-  SYS_LOG_INFO("-2: ") << Quaternion().AngularDistance(
-    {-0.2f, 0.1f, 0.3f, 0.4f});
-  SYS_LOG_INFO("-3: ") << Quaternion().AngularDistance(
-    {-0.3f, 0.1f, 0.2f, 0.4f});
-  SYS_LOG_INFO("-4: ") << Quaternion().AngularDistance(
-    {-0.4f, 0.1f, 0.2f, 0.3f});
-  SYS_LOG_INFO("-5: ") << Quaternion().AngularDistance(
-    {-0.5f, 0.1f, 0.2f, 0.3f});
-  SYS_LOG_INFO("-6: ") << Quaternion().AngularDistance(
-    {-0.6f, 0.1f, 0.2f, 0.3f});
+TEST(LinearInterpolation, Linear) {
+  for (float i = -9.f; i < 9.f; i++) {
+    const float ang = i * PI_4;
+    const Vec3 vec = Vec3::UnitY();
+    const Eigen::Quaternionf aa(Eigen::AngleAxisf(ang, vec));
+    auto sol = core::math::QuaternionInterpolation(
+      Quaternion(), aa, {0.f, 0.25f, 0.5f, .75f, 1.f});
+    const auto rpy0 = core::math::QuaternionToEulerXYZ(sol[0]);
+    const auto rpy1 = core::math::QuaternionToEulerXYZ(sol[1]);
+    const auto rpy2 = core::math::QuaternionToEulerXYZ(sol[2]);
+    const auto rpy3 = core::math::QuaternionToEulerXYZ(sol[3]);
+    const auto rpy4 = core::math::QuaternionToEulerXYZ(sol[4]);
+    SYS_LOG_INFO() << ang                    //
+                   << " -> " << write(rpy0)  //
+                   << " -> " << write(rpy1)  //
+                   << " -> " << write(rpy2)  //
+                   << " -> " << write(rpy3)  //
+                   << " -> " << write(rpy4);
+  }
 }
 
 /*****************************************************************************/

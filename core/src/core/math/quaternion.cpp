@@ -48,15 +48,13 @@ void Quaternion::SetIdentity() {
 }
 
 float Quaternion::Angle() const {
-  const float ang = 2 * std::atan2(Vec().norm(), W());  // signed angle
-  if (ang >= 2.f * PI) {
-    return ang - 2.f * PI;
-  } else if (ang <= -2.f * PI) {
-    return ang + 2.f * PI;
-  } else {
-    return ang;
+  // const float ang =
+  //   2 * std::atan2(Vec().norm(), W());  // signed angle [0, 2*PI]
+  const float ang = 2 * std::acos(W());  // always positive [0, 2*PI)
+  if (ang >= 2 * PI) {
+    return ang - 2 * PI;
   }
-  // return 2 * std::acos(std::abs(scalar_));  // always positive
+  return ang;
 }
 
 Quaternion Quaternion::Conjugate() const {
@@ -164,23 +162,26 @@ QuaternionInterpolation(const Quaternion& qf, const Quaternion& qs,
   const Quaternion q0 = qf.Normalized();
   Quaternion q1 = qs.Normalized();
   float angular_distance = q0.AngularDistance(q1);
-
   // Ensure SLERP takes the shortest path
   if (angular_distance > PI) {
-    SYS_LOG_WARN("Quaternion Interpolation: ") << "flip Second endpoint "
-                                                  "quaternion to takes the "
-                                                  "shortest path";
+    const auto a = angular_distance;
     q1 = Quaternion(-qs.Scalar(), -qs.Vec()).Normalized();
-    // angular_distance *= -1;
     angular_distance = q0.AngularDistance(q1);
+    SYS_LOG_WARN("Quaternion Interpolation: ")
+      << "flip Second endpoint "
+         "quaternion to takes the "
+         "shortest path: "
+      << a << " -> " << angular_distance;
   }
 
   std::vector<Quaternion> quat(interpolation_points.size());
   for (size_t i = 0; i < interpolation_points.size(); i++) {
     if (angular_distance < angular_distance_threshold) {
-      quat[i] = LinearInterpolation(q0, q1, interpolation_points[i]);
+      quat[i] =
+        LinearInterpolation(q0, q1, interpolation_points[i]).Normalized();
     } else {
-      quat[i] = SphericalLinearInterpolation(q0, q1, interpolation_points[i]);
+      quat[i] = SphericalLinearInterpolation(q0, q1, interpolation_points[i])
+                  .Normalized();
     }
   }
   return quat;

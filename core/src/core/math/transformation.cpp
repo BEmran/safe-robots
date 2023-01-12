@@ -4,7 +4,7 @@
 #include <iostream>   // cerr
 
 namespace core::math {
-Mat3 Skew(const Vec3 vec) {
+Mat3 Skew(const Vec3& vec) {
   Mat3 mat = Mat3::Zero();
   mat(2, 1) = +vec.x();
   mat(1, 2) = -vec.x();
@@ -29,20 +29,20 @@ std::pair<float, Vec3> DCMToAxisAngle(const DCM& dcm) {
   return {angle, axis};
 }
 
-DCM AxisAngleToDCM(const float angle, const Vec3 axis) {
+DCM AxisAngleToDCM(const float angle, const Vec3& axis) {
   const Mat3 K = Skew(axis.normalized());
   const Mat3 dcm =
     Mat3::Identity() + std::sin(angle) * K + (1 - std::cos(angle)) * K * K;
   return dcm;
 }
 
-DCM FromEulerXYZ(const RPY rpy) {
+DCM EulerXYZToDCM(const RPY& rpy) {
   return Mat3(Eigen::AngleAxisf(rpy.roll, Vec3::UnitX()) *
               Eigen::AngleAxisf(rpy.pitch, Vec3::UnitY()) *
               Eigen::AngleAxisf(rpy.yaw, Vec3::UnitZ()));
 }
 
-DCM FromEulerZYX(const RPY rpy) {
+DCM EulerZYXToDCM(const RPY& rpy) {
   return Mat3(Eigen::AngleAxisf(rpy.yaw, Vec3::UnitZ()) *
               Eigen::AngleAxisf(rpy.pitch, Vec3::UnitY()) *
               Eigen::AngleAxisf(rpy.roll, Vec3::UnitX()));
@@ -51,16 +51,16 @@ DCM FromEulerZYX(const RPY rpy) {
 DCM EulerToDCM(const RPY rpy, const EulerOrder order) {
   switch (order) {
     case EulerOrder::XYZ:
-      return FromEulerXYZ(rpy);
+      return EulerXYZToDCM(rpy);
     case EulerOrder::ZYX:
-      return FromEulerZYX(rpy);
+      return EulerZYXToDCM(rpy);
     default:
       std::cout << "Undefined EulerOrder" << std::endl;
       return DCM();
   }
 }
 
-RPY DCMToEulerXYZ(const DCM dcm) {
+RPY DCMToEulerXYZ(const DCM& dcm) {
   const Mat3& mat{dcm.Matrix()};
   const float alpha = std::atan2(-mat(1, 2), mat(2, 2));
   const float beta =
@@ -69,7 +69,7 @@ RPY DCMToEulerXYZ(const DCM dcm) {
   return RPY(alpha, beta, gamma);
 }
 
-RPY DCMToEulerZYX(const DCM dcm) {
+RPY DCMToEulerZYX(const DCM& dcm) {
   const Mat3& mat{dcm.Matrix()};
   const float alpha = std::atan2(mat(1, 0), mat(0, 0));
   const float beta =
@@ -90,7 +90,7 @@ RPY DCMToEuler(const DCM& dcm, const EulerOrder order) {
   }
 }
 
-Quaternion Shepperd2(const DCM dcm) {
+Quaternion Shepperd2(const DCM& dcm) {
   const Mat3& mat{dcm.Matrix()};
   const float trace = dcm.Trace();
   const Vec3 diag = mat.diagonal();
@@ -137,7 +137,7 @@ Quaternion Shepperd2(const DCM dcm) {
   return Quaternion(w / gain, x / gain, y / gain, z / gain);
 }
 
-Quaternion Shepperd(const DCM dcm) {
+Quaternion Shepperd(const DCM& dcm) {
   const Mat3& mat{dcm.Matrix()};
   const Vec3 diag = mat.diagonal();
   std::array<float, 4> b{dcm.Trace(), diag[0], diag[1], diag[2]};
@@ -181,7 +181,7 @@ Quaternion Shepperd(const DCM dcm) {
   return quat.Conjugate();
 }
 
-Quaternion Sarabandi(const DCM dcm) {
+Quaternion Sarabandi(const DCM& dcm) {
   const float eta = 1;
   const Mat3& mat{dcm.Matrix()};
 
@@ -239,7 +239,7 @@ Quaternion Sarabandi(const DCM dcm) {
   return Quaternion(qw, qx, qy, qz);
 }
 
-Quaternion Chiaverini(const DCM dcm) {
+Quaternion Chiaverini(const DCM& dcm) {
   const Mat3& mat{dcm.Matrix()};
   const float qx_tmp = std::clamp(mat(0, 0) - mat(1, 1) - mat(2, 2), -1.f, 1.f);
   const float qy_tmp = std::clamp(mat(1, 1) - mat(2, 2) - mat(0, 0), -1.f, 1.f);
@@ -265,7 +265,7 @@ Quaternion DCMToQuaternion(const DCM& dcm, const QuaternionMethod method) {
   }
 }
 
-DCM QuatToDCM(const Quaternion quat) {
+DCM QuaternionToDCM(const Quaternion& quat) {
   const Quaternion q = quat.Normalized();
   Mat3 R = Mat3::Identity();
   R(0, 0) = 1.f - 2.f * (q.Y() * q.Y() + q.Z() * q.Z());
@@ -279,4 +279,17 @@ DCM QuatToDCM(const Quaternion quat) {
   R(2, 2) = 1.f - 2.f * (q.X() * q.X() + q.Y() * q.Y());
   return R;
 }
-}  // namespace math
+
+RPY QuaternionToEulerXYZ(const Quaternion& quat) {
+  return DCMToEulerXYZ(QuaternionToDCM(quat));
+}
+
+RPY QuaternionToEulerZYX(const Quaternion& quat) {
+  return DCMToEulerZYX(QuaternionToDCM(quat));
+}
+
+RPY QuaternionToEuler(const Quaternion& quat, const EulerOrder order) {
+  return DCMToEuler(QuaternionToDCM(quat), order);
+}
+
+}  // namespace core::math
