@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-namespace math {
+namespace core::math {
 DCM::DCM() : mat{Mat3::Identity()} {
 }
 
@@ -92,4 +92,4 @@ MATH_TYPE& DCM::At(const size_t row, const size_t col) {
   }
   return this->operator[](row * 3 + col);
 }
-}  // namespace math
+}  // namespace core::math

@@ -5,7 +5,7 @@
 #include "dcm.hpp"
 #include "quaternion.hpp"
 
-namespace math {
+namespace core::math {
 using core::math::Mat3;
 using core::math::RPY;
 using core::math::Vec3;

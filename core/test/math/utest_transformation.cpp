@@ -12,17 +12,17 @@ using core::math::MATH_TYPE;
 using core::math::Quat;
 using core::math::RPY;
 using core::math::Vec3;
-using math::AxisAngleToDCM;
-using math::DCM;
-using math::DCMToAxisAngle;
-using math::DCMToEuler;
-using math::DCMToQuaternion;
-using math::EulerOrder;
-using math::EulerToDCM;
-using math::Quaternion;
-using math::QuaternionMethod;
-using math::QuatToDCM;
-using math::Skew;
+using core::math::AxisAngleToDCM;
+using core::math::DCM;
+using core::math::DCMToAxisAngle;
+using core::math::DCMToEuler;
+using core::math::DCMToQuaternion;
+using core::math::EulerOrder;
+using core::math::EulerToDCM;
+using core::math::Quaternion;
+using core::math::QuaternionMethod;
+using core::math::QuatToDCM;
+using core::math::Skew;
 
 TEST(Skew, SkewSymmetric) {
   const Vec3 vec(0.2f, -0.4f, 0.8f);

@@ -3,7 +3,7 @@
 #include <algorithm>  // clamp
 #include <iostream>   // cerr
 
-namespace math {
+namespace core::math {
 Mat3 Skew(const Vec3 vec) {
   Mat3 mat = Mat3::Zero();
   mat(2, 1) = +vec.x();

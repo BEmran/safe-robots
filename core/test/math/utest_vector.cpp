@@ -27,7 +27,7 @@ std::string ToString(const Quat quat) {
 }
 
 template <typename T>
-std::string ToString(const math::Vec<T> vec) {
+std::string ToString(const core::math::Vec<T> vec) {
   std::stringstream ss;
   ss << "[";
   for (size_t i = 0; i < vec.Length(); i++) {
@@ -57,13 +57,13 @@ void Print(std::string_view str, const rc_vector_t quat) {
 }
 
 template <typename T>
-void Print(std::string_view str, const math::Vec<T> vec) {
+void Print(std::string_view str, const core::math::Vec<T> vec) {
   std::cout << str << ": " << ToString(vec) << std::endl;
 }
 
 template <typename T>
 ::testing::AssertionResult ExpectEq(const std::vector<T> expect,
-                                    const math::Vec<T>& actual) {
+                                    const core::math::Vec<T>& actual) {
   if (expect.size() != actual.Length()) {
     return ::testing::AssertionFailure()
            << "size mismatch, expect: " << expect.size()

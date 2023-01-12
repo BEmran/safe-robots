@@ -3,7 +3,7 @@
 
 #include "core/math/math.hpp"
 
-namespace math {
+namespace core::math {
 using core::math::Mat3;
 using core::math::MATH_TYPE;
 

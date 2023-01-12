@@ -3,7 +3,10 @@
 #include <cmath>      // acos
 #include <stdexcept>  // out_of_range
 
-namespace math {
+#include "core/math/math.hpp"
+#include "core/utils/logger_macros.hpp"
+
+namespace core::math {
 Quaternion::Quaternion() : Quaternion(1.f, Vec3::Zero()) {
 }
 
@@ -45,8 +48,15 @@ void Quaternion::SetIdentity() {
 }
 
 float Quaternion::Angle() const {
-  // return 2 * std::atan2(Vec().norm(), W()); // signed angle
-  return 2 * std::acos(std::abs(scalar_));  // always positive
+  const float ang = 2 * std::atan2(Vec().norm(), W());  // signed angle
+  if (ang >= 2.f * PI) {
+    return ang - 2.f * PI;
+  } else if (ang <= -2.f * PI) {
+    return ang + 2.f * PI;
+  } else {
+    return ang;
+  }
+  // return 2 * std::acos(std::abs(scalar_));  // always positive
 }
 
 Quaternion Quaternion::Conjugate() const {
@@ -122,79 +132,58 @@ Quaternion operator*(const Quaternion quat, const float scale) {
   return Quaternion(quat.Scalar() * scale, quat.Vec() * scale);
 }
 
+Quaternion operator*(const float scale, const Quaternion quat) {
+  return quat * scale;
+}
+
 Quaternion operator/(const Quaternion quat, const float scale) {
   return Quaternion(quat.Scalar() / scale, quat.Vec() / scale);
 }
 
-// /**
-//  * @brief Interpolate linearly (LERP)
-//  *
-//  * @param qs First endpoint quaternion
-//  * @param q2 Second endpoint quaternion
-//  * @param interpolation_points an interpolation point between 0 and 1
-//  * @return Quat
-//  */
-// Quat LinearInterpolation(const Quat& qf, const Quat& qs,
-//                          const float interpolation_points) {
-//   return qf + interpolation_points * (qs - qf);
-// }
+Quaternion LinearInterpolation(const Quaternion& qf, const Quaternion& qs,
+                               const float interpolation_point) {
+  return qf + interpolation_point * (qs - qf);
+}
 
-// /**
-//  * @brief Spherical Linear Interpolation between two quaternions.
-//  *
-//  * @param qs First endpoint quaternion
-//  * @param q2 Second endpoint quaternion
-//  * @param interpolation_points an interpolation point between 0 and 1
-//  * @return Quat
-//  */
-// Quat SphericalLinearInterpolation(const Quat& qf, const Quat& qs,
-//                                   const float interpolation_points) {
-//   // Angle between vectors
-//   float angular_distance = qf.angularDistance(qs);
-//   const float sin_theta = std::sin(angular_distance);
-//   const float theta_threshold = angular_distance * interpolation_points;
-//   const float s0 = std::sin(angular_distance - theta_threshold) / sin_theta;
-//   const float s1 = std::sin(theta_threshold) / sin_theta;
-//   return s0 * qf + s1 * qs;
-// }
-// /**
-//  * @brief Spherical Linear Interpolation between two quaternions. Return a
-//  valid
-//  * quaternion rotation at a specified distance along the minor arc of a great
-//  * circle passing through any two existing quaternion endpoints lying on the
-//  * unit radius hypersphere. Based on the method detailed in [Wiki_SLERP]_
-//  *
-//  * @param qs First endpoint quaternion
-//  * @param q2 Second endpoint quaternion
-//  * @param interpolation_points a vector of points from 0 to 1
-//  * @return Quat quaternion representing the interpolated rotation
-//  */
-// std::vector<Quat>
-// QuaternionInterpolation(const Quat& qf, const Quat& qs,
-//                         const std::vector<float>& interpolation_points) {
-//   constexpr float angular_distance_threshold = 0.05;
-//   Quat q0 = qf.normalized();
-//   Quat q1 = qs.normalized();
-//   float angular_distance = qf.angularDistance(qs);
+Quaternion SphericalLinearInterpolation(const Quaternion& qf,
+                                        const Quaternion& qs,
+                                        const float interpolation_points) {
+  // Angle between vectors
+  float angular_distance = qf.AngularDistance(qs);
+  const float sin_theta = std::sin(angular_distance);
+  const float theta_threshold = angular_distance * interpolation_points;
+  const float s0 = std::sin(angular_distance - theta_threshold) / sin_theta;
+  const float s1 = std::sin(theta_threshold) / sin_theta;
+  return qf * s0 + qs * s1;
+}
 
-//   // Ensure SLERP takes the shortest path
-//   if (angular_distance > core::math::PI) {
-//     std::cout << "flip Second endpoint quaternion to takes the shortest path"
-//               << std::endl;
-//     angular_distance *= -1;
-//     q1 = Quat(-qs.w(), -qs.x(), -qs.y(), -qs.z()).normalized();
-//   }
+std::vector<Quaternion>
+QuaternionInterpolation(const Quaternion& qf, const Quaternion& qs,
+                        const std::vector<float>& interpolation_points) {
+  constexpr float angular_distance_threshold = 0.05f;
+  const Quaternion q0 = qf.Normalized();
+  Quaternion q1 = qs.Normalized();
+  float angular_distance = q0.AngularDistance(q1);
 
-//   std::vector<Quat> quat(interpolation_points.size());
-//   for (size_t i = 0; i < interpolation_points.size(); i++) {
-//     if (angular_distance < angular_distance_threshold) {
-//       quat[i] = LinearInterpolation(q0, q1, interpolation_points[i]);
-//     } else {
-//       quat[i] = SphericalLinearInterpolation(q0, q1,
-//       interpolation_points[i]);
-//     }
-//   }
-//   return quat;
-// }
+  // Ensure SLERP takes the shortest path
+  if (angular_distance > PI) {
+    SYS_LOG_WARN("Quaternion Interpolation: ") << "flip Second endpoint "
+                                                  "quaternion to takes the "
+                                                  "shortest path";
+    q1 = Quaternion(-qs.Scalar(), -qs.Vec()).Normalized();
+    // angular_distance *= -1;
+    angular_distance = q0.AngularDistance(q1);
+  }
 
-}  // namespace math
+  std::vector<Quaternion> quat(interpolation_points.size());
+  for (size_t i = 0; i < interpolation_points.size(); i++) {
+    if (angular_distance < angular_distance_threshold) {
+      quat[i] = LinearInterpolation(q0, q1, interpolation_points[i]);
+    } else {
+      quat[i] = SphericalLinearInterpolation(q0, q1, interpolation_points[i]);
+    }
+  }
+  return quat;
+}
+
+}  // namespace core::math

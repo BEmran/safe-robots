@@ -11,7 +11,7 @@
 #include <stdexcept>
 #include <vector>
 
-namespace math {
+namespace core::math {
 
 template <typename T>
 class Vec {

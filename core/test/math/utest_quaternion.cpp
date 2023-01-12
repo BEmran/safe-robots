@@ -6,9 +6,10 @@
 #include <eigen3/Eigen/Geometry>
 #include <string_view>
 
+#include "core/math/math.hpp"
 #include "core/math/quaternion.hpp"
 #include "core/math/transformation.hpp"
-#include "core/math/math.hpp"
+#include "core/utils/logger_macros.hpp"
 #include "utest_utils.hpp"
 
 using core::math::Mat3;
@@ -16,9 +17,19 @@ using core::math::MATH_TYPE;
 using core::math::PI;
 using core::math::PI_2;
 using core::math::Quat;
+using core::math::Quaternion;
 using core::math::Vec3;
-using math::Quaternion;
 constexpr float PI_4 = PI / 4.f;
+
+float Mod(const float x, const float val) {
+  if (x >= val) {
+    return Mod(x - val, val);
+  } else if (x <= -val) {
+    return Mod(x + val, val);
+  } else {
+    return x;
+  }
+}
 
 float Norm(const float w, const float x, const float y, const float z) {
   return std::sqrt(w * w + x * x + y * y + z * z);
@@ -174,12 +185,12 @@ TEST(Quaternion, DotForSameQuaternionIsNormSquared) {
 
 TEST(Quaternion, AngularDistance) {
   const Quaternion q1;
-  const std::array<float, 5> angles{PI_4, PI_2, PI, -PI_2, PI_4};
-  for (const auto ang : angles) {
+  for (size_t i = -9; i < 9; i++) {
+    const float ang = static_cast<float>(i) * PI_4;
     const Quaternion q2{
       Eigen::Quaternionf(Eigen::AngleAxisf(ang, Vec3::UnitY()))};
     const float expect = q1.AngularDistance(q2);
-    const float actual = std::abs(ang);
+    const float actual = Mod(ang, 2.f * PI);
     EXPECT_TRUE(ExpectEq(actual, expect));
   }
 }
@@ -264,11 +275,22 @@ TEST(Quaternion, RotateAVector) {
   EXPECT_TRUE(ExpectEqQuaternion(expect, actual));
 }
 
-TEST(Quaternion, MultiplyByConstant) {
+TEST(Quaternion, MultiplyByConstantLHS) {
   const Quaternion q(0.1f, Vec3{0.2f, 0.3f, 0.4f});
   const float constant{3.f};
 
   const Quaternion actual = q * constant;
+  EXPECT_TRUE(ExpectEq(q.W() * constant, actual.W()));
+  EXPECT_TRUE(ExpectEq(q.X() * constant, actual.X()));
+  EXPECT_TRUE(ExpectEq(q.Y() * constant, actual.Y()));
+  EXPECT_TRUE(ExpectEq(q.Z() * constant, actual.Z()));
+}
+
+TEST(Quaternion, MultiplyByConstantRHS) {
+  const Quaternion q(0.1f, Vec3{0.2f, 0.3f, 0.4f});
+  const float constant{3.f};
+
+  const Quaternion actual = constant * q;
   EXPECT_TRUE(ExpectEq(q.W() * constant, actual.W()));
   EXPECT_TRUE(ExpectEq(q.X() * constant, actual.X()));
   EXPECT_TRUE(ExpectEq(q.Y() * constant, actual.Y()));
@@ -284,6 +306,31 @@ TEST(Quaternion, DivideByConstant) {
   EXPECT_TRUE(ExpectEq(q.X() / constant, actual.X()));
   EXPECT_TRUE(ExpectEq(q.Y() / constant, actual.Y()));
   EXPECT_TRUE(ExpectEq(q.Z() / constant, actual.Z()));
+}
+
+TEST(LinearInterpolation, Linear) {
+  SYS_LOG_INFO("0: ") << Quaternion().AngularDistance({0.0f, 0.2f, 0.3f, 0.4f});
+  SYS_LOG_INFO("1: ") << Quaternion().AngularDistance({0.1f, 0.2f, 0.3f, 0.4f});
+  SYS_LOG_INFO("2: ") << Quaternion().AngularDistance({0.2f, 0.1f, 0.3f, 0.4f});
+  SYS_LOG_INFO("3: ") << Quaternion().AngularDistance({0.3f, 0.1f, 0.2f, 0.4f});
+  SYS_LOG_INFO("4: ") << Quaternion().AngularDistance({0.4f, 0.1f, 0.2f, 0.3f});
+  SYS_LOG_INFO("5: ") << Quaternion().AngularDistance({0.5f, 0.1f, 0.2f, 0.3f});
+  SYS_LOG_INFO("6: ") << Quaternion().AngularDistance({0.6f, 0.1f, 0.2f, 0.3f});
+
+  SYS_LOG_INFO("-0: ") << Quaternion().AngularDistance(
+    {-0.0f, 0.2f, 0.3f, 0.4f});
+  SYS_LOG_INFO("-1: ") << Quaternion().AngularDistance(
+    {-0.1f, 0.2f, 0.3f, 0.4f});
+  SYS_LOG_INFO("-2: ") << Quaternion().AngularDistance(
+    {-0.2f, 0.1f, 0.3f, 0.4f});
+  SYS_LOG_INFO("-3: ") << Quaternion().AngularDistance(
+    {-0.3f, 0.1f, 0.2f, 0.4f});
+  SYS_LOG_INFO("-4: ") << Quaternion().AngularDistance(
+    {-0.4f, 0.1f, 0.2f, 0.3f});
+  SYS_LOG_INFO("-5: ") << Quaternion().AngularDistance(
+    {-0.5f, 0.1f, 0.2f, 0.3f});
+  SYS_LOG_INFO("-6: ") << Quaternion().AngularDistance(
+    {-0.6f, 0.1f, 0.2f, 0.3f});
 }
 
 /*****************************************************************************/
@@ -346,4 +393,17 @@ TEST_F(QuaternionVsEigen, MultiplyTwoQuaternions) {
   const Quaternion expect = q1 * q2;
   const Eigen::Quaternionf actual = e1 * e2;
   EXPECT_TRUE(ExpectEqQuaternion(actual, expect));
+}
+
+TEST_F(QuaternionVsEigen, Angle) {
+  for (size_t i = -9; i < 9; i++) {
+    const float ang = static_cast<float>(i) * PI_4;
+    const Vec3 vec = Vec3::UnitY();
+    const Eigen::Quaternionf expect(Eigen::AngleAxisf(ang, vec));
+    const Quaternion actual{expect};
+
+    const std::string msg = "angle (" + std::to_string(ang) + ")";
+    EXPECT_TRUE(ExpectEq(Mod(ang, 2 * PI), actual.Angle(), msg));
+    EXPECT_TRUE(ExpectEq(1.f, core::math::Sign(actual.Y()), msg));
+  }
 }

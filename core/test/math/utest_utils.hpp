@@ -24,8 +24,8 @@ operator&&(const ::testing::AssertionResult& res1,
 [[nodiscard]] ::testing::AssertionResult ExpectEqMat3(const Mat3& expect,
                                                       const Mat3& actual);
 
-[[nodiscard]] ::testing::AssertionResult ExpectEqMat3(const math::DCM& expect,
-                                                      const math::DCM& actual);
+[[nodiscard]] ::testing::AssertionResult ExpectEqMat3(const core::math::DCM& expect,
+                                                      const core::math::DCM& actual);
 
 [[nodiscard]] ::testing::AssertionResult ExpectEqVec3(const Vec3& expect,
                                                       const Vec3& actual);
@@ -37,7 +37,7 @@ ExpectEqRPY(const core::math::RPY& expect, const core::math::RPY& actual);
                                                       const Quat& actual);
 
 [[nodiscard]] ::testing::AssertionResult ExpectEqQuaternion(
-  const math::Quaternion& expect, const math::Quaternion& actual);
+  const core::math::Quaternion& expect, const core::math::Quaternion& actual);
 
 Mat3 RandomRotationMatrix();
 #endif  // CORE_MATH_UTILS_HPP_
