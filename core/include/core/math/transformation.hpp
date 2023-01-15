@@ -15,7 +15,14 @@ enum class QuaternionMethod { SHEPPERD, SARABANDI, CHIAVERINI };
 
 template <typename T>
 T Sign(const T val) {
-  return static_cast<T>((T(0) < val) - (val < T(0)));
+  // return static_cast<T>((T(0) < val) - static_cast<T>(val < T(0)));
+  if (val > T{0}) {
+    return T{1};
+  } else if (val < T{0}) {
+    return T{-1};
+  } else {
+    return T{0};
+  }
 }
 
 template <typename T>
@@ -101,5 +108,9 @@ DCM QuaternionToDCM(const Quaternion& quat);
 RPY QuaternionToEulerXYZ(const Quaternion& quat);
 RPY QuaternionToEulerZYX(const Quaternion& quat);
 RPY QuaternionToEuler(const Quaternion& quat, const EulerOrder order);
+
+Quaternion AxisAngleToQuaternion(const float angle, const Vec3& axis);
+std::pair<float, Vec3> QuaternionToAxisAngle(const Quaternion& quat);
+
 }  // namespace core::math
 #endif  // CORE_MATH_TRANSFORMATION_HPP_

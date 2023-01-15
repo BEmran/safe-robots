@@ -2,27 +2,42 @@
 
 #include <gtest/gtest.h>
 
-#include "core/math/math.hpp"
 #include "core/math/dcm.hpp"
+#include "core/math/math.hpp"
 #include "core/math/transformation.hpp"
 #include "utest_utils.hpp"
 
-using core::math::Mat3;
-using core::math::MATH_TYPE;
-using core::math::Quat;
-using core::math::RPY;
-using core::math::Vec3;
 using core::math::AxisAngleToDCM;
+using core::math::AxisAngleToQuaternion;
 using core::math::DCM;
 using core::math::DCMToAxisAngle;
 using core::math::DCMToEuler;
 using core::math::DCMToQuaternion;
 using core::math::EulerOrder;
 using core::math::EulerToDCM;
+using core::math::Mat3;
+using core::math::MATH_TYPE;
+using core::math::Quat;
 using core::math::Quaternion;
 using core::math::QuaternionMethod;
+using core::math::QuaternionToAxisAngle;
 using core::math::QuaternionToDCM;
+using core::math::RPY;
+using core::math::Sign;
 using core::math::Skew;
+using core::math::Vec3;
+
+TEST(Sign, Negative) {
+  EXPECT_TRUE(Sign(-5.f) < 0);
+}
+
+TEST(Sign, Positive) {
+  EXPECT_TRUE(Sign(5.f) > 0);
+}
+
+TEST(Sign, Zero) {
+  EXPECT_TRUE(Sign(0) == 0);
+}
 
 TEST(Skew, SkewSymmetric) {
   const Vec3 vec(0.2f, -0.4f, 0.8f);
@@ -171,3 +186,56 @@ TEST(DCMToQuaternion, ToQuaternion) {
     EXPECT_TRUE(ExpectEqQuaternion(expect, actual));
   }
 }
+
+/*****************************************************************************/
+class QuaternionAndAxisAngleFixture
+  : public ::testing::TestWithParam<std::tuple<float, Vec3>> {};
+
+TEST_P(QuaternionAndAxisAngleFixture, AxisAngleToQuaternion) {
+  const auto [angle, axis] = GetParam();
+  const Eigen::Quaternionf expect(Eigen::AngleAxisf(angle, axis));
+  const Quaternion actual = AxisAngleToQuaternion(angle, axis);
+  EXPECT_TRUE(ExpectEqQuaternion(expect, actual));
+}
+
+TEST_P(QuaternionAndAxisAngleFixture, QuaternionToAxisAngle) {
+  const auto [angle, axis] = GetParam();
+  const Eigen::Quaternionf expect(Eigen::AngleAxisf(angle, axis));
+  const auto [actual_ang, actual_axis] = QuaternionToAxisAngle(expect);
+
+  //
+  float sign = 1.f;
+  if (angle * actual_ang < 0) {
+    sign = -1.f;
+  }
+
+  EXPECT_TRUE(ExpectEq(sign * angle, actual_ang));
+  EXPECT_TRUE(ExpectEqVec3(sign * axis, actual_axis));
+}
+
+INSTANTIATE_TEST_CASE_P(
+  QuaternionAndAxisAngle, QuaternionAndAxisAngleFixture,
+  ::testing::Values(std::make_tuple(+core::math::PI_2, Vec3::UnitX()),
+                    std::make_tuple(-core::math::PI_2, Vec3::UnitX()),
+                    std::make_tuple(+core::math::PI_2, Vec3::UnitY()),
+                    std::make_tuple(-core::math::PI_2, Vec3::UnitY()),
+                    std::make_tuple(+core::math::PI_2, Vec3::UnitZ()),
+                    std::make_tuple(-core::math::PI_2, Vec3::UnitZ()),
+                    std::make_tuple(+core::math::PI_2 * 3, Vec3::UnitX()),
+                    std::make_tuple(-core::math::PI_2 * 3, Vec3::UnitX()),
+                    std::make_tuple(+core::math::PI_2 * 3, Vec3::UnitY()),
+                    std::make_tuple(-core::math::PI_2 * 3, Vec3::UnitY()),
+                    std::make_tuple(+core::math::PI_2 * 3, Vec3::UnitZ()),
+                    std::make_tuple(-core::math::PI_2 * 3, Vec3::UnitZ()),
+                    std::make_tuple(+core::math::PI_2, Vec3::UnitX() * -1),
+                    std::make_tuple(-core::math::PI_2, Vec3::UnitX() * -1),
+                    std::make_tuple(+core::math::PI_2, Vec3::UnitY() * -1),
+                    std::make_tuple(-core::math::PI_2, Vec3::UnitY() * -1),
+                    std::make_tuple(+core::math::PI_2, Vec3::UnitZ() * -1),
+                    std::make_tuple(-core::math::PI_2, Vec3::UnitZ() * -1),
+                    std::make_tuple(+core::math::PI_2 * 3, Vec3::UnitX() * -1),
+                    std::make_tuple(-core::math::PI_2 * 3, Vec3::UnitX() * -1),
+                    std::make_tuple(+core::math::PI_2 * 3, Vec3::UnitY() * -1),
+                    std::make_tuple(-core::math::PI_2 * 3, Vec3::UnitY() * -1),
+                    std::make_tuple(+core::math::PI_2 * 3, Vec3::UnitZ() * -1),
+                    std::make_tuple(-core::math::PI_2 * 3, Vec3::UnitZ() * -1)));

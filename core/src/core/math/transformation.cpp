@@ -48,7 +48,7 @@ DCM EulerZYXToDCM(const RPY& rpy) {
               Eigen::AngleAxisf(rpy.roll, Vec3::UnitX()));
 }
 
-DCM EulerToDCM(const RPY rpy, const EulerOrder order) {
+DCM EulerToDCM(const RPY& rpy, const EulerOrder order) {
   switch (order) {
     case EulerOrder::XYZ:
       return EulerXYZToDCM(rpy);
@@ -290,6 +290,23 @@ RPY QuaternionToEulerZYX(const Quaternion& quat) {
 
 RPY QuaternionToEuler(const Quaternion& quat, const EulerOrder order) {
   return DCMToEuler(QuaternionToDCM(quat), order);
+}
+
+Quaternion AxisAngleToQuaternion(const float angle, const Vec3& axis) {
+  const float half_angle = angle / 2.f;
+  return {std::cos(half_angle), axis * std::sin(half_angle)};
+}
+
+std::pair<float, Vec3> QuaternionToAxisAngle(const Quaternion& quat) {
+  const Quaternion q = quat.Normalized();
+  const float angle = 2 * std::acos(q.W());
+  // normalize axis vector
+  const float s = std::sqrt(1 - Square(q.W()));
+  if (s < 0.001f) {
+    return {angle, Vec3::Zero()};
+  } else {
+    return {angle, q.Vec() / s};
+  }
 }
 
 }  // namespace core::math
