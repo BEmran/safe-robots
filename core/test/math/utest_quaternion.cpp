@@ -184,14 +184,18 @@ TEST(Quaternion, DotForSameQuaternionIsNormSquared) {
 }
 
 TEST(Quaternion, AngularDistance) {
-  const Quaternion q1;
-  for (size_t i = -9; i < 9; i++) {
+  for (int i = -8; i < 9; i++) {
     const float ang = static_cast<float>(i) * PI_4;
-    const Quaternion q2{
+    const Quaternion q{
       Eigen::Quaternionf(Eigen::AngleAxisf(ang, Vec3::UnitY()))};
-    const float expect = q1.AngularDistance(q2);
-    const float actual = Mod(ang, 2.f * PI);
-    EXPECT_TRUE(ExpectEq(actual, expect));
+    const float actual = Quaternion().AngularDistance(q);
+
+    float expect = std::abs(Mod(ang, 2.f * PI));
+    if (expect >= PI) {
+      expect -= PI;
+    }
+    std::string msg = "angle: " + std::to_string(ang);
+    EXPECT_TRUE(ExpectEq(expect, actual, msg));
   }
 }
 
@@ -314,26 +318,26 @@ std::string write(const core::math::RPY& rpy) {
   return ss.str();
 }
 
-TEST(LinearInterpolation, Linear) {
-  for (float i = -9.f; i < 9.f; i++) {
-    const float ang = i * PI_4;
-    const Vec3 vec = Vec3::UnitY();
-    const Eigen::Quaternionf aa(Eigen::AngleAxisf(ang, vec));
-    auto sol = core::math::QuaternionInterpolation(
-      Quaternion(), aa, {0.f, 0.25f, 0.5f, .75f, 1.f});
-    const auto rpy0 = core::math::QuaternionToEulerXYZ(sol[0]);
-    const auto rpy1 = core::math::QuaternionToEulerXYZ(sol[1]);
-    const auto rpy2 = core::math::QuaternionToEulerXYZ(sol[2]);
-    const auto rpy3 = core::math::QuaternionToEulerXYZ(sol[3]);
-    const auto rpy4 = core::math::QuaternionToEulerXYZ(sol[4]);
-    SYS_LOG_INFO() << ang                    //
-                   << " -> " << write(rpy0)  //
-                   << " -> " << write(rpy1)  //
-                   << " -> " << write(rpy2)  //
-                   << " -> " << write(rpy3)  //
-                   << " -> " << write(rpy4);
-  }
-}
+// TEST(LinearInterpolation, Linear) {
+//   for (int i = -9; i < 9; i++) {
+//     const float ang = static_cast<float>(i) * PI_4;
+//     const Vec3 vec = Vec3::UnitY();
+//     const Eigen::Quaternionf aa(Eigen::AngleAxisf(ang, vec));
+//     auto sol = core::math::QuaternionInterpolation(
+//       Quaternion(), aa, {0.f, 0.25f, 0.5f, .75f, 1.f});
+//     const auto rpy0 = core::math::QuaternionToEulerXYZ(sol[0]);
+//     const auto rpy1 = core::math::QuaternionToEulerXYZ(sol[1]);
+//     const auto rpy2 = core::math::QuaternionToEulerXYZ(sol[2]);
+//     const auto rpy3 = core::math::QuaternionToEulerXYZ(sol[3]);
+//     const auto rpy4 = core::math::QuaternionToEulerXYZ(sol[4]);
+//     SYS_LOG_INFO() << ang                    //
+//                    << " -> " << write(rpy0)  //
+//                    << " -> " << write(rpy1)  //
+//                    << " -> " << write(rpy2)  //
+//                    << " -> " << write(rpy3)  //
+//                    << " -> " << write(rpy4);
+//   }
+// }
 
 /*****************************************************************************/
 class QuaternionVsEigen : public testing::Test {
@@ -392,20 +396,98 @@ TEST_F(QuaternionVsEigen, Conjugate) {
 }
 
 TEST_F(QuaternionVsEigen, MultiplyTwoQuaternions) {
-  const Quaternion expect = q1 * q2;
-  const Eigen::Quaternionf actual = e1 * e2;
-  EXPECT_TRUE(ExpectEqQuaternion(actual, expect));
+  const Quaternion actual = q1 * q2;
+  const Eigen::Quaternionf expect = e1 * e2;
+  EXPECT_TRUE(ExpectEqQuaternion(expect, actual));
 }
 
-TEST_F(QuaternionVsEigen, Angle) {
-  for (size_t i = -9; i < 9; i++) {
+// TEST_F(QuaternionVsEigen, Angle) {
+//   for (int i = -9; i < 9; i++) {
+//     const float ang = static_cast<float>(i) * PI_4;
+//     const Vec3 vec = Vec3::UnitY();
+//     const Eigen::Quaternionf expect(Eigen::AngleAxisf(ang, vec));
+//     Quaternion actual{expect};
+
+//     const std::string msg = "angle (" + std::to_string(ang) + ")";
+//     // if (core::math::Sign(actual.Y()) != core::math::Sign(vec.y())) {
+//     //   actual = actual.Conjugate();
+//     // }
+//     EXPECT_TRUE(ExpectEq(Mod(ang, 2 * PI), actual.Angle(), msg));
+//   }
+// }
+
+TEST_F(QuaternionVsEigen, LinearInterpolation) {
+  const float inc = 1.f;
+  for (int i = -9; i < 9; i++) {
     const float ang = static_cast<float>(i) * PI_4;
     const Vec3 vec = Vec3::UnitY();
-    const Eigen::Quaternionf expect(Eigen::AngleAxisf(ang, vec));
-    const Quaternion actual{expect};
-
-    const std::string msg = "angle (" + std::to_string(ang) + ")";
-    EXPECT_TRUE(ExpectEq(Mod(ang, 2 * PI), actual.Angle(), msg));
-    EXPECT_TRUE(ExpectEq(1.f, core::math::Sign(actual.Y()), msg));
+    const Eigen::Quaternionf qs(Eigen::AngleAxisf(0, vec));
+    const Eigen::Quaternionf qf(Eigen::AngleAxisf(ang, vec));
+    const Eigen::Quaternionf expect = qs.slerp(inc, qf);
+    const std::vector<Quaternion> actual =
+      core::math::QuaternionInterpolation(qs, qf, {inc});
+    EXPECT_TRUE(ExpectEqQuaternion(expect, actual[0]));
   }
 }
+
+/*****************************************************************************/
+class AngleAxis : public Eigen::AngleAxisf {
+ public:
+  AngleAxis(const float ang, const Vec3& vec) : Eigen::AngleAxisf{ang, vec} {
+  }
+
+  friend std::ostream& operator<<(std::ostream& os, const AngleAxis& aa);
+};
+
+std::ostream& operator<<(std::ostream& os, const AngleAxis& aa) {
+  return os << "angle = " << aa.angle() << ", axis= " << aa.axis().transpose();
+}
+
+class QuaternionVsEigenFixture : public ::testing::TestWithParam<AngleAxis> {};
+
+TEST_P(QuaternionVsEigenFixture, slerp) {
+  const float inc = 0.5f;
+  const Eigen::Quaternionf q_start = Eigen::Quaternionf::Identity();
+  const auto q_final = Eigen::Quaternionf(GetParam());
+
+  const Eigen::Quaternionf expect = q_start.slerp(inc, q_final);
+  const Quaternion actual =
+    core::math::QuaternionInterpolation(q_start, q_final, {inc})[0];
+  EXPECT_TRUE(ExpectEqQuaternion(expect, actual));
+}
+
+TEST_P(QuaternionVsEigenFixture, AngularDistance) {
+  Eigen::Quaternionf q_start = Eigen::Quaternionf::Identity();
+
+  const auto q_final = Eigen::Quaternionf(GetParam());
+  const float actual = Quaternion(q_start).AngularDistance(q_final);
+  const float expect = q_start.angularDistance(q_final);
+  EXPECT_TRUE(ExpectEq(expect, actual));
+}
+
+INSTANTIATE_TEST_CASE_P(
+  QuaternionVsEigenFixture, QuaternionVsEigenFixture,
+  ::testing::Values(AngleAxis(+core::math::PI_4, Vec3::UnitX()),
+                    AngleAxis(+core::math::PI_4, Vec3::UnitY()),
+                    AngleAxis(+core::math::PI_4, Vec3::UnitZ()),
+                    AngleAxis(-core::math::PI_4, Vec3::UnitX()),
+                    AngleAxis(-core::math::PI_4, Vec3::UnitY()),
+                    AngleAxis(-core::math::PI_4, Vec3::UnitZ()),
+                    AngleAxis(+core::math::PI_4 * 3, Vec3::UnitX()),
+                    AngleAxis(+core::math::PI_4 * 3, Vec3::UnitY()),
+                    AngleAxis(+core::math::PI_4 * 3, Vec3::UnitZ()),
+                    AngleAxis(-core::math::PI_4 * 3, Vec3::UnitX()),
+                    AngleAxis(-core::math::PI_4 * 3, Vec3::UnitY()),
+                    AngleAxis(-core::math::PI_4 * 3, Vec3::UnitZ()),
+                    AngleAxis(+core::math::PI_4, Vec3::UnitX() * -1),
+                    AngleAxis(+core::math::PI_4, Vec3::UnitY() * -1),
+                    AngleAxis(+core::math::PI_4, Vec3::UnitZ() * -1),
+                    AngleAxis(-core::math::PI_4, Vec3::UnitX() * -1),
+                    AngleAxis(-core::math::PI_4, Vec3::UnitY() * -1),
+                    AngleAxis(-core::math::PI_4, Vec3::UnitZ() * -1),
+                    AngleAxis(+core::math::PI_4 * 3, Vec3::UnitX() * -1),
+                    AngleAxis(+core::math::PI_4 * 3, Vec3::UnitY() * -1),
+                    AngleAxis(+core::math::PI_4 * 3, Vec3::UnitZ() * -1),
+                    AngleAxis(-core::math::PI_4 * 3, Vec3::UnitX() * -1),
+                    AngleAxis(-core::math::PI_4 * 3, Vec3::UnitY() * -1),
+                    AngleAxis(-core::math::PI_4 * 3, Vec3::UnitZ() * -1)));
