@@ -48,9 +48,9 @@ void Quaternion::SetIdentity() {
 }
 
 float Quaternion::Angle() const {
-  // const float ang =
-  //   2 * std::atan2(Vec().norm(), W());  // signed angle [0, 2*PI]
-  const float ang = 2 * std::acos(W());  // always positive [0, 2*PI)
+  const float ang = 2 * std::atan2(Vec().norm(), W());  // signed angle [0,
+  // 2*PI]
+  // const float ang = 2 * std::acos(W());  // always positive [0, 2*PI)
   if (ang >= 2 * PI) {
     return ang - 2 * PI;
   }
@@ -71,11 +71,26 @@ float Quaternion::AngularDistance(const Quaternion& rhs) const {
   // const float dot =
   //   a.W() * b.W() + a.X() * b.X() + a.Y() * b.Y() + a.Z() * b.Z();
   // return std::acos(2 * dot - 1);
-
-  const Quaternion relative_rotation = a.Conjugate() * b;
-  return relative_rotation.Angle();
+  const Quaternion relative_rotation = a * b.Conjugate();
+  const float ang = relative_rotation.Angle();
+  if (ang >= PI) {
+    return ang - PI;
+  } else {
+    return ang;
+  }
+  // return relative_rotation.Angle();
 }
 
+// float Quaternion::ShortAngularDistance2(const Quaternion& rhs) const {
+//   const Quaternion q0 = this->Normalized();
+//   Quaternion q1 = rhs.Normalized();
+//   float ang_dist = q0.AngularDistance(q1);
+//   // Ensure SLERP takes the shortest path
+//   if (ang_dist >= PI) {
+//     q1 = Quaternion(-q1.Scalar(), -q1.Vec());
+//     ang_dist = q0.AngularDistance(q1);
+//   }
+// }
 float Quaternion::operator[](const size_t idx) const {
   if (idx > 4) {
     throw std::out_of_range("expected index values in range of [0, 4)");
@@ -168,10 +183,8 @@ QuaternionInterpolation(const Quaternion& qf, const Quaternion& qs,
     q1 = Quaternion(-qs.Scalar(), -qs.Vec()).Normalized();
     angular_distance = q0.AngularDistance(q1);
     SYS_LOG_WARN("Quaternion Interpolation: ")
-      << "flip Second endpoint "
-         "quaternion to takes the "
-         "shortest path: "
-      << a << " -> " << angular_distance;
+      << "flip Second endpoint quaternion to takes the shortest path: " << a
+      << " -> " << angular_distance;
   }
 
   std::vector<Quaternion> quat(interpolation_points.size());
