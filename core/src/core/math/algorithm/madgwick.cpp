@@ -5,7 +5,7 @@
 #include <cmath>
 
 namespace core::algorithm {
-using core::utils::Mat3;
+using core::math::Mat3;
 
 Madgwick::Madgwick(const MadgwickConfig config) : config_{config} {
 }
@@ -27,7 +27,7 @@ std::optional<Quat> Madgwick::Update(const Vec3& accel, const Vec3& gyro,
     return {};
   }
 
-  Eigen::Matrix<core::utils::MATH_TYPE, 3, 4> J;
+  Eigen::Matrix<core::math::MATH_TYPE, 3, 4> J;
   J << -2 * quat_.y(), 2 * quat_.z(), -2 * quat_.w(), 2 * quat_.x(),  //
     2 * quat_.x(), 2 * quat_.w(), 2 * quat_.z(), 2 * quat_.y(),       //
     0.f, -4 * quat_.x(), -4 * quat_.y(), 0.f;                         //
@@ -60,7 +60,7 @@ std::optional<Quat> Madgwick::Update(const Vec3& accel, const Vec3& gyro,
   const float bx = norm([ h[1], h[2] ]);
   const float bz = h.z();
 
-  Eigen::Matrix<core::utils::MATH_TYPE, 6, 1> f;
+  Eigen::Matrix<core::math::MATH_TYPE, 6, 1> f;
   f << 2 * (quat_.x() * quat_.z() - quat_.w() * quat_.y()) - a.x(),     //
     2 * (quat_.w() * quat_.x() + quat_.y() * quat_.z()) - a.y(),        //
     2 * (0.5 - quat_.x() * quat_.x() - quat_.y() * quat_.y()) - a.z(),  //
@@ -71,7 +71,7 @@ std::optional<Quat> Madgwick::Update(const Vec3& accel, const Vec3& gyro,
     2 * bx * (quat_.w() * quat_.y() + quat_.x() * quat_.z()) +
       2 * bz * (0.5 - quat_.x() * quat_.x() - quat_.y() * quat_.y()) - m.z();
 
-  Eigen::Matrix<core::utils::MATH_TYPE, 6, 4> J;
+  Eigen::Matrix<core::math::MATH_TYPE, 6, 4> J;
   J << -2 * quat_.y(), 2 * quat_.z(), -2 * quat_.w(), 2 * quat_.x(),  //
     2 * quat_.x(), 2 * quat_.w(), 2 * quat_.z(), 2 * quat_.y(),       //
     0.0, -4.0 * quat_.x(), -4.0 * quat_.y(), 0.0,                     //

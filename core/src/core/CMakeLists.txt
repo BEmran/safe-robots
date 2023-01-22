@@ -33,6 +33,12 @@ set(CORE_HEADER_LIST
     ${CORE_INCLUDE_DIR}/utils/writer_file.hpp
     ${CORE_INCLUDE_DIR}/utils/writer.hpp
     ${CORE_INCLUDE_DIR}/hardware/model.hpp
+    ${CORE_INCLUDE_DIR}/math/dcm.hpp
+    ${CORE_INCLUDE_DIR}/math/quaternion.hpp
+    ${CORE_INCLUDE_DIR}/math/math.hpp
+    ${CORE_INCLUDE_DIR}/math/transformation.hpp
+    ${CORE_INCLUDE_DIR}/math/vector.hpp
+    ${CORE_INCLUDE_DIR}/math/algorithm/complementary_filter.hpp
     ${CORE_INCLUDE_DIR}/sensors/module_sensor_imu.hpp
     ${CORE_INCLUDE_DIR}/sensors/module_sensor.hpp)
 
@@ -68,6 +74,7 @@ set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/math/math.cpp
     ${CORE_SOURCE_DIR}/math/transformation.cpp
     ${CORE_SOURCE_DIR}/math/vector.cpp
+    ${CORE_SOURCE_DIR}/math/algorithm/complementary_filter.cpp
     ${CORE_SOURCE_DIR}/sensors/module_sensor_imu.cpp
     ${CORE_SOURCE_DIR}/sensors/module_sensor.cpp)
 

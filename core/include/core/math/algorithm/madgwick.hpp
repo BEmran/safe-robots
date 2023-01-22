@@ -6,11 +6,11 @@
 #include <optional>
 
 #include "core/utils/data.hpp"
-#include "core/utils/math.hpp"
+#include "core/math/math.hpp"
 
 namespace core::algorithm {
-using core::utils::Quat;
-using core::utils::Vec3;
+using core::math::Quat;
+using core::math::Vec3;
 
 struct MadgwickConfig {
   float dt{0.01};

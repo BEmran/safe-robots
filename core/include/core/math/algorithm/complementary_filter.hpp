@@ -1,22 +1,29 @@
 // Copyright (C) 2022 Bara Emran - All Rights Reserved
 
-#ifndef CORE_ALGORITHM_COMPLEMENTARY_FILTER_HPP_
-#define CORE_ALGORITHM_COMPLEMENTARY_FILTER_HPP_
+#ifndef CORE_MATH_ALGORITHM_COMPLEMENTARY_FILTER_HPP_
+#define CORE_MATH_ALGORITHM_COMPLEMENTARY_FILTER_HPP_
 
 #include <optional>
 
+#include "core/math/math.hpp"
 #include "core/utils/data.hpp"
-#include "core/utils/math.hpp"
 
-namespace core::algorithm {
-using core::utils::Quat;
-using core::utils::Vec3;
+namespace core::math::algorithm {
+using core::math::Quat;
+using core::math::Vec3;
+
+constexpr float DEFAULT_GAIN = 0.9f;
 
 enum class Frame { NED, ENU };
 
 struct ComplementaryFilterConfig {
-  float dt{0.01};
-  float gain{0.9};
+  /// @brief sampling time
+  float dt{0.01f};
+  /// @brief gain ratio to blend Gyro sensor sensor with other sensor values.
+  /// the value is expected to be in range of [0, 1]. Where 0 means use gyro
+  /// sensor only while 1 means use other sensor values only.
+  float gain{DEFAULT_GAIN};
+  /// @brief sensor frame
   Frame frame{Frame::NED};
 };
 
@@ -31,14 +38,21 @@ class ComplementaryFilter {
 
   // Attitude Estimation from given measurements and previous orientation.
   std::optional<Quat> Update(const Vec3& accel, const Vec3& gyro,
-                             const float dt = -1);
+                             const float dt = -1.f);
 
   // Attitude Estimation from given measurements and previous orientation.
   std::optional<Quat> Update(const Vec3& accel, const Vec3& gyro,
-                             const Vec3& mag, const float dt = -1);
+                             const Vec3& mag, const float dt = -1.f);
+  Quat GetQuat() const;
+  float GetGain() const;
+
+  Quat Reset(const Quat quat = Quat::Identity());
+  float ResetGain(const float gain = DEFAULT_GAIN);
 
  protected:
-  bool CheckIfVec3IsValid(const Vec3& vec) const;
+  bool IsNearZero(const Vec3& vec) const;
+
+  float DecideWhichDtToUse(const float dt) const;
 
   // Quaternion from roll-pitch-yaw angles
   Quat OrientationFromAccelerometer(const Vec3& accel) const;
@@ -57,5 +71,5 @@ class ComplementaryFilter {
   Quat quat_{Quat().Identity()};
 };
 
-}  // namespace core::algorithm
+}  // namespace core::math::algorithm
 #endif  // CORE_ALGORITHM_COMPLEMENTARY_FILTER_HPP_

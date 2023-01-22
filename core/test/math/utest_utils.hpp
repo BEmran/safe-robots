@@ -5,8 +5,8 @@
 #include <gtest/gtest.h>
 
 #include "core/math/dcm.hpp"
-#include "core/math/quaternion.hpp"
 #include "core/math/math.hpp"
+#include "core/math/quaternion.hpp"
 
 using core::math::Mat3;
 using core::math::MATH_TYPE;
@@ -24,17 +24,14 @@ operator&&(const ::testing::AssertionResult& res1,
 [[nodiscard]] ::testing::AssertionResult ExpectEqMat3(const Mat3& expect,
                                                       const Mat3& actual);
 
-[[nodiscard]] ::testing::AssertionResult ExpectEqMat3(const core::math::DCM& expect,
-                                                      const core::math::DCM& actual);
+[[nodiscard]] ::testing::AssertionResult
+ExpectEqMat3(const core::math::DCM& expect, const core::math::DCM& actual);
 
 [[nodiscard]] ::testing::AssertionResult ExpectEqVec3(const Vec3& expect,
                                                       const Vec3& actual);
 
 [[nodiscard]] ::testing::AssertionResult
 ExpectEqRPY(const core::math::RPY& expect, const core::math::RPY& actual);
-
-[[nodiscard]] ::testing::AssertionResult ExpectEqQuat(const Quat& expect,
-                                                      const Quat& actual);
 
 [[nodiscard]] ::testing::AssertionResult ExpectEqQuaternion(
   const core::math::Quaternion& expect, const core::math::Quaternion& actual);
