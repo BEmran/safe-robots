@@ -11,7 +11,7 @@
 #include <stdexcept>
 #include <vector>
 
-namespace core::math {
+namespace core::math::my {
 
 template <typename T>
 class Vec {
@@ -125,5 +125,5 @@ class Vec3 : public Vec<T> {
   }
 };
 
-}  // namespace math
+}  // namespace core::math::my
 #endif  // MY_MATH_VECTOR_HPP_
