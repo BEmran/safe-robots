@@ -91,7 +91,7 @@ target_include_directories(
                            $<INSTALL_INTERFACE:${ABSOLUTE_INSTALL_INCLUDEDIR}>)
 
 # Link required library
-target_link_libraries(${CORE_LIBRARY} PRIVATE stdc++fs Eigen3::Eigen)
+target_link_libraries(${CORE_LIBRARY} PRIVATE pthread stdc++fs Eigen3::Eigen)
 
 # All users of this library will need at least C++17
 target_compile_features(${CORE_LIBRARY} PUBLIC cxx_std_17)
