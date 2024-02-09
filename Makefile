@@ -3,7 +3,7 @@ SHELL := /bin/bash
 #############################################
 ## .PHONY: install coverage test docs help
 #############################################
-.PHONY: build-all build-dependencies test-all clang-format-all cmake-format-all help
+.PHONY: build-all build-all-release build-dependencies test-all clang-format-all cmake-format-all help
 .DEFAULT_GOAL := help
 
 ################################
@@ -30,10 +30,17 @@ build-all: ## build target
 	@if [ ! -d "./build" ]; then	\
 		mkdir build;				\
 	fi
-	@cmake -S . -B build
+	@cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 	@cd build; \
 	make -j8
 
+build-all-release: ## build target as reslease
+	@if [ ! -d "./build" ]; then	\
+		mkdir build;				\
+	fi
+	@cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+	@cd build; \
+	make -j8
 build-dependencies: ## build project dependencies
 	@cd dependencies; \
 	make build-all -j2

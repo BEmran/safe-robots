@@ -3,7 +3,7 @@ SHELL := /bin/bash
 #############################################
 ## .PHONY: install coverage test docs help
 #############################################
-.PHONY: build-all clean help
+.PHONY: build-all build-robot-control-library build-yamal-cpp clean help
 .DEFAULT_GOAL := help
 
 YAML_CPP = yaml-cpp
@@ -27,6 +27,9 @@ export PRINT_HELP_PYSCRIPT
 ###################
 help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
+
+build-all: build-robot-control-library build-yamal-cpp ## build al ldependencies
+	
 
 build-robot-control-library: ## build robot control library
 	@if [ ! -d "./build/${RCL}" ]; then	\

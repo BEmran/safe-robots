@@ -30,7 +30,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # generate compile_commands.json for clang
 option(WARNINGS_AS_ERRORS "Set warning as erros" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 option(BUILD_EXECTUABLES "Build executables and examples" ON)
-option(BUILD_HARDWARE_COMMON "Build common hardware library" ON)
+option(BUILD_HARDWARE_COMMON "Build common hardware library" OFF)
 option(BUILD_NAVIO "Build navio library for Emlid Navio 2 board" OFF)
 option(BUILD_BBB "Build bbb library for BeagleBone Blue board" OFF)
 option(BUILD_TESTING "Build tests" OFF)
@@ -143,8 +143,7 @@ set(BBB_LIBRARY bbb)
 set(DEPEN_LIBRARY dependencies)
 
 # define library name
-set(CORE ON)
-if (CORE)
+if (BUILD_SHARED_LIBS)
     add_subdirectory(${PROJECT_SOURCE_DIR}/core)
 endif ()
 message(STATUS "CORE project is set ${CORE}")
