@@ -4,6 +4,3 @@
 [submodule "dependencies/librobotcontrol"]
 	path = dependencies/librobotcontrol
 	url = https://github.com/beagleboard/librobotcontrol.git
-[submodule "dependencies/googletest"]
-	path = dependencies/googletest
-	url = ../../google/googletest.git
