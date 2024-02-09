@@ -3,7 +3,7 @@ SHELL := /bin/bash
 #############################################
 ## .PHONY: install coverage test docs help
 #############################################
-.PHONY: build-all build-all-release build-dependencies test-all clang-format-all cmake-format-all help
+.PHONY: build-all build-all-release build-dependencies test test-debug clang-format-all cmake-format-all help
 .DEFAULT_GOAL := help
 
 ################################
@@ -56,10 +56,18 @@ clang-format-all: ## clang format all source and header files
 cmake-format-all: ## cmake format all CMakeList.txt files
 	utils/cmake-format
 
-test-all: ## run tests with ctest
+test-debug: ## run tests with debug information
 	@if [ ! -d "./build" ]; then    								\
 		echo "Please build the project first using: make build";	\
 	else															\
 	cd build;														\
 		ctest -VV;													\
+	fi
+
+test: ## run tests
+	@if [ ! -d "./build" ]; then    								\
+		echo "Please build the project first using: make build";	\
+	else															\
+	cd build;														\
+		ctest --output-on-failure;									\
 	fi

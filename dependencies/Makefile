@@ -8,6 +8,7 @@ SHELL := /bin/bash
 
 YAML_CPP = yaml-cpp
 RCL = rcl
+GTEST = googletest
 ################################
 ## Display option information
 ################################
@@ -28,9 +29,8 @@ export PRINT_HELP_PYSCRIPT
 help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-build-all: build-robot-control-library build-yamal-cpp ## build al ldependencies
+build-all: build-robot-control-library build-yamal-cpp build-google-test ## build al ldependencies
 	
-
 build-robot-control-library: ## build robot control library
 	@if [ ! -d "./build/${RCL}" ]; then	\
 		mkdir -p ./build/${RCL};				\
@@ -45,9 +45,17 @@ build-yamal-cpp: ## build yamal-cpp
 		mkdir -p ./build/${YAML_CPP};				\
 		mkdir -p ./install/${YAML_CPP};				\
 	fi
-	@cmake -S ${YAML_CPP} -B ./build/${YAML_CPP} -DCMAKE_INSTALL_PREFIX=./install/${YAML_CPP} -DYAML_BUILD_SHARED_LIBS=OFF
+	@cmake -S ${YAML_CPP} -B ./build/${YAML_CPP} -DCMAKE_INSTALL_PREFIX=./install/${YAML_CPP}-DCMAKE_INSTALL_PREFIX=./install/${YAML_CPP} -DYAML_BUILD_SHARED_LIBS=OFF
 	@cd ./build/${YAML_CPP}; \
 	make -j8 && make install
+
+build-google-test: ## build google-test
+	@if [ ! -d "./build/${GTEST}" ]; then	\
+		mkdir -p ./build/${GTEST};				\
+	fi
+	@cmake -S ${GTEST} -B ./build/${GTEST}
+	@cd ./build/${GTEST}; \
+	make -j8
 
 clean: ## clean build file
 	@if [ -d "./build" ]; then	\
