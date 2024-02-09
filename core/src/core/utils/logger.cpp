@@ -25,7 +25,7 @@ EventLevel OverallLoggerLevel() {
   return sOverallLoggerLevel;
 }
 
-void SetOverallLoggerLevel(const EventLevel level) {
+void SetOverallLoggerLevel(EventLevel level) {
   sOverallLoggerLevel = level;
 }
 
@@ -54,7 +54,7 @@ void Logger::Log(const LabeledModifier& lm, std::string_view msg) const {
   ThrowExceptionForCriticalEvent(lm.GetEventLevel(), msg);
 }
 
-void Logger::Log(const EventLevel event, std::string_view msg) const {
+void Logger::Log(EventLevel event, std::string_view msg) const {
   switch (event) {
     case EventLevel::DEBUG:
       Log(labeled_modifiers_.debug, msg);
@@ -97,7 +97,7 @@ void Logger::FormatAndWrite(const WriterFormatterPair& wf,
   wf.writer->Write(formatted);
 }
 
-void Logger::ThrowExceptionForCriticalEvent(const EventLevel event,
+void Logger::ThrowExceptionForCriticalEvent(EventLevel event,
                                             std::string_view msg) const {
   if (IsCritical(event)) {
     expectation_factory_->Throw(msg.data());
@@ -108,7 +108,7 @@ bool Logger::IsLoggerLevelSufficientToLog() const {
   return logging_level_ >= OverallLoggerLevel();
 }
 
-bool Logger::IsEventLevelSufficientToLog(const EventLevel event) const {
+bool Logger::IsEventLevelSufficientToLog(EventLevel event) const {
   return IsLoggerLevelSufficientToLog() && event >= logging_level_;
 }
 

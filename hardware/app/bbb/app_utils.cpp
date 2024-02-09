@@ -7,7 +7,7 @@
 #include "core/utils/clock.hpp"
 #include "core/utils/logger_macros.hpp"
 
-constexpr float RAD_TO_DEG = 1.f / core::math::DEG_TO_RAD;
+constexpr float RAD_TO_DEG = 1.F / core::math::DEG_TO_RAD;
 using hardware::common::sensors::MS2_TO_G;
 
 void AccelHeaderMsg(const AccelMode mode) {

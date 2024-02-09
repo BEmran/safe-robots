@@ -32,7 +32,7 @@ std::optional<Quat> Madgwick::Update(const Vec3& accel, const Vec3& gyro,
     2 * quat_.x(), 2 * quat_.w(), 2 * quat_.z(), 2 * quat_.y(),       //
     0.F, -4 * quat_.x(), -4 * quat_.y(), 0.F;                         //
 
-  Quat gradient{J.transpose() * f};
+  Quat gradient{J.transpose() * F};
   gradient.normalize();
   const Quat q_omega{0, gyro.x(), gyro.y(), gyro.z()};
   Quat q_dot{0.5 * quat_.coeffs() * q_omega.coeffs()};
@@ -88,7 +88,7 @@ std::optional<Quat> Madgwick::Update(const Vec3& accel, const Vec3& gyro,
     2 * bx * quat_.y(), 2 * bx * quat_.z() - 4 * bz * quat_.x(),
     2 * bx * quat_.w() - 4 * bz * quat_.y(), 2 * bx * quat_.x();
 
-  Quat gradient{J.transpose() * f};
+  Quat gradient{J.transpose() * F};
   gradient.normalize();
   const Quat q_omega{0, gyro.x(), gyro.y(), gyro.z()};
   Quat q_dot{0.5 * quat_.coeffs() * q_omega.coeffs()};

@@ -28,7 +28,7 @@ class DCM2 : public MatX<3> {
     const float angle = std::acos((Trace() - 1.F) / 2.F);
     const MatType s = mat - T().Matrix();
     // Skew - symmetric matrix
-    const MatType logR = angle * s / (2.f * std::sin(angle));
+    const MatType logR = angle * s / (2.F * std::sin(angle));
     return logR;
   }
 

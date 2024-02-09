@@ -39,7 +39,7 @@ static const Eigen::IOFormat kVecFmtSimple(Eigen::FullPrecision, 0, ", ", ", ",
                                            "", "", "", "");
 
 Scalar CreateScalar(MATH_TYPE val);
-Quat UnitQuaternion(const float scalar, const Vec3 vec);
+Quat UnitQuaternion(float scalar, const Vec3& vec);
 
 /**
  * @brief simple structure to hold RPY data in radian
@@ -47,11 +47,11 @@ Quat UnitQuaternion(const float scalar, const Vec3 vec);
  */
 struct RPY {
   /// @brief angle around x-axis in radian
-  MATH_TYPE roll{0.f};
+  MATH_TYPE roll{0.F};
   /// @brief angle around y-axis in radian
-  MATH_TYPE pitch{0.f};
+  MATH_TYPE pitch{0.F};
   /// @brief angle around z-axis in radian
-  MATH_TYPE yaw{0.f};
+  MATH_TYPE yaw{0.F};
 
   /**
    * @brief Default Construct for RPY object

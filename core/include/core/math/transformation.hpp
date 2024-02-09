@@ -45,7 +45,7 @@ Mat3 Skew(const Vec3& vec);
  *
  * @return DCM dcm matrix
  */
-DCM AxisAngleToDCM(const float angle, const Vec3& axis);
+DCM AxisAngleToDCM(float angle, const Vec3& axis);
 
 /**
  * @brief  Return axis-angle representation of the DCM.
@@ -57,7 +57,7 @@ std::pair<float, Vec3> DCMToAxisAngle(const DCM& dcm);
 
 DCM EulerXYZToDCM(const RPY& rpy);
 DCM EulerZYXToDCM(const RPY& rpy);
-DCM EulerToDCM(const RPY& rpy, const EulerOrder order);
+DCM EulerToDCM(const RPY& rpy, EulerOrder order);
 
 /**
  * @brief Roll-Pitch-Yaw Angles from DCM
@@ -66,7 +66,7 @@ DCM EulerToDCM(const RPY& rpy, const EulerOrder order);
  */
 RPY DCMToEulerXYZ(const DCM& dcm);
 RPY DCMToEulerZYX(const DCM& dcm);
-RPY DCMToEuler(const DCM& dcm, const EulerOrder order);
+RPY DCMToEuler(const DCM& dcm, EulerOrder order);
 
 /**
  * @brief Quaternion from a Direction Cosine Matrix with Shepperd's method

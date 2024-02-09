@@ -12,7 +12,7 @@ using core::math::algorithm::ComplementaryFilter;
 using core::math::algorithm::ComplementaryFilterConfig;
 
 bool IsParallel(const Vec3& a, const Vec3& b) {
-  constexpr float precision = 0.0001f;
+  constexpr float precision = 0.0001F;
   const Vec3 cross{a.cross(b)};
   return cross.isZero(precision);
 }
@@ -78,7 +78,7 @@ TEST(ComplementaryFilterMock, RestGainToSomeValue) {
   // when construct with default config
   ComplementaryFilterMock cfm;
   // if ResetGain function is called with some value
-  const float expect{0.5f};
+  const float expect{0.5F};
   cfm.ResetGain(expect);
   // then the internal gain is set to that value
   EXPECT_FLOAT_EQ(expect, cfm.GetGain());
@@ -144,7 +144,7 @@ TEST(ComplementaryFilterMock, DecideWhichDtToUseIfValuePassedIsNegative) {
   // when construct with default config
   const ComplementaryFilterMock cfm;
   // if DecideWhichDtToUse function is called with any negative value
-  const float actual = cfm.RunDecideWhichDtToUse(-0.1f);
+  const float actual = cfm.RunDecideWhichDtToUse(-0.1F);
   // then the return value is what set in config
   EXPECT_FLOAT_EQ(ComplementaryFilterConfig().dt, actual);
 }

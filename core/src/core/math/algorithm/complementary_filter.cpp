@@ -17,8 +17,7 @@ ComplementaryFilter::ComplementaryFilter(
 }
 
 std::optional<Quat> ComplementaryFilter::Update(const Vec3& accel,
-                                                const Vec3& gyro,
-                                                const float dt) {
+                                                const Vec3& gyro, float dt) {
   if (IsNearZero(accel) || IsNearZero(gyro)) {
     return {};
   }
@@ -31,8 +30,7 @@ std::optional<Quat> ComplementaryFilter::Update(const Vec3& accel,
 
 std::optional<Quat> ComplementaryFilter::Update(const Vec3& accel,
                                                 const Vec3& gyro,
-                                                const Vec3& mag,
-                                                const float dt) {
+                                                const Vec3& mag, float dt) {
   if (IsNearZero(accel) || IsNearZero(gyro) || IsNearZero(mag)) {
     return {};
   }
@@ -48,7 +46,7 @@ bool ComplementaryFilter::IsNearZero(const Vec3& vec) const {
   return vec.norm() < eps;
 }
 
-float ComplementaryFilter::DecideWhichDtToUse(const float dt) const {
+float ComplementaryFilter::DecideWhichDtToUse(float dt) const {
   if (dt > 0.F) {
     return dt;
   }
@@ -56,7 +54,7 @@ float ComplementaryFilter::DecideWhichDtToUse(const float dt) const {
 }
 
 Quat ComplementaryFilter::AttitudePropagation(const Vec3& gyro,
-                                              const float dt) const {
+                                              float dt) const {
   const Vec3 w = -0.5f * dt * gyro;
   Eigen::Matrix<core::math::MATH_TYPE, 4, 4> A;
   A << 1.0f, -w[0], -w[1], -w[2],  //
@@ -130,7 +128,7 @@ Quat ComplementaryFilter::ComplementaryEstimation(const Quat& quat_w,
   //   const Quat out{quat_w.coeffs() * w_gain + quat_am.coeffs() *
   //   config_.gain}; return out.normalized();
   // }
-  // const float w_gain = 1.f - config_.gain;
+  // const float w_gain = 1.F - config_.gain;
   return quat_w.slerp(config_.gain, quat_am).normalized();
 }
 
@@ -142,11 +140,11 @@ float ComplementaryFilter::GetGain() const {
   return config_.gain;
 }
 
-Quat ComplementaryFilter::Reset(const Quat quat) {
+Quat ComplementaryFilter::Reset(const Quat& quat) {
   return quat_ = quat;
 }
 
-float ComplementaryFilter::ResetGain(const float gain) {
+float ComplementaryFilter::ResetGain(float gain) {
   config_.gain = std::clamp(gain, MIN_GAIN, MAX_GAIN);
   return config_.gain;
 }

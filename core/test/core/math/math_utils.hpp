@@ -19,8 +19,8 @@ using core::math::Vec3;
 operator&&(const ::testing::AssertionResult& res1,
            const ::testing::AssertionResult& res2);
 
-[[nodiscard]] ::testing::AssertionResult ExpectEq(const MATH_TYPE expect,
-                                                  const MATH_TYPE actual,
+[[nodiscard]] ::testing::AssertionResult ExpectEq(MATH_TYPE expect,
+                                                  MATH_TYPE actual,
                                                   std::string_view msg = "");
 
 [[nodiscard]] ::testing::AssertionResult ExpectEqMat3(const Mat3& expect,

@@ -11,11 +11,11 @@ class Quaternion {
  public:
   Quaternion();
 
-  Quaternion(const Quat q);
+  Quaternion(const Quat& q);
 
-  Quaternion(const float w, const float x, const float y, const float z);
+  Quaternion(float w, float x, float y, float z);
 
-  Quaternion(const float scalar, const Vec3 vec);
+  Quaternion(float scalar, Vec3 vec);
 
   void Normalize();
 
@@ -33,9 +33,9 @@ class Quaternion {
 
   float AngularDistance(const Quaternion& rhs) const;
 
-  float operator[](const size_t idx) const;
+  float operator[](size_t idx) const;
 
-  float& operator[](const size_t idx);
+  float& operator[](size_t idx);
 
   inline float Scalar() const {
     return scalar_;
@@ -91,15 +91,15 @@ class Quaternion {
   Vec3 vec_;
 };
 
-Quaternion QuaternionFromRotation(const float angle, const Vec3 axis);
+Quaternion QuaternionFromRotation(float angle, const Vec3& axis);
 
-Quaternion operator+(const Quaternion lhs, const Quaternion rhs);
-Quaternion operator-(const Quaternion lhs, const Quaternion rhs);
-Quaternion operator*(const Quaternion lhs, const Quaternion rhs);
-Quaternion operator*(const Quaternion quat, const Vec3& point);
-Quaternion operator*(const Quaternion quat, const float scale);
-Quaternion operator*(const float scale, const Quaternion quat);
-Quaternion operator/(const Quaternion quat, const float scale);
+Quaternion operator+(const Quaternion& lhs, const Quaternion& rhs);
+Quaternion operator-(const Quaternion& lhs, const Quaternion& rhs);
+Quaternion operator*(const Quaternion& lhs, const Quaternion& rhs);
+Quaternion operator*(const Quaternion& quat, const Vec3& point);
+Quaternion operator*(const Quaternion& quat, float scale);
+Quaternion operator*(float scale, const Quaternion& quat);
+Quaternion operator/(const Quaternion& quat, float scale);
 
 /**
  * @brief Interpolate linearly (LERP)
@@ -110,7 +110,7 @@ Quaternion operator/(const Quaternion quat, const float scale);
  * @return Quat
  */
 Quaternion LinearInterpolation(const Quaternion& qf, const Quaternion& qs,
-                               const float interpolation_point);
+                               float interpolation_point);
 
 /**
  * @brief Spherical Linear Interpolation between two quaternions. Return a valid
@@ -125,7 +125,7 @@ Quaternion LinearInterpolation(const Quaternion& qf, const Quaternion& qs,
  */
 Quaternion SphericalLinearInterpolation(const Quaternion& qf,
                                         const Quaternion& qs,
-                                        const float interpolation_points);
+                                        float interpolation_points);
 
 /**
  * @brief Quaternion Interpolation between two quaternions.

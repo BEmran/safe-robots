@@ -15,8 +15,8 @@ operator&&(const ::testing::AssertionResult& res1,
   }
 }
 
-[[nodiscard]] ::testing::AssertionResult ExpectEq(const MATH_TYPE expect,
-                                                  const MATH_TYPE actual,
+[[nodiscard]] ::testing::AssertionResult ExpectEq(MATH_TYPE expect,
+                                                  MATH_TYPE actual,
                                                   std::string_view msg) {
   if (std::abs(expect - actual) > EPS) {
     return ::testing::AssertionFailure()
@@ -64,7 +64,7 @@ ExpectEqRPY(const core::math::RPY& expect, const core::math::RPY& actual) {
   if (std::abs(expect.W() - actual.W()) < EPS) {
     return ExpectEqVec3(expect.Vec(), actual.Vec());
   } else if (std::abs(expect.W()) - std::abs(actual.W()) < EPS) {
-    return ExpectEqVec3(expect.Vec(), Vec3(-1.f * actual.Vec()))  //
+    return ExpectEqVec3(expect.Vec(), Vec3(-1.F * actual.Vec()))  //
            << " needed to flip real part";
   } else {
     return ::testing::AssertionFailure()

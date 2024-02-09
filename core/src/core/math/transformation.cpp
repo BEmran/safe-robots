@@ -29,7 +29,7 @@ std::pair<float, Vec3> DCMToAxisAngle(const DCM& dcm) {
   return {angle, axis};
 }
 
-DCM AxisAngleToDCM(const float angle, const Vec3& axis) {
+DCM AxisAngleToDCM(float angle, const Vec3& axis) {
   const Mat3 K = Skew(axis.normalized());
   const Mat3 dcm =
     Mat3::Identity() + std::sin(angle) * K + (1 - std::cos(angle)) * K * K;
@@ -48,7 +48,7 @@ DCM EulerZYXToDCM(const RPY& rpy) {
               Eigen::AngleAxisf(rpy.roll, Vec3::UnitX()));
 }
 
-DCM EulerToDCM(const RPY& rpy, const EulerOrder order) {
+DCM EulerToDCM(const RPY& rpy, EulerOrder order) {
   switch (order) {
     case EulerOrder::XYZ:
       return EulerXYZToDCM(rpy);
@@ -78,7 +78,7 @@ RPY DCMToEulerZYX(const DCM& dcm) {
   return RPY(gamma, beta, alpha);
 }
 
-RPY DCMToEuler(const DCM& dcm, const EulerOrder order) {
+RPY DCMToEuler(const DCM& dcm, EulerOrder order) {
   switch (order) {
     case EulerOrder::XYZ:
       return DCMToEulerXYZ(dcm.Matrix());
@@ -99,12 +99,12 @@ Quaternion Shepperd2(const DCM& dcm) {
   const auto ptr = std::max_element(b.begin(), b.end());
   const auto idx = std::distance(b.begin(), ptr);
 
-  float w{1.f}, x{0.f}, y{0.f}, z{0.f};
-  float gain{1.f};
+  float w{1.f}, x{0.f}, y{0.f}, z{0.F};
+  float gain{1.F};
   std::cout << "idx: " << idx << std::endl;
   switch (idx) {
     case 0:
-      w = 1.f + diag.sum();
+      w = 1.F + diag.sum();
       x = mat(1, 2) - mat(2, 1);
       y = mat(2, 0) - mat(0, 2);
       z = mat(0, 1) - mat(1, 0);
@@ -112,24 +112,24 @@ Quaternion Shepperd2(const DCM& dcm) {
       break;
     case 1:
       w = mat(1, 2) - mat(2, 1);
-      x = 1.f + diag(0) - diag(1) - diag(2);
+      x = 1.F + diag(0) - diag(1) - diag(2);
       y = mat(1, 0) + mat(0, 1);
       z = mat(2, 0) + mat(0, 2);
-      gain = 2.f * std::sqrt(x);
+      gain = 2.F * std::sqrt(x);
       break;
     case 2:
       w = mat(2, 0) - mat(0, 2);
       x = mat(1, 0) + mat(0, 1);
-      y = 1.f - diag(0) + diag(1) - diag(2);
+      y = 1.F - diag(0) + diag(1) - diag(2);
       z = mat(2, 1) + mat(1, 2);
-      gain = 2.f * std::sqrt(y);
+      gain = 2.F * std::sqrt(y);
       break;
     case 3:
       w = mat(0, 1) - mat(1, 0);
       x = mat(2, 0) + mat(0, 2);
       y = mat(2, 1) + mat(1, 2);
-      z = 1.f - diag(0) - diag(1) + diag(2);
-      gain = 2.f * std::sqrt(z);
+      z = 1.F - diag(0) - diag(1) + diag(2);
+      gain = 2.F * std::sqrt(z);
       break;
     default:
       std::cerr << "Undefined index" << std::endl;
@@ -143,31 +143,31 @@ Quaternion Shepperd(const DCM& dcm) {
   std::array<float, 4> b{dcm.Trace(), diag[0], diag[1], diag[2]};
   const auto ptr = std::max_element(b.begin(), b.end());
   const auto idx = std::distance(b.begin(), ptr);
-  std::array<float, 4> q{1.F, 0.F, 0.F, 0.f};
+  std::array<float, 4> q{1.F, 0.F, 0.F, 0.F};
   switch (idx) {
     case 0:
-      q[0] = 1.f + dcm.Trace();
+      q[0] = 1.F + dcm.Trace();
       q[1] = mat(1, 2) - mat(2, 1);
       q[2] = mat(2, 0) - mat(0, 2);
       q[3] = mat(0, 1) - mat(1, 0);
       break;
     case 1:
       q[0] = mat(1, 2) - mat(2, 1);
-      q[1] = 1.f + diag[0] - diag[1] - diag[2];
+      q[1] = 1.F + diag[0] - diag[1] - diag[2];
       q[2] = mat(1, 0) + mat(0, 1);
       q[3] = mat(2, 0) + mat(0, 2);
       break;
     case 2:
       q[0] = mat(2, 0) - mat(0, 2);
       q[1] = mat(1, 0) + mat(0, 1);
-      q[2] = 1.f - diag[0] + diag[1] - diag[2];
+      q[2] = 1.F - diag[0] + diag[1] - diag[2];
       q[3] = mat(2, 1) + mat(1, 2);
       break;
     case 3:
       q[0] = mat(0, 1) - mat(1, 0);
       q[1] = mat(2, 0) + mat(0, 2);
       q[2] = mat(2, 1) + mat(1, 2);
-      q[3] = 1.f - diag[0] - diag[1] + diag[2];
+      q[3] = 1.F - diag[0] - diag[1] + diag[2];
       break;
     default:
       std::cerr << "wrong index" << std::endl;
@@ -189,51 +189,51 @@ Quaternion Sarabandi(const DCM& dcm) {
   const float dw = mat(0, 0) + mat(1, 1) + mat(2, 2);
   float qw{1.0};
   if (dw > eta) {
-    qw = 0.5f * std::sqrt(1.f + dw);
+    qw = 0.5f * std::sqrt(1.F + dw);
   } else {
     const float nom = Square(mat(2, 1) - mat(1, 2)) +
                       Square(mat(0, 2) - mat(2, 0)) +
                       Square(mat(1, 0) - mat(0, 1));
-    const float denom = 3.f - dw;
+    const float denom = 3.F - dw;
     qw = 0.5f * std::sqrt(nom / denom);
   }
 
   //  Compute qx
   const float dx = mat(0, 0) - mat(1, 1) - mat(2, 2);
-  float qx{0.f};
+  float qx{0.F};
   if (dx > eta) {
-    qx = 0.5f * std::sqrt(1.f + dx);
+    qx = 0.5f * std::sqrt(1.F + dx);
   } else {
     const float nom = Square(mat(2, 1) - mat(1, 2)) +
                       Square(mat(0, 1) + mat(1, 0)) +
                       Square(mat(2, 0) + mat(0, 2));
-    const float denom = 3.f - dx;
+    const float denom = 3.F - dx;
     qx = 0.5f * std::sqrt(nom / denom);
   }
 
   //  Compute qy
   const float dy = -mat(0, 0) + mat(1, 1) - mat(2, 2);
-  float qy{0.f};
+  float qy{0.F};
   if (dy > eta) {
-    qy = 0.5f * std::sqrt(1.f + dy);
+    qy = 0.5f * std::sqrt(1.F + dy);
   } else {
     const float nom = Square(mat(0, 2) - mat(2, 0)) +
                       Square(mat(0, 1) + mat(1, 0)) +
                       Square(mat(1, 2) + mat(2, 1));
-    const float denom = 3.f - dy;
+    const float denom = 3.F - dy;
     qy = 0.5f * std::sqrt(nom / denom);
   }
 
   // Compute qz
   const float dz = -mat(0, 0) - mat(1, 1) + mat(2, 2);
-  float qz{0.f};
+  float qz{0.F};
   if (dz > eta) {
-    qz = 0.5f * std::sqrt(1.f + dz);
+    qz = 0.5f * std::sqrt(1.F + dz);
   } else {
     const float nom = Square(mat(1, 0) - mat(0, 1)) +
                       Square(mat(2, 0) + mat(0, 2)) +
                       Square(mat(1, 2) + mat(2, 1));
-    const float denom = 3.f - dz;
+    const float denom = 3.F - dz;
     qz = 0.5f * std::sqrt(nom / denom);
   }
   return Quaternion(qw, qx, qy, qz);
@@ -268,15 +268,15 @@ Quaternion DCMToQuaternion(const DCM& dcm, const QuaternionMethod method) {
 DCM QuaternionToDCM(const Quaternion& quat) {
   const Quaternion q = quat.Normalized();
   Mat3 R = Mat3::Identity();
-  R(0, 0) = 1.f - 2.f * (q.Y() * q.Y() + q.Z() * q.Z());
-  R(0, 1) = 2.f * (q.X() * q.Y() - q.W() * q.Z());
-  R(0, 2) = 2.f * (q.X() * q.Z() + q.W() * q.Y());
-  R(1, 0) = 2.f * (q.X() * q.Y() + q.W() * q.Z());
-  R(1, 1) = 1.f - 2.f * (q.X() * q.X() + q.Z() * q.Z());
-  R(1, 2) = 2.f * (q.Y() * q.Z() - q.W() * q.X());
-  R(2, 0) = 2.f * (q.X() * q.Z() - q.W() * q.Y());
-  R(2, 1) = 2.f * (q.W() * q.X() + q.Y() * q.Z());
-  R(2, 2) = 1.f - 2.f * (q.X() * q.X() + q.Y() * q.Y());
+  R(0, 0) = 1.F - 2.F * (q.Y() * q.Y() + q.Z() * q.Z());
+  R(0, 1) = 2.F * (q.X() * q.Y() - q.W() * q.Z());
+  R(0, 2) = 2.F * (q.X() * q.Z() + q.W() * q.Y());
+  R(1, 0) = 2.F * (q.X() * q.Y() + q.W() * q.Z());
+  R(1, 1) = 1.F - 2.F * (q.X() * q.X() + q.Z() * q.Z());
+  R(1, 2) = 2.F * (q.Y() * q.Z() - q.W() * q.X());
+  R(2, 0) = 2.F * (q.X() * q.Z() - q.W() * q.Y());
+  R(2, 1) = 2.F * (q.W() * q.X() + q.Y() * q.Z());
+  R(2, 2) = 1.F - 2.F * (q.X() * q.X() + q.Y() * q.Y());
   return R;
 }
 

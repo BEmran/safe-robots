@@ -10,16 +10,15 @@ namespace core::math {
 Quaternion::Quaternion() : Quaternion(1.F, Vec3::Zero()) {
 }
 
-Quaternion::Quaternion(const Quat q) : Quaternion(q.w(), q.vec()) {
+Quaternion::Quaternion(const Quat& q) : Quaternion(q.w(), q.vec()) {
 }
 
-Quaternion::Quaternion(const float w, const float x, const float y,
-                       const float z)
+Quaternion::Quaternion(float w, float x, float y, float z)
   : Quaternion{w, Vec3(x, y, z)} {
 }
 
-Quaternion::Quaternion(const float scalar, const Vec3 vec)
-  : scalar_{scalar}, vec_{vec} {
+Quaternion::Quaternion(float scalar, Vec3 vec)
+  : scalar_{scalar}, vec_{std::move(vec)} {
 }
 
 void Quaternion::Normalize() {
@@ -91,7 +90,7 @@ float Quaternion::AngularDistance(const Quaternion& rhs) const {
 //     ang_dist = q0.AngularDistance(q1);
 //   }
 // }
-float Quaternion::operator[](const size_t idx) const {
+float Quaternion::operator[](size_t idx) const {
   if (idx > 4) {
     throw std::out_of_range("expected index values in range of [0, 4)");
   }
@@ -101,7 +100,7 @@ float Quaternion::operator[](const size_t idx) const {
   return vec_[static_cast<Eigen::Index>(idx + 1)];
 }
 
-float& Quaternion::operator[](const size_t idx) {
+float& Quaternion::operator[](size_t idx) {
   if (idx > 4) {
     throw std::out_of_range("expected index values in range of [0, 4)");
   }
@@ -111,25 +110,25 @@ float& Quaternion::operator[](const size_t idx) {
   return vec_[static_cast<Eigen::Index>(idx + 1)];
 }
 
-Quaternion QuaternionFromRotation(const float angle, const Vec3 axis) {
+Quaternion QuaternionFromRotation(float angle, const Vec3& axis) {
   const float half_angle = angle / 2.F;
   const float sin_half_angle = std::sin(half_angle);
   return Quaternion(std::cos(half_angle), axis * sin_half_angle);
 }
 
-Quaternion operator+(const Quaternion lhs, const Quaternion rhs) {
+Quaternion operator+(const Quaternion& lhs, const Quaternion& rhs) {
   const float scalar = lhs.Scalar() + rhs.Scalar();
   const Vec3 vec = lhs.Vec() + rhs.Vec();
   return Quaternion(scalar, vec);
 }
 
-Quaternion operator-(const Quaternion lhs, const Quaternion rhs) {
+Quaternion operator-(const Quaternion& lhs, const Quaternion& rhs) {
   const float scalar = lhs.Scalar() - rhs.Scalar();
   const Vec3 vec = lhs.Vec() - rhs.Vec();
   return Quaternion(scalar, vec);
 }
 
-Quaternion operator*(const Quaternion lhs, const Quaternion rhs) {
+Quaternion operator*(const Quaternion& lhs, const Quaternion& rhs) {
   const float scalar = lhs.Scalar() * rhs.Scalar() - lhs.Vec().dot(rhs.Vec());
   const Vec3 vec = lhs.Scalar() * rhs.Vec() +  //
                    rhs.Scalar() * lhs.Vec() +  //
@@ -137,30 +136,30 @@ Quaternion operator*(const Quaternion lhs, const Quaternion rhs) {
   return Quaternion(scalar, vec);
 }
 
-Quaternion operator*(const Quaternion quat, const Vec3& point) {
+Quaternion operator*(const Quaternion& quat, const Vec3& point) {
   return quat * Quaternion(0, point) * quat.Conjugate();
 }
 
-Quaternion operator*(const Quaternion quat, const float scale) {
+Quaternion operator*(const Quaternion& quat, const float scale) {
   return Quaternion(quat.Scalar() * scale, quat.Vec() * scale);
 }
 
-Quaternion operator*(const float scale, const Quaternion quat) {
+Quaternion operator*(float scale, const Quaternion& quat) {
   return quat * scale;
 }
 
-Quaternion operator/(const Quaternion quat, const float scale) {
+Quaternion operator/(const Quaternion& quat, float scale) {
   return Quaternion(quat.Scalar() / scale, quat.Vec() / scale);
 }
 
 Quaternion LinearInterpolation(const Quaternion& qf, const Quaternion& qs,
-                               const float interpolation_point) {
+                               float interpolation_point) {
   return qf + interpolation_point * (qs - qf);
 }
 
 Quaternion SphericalLinearInterpolation(const Quaternion& qf,
                                         const Quaternion& qs,
-                                        const float interpolation_points) {
+                                        float interpolation_points) {
   // Angle between vectors
   float angular_distance = qf.AngularDistance(qs);
   const float sin_theta = std::sin(angular_distance);

@@ -56,13 +56,13 @@ class DCM {
 
   MATH_TYPE& operator[](const size_t idx);
 
-  MATH_TYPE At(const size_t idx) const;
+  MATH_TYPE At(size_t idx) const;
 
-  MATH_TYPE& At(const size_t idx);
+  MATH_TYPE& At(size_t idx);
 
-  MATH_TYPE At(const size_t row, const size_t col) const;
+  MATH_TYPE At(size_t row,  size_t col) const;
 
-  MATH_TYPE& At(const size_t row, const size_t col);
+  MATH_TYPE& At(size_t row,  size_t col);
 
  private:
   Mat3 mat;

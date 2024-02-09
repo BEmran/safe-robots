@@ -28,7 +28,7 @@ EventLevel OverallLoggerLevel();
  *
  * @param level new overall logger level
  */
-void SetOverallLoggerLevel(const EventLevel level);
+void SetOverallLoggerLevel(EventLevel level);
 
 /**
  * @brief logger configuration used to struct Logger object
@@ -89,7 +89,7 @@ class Logger {
    * @param event event level of the desired msg to log
    * @param msg msg to log
    */
-  void Log(const EventLevel event, std::string_view msg) const;
+  void Log(EventLevel event, std::string_view msg) const;
 
  protected:
   /**
@@ -116,7 +116,7 @@ class Logger {
    * @param event event level of the desired msg to log
    * @param msg msg to throw
    */
-  void ThrowExceptionForCriticalEvent(const EventLevel event,
+  void ThrowExceptionForCriticalEvent(EventLevel event,
                                       std::string_view msg) const;
   /**
    * @brief Compare LoggerLevel with OverallLoggerLevel
@@ -133,7 +133,7 @@ class Logger {
    * @return true if EventLevel is bigger or equal
    * @return false otherwise
    */
-  bool IsEventLevelSufficientToLog(const EventLevel event) const;
+  bool IsEventLevelSufficientToLog(EventLevel event) const;
 
  private:
   /// @brief Logger name surrounded by brackets "[]" if defined

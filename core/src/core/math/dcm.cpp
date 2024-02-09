@@ -49,7 +49,7 @@ Mat3 DCM::Log() const {
   const float angle = std::acos((Trace() - 1.F) / 2.F);
   const Mat3 s = mat - T().Matrix();
   // Skew - symmetric matrix
-  const Mat3 logR = angle * s / (2.f * std::sin(angle));
+  const Mat3 logR = angle * s / (2.F * std::sin(angle));
   return logR;
 }
 
@@ -71,22 +71,22 @@ MATH_TYPE& DCM::operator[](const size_t idx) {
   return mat(static_cast<Eigen::Index>(idx));
 }
 
-MATH_TYPE DCM::At(const size_t idx) const {
+MATH_TYPE DCM::At(size_t idx) const {
   return this->operator[](idx);
 }
 
-MATH_TYPE& DCM::At(const size_t idx) {
+MATH_TYPE& DCM::At(size_t idx) {
   return this->operator[](idx);
 }
 
-MATH_TYPE DCM::At(const size_t row, const size_t col) const {
+MATH_TYPE DCM::At(size_t row, size_t col) const {
   if (row > 3 || col > 3) {
     throw std::out_of_range("expected row and col values in range of [0, 3)");
   }
   return this->operator[](row * 3 + col);
 }
 
-MATH_TYPE& DCM::At(const size_t row, const size_t col) {
+MATH_TYPE& DCM::At(size_t row, size_t col) {
   if (row > 3 || col > 3) {
     throw std::out_of_range("expected row and col values in range of [0, 3)");
   }

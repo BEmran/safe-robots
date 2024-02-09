@@ -40,25 +40,25 @@ TEST(Sign, Zero) {
 }
 
 TEST(Skew, SkewSymmetric) {
-  const Vec3 vec(0.2f, -0.4f, 0.8f);
+  const Vec3 vec(0.2F, -0.4F, 0.8F);
   Mat3 s = Skew(vec);
   EXPECT_TRUE(ExpectEqMat3(Mat3::Zero(), s + s.transpose()));
 }
 
 TEST(Skew, SkewSymmetric2) {
-  const Vec3 vec(0.5f, -0.2f, 0.1f);
+  const Vec3 vec(0.5F, -0.2F, 0.1F);
   Mat3 s = Skew(vec);
   EXPECT_TRUE(ExpectEqMat3(-s, s.transpose()));
 }
 
 TEST(Skew, DiagonalAreZeros) {
-  const Vec3 vec(0.5f, -0.2f, 0.1f);
+  const Vec3 vec(0.5F, -0.2F, 0.1F);
   Mat3 s = Skew(vec);
   EXPECT_TRUE(s.diagonal().isZero());
 }
 
 TEST(Skew, CheckVectorValues) {
-  const Vec3 vec(0.5f, -0.2f, 0.1f);
+  const Vec3 vec(0.5F, -0.2F, 0.1F);
   Mat3 s = Skew(vec);
   EXPECT_FLOAT_EQ(vec.x(), s(2, 1));
   EXPECT_FLOAT_EQ(vec.y(), s(0, 2));
@@ -66,13 +66,13 @@ TEST(Skew, CheckVectorValues) {
 }
 
 TEST(AxisAngleToRotation, FirstQuarterAngleRandomVector) {
-  Eigen::AngleAxisf aa(0.2f, Vec3::Random().normalized());
+  Eigen::AngleAxisf aa(0.2F, Vec3::Random().normalized());
   EXPECT_TRUE(
     ExpectEqMat3(aa.toRotationMatrix(), AxisAngleToDCM(aa.angle(), aa.axis())));
 }
 
 TEST(AxisAngleToRotation, SecondQuarterAngleRandomVector) {
-  Eigen::AngleAxisf aa(1.7f, Vec3::Random().normalized());
+  Eigen::AngleAxisf aa(1.7F, Vec3::Random().normalized());
   EXPECT_TRUE(
     ExpectEqMat3(aa.toRotationMatrix(), AxisAngleToDCM(aa.angle(), aa.axis())));
 }
@@ -84,13 +84,13 @@ TEST(AxisAngleToRotation, ThirdQuarterAngleRandomVector) {
 }
 
 TEST(AxisAngleToRotation, FourthQuarterAngleRandomVector) {
-  Eigen::AngleAxisf aa(-0.4f, Vec3::Random().normalized());
+  Eigen::AngleAxisf aa(-0.4F, Vec3::Random().normalized());
   EXPECT_TRUE(
     ExpectEqMat3(aa.toRotationMatrix(), AxisAngleToDCM(aa.angle(), aa.axis())));
 }
 
 TEST(Euler, XYZToRotationMatrix) {
-  const RPY rpy(0.2f, -0.8f, 1.8f);
+  const RPY rpy(0.2F, -0.8F, 1.8F);
   const Mat3 rot = Mat3(Eigen::AngleAxisf(rpy.roll, Vec3::UnitX()) *
                         Eigen::AngleAxisf(rpy.pitch, Vec3::UnitY()) *
                         Eigen::AngleAxisf(rpy.yaw, Vec3::UnitZ()));
@@ -98,7 +98,7 @@ TEST(Euler, XYZToRotationMatrix) {
 }
 
 TEST(Euler, ZYXToRotationMatrix) {
-  const RPY rpy(0.2f, -0.8f, 1.8f);
+  const RPY rpy(0.2F, -0.8F, 1.8F);
   const Mat3 rot = Mat3(Eigen::AngleAxisf(rpy.yaw, Vec3::UnitZ()) *
                         Eigen::AngleAxisf(rpy.pitch, Vec3::UnitY()) *
                         Eigen::AngleAxisf(rpy.roll, Vec3::UnitX()));
@@ -112,20 +112,20 @@ TEST(QuaternionToDCM, Insanity) {
 }
 
 TEST(AxisAngleToDCM, Insanity) {
-  Eigen::AngleAxisf aa(0.2f, Vec3::Random().normalized());
+  Eigen::AngleAxisf aa(0.2F, Vec3::Random().normalized());
   const DCM dcm = AxisAngleToDCM(aa.angle(), aa.axis());
   EXPECT_TRUE(ExpectEqMat3(aa.toRotationMatrix(), dcm.Matrix()));
 }
 
 TEST(EulerToDCM, Insanity1) {
-  const RPY rpy(0.2f, -1.3f, 2.3f);
+  const RPY rpy(0.2F, -1.3F, 2.3F);
   const DCM expect = EulerToDCM(rpy, EulerOrder::XYZ);
   const RPY actual_rpy = DCMToEuler(expect, EulerOrder::XYZ);
   EXPECT_TRUE(ExpectEqRPY(rpy, actual_rpy));
 }
 
 TEST(EulerToDCM, Insanity2) {
-  const RPY rpy(0.8f, 1.3f, -2.3f);
+  const RPY rpy(0.8F, 1.3F, -2.3F);
   const DCM expect = EulerToDCM(rpy, EulerOrder::ZYX);
   const RPY actual_rpy = DCMToEuler(expect, EulerOrder::ZYX);
   EXPECT_TRUE(ExpectEqRPY(rpy, actual_rpy));
@@ -156,14 +156,14 @@ TEST(DCMToEuler, QuaternionToEulerZYX) {
 }
 
 TEST(EulerToDCM, EulerXYZ) {
-  const RPY expect_rpy(0.3f, 0.5f, -0.8f);
+  const RPY expect_rpy(0.3F, 0.5F, -0.8F);
   const DCM dcm = EulerToDCM(expect_rpy, EulerOrder::ZYX);
   const RPY actual_rpy = DCMToEuler(dcm, EulerOrder::ZYX);
   EXPECT_TRUE(ExpectEqRPY(expect_rpy, actual_rpy));
 }
 
 TEST(EulerToDCM, EulerZYX) {
-  const RPY expect_rpy(1.1f, -0.7f, 0.7f);
+  const RPY expect_rpy(1.1F, -0.7F, 0.7F);
   const DCM dcm = EulerToDCM(expect_rpy, EulerOrder::ZYX);
   const RPY actual_rpy = DCMToEuler(dcm, EulerOrder::ZYX);
   EXPECT_TRUE(ExpectEqRPY(expect_rpy, actual_rpy));
