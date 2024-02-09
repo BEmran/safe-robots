@@ -34,7 +34,8 @@ set(COMMON_SOURCE_LIST
 # ##############################################################################
 # Declare a C++ library Make an automatic library - will be static or dynamic
 # based on user setting
-add_library(${HARDWARE_COMMON_LIBRARY} ${COMMON_SOURCE_LIST}) # ${COMMON_HEADER_LIST}
+add_library(${HARDWARE_COMMON_LIBRARY} ${COMMON_SOURCE_LIST}
+)# ${COMMON_HEADER_LIST}
 
 # Global includes
 target_include_directories(

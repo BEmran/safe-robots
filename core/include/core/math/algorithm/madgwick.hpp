@@ -5,8 +5,8 @@
 
 #include <optional>
 
-#include "core/utils/data.hpp"
 #include "core/math/math.hpp"
+#include "core/utils/data.hpp"
 
 namespace core::algorithm {
 using core::math::Quat;

@@ -20,7 +20,7 @@ export -f format
 if [ $#  -eq  0 ]
 then
   # Declare projects and directories to search through as a string array
-  declare -a projects=("core" "hardware/navio")
+  declare -a projects=("core" "hardware")
   declare -a directories=("app" "include" "src" "test")
   # Search for c++ files through passed directories and call foramt function
   for pro in "${projects[@]}"; do

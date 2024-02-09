@@ -12,8 +12,8 @@
 #include <math>
 #include <optional>
 
-#include "core/utils/data.hpp"
 #include "core/math/math.hpp"
+#include "core/utils/data.hpp"
 
 namespace core::algorithm {
 // Include a hardware specific header file to redefine these predetermined

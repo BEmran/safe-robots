@@ -571,5 +571,5 @@ bool Mpu9250::WriteAK8963Register(uint8_t reg, uint8_t data) const {
   printf("write reg: 0x%x data: 0x%x\n", reg, data);
   return res;
 }
-}  // namespace
+}  // namespace hardware::common::sensors::mpu
    // hardware::common::sensors::mpu

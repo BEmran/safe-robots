@@ -4,7 +4,7 @@
 # find Eigen library
 find_package(Eigen3 3.3 REQUIRED)
 if (NOT Eigen3_FOUND)
-    message(FATAL_ERROR "Google Test library [Eigen3] not found")
+    message(FATAL_ERROR "Eigen3 Test library [Eigen3] not found")
 endif ()
 
 # ##############################################################################

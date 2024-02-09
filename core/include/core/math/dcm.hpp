@@ -67,5 +67,5 @@ class DCM {
  private:
   Mat3 mat;
 };
-}  // namespace math
+}  // namespace core::math
 #endif  // CORE_MATH_DCM_HPP_
