@@ -10,6 +10,7 @@ dependencies/[Ii]nstall/*
 compile_commands.json
 
 ### VisualStudioCode ###
+.idea/*
 .vscode/*
 .vscode/settings.json
 .vscode/tasks.json
