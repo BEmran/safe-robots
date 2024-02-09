@@ -129,9 +129,15 @@ if (yaml-cpp_FOUND)
 endif ()
 
 set(ROBOT_CONTROL_LIBRARY librobotcontrol)
-set(ROBOT_CONTROL_LIBRARY_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/librobotcontrol/library/include/)
+set(ROBOT_CONTROL_LIBRARY_INCLUDE
+    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/librobotcontrol/library/include/)
 add_library(${ROBOT_CONTROL_LIBRARY} SHARED IMPORTED)
-set_target_properties(${ROBOT_CONTROL_LIBRARY} PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/build/rcl/library/librobotics_cape.a)
+set_target_properties(
+    ${ROBOT_CONTROL_LIBRARY}
+    PROPERTIES
+        IMPORTED_LOCATION
+        ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/build/rcl/library/librobotics_cape.a
+)
 # ##############################################################################
 # Library
 # ##############################################################################
@@ -148,7 +154,9 @@ if (BUILD_SHARED_LIBS)
 endif ()
 message(STATUS "CORE project is set ${CORE}")
 
-if (BUILD_HARDWARE_COMMON OR BUILD_NAVIO OR BUILD_BBB)
+if (BUILD_HARDWARE_COMMON
+    OR BUILD_NAVIO
+    OR BUILD_BBB)
     add_subdirectory(${PROJECT_SOURCE_DIR}/hardware)
 endif ()
 message(STATUS "Hardware Common project is set ${BUILD_HARDWARE_COMMON}")
