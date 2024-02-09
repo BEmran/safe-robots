@@ -25,7 +25,7 @@ class DCM2 : public MatX<3> {
    * @return Mat3 Logarithm of DCM
    */
   DCM2 Log() const {
-    const float angle = std::acos((Trace() - 1.f) / 2.f);
+    const float angle = std::acos((Trace() - 1.F) / 2.F);
     const MatType s = mat - T().Matrix();
     // Skew - symmetric matrix
     const MatType logR = angle * s / (2.f * std::sin(angle));

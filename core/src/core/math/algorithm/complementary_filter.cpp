@@ -7,8 +7,8 @@
 
 namespace core::math::algorithm {
 namespace {
-constexpr float MIN_GAIN = 0.f;
-constexpr float MAX_GAIN = 1.f;
+constexpr float MIN_GAIN = 0.F;
+constexpr float MAX_GAIN = 1.F;
 }  // namespace
 
 ComplementaryFilter::ComplementaryFilter(
@@ -49,7 +49,7 @@ bool ComplementaryFilter::IsNearZero(const Vec3& vec) const {
 }
 
 float ComplementaryFilter::DecideWhichDtToUse(const float dt) const {
-  if (dt > 0.f) {
+  if (dt > 0.F) {
     return dt;
   }
   return config_.dt;

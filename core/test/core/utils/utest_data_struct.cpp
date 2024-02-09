@@ -43,15 +43,15 @@ TEST(MathTypeDataStruct, HeaderWithLabel) {
 
 TEST(MathTypeDataStruct, Construct) {
   const MathTypeDataStruct mt;
-  EXPECT_TRUE(ExpectEq(0.f, mt.Get()));
+  EXPECT_TRUE(ExpectEq(0.F, mt.Get()));
 }
 
 TEST(MathTypeDataStruct, Clear) {
   MathTypeDataStruct mt;
   mt.Set(1.0);
-  EXPECT_TRUE(ExpectEq(1.f, mt.Get()));
+  EXPECT_TRUE(ExpectEq(1.F, mt.Get()));
   mt.Clear();
-  EXPECT_TRUE(ExpectEq(0.f, mt.Get()));
+  EXPECT_TRUE(ExpectEq(0.F, mt.Get()));
 }
 // TemperatureData -----------------------------------------------------------
 TEST(TemperatureDataStruct, Header) {

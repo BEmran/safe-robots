@@ -16,7 +16,7 @@ Mat3 Skew(const Vec3& vec) {
 }
 
 std::pair<float, Vec3> DCMToAxisAngle(const DCM& dcm) {
-  float angle = std::acos((dcm.Trace() - 1) / 2.f);
+  float angle = std::acos((dcm.Trace() - 1) / 2.F);
   Vec3 axis = Vec3::Zero();
   if (angle == 0) {
     return {0, axis};
@@ -143,7 +143,7 @@ Quaternion Shepperd(const DCM& dcm) {
   std::array<float, 4> b{dcm.Trace(), diag[0], diag[1], diag[2]};
   const auto ptr = std::max_element(b.begin(), b.end());
   const auto idx = std::distance(b.begin(), ptr);
-  std::array<float, 4> q{1.f, 0.f, 0.f, 0.f};
+  std::array<float, 4> q{1.F, 0.F, 0.F, 0.f};
   switch (idx) {
     case 0:
       q[0] = 1.f + dcm.Trace();
@@ -241,13 +241,13 @@ Quaternion Sarabandi(const DCM& dcm) {
 
 Quaternion Chiaverini(const DCM& dcm) {
   const Mat3& mat{dcm.Matrix()};
-  const float qx_tmp = std::clamp(mat(0, 0) - mat(1, 1) - mat(2, 2), -1.f, 1.f);
-  const float qy_tmp = std::clamp(mat(1, 1) - mat(2, 2) - mat(0, 0), -1.f, 1.f);
-  const float qz_tmp = std::clamp(mat(2, 2) - mat(0, 0) - mat(1, 1), -1.f, 1.f);
-  const float qw = 0.5f * std::sqrt(dcm.Trace() + 1.f);
-  const float qx = 0.5f * Sign(mat(2, 1) - mat(1, 2)) * std::sqrt(qx_tmp + 1.f);
-  const float qy = 0.5f * Sign(mat(0, 2) - mat(2, 0)) * std::sqrt(qy_tmp + 1.f);
-  const float qz = 0.5f * Sign(mat(1, 0) - mat(0, 1)) * std::sqrt(qz_tmp + 1.f);
+  const float qx_tmp = std::clamp(mat(0, 0) - mat(1, 1) - mat(2, 2), -1.F, 1.F);
+  const float qy_tmp = std::clamp(mat(1, 1) - mat(2, 2) - mat(0, 0), -1.F, 1.F);
+  const float qz_tmp = std::clamp(mat(2, 2) - mat(0, 0) - mat(1, 1), -1.F, 1.F);
+  const float qw = 0.5f * std::sqrt(dcm.Trace() + 1.F);
+  const float qx = 0.5f * Sign(mat(2, 1) - mat(1, 2)) * std::sqrt(qx_tmp + 1.F);
+  const float qy = 0.5f * Sign(mat(0, 2) - mat(2, 0)) * std::sqrt(qy_tmp + 1.F);
+  const float qz = 0.5f * Sign(mat(1, 0) - mat(0, 1)) * std::sqrt(qz_tmp + 1.F);
   return Quaternion(qw, qx, qy, qz).Normalized();
 }
 
@@ -293,7 +293,7 @@ RPY QuaternionToEuler(const Quaternion& quat, const EulerOrder order) {
 }
 
 Quaternion AxisAngleToQuaternion(const float angle, const Vec3& axis) {
-  const float half_angle = angle / 2.f;
+  const float half_angle = angle / 2.F;
   return {std::cos(half_angle), axis * std::sin(half_angle)};
 }
 

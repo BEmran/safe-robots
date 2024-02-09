@@ -38,11 +38,11 @@ class ComplementaryFilter {
 
   // Attitude Estimation from given measurements and previous orientation.
   std::optional<Quat> Update(const Vec3& accel, const Vec3& gyro,
-                             const float dt = -1.f);
+                             const float dt = -1.F);
 
   // Attitude Estimation from given measurements and previous orientation.
   std::optional<Quat> Update(const Vec3& accel, const Vec3& gyro,
-                             const Vec3& mag, const float dt = -1.f);
+                             const Vec3& mag, const float dt = -1.F);
   Quat GetQuat() const;
   float GetGain() const;
 

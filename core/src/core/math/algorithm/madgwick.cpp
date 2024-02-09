@@ -30,7 +30,7 @@ std::optional<Quat> Madgwick::Update(const Vec3& accel, const Vec3& gyro,
   Eigen::Matrix<core::math::MATH_TYPE, 3, 4> J;
   J << -2 * quat_.y(), 2 * quat_.z(), -2 * quat_.w(), 2 * quat_.x(),  //
     2 * quat_.x(), 2 * quat_.w(), 2 * quat_.z(), 2 * quat_.y(),       //
-    0.f, -4 * quat_.x(), -4 * quat_.y(), 0.f;                         //
+    0.F, -4 * quat_.x(), -4 * quat_.y(), 0.F;                         //
 
   Quat gradient{J.transpose() * f};
   gradient.normalize();

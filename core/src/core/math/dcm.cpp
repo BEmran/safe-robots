@@ -46,7 +46,7 @@ float DCM::Trace() const {
 }
 
 Mat3 DCM::Log() const {
-  const float angle = std::acos((Trace() - 1.f) / 2.f);
+  const float angle = std::acos((Trace() - 1.F) / 2.F);
   const Mat3 s = mat - T().Matrix();
   // Skew - symmetric matrix
   const Mat3 logR = angle * s / (2.f * std::sin(angle));

@@ -153,7 +153,7 @@ TEST(ComplementaryFilterMock, DecideWhichDtToUseIfValuePassedIsZero) {
   // when construct with default config
   const ComplementaryFilterMock cfm;
   // if DecideWhichDtToUse function is called with zero
-  const float actual = cfm.RunDecideWhichDtToUse(0.f);
+  const float actual = cfm.RunDecideWhichDtToUse(0.F);
   // then the return value is what set in config
   EXPECT_FLOAT_EQ(ComplementaryFilterConfig().dt, actual);
 }
@@ -161,7 +161,7 @@ TEST(ComplementaryFilterMock, DecideWhichDtToUseIfValuePassedIsZero) {
 TEST(ComplementaryFilterMock, ComplementaryEstimationWithGainZero) {
   // when construct with gain of 0
   ComplementaryFilterConfig config;
-  config.gain = 0.f;
+  config.gain = 0.F;
   const ComplementaryFilterMock cfm{config};
   // if ComplementaryEstimation function is called with gain of 0
   const Quat gyro_sensor = Quat::UnitRandom();
@@ -174,7 +174,7 @@ TEST(ComplementaryFilterMock, ComplementaryEstimationWithGainZero) {
 TEST(ComplementaryFilterMock, ComplementaryEstimationWithGainOne) {
   // when construct with gain of 1
   ComplementaryFilterConfig config;
-  config.gain = 1.f;
+  config.gain = 1.F;
   const ComplementaryFilterMock cfm{config};
   // if ComplementaryEstimation function is called with gain of 1
   const Quat gyro_sensor = Quat::UnitRandom();
@@ -204,7 +204,7 @@ TEST(ComplementaryFilterMock, AttitudePropagationWithZeroDt) {
   const Quat expect = Quat::UnitRandom();
   cfm.Reset(expect);
   // if AttitudePropagation function is called with zero dt
-  const Quat actual = cfm.RunAttitudePropagation(Vec3::Random(), 0.f);
+  const Quat actual = cfm.RunAttitudePropagation(Vec3::Random(), 0.F);
   // then the return value is the current quat value
   EXPECT_TRUE(ExpectEqQuaternion(expect, actual));
 }
@@ -216,7 +216,7 @@ TEST(ComplementaryFilterMock, AttitudePropagationWithZeroGyro) {
   const Quat expect = Quat::UnitRandom();
   cfm.Reset(expect);
   // if AttitudePropagation function is called with zero gyro value
-  const Quat actual = cfm.RunAttitudePropagation(Vec3::Zero(), 1.f);
+  const Quat actual = cfm.RunAttitudePropagation(Vec3::Zero(), 1.F);
   // then the return value is the current quat value
   EXPECT_TRUE(ExpectEqQuaternion(expect, actual));
 }
@@ -228,7 +228,7 @@ TEST(ComplementaryFilterMock, AttitudePropagationWithIdentityQuat) {
   cfm.Reset();
   // if AttitudePropagation function is called with some vector and dt
   const Vec3 vec = Vec3::Random();
-  const float dt = -2.f;
+  const float dt = -2.F;
   const Quat actual = cfm.RunAttitudePropagation(vec, dt);
   // then the return value is a quaternion with an axis in the same direction as
   // axis of the used vector

@@ -28,11 +28,11 @@ using core::math::Skew;
 using core::math::Vec3;
 
 TEST(Sign, Negative) {
-  EXPECT_TRUE(Sign(-5.f) < 0);
+  EXPECT_TRUE(Sign(-5.F) < 0);
 }
 
 TEST(Sign, Positive) {
-  EXPECT_TRUE(Sign(5.f) > 0);
+  EXPECT_TRUE(Sign(5.F) > 0);
 }
 
 TEST(Sign, Zero) {
@@ -78,7 +78,7 @@ TEST(AxisAngleToRotation, SecondQuarterAngleRandomVector) {
 }
 
 TEST(AxisAngleToRotation, ThirdQuarterAngleRandomVector) {
-  Eigen::AngleAxisf aa(-2.f, Vec3::Random().normalized());
+  Eigen::AngleAxisf aa(-2.F, Vec3::Random().normalized());
   EXPECT_TRUE(
     ExpectEqMat3(aa.toRotationMatrix(), AxisAngleToDCM(aa.angle(), aa.axis())));
 }
@@ -204,9 +204,9 @@ TEST_P(QuaternionAndAxisAngleFixture, QuaternionToAxisAngle) {
   const auto [actual_ang, actual_axis] = QuaternionToAxisAngle(expect);
 
   //
-  float sign = 1.f;
+  float sign = 1.F;
   if (angle * actual_ang < 0) {
-    sign = -1.f;
+    sign = -1.F;
   }
 
   EXPECT_TRUE(ExpectEq(sign * angle, actual_ang));

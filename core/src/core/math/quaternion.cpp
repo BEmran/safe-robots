@@ -7,7 +7,7 @@
 #include "core/utils/logger_macros.hpp"
 
 namespace core::math {
-Quaternion::Quaternion() : Quaternion(1.f, Vec3::Zero()) {
+Quaternion::Quaternion() : Quaternion(1.F, Vec3::Zero()) {
 }
 
 Quaternion::Quaternion(const Quat q) : Quaternion(q.w(), q.vec()) {
@@ -32,7 +32,7 @@ Quaternion Quaternion::Normalized() const {
   constexpr float EPS = 0.001f;
   const float norm = Norm();
   if (norm < EPS) {
-    return Quaternion(1.f, Vec3::Zero());
+    return Quaternion(1.F, Vec3::Zero());
   }
   return Quaternion(scalar_ / norm, vec_ / norm);
 }
@@ -43,7 +43,7 @@ float Quaternion::Norm() const {
 }
 
 void Quaternion::SetIdentity() {
-  scalar_ = 1.f;
+  scalar_ = 1.F;
   vec_ = Vec3::Zero();
 }
 
@@ -112,7 +112,7 @@ float& Quaternion::operator[](const size_t idx) {
 }
 
 Quaternion QuaternionFromRotation(const float angle, const Vec3 axis) {
-  const float half_angle = angle / 2.f;
+  const float half_angle = angle / 2.F;
   const float sin_half_angle = std::sin(half_angle);
   return Quaternion(std::cos(half_angle), axis * sin_half_angle);
 }
