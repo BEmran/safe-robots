@@ -7,7 +7,7 @@ macro (package_add_test_with_libraries TESTNAME FILES LIBRARIES
 
     # create an exectuable in which the tests will be stored
     add_executable(${TESTNAME} "${FILES}")
-    
+
     # add the binary tree to the search path for include files so that we will
     # find include files
     target_include_directories(
@@ -19,7 +19,7 @@ macro (package_add_test_with_libraries TESTNAME FILES LIBRARIES
     # link the Google test infrastructure, mocking library, testing libraries
     # and a default main fuction to the test executable. Remove gtest_main if
     # writing your own main function.
-    target_link_libraries(${TESTNAME} PUBLIC "${LIBRARIES}" ${GOOGLE_LIBRARIES}
+    target_link_libraries(${TESTNAME} PUBLIC "${LIBRARIES}" ${GTEST_LIBRARIES}
                                              pthread)
 
     # All users of this library will need at least C++17

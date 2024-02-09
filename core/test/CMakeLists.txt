@@ -1,20 +1,23 @@
 # ##############################################################################
 # System Dependencies
 # ##############################################################################
-# find googletest library
-find_package(GTest REQUIRED)
-if (NOT GTest_FOUND)
-    message(FATAL_ERROR "Google Test library [gtest] not found")
-endif ()
+# find googletest library Prevent overriding the parent project's
+# compiler/linker settings on Windows
+set(gtest_force_shared_crt
+    ON
+    CACHE BOOL "" FORCE)
 
-include(GoogleTest)
-set(GOOGLE_LIBRARIES gtest gtest_main)
+# Add googletest directly to our build. This defines the gtest and gtest_main
+# targets.
+add_subdirectory(
+    ${PROJECT_SOURCE_DIR}/dependencies/googletest
+    ${PROJECT_SOURCE_DIR}/dependencies/build/googletest EXCLUDE_FROM_ALL)
+
+set(GTEST_LIBRARIES gtest gmock gtest_main)
 
 # ##############################################################################
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/AddTestWithLibraries.cmake)
 
 # ##############################################################################
-add_subdirectory(utils)
-add_subdirectory(sensors)
+add_subdirectory(core)
 add_subdirectory(dependencies)
-add_subdirectory(math)
