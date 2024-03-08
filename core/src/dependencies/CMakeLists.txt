@@ -30,8 +30,8 @@ target_include_directories(
 target_link_libraries(${DEPEN_LIBRARY} PRIVATE pthread stdc++fs
                                                ${YAML_CPP_LIBRARIES})
 
-# All users of this library will need at least C++17
-target_compile_features(${DEPEN_LIBRARY} PUBLIC cxx_std_17)
+# All users of this library will need at least C++20
+target_compile_features(${DEPEN_LIBRARY} PUBLIC cxx_std_20)
 
 target_compile_options(${DEPEN_LIBRARY} PRIVATE ${PROJECT_WARNINGS})
 # add_dependencies(${DEPEN_LIBRARY} yaml_cpp_project) IDEs should put the

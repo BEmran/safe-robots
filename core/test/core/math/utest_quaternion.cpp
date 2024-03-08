@@ -465,7 +465,7 @@ TEST_P(QuaternionVsEigenFixture, AngularDistance) {
   EXPECT_TRUE(ExpectEq(expect, actual));
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
   QuaternionVsEigenFixture, QuaternionVsEigenFixture,
   ::testing::Values(AngleAxis(+core::math::PI_4, Vec3::UnitX()),
                     AngleAxis(+core::math::PI_4, Vec3::UnitY()),

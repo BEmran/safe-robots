@@ -28,7 +28,7 @@ TEST(AdcData, Clear) {
   AdcData adc;
   Vec3 vec(1.4F, 2.5F, 3.6F);
   adc.values = vec;
-  ExpectVec3Eq(vec, adc.values);
+  EXPECT_TRUE(ExpectVec3Eq(vec, adc.values));
   adc.Clear();
   EXPECT_TRUE(ExpectVec3Eq(Vec3::Zero(), adc.values));
 }

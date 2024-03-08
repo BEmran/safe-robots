@@ -126,7 +126,7 @@ std::optional<int> Socket::Accept() {
 }
 
 bool Socket::Send(int client_sock, const std::string& msg) {
-  const int status = ::send(client_sock, msg.c_str(), msg.size(), MSG_NOSIGNAL);
+  const int status = static_cast<int>(::send(client_sock, msg.c_str(), msg.size(), MSG_NOSIGNAL));
   if (status == -1) {
     node_->GetNodeLogger()->Warn("Failed to Send data") << std::strerror(errno);
     return {};

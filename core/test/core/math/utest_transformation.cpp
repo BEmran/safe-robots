@@ -213,7 +213,7 @@ TEST_P(QuaternionAndAxisAngleFixture, QuaternionToAxisAngle) {
   EXPECT_TRUE(ExpectEqVec3(sign * axis, actual_axis));
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
   QuaternionAndAxisAngle, QuaternionAndAxisAngleFixture,
   ::testing::Values(std::make_tuple(+core::math::PI_2, Vec3::UnitX()),
                     std::make_tuple(-core::math::PI_2, Vec3::UnitX()),
