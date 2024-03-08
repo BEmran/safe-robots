@@ -76,7 +76,9 @@ set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/math/vector.cpp
     ${CORE_SOURCE_DIR}/math/algorithm/complementary_filter.cpp
     ${CORE_SOURCE_DIR}/sensors/module_sensor_imu.cpp
-    ${CORE_SOURCE_DIR}/sensors/module_sensor.cpp)
+    ${CORE_SOURCE_DIR}/sensors/module_sensor.cpp
+    ${CORE_SOURCE_DIR}/simplemath/simplemath.cpp
+    )
 
 # ##############################################################################
 # Build core library
@@ -93,8 +95,8 @@ target_include_directories(
 # Link required library
 target_link_libraries(${CORE_LIBRARY} PRIVATE pthread stdc++fs Eigen3::Eigen)
 
-# All users of this library will need at least C++17
-target_compile_features(${CORE_LIBRARY} PUBLIC cxx_std_17)
+# All users of this library will need at least C++20
+target_compile_features(${CORE_LIBRARY} PUBLIC cxx_std_20)
 
 target_compile_options(${CORE_LIBRARY} PRIVATE ${PROJECT_WARNINGS})
 

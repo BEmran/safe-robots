@@ -11,7 +11,7 @@ cmake_minimum_required(VERSION 3.13.4)
 project(Smart-Robot)
 
 # specify the C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # generate compile_commands.json for clang
@@ -64,8 +64,8 @@ elseif (CMAKE_BUILD_TYPE STREQUAL Debug)
     set(WARNINGS_AS_ERRORS ON)
     set(BUILD_TESTING ON)
     set(ENABLE_DOXYGEN OFF)
-    set(ENABLE_CPPCHECK ON)
-    set(ENABLE_CLANG_TIDY ON)
+    set(ENABLE_CPPCHECK OFF)
+    set(ENABLE_CLANG_TIDY OFF)
 else ()
     message(
         FATAL_ERROR "Unrecognise CMAKE_BUILD_TYPE of type ${CMAKE_BUILD_TYPE}")

@@ -1,134 +1,167 @@
+// Copyright (C) 2024 Bara Emran - All Rights Reserved
+
 #pragma once
 #include <cstddef>
 
-template<typename T>
-struct VF2 {
+template <typename T>
+struct Point2D {
+  T x{};
+  T y{};
+  Point2D() = default;
+  Point2D(T _x, T _y) : x(_x), y(_y){};
+};
+
+template <typename T>
+struct Point3D {
+  T x{};
+  T y{};
+  T z{};
+  Point3D() = default;
+  Point3D(T _x, T _y, T _z) : x(_x), y(_y), z(_z){};
+};
+
+template <typename T>
+struct BasicVector2 {
+  static const size_t array_size{2};
   union {
-    struct {
-      T x, y;
-    };
-    T v[2];
+    Point2D<T> point;
+    T data[array_size] = {};
   };
 
-  VF2<T>() = default;
-  VF2<T>(VF2<T>&&) = default;
-  VF2<T>(const VF2<T>&) = default;
-  VF2<T>& operator=(VF2<T>&&) = default;
-  VF2<T>& operator=(const VF2<T>&) = default;
-
-  constexpr VF2(T _x, T _y) noexcept : x{_x}, y{_y} {
+  BasicVector2() : point() {
   }
 
-  // explicit VF2(_In_reads_(2) const float* pArray) noexcept;
-
-  T operator()(size_t _idx) const noexcept {
-    return v[_idx];
+  BasicVector2(T c) noexcept : point(c, c) {
   }
 
-  T& operator()(size_t _idx) noexcept {
-    return v[_idx];
+  BasicVector2(T x, T y) noexcept : point(x, y) {
+  }
+
+  inline T operator()(size_t idx) const noexcept {
+    return data[idx];
+  }
+
+  inline T& operator()(size_t idx) noexcept {
+    return data[idx];
+  }
+
+  inline T operator[](size_t idx) const noexcept {
+    return data[idx];
+  }
+
+  inline T& operator[](size_t idx) noexcept {
+    return data[idx];
+  }
+
+  inline T x() const noexcept {
+    return point.x;
+  }
+
+  inline T& x() noexcept {
+    return point.x;
+  }
+
+  inline T y() const noexcept {
+    return point.y;
+  }
+
+  inline T& y() noexcept {
+    return point.y;
+  }
+
+  constexpr inline size_t size() const noexcept {
+    return array_size;
   }
 };
 
-template<typename T>
-struct VF3 {
+template <typename T>
+struct BasicVector3 {
+  static const size_t array_size{3};
   union {
-    struct {
-      T x, y, z;
-    };
-    T v[3];
+    Point3D<T> point;
+    T data[array_size] = {};
   };
 
-  VF3() = default;
-  VF3(VF3&&) = default;
-  VF3(const VF3&) = default;
-  VF3& operator=(VF3&&) = default;
-  VF3& operator=(const VF3&) = default;
-
-  constexpr VF3(T _x, T _y, T _z) noexcept : x{_x}, y{_y}, z{_z} {
+  BasicVector3() : point() {
   }
 
-  // explicit VF3(_In_reads_(3) const float* pArray) noexcept;
-
-  T operator()(size_t _idx) const noexcept {
-    return v[_idx];
+  BasicVector3(T c) noexcept : point(c, c, c) {
   }
 
-  T& operator()(size_t _idx) noexcept {
-    return v[_idx];
+  BasicVector3(T x, T y, T z) noexcept : point(x, y, z) {
+  }
+
+  inline T operator()(size_t idx) const noexcept {
+    return data[idx];
+  }
+
+  inline T& operator()(size_t idx) noexcept {
+    return data[idx];
+  }
+
+  inline T operator[](size_t idx) const noexcept {
+    return data[idx];
+  }
+
+  inline T& operator[](size_t idx) noexcept {
+    return data[idx];
+  }
+
+  inline T x() const noexcept {
+    return point.x;
+  }
+
+  inline T& x() noexcept {
+    return point.x;
+  }
+
+  inline T y() const noexcept {
+    return point.y;
+  }
+
+  inline T& y() noexcept {
+    return point.y;
+  }
+
+  inline T z() const noexcept {
+    return point.z;
+  }
+
+  inline T& z() noexcept {
+    return point.z;
+  }
+  constexpr inline size_t size() const noexcept {
+    return array_size;
   }
 };
 
+template <typename T>
+struct MatrixElements2D {
+  T m00{};
+  T m01{};
+  T m10{};
+  T m11{};
 
-template<typename T>
-struct MF2X2 {
-  union {
-    struct {
-      T m00, m01;
-      T m10, m11;
-    };
-    VF2<T> row[2];
-    T mat[2][2];
-    T data[4];
-  };
-
-  MF2X2() = default;
-  MF2X2(MF2X2&&) = default;
-  MF2X2(const MF2X2&) = default;
-  MF2X2& operator=(MF2X2&&) = default;
-  MF2X2& operator=(const MF2X2&) = default;
-
-  constexpr MF2X2(T _m00, T _m01, T _m10, T _m11) noexcept
-    : m00{_m00}
-    , m01{_m01}
-    , m10{_m10}
-    , m11{_m11} {
-  }
-
-  constexpr MF2X2(const VF2<T>& _row0, const VF2<T>& _row1) noexcept
-    : row{_row0, _row1} {
-  }
-  // explicit MF2X2(_In_reads_(4) const float* pArray) noexcept;
-
-  T operator()(size_t _row, size_t _col) const noexcept {
-    return mat[_row][_col];
-  }
-
-  T& operator()(size_t _row, size_t _col) noexcept {
-    return mat[_row][_col];
-  }
-
-  T operator[](size_t _idx) const noexcept {
-    return data[_idx];
-  }
-
-  T& operator[](size_t _idx) noexcept {
-    return data[_idx];
+  MatrixElements2D() = default;
+  MatrixElements2D(T _m00, T _m01, T _m10, T _m11)
+    : m00{_m00}, m01{_m01}, m10{_m10}, m11{_m11} {
   }
 };
 
-
-template<typename T>
-struct MF3X3 {
-  union {
-    struct {
-      T m00, m01, m02;
-      T m10, m11, m12;
-      T m20, m21, m22;
-    };
-    VF3<T> row[3];
-    T mat[3][3];
-    T data[9];
-  };
-
-  MF3X3() = default;
-  MF3X3(MF3X3&&) = default;
-  MF3X3(const MF3X3&) = default;
-  MF3X3& operator=(MF3X3&&) = default;
-  MF3X3& operator=(const MF3X3&) = default;
-
-  constexpr MF3X3(T _m00, T _m01, T _m02, T _m10, T _m11,
-                  T _m12, T _m20, T _m21, T _m22) noexcept
+template <typename T>
+struct MatrixElements3D {
+  T m00{};
+  T m01{};
+  T m02{};
+  T m10{};
+  T m11{};
+  T m12{};
+  T m20{};
+  T m21{};
+  T m22{};
+  MatrixElements3D() = default;
+  MatrixElements3D(T _m00, T _m01, T _m02, T _m10, T _m11, T _m12, T _m20,
+                   T _m21, T _m22) noexcept
     : m00{_m00}
     , m01{_m01}
     , m02{_m02}
@@ -139,33 +172,127 @@ struct MF3X3 {
     , m21{_m21}
     , m22{_m22} {
   }
+};
 
-  constexpr MF3X3(const VF3<T>& _row0, const VF3<T>& _row1, const VF3<T>& _row2) noexcept
-    : row{_row0, _row1, _row2} {
+template <typename T>
+struct BasicMatrix2x2 {
+  static const size_t num_rows{2};
+  static const size_t num_cols{2};
+  static const size_t array_size{num_rows * num_cols};
+  union {
+    MatrixElements2D<T> elements;
+    BasicVector2<T> row[num_rows];
+    T mat[num_rows][num_cols];
+    T data[array_size] = {};
+  };
+
+  BasicMatrix2x2() : elements{} {
   }
-  // explicit MF3X3(_In_reads_(9) const float* pArray) noexcept;
 
-  T operator()(size_t _row, size_t _col) const noexcept {
-    return mat[_row][_col];
+  BasicMatrix2x2(T c) noexcept : elements(c, c, c, c) {
   }
 
-  T& operator()(size_t _row, size_t _col) noexcept {
-    return mat[_row][_col];
+  BasicMatrix2x2(T m00, T m01, T m10, T m11) noexcept
+    : elements(m00, m01, m10, m11) {
   }
 
-  T operator[](size_t _idx) const noexcept {
-    return data[_idx];
+  BasicMatrix2x2(const BasicVector2<T>& row0,
+                 const BasicVector2<T>& row1) noexcept
+    : row{row0, row1} {
   }
 
-  T& operator[](size_t _idx) noexcept {
-    return data[_idx];
+  inline T operator()(size_t row, size_t col) const noexcept {
+    return mat[row][col];
+  }
+
+  inline T& operator()(size_t row, size_t col) noexcept {
+    return mat[row][col];
+  }
+
+  inline T operator()(size_t idx) const noexcept {
+    return data[idx];
+  }
+
+  inline T& operator()(size_t idx) noexcept {
+    return data[idx];
+  }
+
+  inline T operator[](size_t idx) const noexcept {
+    return data[idx];
+  }
+
+  inline T& operator[](size_t idx) noexcept {
+    return data[idx];
+  }
+  constexpr inline size_t size() const noexcept {
+    return array_size;
+  }
+  constexpr inline size_t rows() const noexcept {
+    return num_rows;
+  }
+  constexpr inline size_t cols() const noexcept {
+    return num_cols;
   }
 };
 
-// float sum_array(float* array, size_t size) {
-//   float sum{0.f};
-//   for(size_t i=0; i<size; ++i) {
-//     sum += array[i];
-//   }
-//   return sum;
-// }
+template <typename T>
+struct BasicMatrix3x3 {
+  static const size_t num_rows{3};
+  static const size_t num_cols{3};
+  static const size_t array_size{num_rows * num_cols};
+  union {
+    MatrixElements3D<T> elements;
+    BasicVector3<T> row[num_rows];
+    T mat[num_rows][num_cols];
+    T data[array_size] = {};
+  };
+
+  BasicMatrix3x3() : elements{} {
+  }
+
+  BasicMatrix3x3(T c) noexcept : elements(c, c, c, c, c, c, c, c, c) {
+  }
+
+  BasicMatrix3x3(T m00, T m01, T m02, T m10, T m11, T m12, T m20, T m21,
+                 T m22) noexcept
+    : elements(m00, m01, m02, m10, m11, m12, m20, m21, m22) {
+  }
+
+  BasicMatrix3x3(const BasicVector2<T>& row0, const BasicVector2<T>& row1,
+                 const BasicVector2<T>& row2) noexcept
+    : row{row0, row1, row2} {
+  }
+
+  inline T operator()(size_t row, size_t col) const noexcept {
+    return mat[row][col];
+  }
+
+  inline T& operator()(size_t row, size_t col) noexcept {
+    return mat[row][col];
+  }
+
+  inline T operator()(size_t idx) const noexcept {
+    return data[idx];
+  }
+
+  inline T& operator()(size_t idx) noexcept {
+    return data[idx];
+  }
+
+  inline T operator[](size_t idx) const noexcept {
+    return data[idx];
+  }
+
+  inline T& operator[](size_t idx) noexcept {
+    return data[idx];
+  }
+  constexpr inline size_t size() const noexcept {
+    return array_size;
+  }
+  constexpr inline size_t rows() const noexcept {
+    return num_rows;
+  }
+  constexpr inline size_t cols() const noexcept {
+    return num_cols;
+  }
+};
