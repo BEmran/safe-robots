@@ -61,15 +61,15 @@ struct Matrix3x3 : public BasicMatrix3x3<T> {
   // // Comparison operators
   // bool operator==(const Matrix3x3<T>& other) const noexcept {
   //   return                       //
-  //     this->mat[0][0] == other.m00 &&  //
-  //     this->mat[0][1] == other.m01 &&  //
-  //     this->mat[0][2] == other.m02 &&  //
-  //     this->mat[1][0] == other.m10 &&  //
-  //     this->mat[1][1] == other.m11 &&  //
-  //     this->mat[1][2] == other.m12 &&  //
-  //     this->mat[2][0] == other.m20 &&  //
-  //     this->mat[2][1] == other.m21 &&  //
-  //     this->mat[2][2] == other.m22;
+  //     this->at(0, 0) == other.m00 &&  //
+  //     this->at(0, 1) == other.m01 &&  //
+  //     this->at(0, 2) == other.m02 &&  //
+  //     this->at(1, 0) == other.m10 &&  //
+  //     this->at(1, 1) == other.m11 &&  //
+  //     this->at(1, 2) == other.m12 &&  //
+  //     this->at(2, 0) == other.m20 &&  //
+  //     this->at(2, 1) == other.m21 &&  //
+  //     this->at(2, 2) == other.m22;
   // }
 
   // bool operator!=(const Matrix3x3<T>& other) const noexcept {
@@ -78,77 +78,77 @@ struct Matrix3x3 : public BasicMatrix3x3<T> {
 
   // // Assignment operators
   // Matrix3x3& operator=(const BasicMatrix3x3<T>& other) noexcept {
-  //   this->mat[0][0] = other.m00;
-  //   this->mat[0][1] = other.m01;
-  //   this->mat[0][2] = other.m02;
-  //   this->mat[1][0] = other.m10;
-  //   this->mat[1][1] = other.m11;
-  //   this->mat[1][2] = other.m12;
-  //   this->mat[2][0] = other.m20;
-  //   this->mat[2][1] = other.m21;
-  //   this->mat[2][2] = other.m22;
+  //   this->at(0, 0) = other.m00;
+  //   this->at(0, 1) = other.m01;
+  //   this->at(0, 2) = other.m02;
+  //   this->at(1, 0) = other.m10;
+  //   this->at(1, 1) = other.m11;
+  //   this->at(1, 2) = other.m12;
+  //   this->at(2, 0) = other.m20;
+  //   this->at(2, 1) = other.m21;
+  //   this->at(2, 2) = other.m22;
   //   return *this;
   // }
 
   Matrix3x3& operator+=(const Matrix3x3<T>& other) noexcept {
-    this->mat[0][0] += other(0, 0);
-    this->mat[0][1] += other(0, 1);
-    this->mat[0][2] += other(0, 2);
-    this->mat[1][0] += other(1, 0);
-    this->mat[1][1] += other(1, 1);
-    this->mat[1][2] += other(1, 2);
-    this->mat[2][0] += other(2, 0);
-    this->mat[2][1] += other(2, 1);
-    this->mat[2][2] += other(2, 2);
+    this->at(0, 0) += other.at(0, 0);
+    this->at(0, 1) += other.at(0, 1);
+    this->at(0, 2) += other.at(0, 2);
+    this->at(1, 0) += other.at(1, 0);
+    this->at(1, 1) += other.at(1, 1);
+    this->at(1, 2) += other.at(1, 2);
+    this->at(2, 0) += other.at(2, 0);
+    this->at(2, 1) += other.at(2, 1);
+    this->at(2, 2) += other.at(2, 2);
     return *this;
   }
 
   Matrix3x3<T>& operator-=(const Matrix3x3<T>& other) noexcept {
-    this->mat[0][0] -= other(0, 0);
-    this->mat[0][1] -= other(0, 1);
-    this->mat[0][2] -= other(0, 2);
-    this->mat[1][0] -= other(1, 0);
-    this->mat[1][1] -= other(1, 1);
-    this->mat[1][2] -= other(1, 2);
-    this->mat[2][0] -= other(2, 0);
-    this->mat[2][1] -= other(2, 1);
-    this->mat[2][2] -= other(2, 2);
+    this->at(0, 0) -= other.at(0, 0);
+    this->at(0, 1) -= other.at(0, 1);
+    this->at(0, 2) -= other.at(0, 2);
+    this->at(1, 0) -= other.at(1, 0);
+    this->at(1, 1) -= other.at(1, 1);
+    this->at(1, 2) -= other.at(1, 2);
+    this->at(2, 0) -= other.at(2, 0);
+    this->at(2, 1) -= other.at(2, 1);
+    this->at(2, 2) -= other.at(2, 2);
     return *this;
   }
 
   Matrix3x3<T>& operator*=(const Matrix3x3<T>& other) noexcept {
     BasicMatrix3x3<T> tmp(*this);
-    // const T m00 = tmp(0, 0) * other(0, 0) + tmp(0, 1) * other(1, 0) + tmp(0,
-    // 2) * other(2, 0);
+    // const T m00 = tmp(0, 0) * other.at(0, 0) + tmp(0, 1) * other.at(1, 0) +
+    // tmp(0, 2) * other.at(2, 0);
 
-    // const T m10 = tmp(1, 0) * other(0, 0) + tmp(1, 1) * other(1, 0) + tmp(1,
-    // 2) * other(2, 0);
+    // const T m10 = tmp(1, 0) * other.at(0, 0) + tmp(1, 1) * other.at(1, 0) +
+    // tmp(1, 2) * other.at(2, 0);
 
-    // const T m20 = tmp(2, 0) * other(0, 0) + tmp(2, 1) * other(1, 0) + tmp(2,
-    // 2) * other(2, 0);
+    // const T m20 = tmp(2, 0) * other.at(0, 0) + tmp(2, 1) * other.at(1, 0) +
+    // tmp(2, 2) * other.at(2, 0);
 
-    // const T m01 = tmp(0, 0) * other(0, 1) + tmp(0, 1) * other(1, 1) + tmp(0,
-    // 2) * other(2, 1);
+    // const T m01 = tmp(0, 0) * other.at(0, 1) + tmp(0, 1) * other.at(1, 1) +
+    // tmp(0, 2) * other.at(2, 1);
 
-    // const T m11 = tmp(1, 0) * other(0, 1) + tmp(1, 1) * other(1, 1) + tmp(1,
-    // 2) * other(2, 1);
+    // const T m11 = tmp(1, 0) * other.at(0, 1) + tmp(1, 1) * other.at(1, 1) +
+    // tmp(1, 2) * other.at(2, 1);
 
-    // const T m21 = tmp(2, 0) * other(0, 1) + tmp(2, 1) * other(1, 1) + tmp(2,
-    // 2) * other(2, 1);
+    // const T m21 = tmp(2, 0) * other.at(0, 1) + tmp(2, 1) * other.at(1, 1) +
+    // tmp(2, 2) * other.at(2, 1);
 
-    // const T m02 = tmp(0, 0) * other(0, 2) + tmp(0, 1) * other(1, 2) + tmp(0,
-    // 2) * other(2, 2);
+    // const T m02 = tmp(0, 0) * other.at(0, 2) + tmp(0, 1) * other.at(1, 2) +
+    // tmp(0, 2) * other.at(2, 2);
 
-    // const T m12 = tmp(1, 0) * other(0, 2) + tmp(1, 1) * other(1, 2) + tmp(1,
-    // 2) * other(2, 2);
+    // const T m12 = tmp(1, 0) * other.at(0, 2) + tmp(1, 1) * other.at(1, 2) +
+    // tmp(1, 2) * other.at(2, 2);
 
-    // const T m22 = tmp(2, 0) * other(0, 2) + tmp(2, 1) * other(1, 2) + tmp(2,
-    // 2) * other(2, 2);
+    // const T m22 = tmp(2, 0) * other.at(0, 2) + tmp(2, 1) * other.at(1, 2) +
+    // tmp(2, 2) * other.at(2, 2);
 
     auto row_by_col = [&](size_t row, size_t col) -> T {
-      return tmp(row, 0) * other(0, col) +  //
-             tmp(row, 1) * other(1, col) +  //
-             tmp(row, 2) * other(2, col);
+      return tmp.at(row, 0) * other.at(0, col) +  //
+             tmp.at(row, 1) * other.at(1, col) +  //
+             tmp.at(row, 2) * other.at(2, col);
     };
 
     const T m00 = row_by_col(0, 0);
@@ -161,42 +161,42 @@ struct Matrix3x3 : public BasicMatrix3x3<T> {
     const T m12 = row_by_col(1, 2);
     const T m22 = row_by_col(2, 2);
 
-    this->mat[0][0] = m00;
-    this->mat[1][0] = m10;
-    this->mat[2][0] = m20;
-    this->mat[0][1] = m01;
-    this->mat[1][1] = m11;
-    this->mat[2][1] = m21;
-    this->mat[0][2] = m02;
-    this->mat[1][2] = m12;
-    this->mat[2][2] = m22;
+    this->at(0, 0) = m00;
+    this->at(1, 0) = m10;
+    this->at(2, 0) = m20;
+    this->at(0, 1) = m01;
+    this->at(1, 1) = m11;
+    this->at(2, 1) = m21;
+    this->at(0, 2) = m02;
+    this->at(1, 2) = m12;
+    this->at(2, 2) = m22;
 
     return *this;
   }
 
   Matrix3x3<T>& operator*=(T s) noexcept {
-    this->mat[0][0] *= s;
-    this->mat[0][1] *= s;
-    this->mat[0][2] *= s;
-    this->mat[1][0] *= s;
-    this->mat[1][1] *= s;
-    this->mat[1][2] *= s;
-    this->mat[2][0] *= s;
-    this->mat[2][1] *= s;
-    this->mat[2][2] *= s;
+    this->at(0, 0) *= s;
+    this->at(1, 0) *= s;
+    this->at(2, 0) *= s;
+    this->at(0, 1) *= s;
+    this->at(1, 1) *= s;
+    this->at(2, 1) *= s;
+    this->at(0, 2) *= s;
+    this->at(1, 2) *= s;
+    this->at(2, 2) *= s;
     return *this;
   }
 
   Matrix3x3<T>& operator/=(T s) noexcept {
-    this->mat[0][0] /= s;
-    this->mat[0][1] /= s;
-    this->mat[0][2] /= s;
-    this->mat[1][0] /= s;
-    this->mat[1][1] /= s;
-    this->mat[1][2] /= s;
-    this->mat[2][0] /= s;
-    this->mat[2][1] /= s;
-    this->mat[2][2] /= s;
+    this->at(0, 0) /= s;
+    this->at(1, 0) /= s;
+    this->at(2, 0) /= s;
+    this->at(0, 1) /= s;
+    this->at(1, 1) /= s;
+    this->at(2, 1) /= s;
+    this->at(0, 2) /= s;
+    this->at(1, 2) /= s;
+    this->at(2, 2) /= s;
     return *this;
   }
 
@@ -207,18 +207,18 @@ struct Matrix3x3 : public BasicMatrix3x3<T> {
 
   T det() const noexcept {
     return  //
-      this->mat[0][0] * (this->mat[1][1] * this->mat[2][2] -
-                         this->mat[2][1] * this->mat[1][2]) +
-      this->mat[0][1] * (this->mat[2][0] * this->mat[1][2] -
-                         this->mat[1][0] * this->mat[2][2]) +
-      this->mat[0][2] *
-        (this->mat[1][0] * this->mat[2][1] - this->mat[1][1] * this->mat[2][0]);
+      this->at(0, 0) *
+        (this->at(1, 1) * this->at(2, 2) - this->at(2, 1) * this->at(1, 2)) +
+      this->at(0, 1) *
+        (this->at(2, 0) * this->at(1, 2) - this->at(1, 0) * this->at(2, 2)) +
+      this->at(0, 2) *
+        (this->at(1, 0) * this->at(2, 1) - this->at(1, 1) * this->at(2, 0));
   }
 
   void transpose() noexcept {
-    std::swap(this->mat[0][1], this->mat[1][0]);
-    std::swap(this->mat[0][2], this->mat[2][0]);
-    std::swap(this->mat[1][2], this->mat[2][1]);
+    std::swap(this->at(0, 1), this->at(1, 0));
+    std::swap(this->at(0, 2), this->at(2, 0));
+    std::swap(this->at(1, 2), this->at(2, 1));
   }
 
   Matrix3x3 transposed() const noexcept {
@@ -234,47 +234,58 @@ struct Matrix3x3 : public BasicMatrix3x3<T> {
       std::wcerr << "WARN: det is too small: " << d << std::endl;
       return *this;  // TODO: print warning when result is false
     }
-    
+
     // Matrix3x3 result(*this);
     // result.transpose();
-    // m00 = (this->mat[1][1] * this->mat[2][2] - this->mat[1][2] * this->mat[2][1]) / d;
-    // m01 = (this->mat[2][0] * this->mat[1][2] - this->mat[1][0] * this->mat[2][2]) / d;
-    // m02 = (this->mat[1][0] * this->mat[2][1] - this->mat[1][1] * this->mat[2][0]) / d;
-    // m10 = (this->mat[2][1] * this->mat[0][2] - this->mat[0][1] * this->mat[2][2]) / d;
-    // m11 = (this->mat[0][0] * this->mat[2][2] - this->mat[2][0] * this->mat[0][2]) / d;
-    // m12 = (this->mat[2][0] * this->mat[0][1] - this->mat[0][0] * this->mat[2][1]) / d;
-    // m20 = (this->mat[0][1] * this->mat[1][2] - this->mat[1][1] * this->mat[0][2]) / d;
-    // m21 = (this->mat[1][0] * this->mat[0][2] - this->mat[0][0] * this->mat[1][2]) / d;
-    // m22 = (this->mat[0][0] * this->mat[1][1] - this->mat[0][1] * this->mat[1][0]) / d;
-    // return result;
-    
+    // m00 = (this->at(1, 1) * this->at(2, 2) - this->at(1, 2) * this->at(2, 1))
+    // / d; m01 = (this->at(2, 0) * this->at(1, 2) - this->at(1, 0) *
+    // this->at(2, 2)) / d; m02 = (this->at(1, 0) * this->at(2, 1) - this->at(1,
+    // 1) * this->at(2, 0)) / d; m10 = (this->at(2, 1) * this->at(0, 2) -
+    // this->at(0, 1) * this->at(2, 2)) / d; m11 = (this->at(0, 0) * this->at(2,
+    // 2) - this->at(2, 0) * this->at(0, 2)) / d; m12 = (this->at(2, 0) *
+    // this->at(0, 1) - this->at(0, 0) * this->at(2, 1)) / d; m20 = (this->at(0,
+    // 1) * this->at(1, 2) - this->at(1, 1) * this->at(0, 2)) / d; m21 =
+    // (this->at(1, 0) * this->at(0, 2) - this->at(0, 0) * this->at(1, 2)) / d;
+    // m22 = (this->at(0, 0) * this->at(1, 1) - this->at(0, 1) * this->at(1, 0))
+    // / d; return result;
+
     return adjoint() / d;
   }
 
   Matrix3x3 adjoint() const noexcept {
     // Calculate the cofactor matrix and transpose matrix it at the same time.
-    const T m00 = this->mat[1][1] * this->mat[2][2] - this->mat[1][2] * this->mat[2][1];
-    const T m01 = this->mat[2][0] * this->mat[1][2] - this->mat[1][0] * this->mat[2][2];
-    const T m02 = this->mat[1][0] * this->mat[2][1] - this->mat[1][1] * this->mat[2][0];
-    const T m10 = this->mat[2][1] * this->mat[0][2] - this->mat[0][1] * this->mat[2][2];
-    const T m11 = this->mat[0][0] * this->mat[2][2] - this->mat[2][0] * this->mat[0][2];
-    const T m12 = this->mat[2][0] * this->mat[0][1] - this->mat[0][0] * this->mat[2][1];
-    const T m20 = this->mat[0][1] * this->mat[1][2] - this->mat[1][1] * this->mat[0][2];
-    const T m21 = this->mat[1][0] * this->mat[0][2] - this->mat[0][0] * this->mat[1][2];
-    const T m22 = this->mat[0][0] * this->mat[1][1] - this->mat[0][1] * this->mat[1][0];
-    return Matrix3x3(m00, m10, m20, m01, m11, m21, m02, m12, m22); // transposed
+    const T m00 =
+      this->at(1, 1) * this->at(2, 2) - this->at(1, 2) * this->at(2, 1);
+    const T m01 =
+      this->at(2, 0) * this->at(1, 2) - this->at(1, 0) * this->at(2, 2);
+    const T m02 =
+      this->at(1, 0) * this->at(2, 1) - this->at(1, 1) * this->at(2, 0);
+    const T m10 =
+      this->at(2, 1) * this->at(0, 2) - this->at(0, 1) * this->at(2, 2);
+    const T m11 =
+      this->at(0, 0) * this->at(2, 2) - this->at(2, 0) * this->at(0, 2);
+    const T m12 =
+      this->at(2, 0) * this->at(0, 1) - this->at(0, 0) * this->at(2, 1);
+    const T m20 =
+      this->at(0, 1) * this->at(1, 2) - this->at(1, 1) * this->at(0, 2);
+    const T m21 =
+      this->at(1, 0) * this->at(0, 2) - this->at(0, 0) * this->at(1, 2);
+    const T m22 =
+      this->at(0, 0) * this->at(1, 1) - this->at(0, 1) * this->at(1, 0);
+    return Matrix3x3(m00, m10, m20, m01, m11, m21, m02, m12,
+                     m22);  // transposed
   }
 
   void clamp(T vmin, T vmax) noexcept {
-    this->mat[0][0] = std::clamp(this->mat[0][0], vmin, vmax);
-    this->mat[0][1] = std::clamp(this->mat[0][1], vmin, vmax);
-    this->mat[0][2] = std::clamp(this->mat[0][2], vmin, vmax);
-    this->mat[1][0] = std::clamp(this->mat[1][0], vmin, vmax);
-    this->mat[1][1] = std::clamp(this->mat[1][1], vmin, vmax);
-    this->mat[1][2] = std::clamp(this->mat[1][2], vmin, vmax);
-    this->mat[2][0] = std::clamp(this->mat[2][0], vmin, vmax);
-    this->mat[2][1] = std::clamp(this->mat[2][1], vmin, vmax);
-    this->mat[2][2] = std::clamp(this->mat[2][2], vmin, vmax);
+    this->at(0, 0) = std::clamp(this->at(0, 0), vmin, vmax);
+    this->at(0, 1) = std::clamp(this->at(0, 1), vmin, vmax);
+    this->at(0, 2) = std::clamp(this->at(0, 2), vmin, vmax);
+    this->at(1, 0) = std::clamp(this->at(1, 0), vmin, vmax);
+    this->at(1, 1) = std::clamp(this->at(1, 1), vmin, vmax);
+    this->at(1, 2) = std::clamp(this->at(1, 2), vmin, vmax);
+    this->at(2, 0) = std::clamp(this->at(2, 0), vmin, vmax);
+    this->at(2, 1) = std::clamp(this->at(2, 1), vmin, vmax);
+    this->at(2, 2) = std::clamp(this->at(2, 2), vmin, vmax);
   }
 
   Matrix3x3 clamped(T vmin, T vmax) const noexcept {
@@ -284,11 +295,11 @@ struct Matrix3x3 : public BasicMatrix3x3<T> {
   }
 
   inline Vector3<T> row(size_t idx) const noexcept {
-    return Vector3<T>(this->mat[idx][0], this->mat[idx][1], this->mat[idx][2]);
+    return Vector3<T>(this->at(idx, 0), this->at(idx, 1), this->at(idx, 2));
   }
 
   inline Vector3<T> col(size_t idx) const noexcept {
-    return Vector3<T>(this->mat[0][idx], this->mat[1][idx], this->mat[2][idx]);
+    return Vector3<T>(this->at(0, idx), this->at(1, idx), this->at(2, idx));
   }
 };
 
@@ -341,7 +352,7 @@ inline Matrix3x3<T> operator/(const Matrix3x3<T>& lhs,
 std::ostream& operator<<(std::ostream& os, Matrix3x3<float> mat) {
   for (size_t r = 0; r < mat.rows(); ++r) {
     for (size_t c = 0; c < mat.cols(); ++c) {
-      os << mat.mat[r][c] << ", ";
+      os << mat.at(r, c) << ", ";
     }
     os << "\n";
   }

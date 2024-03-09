@@ -220,7 +220,7 @@ TEST(Vector2, ClampWithVector) {
   const Vector2<float> vmax(1.f);
   Vector2<float> vec(x, y);
   vec.clamp(vmin, vmax);
-  EXPECT_TRUE(expect_near(vec, Vector2<float>(vmax[0], vmax[1])));
+  EXPECT_TRUE(expect_near(vec, Vector2<float>(vmax.at(0), vmax.at(1))));
 }
 
 TEST(Vector2, ClampedWithVector) {

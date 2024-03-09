@@ -54,26 +54,16 @@ TEST(BasicVector2, ConstructorWithXY) {
   EXPECT_TRUE(expect_near(VEC2, BasicVector2<float>(X, Y)));
 }
 
-TEST(BasicVector2, UsingSquareIndicies) {
-  EXPECT_FLOAT_EQ(VEC2[0], X);
-  EXPECT_FLOAT_EQ(VEC2[1], Y);
-}
-
-TEST(BasicVector2, UsingRoundIndicies) {
-  EXPECT_FLOAT_EQ(VEC2(0), X);
-  EXPECT_FLOAT_EQ(VEC2(1), Y);
-}
-
-TEST(BasicVector2, UsingData) {
-  EXPECT_FLOAT_EQ(VEC2.data[0], X);
-  EXPECT_FLOAT_EQ(VEC2.data[1], Y);
+TEST(BasicVector2, UsingIndicies) {
+  EXPECT_FLOAT_EQ(VEC2.at(0), X);
+  EXPECT_FLOAT_EQ(VEC2.at(1), Y);
 }
 
 TEST(BasicVector2, AlternateValues) {
   BasicVector2<float> vec;
   EXPECT_TRUE(expect_near(vec, BasicVector2<float>(0.f, 0.f)));
-  vec[0] = VEC2[0];
-  vec[1] = VEC2[1];
+  vec.at(0) = VEC2.at(0);
+  vec.at(1) = VEC2.at(1);
   EXPECT_TRUE(expect_near(vec, VEC2));
 }
 
@@ -103,30 +93,18 @@ TEST(BasicVector3, ConstructorWithXYZ) {
   EXPECT_TRUE(expect_near(VEC3, BasicVector3<float>(X, Y, Z)));
 }
 
-TEST(BasicVector3, UsingSquareIndicies) {
-  EXPECT_FLOAT_EQ(VEC3[0], X);
-  EXPECT_FLOAT_EQ(VEC3[1], Y);
-  EXPECT_FLOAT_EQ(VEC3[2], Z);
-}
-
 TEST(BasicVector3, UsingRoundIndicies) {
-  EXPECT_FLOAT_EQ(VEC3(0), X);
-  EXPECT_FLOAT_EQ(VEC3(1), Y);
-  EXPECT_FLOAT_EQ(VEC3(2), Z);
-}
-
-TEST(BasicVector3, UsingData) {
-  EXPECT_FLOAT_EQ(VEC3.data[0], X);
-  EXPECT_FLOAT_EQ(VEC3.data[1], Y);
-  EXPECT_FLOAT_EQ(VEC3.data[2], Z);
+  EXPECT_FLOAT_EQ(VEC3.at(0), X);
+  EXPECT_FLOAT_EQ(VEC3.at(1), Y);
+  EXPECT_FLOAT_EQ(VEC3.at(2), Z);
 }
 
 TEST(BasicVector3, AssignValues) {
   BasicVector3<float> vec;
   EXPECT_TRUE(expect_near(vec, BasicVector3<float>(0.f, 0.f, 0.f)));
-  vec[0] = VEC3[0];
-  vec[1] = VEC3[1];
-  vec[2] = VEC3[2];
+  vec.at(0) = VEC3.at(0);
+  vec.at(1) = VEC3.at(1);
+  vec.at(2) = VEC3.at(2);
   EXPECT_TRUE(expect_near(vec, VEC3));
 }
 
@@ -205,46 +183,25 @@ TEST(BasicMatrix2x2, Size) {
   EXPECT_EQ(MAT2.size(), 4);
 }
 
-TEST(BasicMatrix2x2, UsingSquareIndicies) {
-  EXPECT_FLOAT_EQ(MAT2[0], M00);
-  EXPECT_FLOAT_EQ(MAT2[1], M01);
-  EXPECT_FLOAT_EQ(MAT2[2], M10);
-  EXPECT_FLOAT_EQ(MAT2[3], M11);
+TEST(BasicMatrix2x2, UsingSingleIndex) {
+  EXPECT_FLOAT_EQ(MAT2.at(0), M00);
+  EXPECT_FLOAT_EQ(MAT2.at(1), M01);
+  EXPECT_FLOAT_EQ(MAT2.at(2), M10);
+  EXPECT_FLOAT_EQ(MAT2.at(3), M11);
 }
 
-TEST(BasicMatrix2x2, UsingRoundSingleIndex) {
-  EXPECT_FLOAT_EQ(MAT2(0), M00);
-  EXPECT_FLOAT_EQ(MAT2(1), M01);
-  EXPECT_FLOAT_EQ(MAT2(2), M10);
-  EXPECT_FLOAT_EQ(MAT2(3), M11);
-}
-
-TEST(BasicMatrix2x2, UsingRoundDoubleIndices) {
-  EXPECT_FLOAT_EQ(MAT2(0, 0), M00);
-  EXPECT_FLOAT_EQ(MAT2(0, 1), M01);
-  EXPECT_FLOAT_EQ(MAT2(1, 0), M10);
-  EXPECT_FLOAT_EQ(MAT2(1, 1), M11);
-}
-
-TEST(BasicMatrix2x2, UsingData) {
-  EXPECT_FLOAT_EQ(MAT2.data[0], M00);
-  EXPECT_FLOAT_EQ(MAT2.data[1], M01);
-  EXPECT_FLOAT_EQ(MAT2.data[2], M10);
-  EXPECT_FLOAT_EQ(MAT2.data[3], M11);
-}
-
-TEST(BasicMatrix2x2, UsingMat) {
-  EXPECT_FLOAT_EQ(MAT2.mat[0][0], M00);
-  EXPECT_FLOAT_EQ(MAT2.mat[0][1], M01);
-  EXPECT_FLOAT_EQ(MAT2.mat[1][0], M10);
-  EXPECT_FLOAT_EQ(MAT2.mat[1][1], M11);
+TEST(BasicMatrix2x2, UsingDoubleIndices) {
+  EXPECT_FLOAT_EQ(MAT2.at(0, 0), M00);
+  EXPECT_FLOAT_EQ(MAT2.at(0, 1), M01);
+  EXPECT_FLOAT_EQ(MAT2.at(1, 0), M10);
+  EXPECT_FLOAT_EQ(MAT2.at(1, 1), M11);
 }
 
 TEST(BasicMatrix2x2, AlternateValues) {
   BasicMatrix2x2<float> mat;
   EXPECT_TRUE(expect_near(mat, BasicMatrix2x2<float>(0, 0, 0, 0)));
   for (size_t i = 0; i < mat.size(); ++i) {
-    mat[i] = MAT2.data[i];
+    mat.at(i) = MAT2.data[i];
   }
   EXPECT_TRUE(expect_near(mat, MAT2));
 }
@@ -290,22 +247,16 @@ TEST(BasicMatrix3x3, Size) {
   EXPECT_EQ(MAT3.size(), 9);
 }
 
-TEST(BasicMatrix3x3, UsingSquareIndicies) {
+TEST(BasicMatrix3x3, UsingSingleIndex) {
   for (size_t i = 0; i < MAT3.size(); ++i) {
-    EXPECT_FLOAT_EQ(MAT3[i], MAT3.data[i]);
+    EXPECT_FLOAT_EQ(MAT3.at(i), MAT3.at(i));
   }
 }
 
-TEST(BasicMatrix3x3, UsingRoundSingleIndex) {
-  for (size_t i = 0; i < MAT3.size(); ++i) {
-    EXPECT_FLOAT_EQ(MAT3(i), MAT3.data[i]);
-  }
-}
-
-TEST(BasicMatrix3x3, UsingRoundDoubleIndices) {
+TEST(BasicMatrix3x3, UsingDoubleIndices) {
   for (size_t r = 0; r < MAT3.rows(); ++r) {
     for (size_t c = 0; c < MAT3.cols(); ++c) {
-      EXPECT_FLOAT_EQ(MAT3(r, c), MAT3.mat[r][c]);
+      EXPECT_FLOAT_EQ(MAT3.at(r, c), MAT3.at(r, c));
     }
   }
 }
@@ -315,7 +266,7 @@ TEST(BasicMatrix3x3, AssignValues) {
   EXPECT_TRUE(
     expect_near(mat, BasicMatrix3x3<float>(0, 0, 0, 0, 0, 0, 0, 0, 0)));
   for (size_t i = 0; i < mat.size(); ++i) {
-    mat[i] = MAT3.data[i];
+    mat.at(i) = MAT3.at(i);
   }
   EXPECT_TRUE(expect_near(mat, MAT3));
 }
