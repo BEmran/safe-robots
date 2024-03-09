@@ -149,7 +149,7 @@ template <typename T>
 ::testing::AssertionResult expect_near(T expect, T actual) {
   auto result = ::testing::AssertionSuccess();
   for (size_t i = 0; i < expect.size(); ++i) {
-    result = result && expect_near(expect[i], actual[i], std::to_string(i));
+    result = result && expect_near(expect.at(i), actual.at(i), std::to_string(i));
   }
   return result;
 }
