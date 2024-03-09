@@ -2,8 +2,9 @@
 
 #pragma once
 #include <cstddef>
-#include "basic.hpp"
-#include "utility.hpp"
+#include "core/simplemath/basic.hpp"
+#include "core/simplemath/vector3.hpp"
+#include "core/simplemath/utility.hpp"
 #include <iostream>
 #include <sstream>
 #include <array>
@@ -261,7 +262,7 @@ struct Matrix3x3 : public BasicMatrix3x3<T> {
     const T m20 = this->mat[0][1] * this->mat[1][2] - this->mat[1][1] * this->mat[0][2];
     const T m21 = this->mat[1][0] * this->mat[0][2] - this->mat[0][0] * this->mat[1][2];
     const T m22 = this->mat[0][0] * this->mat[1][1] - this->mat[0][1] * this->mat[1][0];
-    return Matrix3x3(m00, m01, m02, m10, m11, m12, m20, m21, m22).transposed();
+    return Matrix3x3(m00, m10, m20, m01, m11, m21, m02, m12, m22); // transposed
   }
 
   void clamp(T vmin, T vmax) noexcept {
