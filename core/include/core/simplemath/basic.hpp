@@ -22,6 +22,8 @@ struct Point3D {
 
 template <typename T>
 struct BasicVector2 {
+  using iterator = T*;
+  using const_iterator = const T*;
   static const size_t array_size{2};
   union {
     Point2D<T> point;
@@ -72,10 +74,26 @@ struct BasicVector2 {
   constexpr inline size_t size() const noexcept {
     return array_size;
   }
+
+  // iterators
+  constexpr iterator begin() noexcept {
+    return data;
+  }
+  constexpr const_iterator begin() const noexcept {
+    return data;
+  }
+  constexpr iterator end() noexcept {
+    return data + array_size;
+  }
+  constexpr const_iterator end() const noexcept {
+    return data + array_size;
+  }
 };
 
 template <typename T>
 struct BasicVector3 {
+  using iterator = T*;
+  using const_iterator = const T*;
   static const size_t array_size{3};
   union {
     Point3D<T> point;
@@ -130,8 +148,22 @@ struct BasicVector3 {
   inline T& z() noexcept {
     return point.z;
   }
+
   constexpr inline size_t size() const noexcept {
     return array_size;
+  }
+  // iterators
+  constexpr iterator begin() noexcept {
+    return data;
+  }
+  constexpr const_iterator begin() const noexcept {
+    return data;
+  }
+  constexpr iterator end() noexcept {
+    return data + array_size;
+  }
+  constexpr const_iterator end() const noexcept {
+    return data + array_size;
   }
 };
 
@@ -176,12 +208,13 @@ struct MatrixElements3D {
 
 template <typename T>
 struct BasicMatrix2x2 {
+  using iterator = T*;
+  using const_iterator = const T*;
   static const size_t num_rows{2};
   static const size_t num_cols{2};
   static const size_t array_size{num_rows * num_cols};
   union {
     MatrixElements2D<T> elements;
-    BasicVector2<T> row[num_rows];
     T mat[num_rows][num_cols];
     T data[array_size] = {};
   };
@@ -198,7 +231,7 @@ struct BasicMatrix2x2 {
 
   BasicMatrix2x2(const BasicVector2<T>& row0,
                  const BasicVector2<T>& row1) noexcept
-    : row{row0, row1} {
+    : BasicMatrix2x2<T>(row0.x(), row0.y(), row1.x(), row1.y()) {
   }
 
   inline T operator()(size_t row, size_t col) const noexcept {
@@ -224,25 +257,46 @@ struct BasicMatrix2x2 {
   inline T& operator[](size_t idx) noexcept {
     return data[idx];
   }
+
   constexpr inline size_t size() const noexcept {
     return array_size;
   }
+
   constexpr inline size_t rows() const noexcept {
     return num_rows;
   }
+
   constexpr inline size_t cols() const noexcept {
     return num_cols;
+  }
+
+  // iterators
+  constexpr iterator begin() noexcept {
+    return data;
+  }
+
+  constexpr const_iterator begin() const noexcept {
+    return data;
+  }
+
+  constexpr iterator end() noexcept {
+    return data + array_size;
+  }
+
+  constexpr const_iterator end() const noexcept {
+    return data + array_size;
   }
 };
 
 template <typename T>
 struct BasicMatrix3x3 {
+  using iterator = T*;
+  using const_iterator = const T*;
   static const size_t num_rows{3};
   static const size_t num_cols{3};
   static const size_t array_size{num_rows * num_cols};
   union {
     MatrixElements3D<T> elements;
-    BasicVector3<T> row[num_rows];
     T mat[num_rows][num_cols];
     T data[array_size] = {};
   };
@@ -260,7 +314,8 @@ struct BasicMatrix3x3 {
 
   BasicMatrix3x3(const BasicVector2<T>& row0, const BasicVector2<T>& row1,
                  const BasicVector2<T>& row2) noexcept
-    : row{row0, row1, row2} {
+    : BasicMatrix3x3<T>(row0.x(), row0.y(), row0.z(), row1.x(), row1.y(),
+                        row1.z(), row2.x(), row2.y(), row2.z()) {
   }
 
   inline T operator()(size_t row, size_t col) const noexcept {
@@ -286,13 +341,33 @@ struct BasicMatrix3x3 {
   inline T& operator[](size_t idx) noexcept {
     return data[idx];
   }
+
   constexpr inline size_t size() const noexcept {
     return array_size;
   }
+
   constexpr inline size_t rows() const noexcept {
     return num_rows;
   }
+
   constexpr inline size_t cols() const noexcept {
     return num_cols;
+  }
+
+  // iterators
+  constexpr iterator begin() noexcept {
+    return data;
+  }
+
+  constexpr const_iterator begin() const noexcept {
+    return data;
+  }
+
+  constexpr iterator end() noexcept {
+    return data + array_size;
+  }
+
+  constexpr const_iterator end() const noexcept {
+    return data + array_size;
   }
 };

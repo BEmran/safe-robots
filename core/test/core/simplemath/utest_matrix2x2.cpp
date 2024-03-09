@@ -159,15 +159,8 @@ TEST(Matrix2x2, Inverse) {
     expect_near(mat, Matrix2x2<float>(1.f, -1.f / 3.f, -1, 2.f / 3.f)));
 }
 
-TEST(Matrix2x2, Inversed) {
-  const float m00{2.f};
-  const float m01{1.f};
-  const float m10{3.f};
-  const float m11{3.f};
-
-  Matrix2x2<float> mat(m00, m01, m10, m11);
-  EXPECT_TRUE(expect_near(mat.inversed(),
-                          Matrix2x2<float>(1.f, -1.f / 3.f, -1, 2.f / 3.f)));
+TEST(Matrix2x2, Adjoint) {
+  EXPECT_TRUE(expect_near(MAT.adjoint(), Matrix2x2<float>(M11, M01, M10, M00)));
 }
 
 TEST(Matrix2x2, ClampOverValue) {

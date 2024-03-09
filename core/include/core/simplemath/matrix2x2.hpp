@@ -146,10 +146,9 @@ struct Matrix2x2 : public BasicMatrix2x2<T> {
     this->mat[1][1] = tmp / d;
   }
 
-  Matrix2x2 inversed() const noexcept {
-    Matrix2x2 result(*this);
-    result.inverse();
-    return result;
+  Matrix2x2 adjoint() const noexcept {
+    // Calculate the cofactor matrix and transpose matrix it at the same time
+    return Matrix2x2(this->mat[1][1], this->mat[0][1], this->mat[1][0], this->mat[0][0]);
   }
 
   void clamp(T vmin, T vmax) noexcept {
@@ -164,14 +163,6 @@ struct Matrix2x2 : public BasicMatrix2x2<T> {
     result.clamp(vmin, vmax);
     return std::move(result);
   }
-
-  // Element-wise divide
-
-  // Unary operators
-  // Matrix2x2<T> operator+() const noexcept {
-  //   return *this;
-  // }
-  // Matrix2x2<T> operator-() const noexcept;
 };
 
 template <typename T>

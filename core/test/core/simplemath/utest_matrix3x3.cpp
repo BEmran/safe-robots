@@ -110,17 +110,19 @@ TEST(Matrix3x3, MultiplyByConstant) {
 }
 
 TEST(Matrix3x3, MultiplyByMatrixInplace) {
-  Matrix3x3<float> mat1(2.f, 3.f, 4.f,  3.f, 5.f, 6.f, 4.f, 5.f, 3.f);
+  Matrix3x3<float> mat1(2.f, 3.f, 4.f, 3.f, 5.f, 6.f, 4.f, 5.f, 3.f);
   Matrix3x3<float> mat2(1.f, 2.f, 1.f, -1.f, 2.f, 1.f, 3.f, 2.f, 1.f);
   mat1 *= mat2;
-  EXPECT_TRUE(expect_near(mat1, Matrix3x3<float>(11.f, 18.f, 9.f, 16.f, 28.f, 14.f, 8.f, 24.f, 12.f)));
+  EXPECT_TRUE(expect_near(mat1, Matrix3x3<float>(11.f, 18.f, 9.f, 16.f, 28.f,
+                                                 14.f, 8.f, 24.f, 12.f)));
 }
 
 TEST(Matrix3x3, MultiplyByMatrix) {
-  Matrix3x3<float> mat1(2.f, 3.f, 4.f,  3.f, 5.f, 6.f, 4.f, 5.f, 3.f);
+  Matrix3x3<float> mat1(2.f, 3.f, 4.f, 3.f, 5.f, 6.f, 4.f, 5.f, 3.f);
   Matrix3x3<float> mat2(1.f, 2.f, 1.f, -1.f, 2.f, 1.f, 3.f, 2.f, 1.f);
   Matrix3x3<float> result = mat1 * mat2;
-  EXPECT_TRUE(expect_near(result, Matrix3x3<float>(11.f, 18.f, 9.f, 16.f, 28.f, 14.f, 8.f, 24.f, 12.f)));
+  EXPECT_TRUE(expect_near(result, Matrix3x3<float>(11.f, 18.f, 9.f, 16.f, 28.f,
+                                                   14.f, 8.f, 24.f, 12.f)));
 }
 
 TEST(Matrix3x3, MultiplyByIdentityMatrix) {
@@ -139,11 +141,11 @@ TEST(Matrix3x3, Det) {
   const float m21{6.f};
   const float m22{0.f};
   Matrix3x3<float> mat(m00, m01, m02, m10, m11, m12, m20, m21, m22);
-  EXPECT_FLOAT_EQ(mat.det(), 0.f);
+  EXPECT_FLOAT_EQ(mat.det(), 1.f);
 }
 
 TEST(Matrix3x3, DetOfIdentity) {
-  EXPECT_FLOAT_EQ(Matrix3x3<float>::eye().det(), 3.f);
+  EXPECT_FLOAT_EQ(Matrix3x3<float>::eye().det(), 1.f);
 }
 
 TEST(Matrix3x3, Transpose) {
@@ -166,36 +168,81 @@ TEST(Matrix3x3, InverseIdentity) {
 }
 
 TEST(Matrix3x3, Inverse) {
-  const float m00{3.f};
-  const float m01{0.f};
-  const float m02{2.f};
+
+  const float m00{1.f};
+  const float m01{2.f};
+  const float m02{-1.f};
   const float m10{2.f};
-  const float m11{0.f};
-  const float m12{-2.f};
-  const float m20{0.f};
-  const float m21{1.f};
+  const float m11{1.f};
+  const float m12{2.f};
+  const float m20{-1.f};
+  const float m21{2.f};
   const float m22{1.f};
   Matrix3x3<float> mat(m00, m01, m02, m10, m11, m12, m20, m21, m22);
-  mat.inverse();
-  EXPECT_TRUE(
-    expect_near(mat, Matrix3x3<float>(1 / 15.f, 1 / 15.f, 0.f, -1 / 15.f, 0.1f,
-                                      1 / 3.f, 1 / 15.f, -0.1f, -1 / 7.5f)));
+  Matrix3x3<float> expect(-3.f, -4.f, 5.f, -4.f, 0, -4.f, 5.f, -4.f, -3.f);
+  expect /= -16.f;
+  EXPECT_TRUE(expect_near(mat.inverse(), expect));
 }
 
-TEST(Matrix3x3, Inversed) {
-  const float m00{3.f};
-  const float m01{0.f};
-  const float m02{2.f};
-  const float m10{2.f};
-  const float m11{0.f};
+TEST(Matrix3x3, Inverse2) {
+  const float m00{1.f};
+  const float m01{2.f};
+  const float m02{3.f};
+  const float m10{0.f};
+  const float m11{1.f};
+  const float m12{4.f};
+  const float m20{5.f};
+  const float m21{6.f};
+  const float m22{0.f};
+  Matrix3x3<float> mat(m00, m01, m02, m10, m11, m12, m20, m21, m22);
+  Matrix3x3<float> expect(-24.f, 18.f, 5.f, 20.f, -15.f, -4.f, -5.f, 4.f, 1.f);
+  expect /= 1.f;
+  EXPECT_TRUE(expect_near(mat.inverse(), expect));
+}
+
+TEST(Matrix3x3, Inverse3) {
+  const float m00{0.f};
+  const float m01{-3.f};
+  const float m02{-2.f};
+  const float m10{1.f};
+  const float m11{-4.f};
   const float m12{-2.f};
-  const float m20{0.f};
-  const float m21{1.f};
+  const float m20{-3.f};
+  const float m21{4.f};
   const float m22{1.f};
   Matrix3x3<float> mat(m00, m01, m02, m10, m11, m12, m20, m21, m22);
-  EXPECT_TRUE(expect_near(
-    mat.inversed(), Matrix3x3<float>(1 / 15.f, 1 / 15.f, 0.f, -1 / 15.f, 0.1f,
-                                     1 / 3.f, 1 / 15.f, -0.1f, -1 / 7.5f)));
+  Matrix3x3<float> expect(4.f, -5.f, -2.f, 5.f, -6.f, -2.f, -8.f, 9.f, 3.f);
+  EXPECT_TRUE(expect_near(mat.inverse(), expect));
+}
+
+TEST(Matrix3x3, Adjoint) {
+  const float m00{1.f};
+  const float m01{2.f};
+  const float m02{-1.f};
+  const float m10{2.f};
+  const float m11{1.f};
+  const float m12{2.f};
+  const float m20{-1.f};
+  const float m21{2.f};
+  const float m22{1.f};
+  Matrix3x3<float> mat(m00, m01, m02, m10, m11, m12, m20, m21, m22);
+  Matrix3x3<float> expect(-3.f, -4.f, 5.f, -4.f, 0, -4.f, 5.f, -4.f, -3.f);
+  EXPECT_TRUE(expect_near(mat.adjoint(), expect));
+}
+
+TEST(Matrix3x3, Adjoint2) {
+  const float m00{1.f};
+  const float m01{2.f};
+  const float m02{3.f};
+  const float m10{0.f};
+  const float m11{1.f};
+  const float m12{4.f};
+  const float m20{5.f};
+  const float m21{6.f};
+  const float m22{0.f};
+  Matrix3x3<float> mat(m00, m01, m02, m10, m11, m12, m20, m21, m22);
+  Matrix3x3<float> expect(-24.f, 18.f, 5.f, 20.f, -15.f, -4.f, -5.f, 4.f, 1.f);
+  EXPECT_TRUE(expect_near(mat.adjoint(), expect));
 }
 
 TEST(Matrix3x3, ClampOverValue) {
