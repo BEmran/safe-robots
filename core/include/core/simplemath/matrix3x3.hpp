@@ -105,6 +105,13 @@ struct Matrix3x3 : public BasicMatrix3x3<T> {
     return *this;
   }
 
+  Vector3<T> operator*(const Vector3<T>& vec) noexcept {
+    const T x = mat[0][0] * vec.x() + mat[0][1] * vec.y() +  mat[0][2] * vec.z();
+    const T y = mat[1][0] * vec.x() + mat[1][1] * vec.y() +  mat[1][2] * vec.z();
+    const T z = mat[2][0] * vec.x() + mat[2][1] * vec.y() +  mat[2][2] * vec.z();
+    return Vector3<T>(x, y, z);
+  }
+
   Matrix3x3<T>& operator*=(T s) noexcept {
     data[0] *= s;
     data[1] *= s;
@@ -231,15 +238,20 @@ Matrix3x3<T> operator*(const Matrix3x3<T>& lhs,
 }
 
 template <typename T>
-Matrix3x3<T> operator*(const Matrix3x3<T>& vec, T s) noexcept {
-  Matrix3x3<T> result(vec);
+Matrix3x3<T> operator*(const Matrix3x3<T>& mat, T s) noexcept {
+  Matrix3x3<T> result(mat);
   result *= s;
   return result;
 }
 
 template <typename T>
-inline Matrix3x3<T> operator/(const Matrix3x3<T>& vec, T s) noexcept {
-  Matrix3x3<T> result(vec);
+Vector3<T> operator*(const Matrix3x3<T>& mat, const Vector3<T>& vec) noexcept {
+  return mat.operator*(vec);
+}
+
+template <typename T>
+inline Matrix3x3<T> operator/(const Matrix3x3<T>& mat, T s) noexcept {
+  Matrix3x3<T> result(mat);
   result /= s;
   return result;
 }

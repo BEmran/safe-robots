@@ -21,6 +21,16 @@ struct Point3D {
 };
 
 template <typename T>
+struct Point4D {
+  T x{};
+  T y{};
+  T z{};
+  T w{};
+  Point4D() = default;
+  Point4D(T _x, T _y, T _z, T _w) : x(_x), y(_y), z(_z), w(_w){};
+};
+
+template <typename T>
 struct BasicVector2 {
   using iterator = T*;
   using const_iterator = const T*;
@@ -133,6 +143,86 @@ struct BasicVector3 {
 
   inline T& z() noexcept {
     return data[2];
+  }
+
+  constexpr inline size_t size() const noexcept {
+    return array_size;
+  }
+
+  constexpr iterator begin() noexcept {
+    return data;
+  }
+
+  constexpr const_iterator begin() const noexcept {
+    return data;
+  }
+
+  constexpr iterator end() noexcept {
+    return data + array_size;
+  }
+
+  constexpr const_iterator end() const noexcept {
+    return data + array_size;
+  }
+};
+
+template <typename T>
+struct BasicVector4 {
+  using iterator = T*;
+  using const_iterator = const T*;
+  static const size_t array_size{4};
+  // union {
+  // Point3D<T> point;
+  T data[array_size] = {};
+  // };
+
+  BasicVector4() : data{T{}, T{}, T{}, T{}} {
+  }
+
+  BasicVector4(T c) noexcept : data{c, c, c, c} {
+  }
+
+  BasicVector4(T w, T x, T y, T z) noexcept : data{w, x, y, z} {
+  }
+
+  inline T& at(size_t idx) noexcept {
+    return data[idx];
+  }
+
+  inline T at(size_t idx) const noexcept {
+    return data[idx];
+  }
+
+  inline T w() const noexcept {
+    return data[0];
+  }
+
+  inline T& w() noexcept {
+    return data[0];
+  }
+
+  inline T x() const noexcept {
+    return data[1];
+  }
+
+  inline T& x() noexcept {
+    return data[1];
+  }
+
+  inline T y() const noexcept {
+    return data[2];
+  }
+
+  inline T& y() noexcept {
+    return data[2];
+  }
+
+  inline T z() const noexcept {
+    return data[3];
+  }
+
+  inline T& z() noexcept {
+    return data[3];
   }
 
   constexpr inline size_t size() const noexcept {

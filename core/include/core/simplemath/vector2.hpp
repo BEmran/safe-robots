@@ -26,11 +26,6 @@ struct Vector2 : public BasicVector2<T>{
   Vector2(const BasicVector2<T>& bv) noexcept : BasicVector2<T>(bv) {
   }
 
-  // Vector2(const Vector2<T>&) = default;
-  // Vector2(Vector2<T>&&) = default;
-  // Vector2& operator=(const Vector2<T>&) = default;
-  // Vector2& operator=(Vector2<T>&&) = default;
-
   inline static Vector2<T> ones() {
     return Vector2<T>(1.f);
   }
@@ -43,11 +38,6 @@ struct Vector2 : public BasicVector2<T>{
     return Vector2<T>(generate_randoms<T, 2>(vmin, vmax));
   }
 
-  // // Comparison operators
-  // bool operator==(const Vector2<T>& other) const noexcept;
-  // bool operator!=(const Vector2<T>& other) const noexcept;
-
-  // Assignment operators
   inline Vector2& operator+=(const Vector2<T>& other) noexcept {
     this->x() += other.x();
     this->y() += other.y();

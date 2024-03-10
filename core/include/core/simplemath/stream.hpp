@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/simplemath/basic.hpp"
+#include "core/simplemath/quaternion.hpp"
 #include "core/simplemath/vector2.hpp"
 #include "core/simplemath/vector3.hpp"
 #include "core/simplemath/matrix2x2.hpp"
@@ -82,5 +83,11 @@ std::ostream& operator<<(std::ostream& os, const Matrix3x3<T>& mat) {
   os << "[[" << mat.at(0) << ", " << mat.at(1) << ", " << mat.at(2) << "]\n"
      << " [" << mat.at(3) << ", " << mat.at(4) << ", " << mat.at(5) << "]\n"
      << " [" << mat.at(6) << ", " << mat.at(7) << ", " << mat.at(8) << "]]";
+  return os;
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const Quaternion<T>& quat) {
+  os << "{w = " << quat.scalar() << ", vec = " << quat.vec() << "}";
   return os;
 }
