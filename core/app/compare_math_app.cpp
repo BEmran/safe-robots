@@ -6,6 +6,7 @@
 #include <functional>
 #include "core/math/math.hpp"
 #include "core/simplemath/simplemath.hpp"
+#include "core/simplemath2/simplemath2.hpp"
 
 const float AMat[9] = {0.f, -3.f, -2.f, 1.f, -4.f, -2.f, -3.f, 4.f, 1.f};
 const float BMat[9] = {1.f, 2.f, 3.f, 0.f, 1.f, 4.f, 5.f, 6.f, 0.f};
@@ -21,12 +22,31 @@ void simple_math() {
   a *= Constant;
   b += b;
   Matrix3x3<float> c = a * b;
+
   c.inverse();
   // std::cout << "A:\n" << a << std::endl;
   // std::cout << "B:\n" << b << std::endl;
   // std::cout << "C:\n" << c << std::endl;
   // std::cout << "det:" << c.det() << std::endl;
-  // std::cout << "inv:\n" << c.inverse() << std::endl;
+  std::cout << "inv:\n" << c.inverse() << std::endl;
+}
+
+void simple2_math() {
+  simple2::Matrix3<float> a(AMat[0], AMat[1], AMat[2], AMat[3], AMat[4], AMat[5],
+                     AMat[6], AMat[7], AMat[8]);
+  simple2::Matrix3<float> b(BMat[0], BMat[1], BMat[2], BMat[3], BMat[4], BMat[5],
+                     BMat[6], BMat[7], BMat[8]);
+  a *= Constant;
+  b += b;
+  simple2::Matrix3<float> c = a * b;
+  c.inverse();
+
+  // std::cout << "A:\n" << a << std::endl;
+  // std::cout << "B:\n" << b << std::endl;
+  // std::cout << "C:\n" << c << std::endl;
+  // std::cout << "det:" << c.det() << std::endl;
+  // std::cout << "adjoint:" << c.adjoint() << std::endl;
+  std::cout << "inv:\n" << c.inverse() << std::endl;
 }
 
 void eigen_math() {
@@ -59,8 +79,9 @@ void test(void (*func)(void), const char* version, int iter) {
 }
 
 int main() {
-  const int iter = 1e5;
+  const int iter = 1e0;
   test(*eigen_math, "eigen_math", iter);
   test(*simple_math, "simple_math", iter);
+  test(*simple2_math, "simple2_math", iter);
   return 0;
 }

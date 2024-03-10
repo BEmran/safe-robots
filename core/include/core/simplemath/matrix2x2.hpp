@@ -99,7 +99,7 @@ struct Matrix2x2 : public BasicMatrix2x2<T> {
   }
 
   Matrix2x2<T>& operator/=(const Matrix2x2<T>& other) noexcept {
-    this->operator*=(other.inversed());
+    this->operator*= (other.inverse());
     return *this;
   }
 

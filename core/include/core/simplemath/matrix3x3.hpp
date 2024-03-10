@@ -132,7 +132,7 @@ struct Matrix3x3 : public BasicMatrix3x3<T> {
   }
 
   Matrix3x3<T>& operator/=(const Matrix3x3<T>& other) noexcept {
-    this->operator*=(other.inverse());
+    this->operator*= (other.inverse());
     return *this;
   }
 

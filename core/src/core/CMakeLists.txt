@@ -78,6 +78,7 @@ set(CORE_SOURCE_LIST
     ${CORE_SOURCE_DIR}/sensors/module_sensor_imu.cpp
     ${CORE_SOURCE_DIR}/sensors/module_sensor.cpp
     ${CORE_SOURCE_DIR}/simplemath/simplemath.cpp
+    ${CORE_SOURCE_DIR}/simplemath2/simplemath2.cpp
     )
 
 # ##############################################################################
