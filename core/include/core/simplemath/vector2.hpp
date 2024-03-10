@@ -100,10 +100,10 @@ struct Vector2 : public BasicVector2<T>{
   }
 
   void normalize() noexcept {
-    static constexpr double EPSILON{0.00001};
+    static constexpr T EPSILON{static_cast<T>(0.00001)};
     const T n = norm();
-    if (static_cast<double>(n) < EPSILON) {
-      // TODO: print warning when result is false
+    if (n < EPSILON && n > -EPSILON) {
+      std::wcerr << "WARN: norm is too small: " << n << std::endl;
       return;
     }
     *this /= n;

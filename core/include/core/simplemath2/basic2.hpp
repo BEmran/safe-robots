@@ -3,8 +3,57 @@
 #pragma once
 #include <cstddef>
 #include <algorithm>
+#include <array>
 
 namespace simple2 {
+
+template <typename T, size_t SIZE>
+struct BasicVector {
+  using iterator = T*;
+  using const_iterator = const T*;
+  static const size_t array_size{SIZE};
+  T data[array_size] = {};
+
+  BasicVector() {
+  }
+
+  BasicVector(T c) noexcept {
+    std::fill_n(data, array_size, c);
+  }
+
+  BasicVector(std::array<T, SIZE>& array) noexcept {
+    std::fill(array.begin(), array.end(), data);
+  }
+
+  inline T& at(size_t idx) noexcept {
+    return data[idx];
+  }
+
+  inline T at(size_t idx) const noexcept {
+    return data[idx];
+  }
+
+  constexpr inline size_t size() const noexcept {
+    return array_size;
+  }
+
+  constexpr iterator begin() noexcept {
+    return data;
+  }
+
+  constexpr const_iterator begin() const noexcept {
+    return data;
+  }
+
+  constexpr iterator end() noexcept {
+    return data + array_size;
+  }
+
+  constexpr const_iterator end() const noexcept {
+    return data + array_size;
+  }
+};
+
 template <typename T, size_t SIZE>
 struct BasicSquareMatrix {
   using iterator = T*;

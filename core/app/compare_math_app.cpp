@@ -28,7 +28,7 @@ void simple_math() {
   // std::cout << "B:\n" << b << std::endl;
   // std::cout << "C:\n" << c << std::endl;
   // std::cout << "det:" << c.det() << std::endl;
-  std::cout << "inv:\n" << c.inverse() << std::endl;
+  // std::cout << "inv:\n" << c.inverse() << std::endl;
 }
 
 void simple2_math() {
@@ -46,7 +46,7 @@ void simple2_math() {
   // std::cout << "C:\n" << c << std::endl;
   // std::cout << "det:" << c.det() << std::endl;
   // std::cout << "adjoint:" << c.adjoint() << std::endl;
-  std::cout << "inv:\n" << c.inverse() << std::endl;
+  // std::cout << "inv:\n" << c.inverse() << std::endl;
 }
 
 void eigen_math() {
@@ -79,7 +79,7 @@ void test(void (*func)(void), const char* version, int iter) {
 }
 
 int main() {
-  const int iter = 1e0;
+  const int iter = 1e5;
   test(*eigen_math, "eigen_math", iter);
   test(*simple_math, "simple_math", iter);
   test(*simple2_math, "simple2_math", iter);

@@ -4,4 +4,5 @@
 
 #include "core/simplemath2/basic2.hpp"
 #include "core/simplemath2/matrix.hpp"
+#include "core/simplemath2/vector.hpp"
 #include "core/simplemath2/stream2.hpp"

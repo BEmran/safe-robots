@@ -9,7 +9,7 @@
 #include <iostream>
 
 template <typename T>
-struct Vector3 : public BasicVector3<T>{
+struct Vector3 : public BasicVector3<T> {
   Vector3() noexcept : BasicVector3<T>() {
   }
 
@@ -96,12 +96,9 @@ struct Vector3 : public BasicVector3<T>{
   }
 
   Vector3 cross(const Vector3& other) const noexcept {
-    const T tmp_x =
-      this->y() * other->z() - this->z() * other->y();
-    const T tmp_y =
-      this->z() * other->x() - this->x() * other->z();
-    const T tmp_z =
-      this->x() * other->y() - this->y() * other->x();
+    const T tmp_x = this->y() * other.z() - this->z() * other.y();
+    const T tmp_y = this->z() * other.x() - this->x() * other.z();
+    const T tmp_z = this->x() * other.y() - this->y() * other.x();
     return Vector3<T>(tmp_x, tmp_y, tmp_z);
   }
 
@@ -110,10 +107,10 @@ struct Vector3 : public BasicVector3<T>{
   }
 
   void normalize() noexcept {
-    static constexpr double EPSILON{0.00001};
+    static constexpr T EPSILON{static_cast<T>(0.00001)};
     const T n = norm();
-    if (static_cast<double>(n) < EPSILON) {
-      // TODO: print warning when result is false
+    if (n < EPSILON && n > -EPSILON) {
+      std::wcerr << "WARN: norm is too small: " << n << std::endl;
       return;
     }
     *this /= n;

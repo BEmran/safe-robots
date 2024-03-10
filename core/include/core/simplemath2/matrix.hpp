@@ -1,7 +1,8 @@
 // Copyright (C) 2024 Bara Emran - All Rights Reserved
 
 #pragma once
-#include "basic2.hpp"
+#include "core/simplemath2/basic2.hpp"
+#include "core/simplemath2/utility2.hpp"
 
 #include <cstddef>
 #include <iostream>
@@ -35,16 +36,20 @@ struct Matrix : public BasicSquareMatrix<T, SIZE> {
   }
 
   template <std::size_t S = SIZE, std::enable_if_t<S != 3 && S == SIZE, int> = 0>
-  inline static Matrix<T, SIZE> eye() {
+  inline static Matrix eye() {
     return Matrix<T, SIZE>(0.5f);
   }
 
-  inline static Matrix<T, SIZE> ones() {
+  inline static Matrix ones() {
     return Matrix<T, SIZE>(1.f);
   }
 
-  inline static Matrix<T, SIZE> zeros() {
+  inline static Matrix zeros() {
     return Matrix<T, SIZE>(0.f);
+  }
+
+  inline static Matrix random(T vmin, T vmax) {
+    return Vector(generate_randoms<T, 3>(vmin, vmax));
   }
 
   template <typename U>
@@ -193,7 +198,7 @@ struct Matrix : public BasicSquareMatrix<T, SIZE> {
   }
 
   template <typename U>
-  Matrix clamped(T vmin, T vmax) const noexcept {
+  Matrix clamped(U vmin, U vmax) const noexcept {
     Matrix result(*this);
     result.clamp(vmin, vmax);
     return result;
@@ -308,7 +313,7 @@ operator*(const simple2::Matrix<T, SIZE>& lhs,
 
 template <typename T, size_t SIZE, typename U>
 simple2::Matrix<T, SIZE> operator*(const simple2::Matrix<T, SIZE>& mat,
-                                   T s) noexcept {
+                                   U s) noexcept {
   simple2::Matrix<T, SIZE> result(mat);
   result *= s;
   return result;
