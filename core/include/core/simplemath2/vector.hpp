@@ -153,10 +153,16 @@ struct Vector : public BasicVector<T, SIZE> {
 };
 
 template <typename T>
+using Vector4 = Vector<T, 4>;
+using Vector4F = Vector4<float>;
+
+template <typename T>
 using Vector3 = Vector<T, 3>;
+using Vector3F = Vector3<float>;
 
 template <typename T>
 using Vector2 = Vector<T, 2>;
+using Vector2F = Vector2<float>;
 
 }  // namespace simple2
 

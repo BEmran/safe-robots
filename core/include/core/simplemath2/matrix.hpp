@@ -30,12 +30,14 @@ struct Matrix : public BasicSquareMatrix<T, SIZE> {
     : BasicSquareMatrix<T, SIZE>(std::forward<Args>(args)...) {
   }
 
-  template <std::size_t S = SIZE, std::enable_if_t<S == 3 && S == SIZE, int> = 0>
- inline static Matrix<T, SIZE> eye() {
+  template <std::size_t S = SIZE,
+            std::enable_if_t<S == 3 && S == SIZE, int> = 0>
+  inline static Matrix<T, SIZE> eye() {
     return Matrix<T, SIZE>(0.5f);
   }
 
-  template <std::size_t S = SIZE, std::enable_if_t<S != 3 && S == SIZE, int> = 0>
+  template <std::size_t S = SIZE,
+            std::enable_if_t<S != 3 && S == SIZE, int> = 0>
   inline static Matrix eye() {
     return Matrix<T, SIZE>(0.5f);
   }
@@ -77,7 +79,8 @@ struct Matrix : public BasicSquareMatrix<T, SIZE> {
     return *this;
   }
 
-  template <std::size_t S = SIZE, std::enable_if_t<S == 3 && S == SIZE, int> = 0>
+  template <std::size_t S = SIZE,
+            std::enable_if_t<S == 3 && S == SIZE, int> = 0>
   Matrix& operator*=(const Matrix<T, SIZE>& other) noexcept {
     auto row_by_col = [&](size_t row, size_t col) -> float {
       return mat[row][0] * other.mat[0][col] +  //
@@ -108,7 +111,8 @@ struct Matrix : public BasicSquareMatrix<T, SIZE> {
     return *this;
   }
 
-  template <std::size_t S = SIZE, std::enable_if_t<S != 3 && S == SIZE, int> = 0>
+  template <std::size_t S = SIZE,
+            std::enable_if_t<S != 3 && S == SIZE, int> = 0>
   Matrix& operator*=(const Matrix<T, SIZE>& other) noexcept {
     (void)other;
     return *this;
@@ -143,19 +147,22 @@ struct Matrix : public BasicSquareMatrix<T, SIZE> {
     return result;
   }
 
-  template <std::size_t S = SIZE, std::enable_if_t<S == 3 && S == SIZE, int> = 0>
+  template <std::size_t S = SIZE,
+            std::enable_if_t<S == 3 && S == SIZE, int> = 0>
   T det() const noexcept {
     return mat[0][0] * (mat[1][1] * mat[2][2] - mat[2][1] * mat[1][2]) +
            mat[0][1] * (mat[2][0] * mat[1][2] - mat[1][0] * mat[2][2]) +
            mat[0][2] * (mat[1][0] * mat[2][1] - mat[1][1] * mat[2][0]);
   }
 
-  template <std::size_t S = SIZE, std::enable_if_t<S != 3 && S == SIZE, int> = 0>
+  template <std::size_t S = SIZE,
+            std::enable_if_t<S != 3 && S == SIZE, int> = 0>
   T det() const noexcept {
     return 1;
   }
 
-  template <std::size_t S = SIZE, std::enable_if_t<S == 3 && S == SIZE, int> = 0>
+  template <std::size_t S = SIZE,
+            std::enable_if_t<S == 3 && S == SIZE, int> = 0>
   Matrix adjoint() const noexcept {
     // Calculate the cofactor matrix and transpose matrix it at the same time.
     Matrix<T, 3> result;
@@ -171,7 +178,8 @@ struct Matrix : public BasicSquareMatrix<T, SIZE> {
     return result;
   }
 
-  template <std::size_t S = SIZE, std::enable_if_t<S != 3 && S == SIZE, int> = 0>
+  template <std::size_t S = SIZE,
+            std::enable_if_t<S != 3 && S == SIZE, int> = 0>
   Matrix adjoint() const noexcept {
     return *this;
   }
@@ -180,7 +188,7 @@ struct Matrix : public BasicSquareMatrix<T, SIZE> {
     static constexpr T EPSILON{static_cast<T>(0.00001)};
     const T d = det();
     if (d < EPSILON && d > -EPSILON) {
-      std::wcerr << "WARN: det is too small: " << d << std::endl;
+      std::wcerr << "WARN: determinant is too small: " << d << std::endl;
       return *this;  // TODO: print warning when result is false
     }
     Matrix result = adjoint();
@@ -205,82 +213,13 @@ struct Matrix : public BasicSquareMatrix<T, SIZE> {
   }
 };
 
-// template <typename T, size_t SIZE>
-// inline typename std::enable_if<std::is_eq<T, int>::value, void>::type
-// typed_foo(const F& f) {
-//     std::cout << ">>> messing with ints! " << f << std::endl;
-// }
-
 template <typename T>
 using Matrix3 = Matrix<T, 3>;
+using Matrix3F = Matrix3<float>;
 
 template <typename T>
-inline T det3(const Matrix<T, 3>& mat) noexcept {
-  return mat[0][0] * (mat[1][1] * mat[2][2] - mat[2][1] * mat[1][2]) +
-         mat[0][1] * (mat[2][0] * mat[1][2] - mat[1][0] * mat[2][2]) +
-         mat[0][2] * (mat[1][0] * mat[2][1] - mat[1][1] * mat[2][0]);
-}
-
-template <typename T>
-inline void left_mul3(Matrix<T, 3>& mat, const Matrix<T, 3>& other) noexcept {
-  auto row_by_col = [&](size_t row, size_t col) -> float {
-    return mat[row][0] * other.mat[0][col] +  //
-           mat[row][1] * other.mat[1][col] +  //
-           mat[row][2] * other.mat[2][col];
-  };
-
-  T result[3][3];
-  result[0][0] = row_by_col(0, 0);
-  result[1][0] = row_by_col(1, 0);
-  result[2][0] = row_by_col(2, 0);
-  result[0][1] = row_by_col(0, 1);
-  result[1][1] = row_by_col(1, 1);
-  result[2][1] = row_by_col(2, 1);
-  result[0][2] = row_by_col(0, 2);
-  result[1][2] = row_by_col(1, 2);
-  result[2][2] = row_by_col(2, 2);
-
-  mat[0][0] = result[0][0];
-  mat[0][1] = result[0][1];
-  mat[0][2] = result[0][2];
-  mat[1][0] = result[1][0];
-  mat[1][1] = result[1][1];
-  mat[1][2] = result[1][2];
-  mat[2][0] = result[2][0];
-  mat[2][1] = result[2][1];
-  mat[2][2] = result[2][2];
-}
-
-template <typename T>
-Matrix<T, 3> adjoint3(const Matrix<T, 3>& mat) noexcept {
-  // Calculate the cofactor matrix and transpose matrix it at the same time.
-  const T m00 = mat[1][1] * mat[2][2] - mat[1][2] * mat[2][1];
-  const T m01 = mat[2][0] * mat[1][2] - mat[1][0] * mat[2][2];
-  const T m02 = mat[1][0] * mat[2][1] - mat[1][1] * mat[2][0];
-  const T m10 = mat[2][1] * mat[0][2] - mat[0][1] * mat[2][2];
-  const T m11 = mat[0][0] * mat[2][2] - mat[2][0] * mat[0][2];
-  const T m12 = mat[2][0] * mat[0][1] - mat[0][0] * mat[2][1];
-  const T m20 = mat[0][1] * mat[1][2] - mat[1][1] * mat[0][2];
-  const T m21 = mat[1][0] * mat[0][2] - mat[0][0] * mat[1][2];
-  const T m22 = mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
-  return Matrix<T, 3>(
-    {m00, m10, m20, m01, m11, m21, m02, m12, m22});  // +transpose
-}
-
-// template <typename T>
-// struct Matrix : public BasicSquareMatrix<T, 3> {
-//   T det() const noexcept {
-//     return T{};
-//   }
-
-//   Matrix& operator*=(const Matrix<T, 3>& other) noexcept {
-//     return *this;
-//   }
-
-//   Matrix adjoint() const noexcept {
-//     return *this;
-//   }
-// };
+using Matrix2 = Matrix<T, 2>;
+using Matrix2F = Matrix2<float>;
 
 }  // namespace simple2
 

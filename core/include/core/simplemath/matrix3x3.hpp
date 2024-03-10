@@ -132,7 +132,7 @@ struct Matrix3x3 : public BasicMatrix3x3<T> {
   }
 
   Matrix3x3<T>& operator/=(const Matrix3x3<T>& other) noexcept {
-    this->operator*= (other.inverse());
+    this->operator*=(other.inverse());
     return *this;
   }
 
@@ -158,7 +158,7 @@ struct Matrix3x3 : public BasicMatrix3x3<T> {
     static constexpr T EPSILON{static_cast<T>(0.00001)};
     const T d = det();
     if (d < EPSILON && d > -EPSILON) {
-      std::wcerr << "WARN: det is too small: " << d << std::endl;
+      std::wcerr << "WARN: determinant is too small: " << d << std::endl;
       return *this;  // TODO: print warning when result is false
     }
     return adjoint() / d;
