@@ -1,7 +1,7 @@
 // Copyright (C) 2023 Bara Emran - All Rights Reserved
 
-#ifndef TEST_UTILS_HPP
-#define TEST_UTILS_HPP
+#ifndef TEST_UTILS_SIMPLEMATH_HPP
+#define TEST_UTILS_SIMPLEMATH_HPP
 
 #include "core/simplemath/simplemath.hpp"
 #include <ostream>
@@ -10,83 +10,6 @@
 
 constexpr float EPSILON{1e-6f};
 
-template <typename T>
-std::ostream& operator<<(std::ostream& os, const Point2D<T>& p) {
-  return os << "Point2D { "              //
-            << ".x = [" << p.x << "], "  //
-            << ".y = [" << p.y << "]}";  //
-}
-
-template <typename T>
-std::ostream& operator<<(std::ostream& os, const Point3D<T>& p) {
-  return os << "Point3D { "              //
-            << ".x = [" << p.x << "], "  //
-            << ".y = [" << p.y << "], "  //
-            << ".z = [" << p.z << "]}";  //
-}
-
-template <typename T>
-std::ostream& operator<<(std::ostream& os, const BasicVector2<T>& v) {
-  return os << "BasicVector2 { "           //
-            << ".x = [" << v.x() << "], "  //
-            << ".y = [" << v.y() << "]}";  //
-}
-
-template <typename T>
-std::ostream& operator<<(std::ostream& os, const BasicVector3<T>& v) {
-  return os << "BasicVector3 { "           //
-            << ".x = [" << v.x() << "], "  //
-            << ".y = [" << v.y() << "], "  //
-            << ".z = [" << v.z() << "]}";  //
-}
-
-template <typename T>
-std::ostream& operator<<(std::ostream& os, const MatrixElements2D<T>& e) {
-  return os << "MatrixElements2D { "         //
-            << ".m00 = [" << e.m00 << "], "  //
-            << ".m01 = [" << e.m01 << "], "  //
-            << ".m10 = [" << e.m10 << "], "  //
-            << ".m11 = [" << e.m11 << "]}";
-}
-
-template <typename T>
-std::ostream& operator<<(std::ostream& os, const MatrixElements3D<T>& e) {
-  return os << "MatrixElements3D {"          //
-            << ".m00 = [" << e.m00 << "], "  //
-            << ".m01 = [" << e.m01 << "], "  //
-            << ".m02 = [" << e.m02 << "], "  //
-            << ".m10 = [" << e.m10 << "], "  //
-            << ".m11 = [" << e.m11 << "], "  //
-            << ".m12 = [" << e.m12 << "], "  //
-            << ".m20 = [" << e.m20 << "], "  //
-            << ".m21 = [" << e.m21 << "], "  //
-            << ".m22 = [" << e.m22 << "]}";
-}
-
-template <typename T>
-std::string to_string(T* array, size_t size) {
-  std::stringstream ss;
-  for (size_t i = 0; i < size; ++i) {
-    ss << "[" << i << "]: " << array[i];
-    if (i < size - 1) {
-      ss << ", ";
-    }
-  }
-  return ss.str();
-}
-
-template <typename T>
-std::ostream& operator<<(std::ostream& os, const BasicMatrix2x2<T>& e) {
-  return os << "MatrixElements2D { .data: " << to_string(e.data, e.size())
-            << "}";
-}
-
-template <typename T>
-std::ostream& operator<<(std::ostream& os, const BasicMatrix3x3<T>& e) {
-  return os << "MatrixElements3D { .data: " << to_string(e.data, e.size())
-            << "}";
-}
-/*****************************************************************************/
 [[__nodiscard__]] ::testing::AssertionResult
 operator&&(::testing::AssertionResult lhs, ::testing::AssertionResult rhs) {
   if (not lhs) {
@@ -154,4 +77,4 @@ template <typename T>
   return result;
 }
 
-#endif  // TEST_UTILS_HPP
+#endif  // TEST_UTILS_SIMPLEMATH_HPP

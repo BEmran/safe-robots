@@ -39,11 +39,11 @@ struct BasicVector2 {
   BasicVector2(T x, T y) noexcept : data{x, y} {
   }
 
-  inline T& at(size_t idx) noexcept{
+  inline T& at(size_t idx) noexcept {
     return data[idx];
   }
 
-  inline T at(size_t idx) const noexcept{
+  inline T at(size_t idx) const noexcept {
     return data[idx];
   }
 
@@ -67,16 +67,18 @@ struct BasicVector2 {
     return array_size;
   }
 
-  // iterators
   constexpr iterator begin() noexcept {
     return data;
   }
+
   constexpr const_iterator begin() const noexcept {
     return data;
   }
+
   constexpr iterator end() noexcept {
     return data + array_size;
   }
+
   constexpr const_iterator end() const noexcept {
     return data + array_size;
   }
@@ -101,11 +103,11 @@ struct BasicVector3 {
   BasicVector3(T x, T y, T z) noexcept : data{x, y, z} {
   }
 
-  inline T& at(size_t idx) noexcept{
+  inline T& at(size_t idx) noexcept {
     return data[idx];
   }
 
-  inline T at(size_t idx) const noexcept{
+  inline T at(size_t idx) const noexcept {
     return data[idx];
   }
 
@@ -136,16 +138,19 @@ struct BasicVector3 {
   constexpr inline size_t size() const noexcept {
     return array_size;
   }
-  // iterators
+
   constexpr iterator begin() noexcept {
     return data;
   }
+
   constexpr const_iterator begin() const noexcept {
     return data;
   }
+
   constexpr iterator end() noexcept {
     return data + array_size;
   }
+
   constexpr const_iterator end() const noexcept {
     return data + array_size;
   }
@@ -197,11 +202,11 @@ struct BasicMatrix2x2 {
   static const size_t num_rows{2};
   static const size_t num_cols{2};
   static const size_t array_size{num_rows * num_cols};
-  // union {
-  // MatrixElements2D<T> elements;
-  // T mat[num_rows][num_cols];
-  T data[array_size] = {};
-  // };
+  union {
+    // MatrixElements2D<T> elements;
+    T mat[num_rows][num_cols];
+    T data[array_size] = {};
+  };
 
   BasicMatrix2x2() : BasicMatrix2x2(T{}) {
   }
@@ -218,26 +223,22 @@ struct BasicMatrix2x2 {
     : BasicMatrix2x2<T>(row0.x(), row0.y(), row1.x(), row1.y()) {
   }
 
-  inline size_t to_idx(size_t row, size_t col) const noexcept {
-    return row * num_cols + col;
+  inline T& at(size_t row, size_t col) noexcept {
+    return data[row * num_cols + col];
   }
 
-  inline T& at(size_t row, size_t col) noexcept{
-    return data[to_idx(row, col)];
+  inline T at(size_t row, size_t col) const noexcept {
+    return data[row * num_cols + col];
   }
 
-  inline T at(size_t row, size_t col) const noexcept{
-    return data[to_idx(row, col)];
-  }
-  
-  inline T& at(size_t idx) noexcept{
+  inline T& at(size_t idx) noexcept {
     return data[idx];
   }
 
-  inline T at(size_t idx) const noexcept{
+  inline T at(size_t idx) const noexcept {
     return data[idx];
   }
-  
+
   constexpr inline size_t size() const noexcept {
     return array_size;
   }
@@ -275,11 +276,11 @@ struct BasicMatrix3x3 {
   static const size_t num_rows{3};
   static const size_t num_cols{3};
   static const size_t array_size{num_rows * num_cols};
-  // union {
-  // MatrixElements3D<T> elements;
-  // T mat[num_rows][num_cols];
-  T data[array_size] = {};
-  // };
+  union {
+    // MatrixElements3D<T> elements;
+    T mat[num_rows][num_cols];
+    T data[array_size] = {};
+  };
 
   BasicMatrix3x3() : BasicMatrix3x3(T{}) {
   }
@@ -298,26 +299,22 @@ struct BasicMatrix3x3 {
                         row1.z(), row2.x(), row2.y(), row2.z()) {
   }
 
-  inline size_t to_idx(size_t row, size_t col) const noexcept {
-    return row * num_cols + col;
+  inline T& at(size_t row, size_t col) noexcept {
+    return mat[row][col];
   }
 
-  inline T& at(size_t row, size_t col) noexcept{
-    return data[to_idx(row, col)];
+  inline T at(size_t row, size_t col) const noexcept {
+    return mat[row][col];
   }
 
-  inline T at(size_t row, size_t col) const noexcept{
-    return data[to_idx(row, col)];
-  }
-
-  inline T& at(size_t idx) noexcept{
+  inline T& at(size_t idx) noexcept {
     return data[idx];
   }
 
-  inline T at(size_t idx) const noexcept{
+  inline T at(size_t idx) const noexcept {
     return data[idx];
   }
-  
+
   constexpr inline size_t size() const noexcept {
     return array_size;
   }

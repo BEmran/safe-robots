@@ -1,16 +1,19 @@
 // Copyright (C) 2024 Bara Emran - All Rights Reserved
 
 #pragma once
-#include <cstddef>
-#include "basic.hpp"
-#include "utility.hpp"
-#include <ostream>
+#include "core/simplemath/basic.hpp"
+#include "core/simplemath/vector2.hpp"
+#include "core/simplemath/utility.hpp"
+
 #include <array>
-#include <sstream>
+#include <cstddef>
 #include <iostream>
 
 template <typename T>
 struct Matrix2x2 : public BasicMatrix2x2<T> {
+  using BasicMatrix2x2<T>::data;
+  using BasicMatrix2x2<T>::mat;
+
   Matrix2x2() noexcept : BasicMatrix2x2<T>() {
   }
 
@@ -28,11 +31,6 @@ struct Matrix2x2 : public BasicMatrix2x2<T> {
   Matrix2x2(const BasicMatrix2x2<T>& bm) noexcept : BasicMatrix2x2<T>(bm) {
   }
 
-  // Matrix2x2(const Matrix2x2<T>&) = default;
-  // Matrix2x2(Matrix2x2<T>&&) = default;
-  // Matrix2x2& operator=(const Matrix2x2<T>&) = default;
-  // Matrix2x2& operator=(Matrix2x2<T>&&) = default;
-
   inline static Matrix2x2<T> eye() {
     return Matrix2x2<T>(1.f, 0.f, 0.f, 1.f);
   }
@@ -49,75 +47,54 @@ struct Matrix2x2 : public BasicMatrix2x2<T> {
     return Matrix2x2<T>(generate_randoms<T, 4>(vmin, vmax));
   }
 
-  // // Comparison operators
-  // bool operator==(const Matrix2x2<T>& other) const noexcept {
-  //   return                       //
-  //     this->at(0, 0) == other.at(0, 0) &&  //
-  //     this->at(0, 1) == other.at(0, 1) &&  //
-  //     this->at(1, 0) == other.at(1, 0) &&  //
-  //     this->at(1, 1) == other.at(1, 1);
-  // }
-
-  // bool operator!=(const Matrix2x2<T>& other) const noexcept {
-  //   return not this->operator==(other);
-  // }
-
-  // // Assignment operators
-  // Matrix2x2& operator=(const BasicMatrix2x2<T>& other) noexcept {
-  //   this->at(0, 0) = other.at(0, 0);
-  //   this->at(0, 1) = other.at(0, 1);
-  //   this->at(1, 0) = other.at(1, 0);
-  //   this->at(1, 1) = other.at(1, 1);
-  //   return *this;
-  // }
-
   Matrix2x2& operator+=(const Matrix2x2<T>& other) noexcept {
-    this->at(0, 0) += other.at(0, 0);
-    this->at(0, 1) += other.at(0, 1);
-    this->at(1, 0) += other.at(1, 0);
-    this->at(1, 1) += other.at(1, 1);
+    mat[0][0] += other.at(0, 0);
+    mat[0][1] += other.at(0, 1);
+    mat[1][0] += other.at(1, 0);
+    mat[1][1] += other.at(1, 1);
     return *this;
   }
 
   Matrix2x2<T>& operator-=(const Matrix2x2<T>& other) noexcept {
-    this->at(0, 0) -= other.at(0, 0);
-    this->at(0, 1) -= other.at(0, 1);
-    this->at(1, 0) -= other.at(1, 0);
-    this->at(1, 1) -= other.at(1, 1);
+    mat[0][0] -= other.at(0, 0);
+    mat[0][1] -= other.at(0, 1);
+    mat[1][0] -= other.at(1, 0);
+    mat[1][1] -= other.at(1, 1);
     return *this;
   }
 
   Matrix2x2<T>& operator*=(T s) noexcept {
-    this->at(0, 0) *= s;
-    this->at(0, 1) *= s;
-    this->at(1, 0) *= s;
-    this->at(1, 1) *= s;
+    mat[0][0] *= s;
+    mat[0][1] *= s;
+    mat[1][0] *= s;
+    mat[1][1] *= s;
     return *this;
   }
 
   Matrix2x2<T>& operator*=(const Matrix2x2<T>& other) noexcept {
     // this is done in this way because of one used for the same matrix (mat *=
     // mat) it will update the matrix while in the middle of multiplication
-    const T m00 =
-      this->at(0, 0) * other.at(0, 0) + this->at(0, 1) * other.at(1, 0);
-    const T m01 =
-      this->at(0, 0) * other.at(0, 1) + this->at(0, 1) * other.at(1, 1);
-    const T m10 =
-      this->at(1, 0) * other.at(0, 0) + this->at(1, 1) * other.at(1, 0);
-    const T m11 =
-      this->at(1, 0) * other.at(0, 1) + this->at(1, 1) * other.at(1, 1);
-    this->at(0, 0) = m00;
-    this->at(0, 1) = m01;
-    this->at(1, 0) = m10;
-    this->at(1, 1) = m11;
+
+    auto row_by_col = [&](size_t row, size_t col) -> T {
+      return mat[row][0] * other.at(0, col) + mat[row][1] * other.at(1, col);
+    };
+    T result[2][2];
+    result[0][0] = row_by_col(0, 0);
+    result[0][1] = row_by_col(0, 1);
+    result[1][0] = row_by_col(1, 0);
+    result[1][1] = row_by_col(1, 1);
+    mat[0][0] = result[0][0];
+    mat[0][1] = result[0][1];
+    mat[1][0] = result[1][0];
+    mat[1][1] = result[1][1];
     return *this;
   }
 
   Matrix2x2<T>& operator/=(T s) noexcept {
-    this->at(0, 0) /= s;
-    this->at(0, 1) /= s;
-    this->at(1, 0) /= s;
-    this->at(1, 1) /= s;
+    mat[0][0] /= s;
+    mat[0][1] /= s;
+    mat[1][0] /= s;
+    mat[1][1] /= s;
     return *this;
   }
 
@@ -127,7 +104,7 @@ struct Matrix2x2 : public BasicMatrix2x2<T> {
   }
 
   void transpose() noexcept {
-    std::swap(this->at(0, 1), this->at(1, 0));
+    std::swap(mat[0][1], mat[1][0]);
   }
 
   Matrix2x2 transposed() const noexcept {
@@ -137,29 +114,29 @@ struct Matrix2x2 : public BasicMatrix2x2<T> {
   }
 
   T det() const noexcept {
-    return this->at(0, 0) * this->at(1, 1) - this->at(0, 1) * this->at(1, 0);
+    return mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
   }
 
-  void inverse() noexcept {
+  Matrix2x2 inverse() noexcept {
+    static constexpr T EPSILON{static_cast<T>(0.00001)};
     const T d = det();
-    const float tmp = this->at(0, 0);
-    this->at(0, 0) = this->at(1, 1) / d;
-    this->at(0, 1) /= -d;
-    this->at(1, 0) /= -d;
-    this->at(1, 1) = tmp / d;
+    if (d < EPSILON && d > -EPSILON) {
+      std::wcerr << "WARN: det is too small: " << d << std::endl;
+      return *this;  // TODO: print warning when result is false
+    }
+    return adjoint() / d;
   }
 
   Matrix2x2 adjoint() const noexcept {
     // Calculate the cofactor matrix and transpose matrix it at the same time
-    return Matrix2x2(this->at(1, 1), this->at(0, 1), this->at(1, 0),
-                     this->at(0, 0));
+    return Matrix2x2(mat[1][1], -mat[0][1], -mat[1][0], mat[0][0]);
   }
 
   void clamp(T vmin, T vmax) noexcept {
-    this->at(0, 0) = std::clamp(this->at(0, 0), vmin, vmax);
-    this->at(0, 1) = std::clamp(this->at(0, 1), vmin, vmax);
-    this->at(1, 0) = std::clamp(this->at(1, 0), vmin, vmax);
-    this->at(1, 1) = std::clamp(this->at(1, 1), vmin, vmax);
+    mat[0][0] = std::clamp(mat[0][0], vmin, vmax);
+    mat[0][1] = std::clamp(mat[0][1], vmin, vmax);
+    mat[1][0] = std::clamp(mat[1][0], vmin, vmax);
+    mat[1][1] = std::clamp(mat[1][1], vmin, vmax);
   }
 
   Matrix2x2 clamped(T vmin, T vmax) const noexcept {

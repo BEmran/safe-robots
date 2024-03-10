@@ -9,6 +9,7 @@
 
 const float AMat[9] = {0.f, -3.f, -2.f, 1.f, -4.f, -2.f, -3.f, 4.f, 1.f};
 const float BMat[9] = {1.f, 2.f, 3.f, 0.f, 1.f, 4.f, 5.f, 6.f, 0.f};
+const float Constant{4.f};
 // const float BMat[9] = {1, 0, 0, 0, 1, 0, 0, 0, 1};
 
 void simple_math() {
@@ -17,8 +18,9 @@ void simple_math() {
                      AMat[6], AMat[7], AMat[8]);
   Matrix3x3<float> b(BMat[0], BMat[1], BMat[2], BMat[3], BMat[4], BMat[5],
                      BMat[6], BMat[7], BMat[8]);
+  a *= Constant;
+  b += b;
   Matrix3x3<float> c = a * b;
-  (void)c;
   c.inverse();
   // std::cout << "A:\n" << a << std::endl;
   // std::cout << "B:\n" << b << std::endl;
@@ -34,8 +36,9 @@ void eigen_math() {
     AMat[8];
   B << BMat[0], BMat[1], BMat[2], BMat[3], BMat[4], BMat[5], BMat[6], BMat[7],
     BMat[8];
+  A *= Constant;
+  B += B;
   core::math::Mat3 C = A * B;
-  (void)C;
   C.inverse();
   // std::cout << "A:\n" << A << std::endl;
   // std::cout << "B:\n" << B << std::endl;

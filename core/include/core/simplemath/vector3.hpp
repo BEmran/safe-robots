@@ -1,10 +1,12 @@
 #pragma once
-#include "basic.hpp"
+#include "core/simplemath/basic.hpp"
+#include "core/simplemath/utility.hpp"
 
-#include <cstddef>
-#include "utility.hpp"
-#include <cmath>
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <iostream>
 
 template <typename T>
 struct Vector3 : public BasicVector3<T>{
