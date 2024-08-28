@@ -48,6 +48,18 @@ struct Matrix3x3 : public BasicMatrix3x3<T> {
     return Matrix3x3<T>(generate_randoms<T, 9>(vmin, vmax));
   }
 
+  bool is_approx(const Matrix3x3<T>& other) const noexcept {
+    return is_approx(data[0], other.at(0)) &&  //
+           is_approx(data[1], other.at(1)) &&  //
+           is_approx(data[2], other.at(2)) &&  //
+           is_approx(data[3], other.at(3)) &&  //
+           is_approx(data[4], other.at(4)) &&  //
+           is_approx(data[5], other.at(5)) &&  //
+           is_approx(data[6], other.at(6)) &&  //
+           is_approx(data[7], other.at(7)) &&  //
+           is_approx(data[8], other.at(8));
+  }
+
   Matrix3x3& operator+=(const Matrix3x3<T>& other) noexcept {
     data[0] += other.at(0);
     data[1] += other.at(1);
@@ -106,10 +118,12 @@ struct Matrix3x3 : public BasicMatrix3x3<T> {
   }
 
   Vector3<T> operator*(const Vector3<T>& vec) noexcept {
-    const T x = mat[0][0] * vec.x() + mat[0][1] * vec.y() +  mat[0][2] * vec.z();
-    const T y = mat[1][0] * vec.x() + mat[1][1] * vec.y() +  mat[1][2] * vec.z();
-    const T z = mat[2][0] * vec.x() + mat[2][1] * vec.y() +  mat[2][2] * vec.z();
-    return Vector3<T>(x, y, z);
+    auto dot = [&](size_t idx) -> T {
+      return mat[idx][0] * vec.at(0) +  //
+             mat[idx][1] * vec.at(1) +  //
+             mat[idx][2] * vec.at(2);
+    };
+    return Vector3<T>(dot(0), dot(1), dot(2));
   }
 
   Matrix3x3<T>& operator*=(T s) noexcept {

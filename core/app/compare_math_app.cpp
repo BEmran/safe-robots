@@ -34,20 +34,20 @@ void simple_math() {
     Quaternion<float>(-0.5f, -0.5f, -0.5f, -0.5f).normalized();
   Quaternion<float> q4;
   std::cout << "q 1:\n" << q1 << std::endl;
-  std::cout << "rotation 1:\n" << q1.matrix() << std::endl;
+  std::cout << "rotation 1:\n" << q1.to_matrix() << std::endl;
   std::cout << "q 2:\n" << q2 << std::endl;
-  std::cout << "rotation 2:\n" << q2.matrix() << std::endl;
+  std::cout << "rotation 2:\n" << q2.to_matrix() << std::endl;
   std::cout << "q 3:\n" << q3 << std::endl;
-  std::cout << "rotation 3:\n" << q3.matrix() << std::endl;
+  std::cout << "rotation 3:\n" << q3.to_matrix() << std::endl;
   std::cout << "q 4:\n" << q4 << std::endl;
-  std::cout << "rotation 4:\n" << q4.matrix() << std::endl;
+  std::cout << "rotation 4:\n" << q4.to_matrix() << std::endl;
 
   std::cout << "rotate 1:\n"
-            << rotate(q1, Vector3<float>(1.f, 2.f, 3.f)) << std::endl;
+            << q1.rotate(Vector3<float>(1.f, 2.f, 3.f)) << std::endl;
   std::cout << "rotate 2:\n"
-            << rotate(q2, Vector3<float>(1.f, 2.f, 3.f)) << std::endl;
+            << q2.rotate(Vector3<float>(1.f, 2.f, 3.f)) << std::endl;
   std::cout << "rotate 3:\n"
-            << rotate(q3, Vector3<float>(1.f, 2.f, 3.f)) << std::endl;
+            << q3.rotate(Vector3<float>(1.f, 2.f, 3.f)) << std::endl;
   // std::cout << "A:\n" << a << std::endl;
   // std::cout << "B:\n" << b << std::endl;
   // std::cout << "C:\n" << c << std::endl;

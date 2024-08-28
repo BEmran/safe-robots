@@ -1,8 +1,5 @@
 // Copyright (C) 2024 Bara Emran - All Rights Reserved
 
-#ifndef TEST_SIMPLEMATH_UTEST_VECTOR2_HPP
-#define TEST_SIMPLEMATH_UTEST_VECTOR2_HPP
-
 #include "core/simplemath/vector2.hpp"
 #include "utils.hpp"
 
@@ -231,4 +228,3 @@ TEST(Vector2, ClampedWithVector) {
   Vector2<float> vec(x, y);
   EXPECT_TRUE(expect_near(vec.clamped(vmin, vmax), vec));
 }
-#endif  // TEST_SIMPLEMATH_UTEST_VECTOR2_HPP

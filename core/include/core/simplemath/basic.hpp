@@ -2,6 +2,20 @@
 
 #pragma once
 #include <cstddef>
+#include <cstdlib>
+
+using BASIC_TYPE = float;
+
+template <typename T>
+inline T epsilon() noexcept {
+  static constexpr BASIC_TYPE val{0.0001f};
+  return static_cast<T>(val);
+}
+
+template <typename T>
+inline bool is_approx(T lhs, T rhs, T eps = epsilon<T>()) noexcept {
+  return std::abs(lhs - rhs) < eps;
+}
 
 template <typename T>
 struct Point2D {

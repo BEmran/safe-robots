@@ -13,3 +13,6 @@ package_add_test_with_libraries(utest_matrix2x2 "${UTEST_MATRIX2X2_FILES}" "${CO
 
 set(UTEST_MATRIX3X3_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_matrix3x3.cpp)
 package_add_test_with_libraries(utest_matrix3x3 "${UTEST_MATRIX3X3_FILES}" "${CORE_LIBRARY}" "")
+
+set(UTEST_QUATERNION_FILES ${CMAKE_CURRENT_SOURCE_DIR}/utest_quaternion.cpp)
+package_add_test_with_libraries(utest_quat "${UTEST_QUATERNION_FILES}" "${CORE_LIBRARY}" "")

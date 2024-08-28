@@ -47,6 +47,13 @@ struct Matrix2x2 : public BasicMatrix2x2<T> {
     return Matrix2x2<T>(generate_randoms<T, 4>(vmin, vmax));
   }
 
+  bool is_approx(const Matrix2x2<T>& other) const noexcept {
+    return is_approx(data[0], other.at(0)) &&  //
+           is_approx(data[1], other.at(1)) &&  //
+           is_approx(data[2], other.at(2)) &&  //
+           is_approx(data[3], other.at(3));
+  }
+
   Matrix2x2& operator+=(const Matrix2x2<T>& other) noexcept {
     mat[0][0] += other.at(0, 0);
     mat[0][1] += other.at(0, 1);

@@ -9,6 +9,7 @@ SHELL := /bin/bash
 YAML_CPP = yaml-cpp
 RCL = rcl
 GTEST = googletest
+LRC = librobotcontrol
 ################################
 ## Display option information
 ################################
@@ -55,6 +56,14 @@ build-google-test: ## build google-test
 	fi
 	@cmake -S ${GTEST} -B ./build/${GTEST}
 	@cd ./build/${GTEST}; \
+	make -j8
+
+build-lrc: ## build librobotcontrol
+	@if [ ! -d "./build/${LRC}" ]; then	\
+		mkdir -p ./build/${LRC};				\
+	fi
+	@cmake -S ${LRC} -B ./build/${LRC}
+	@cd ./build/${LRC}; \
 	make -j8
 
 clean: ## clean build file

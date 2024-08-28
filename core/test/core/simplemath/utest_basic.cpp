@@ -1,8 +1,5 @@
 // Copyright (C) 2023 Bara Emran - All Rights Reserved
 
-#ifndef TEST_UTEST_BASIC_HPP
-#define TEST_UTEST_BASIC_HPP
-
 #include "core/simplemath/basic.hpp"
 #include "utils.hpp"
 
@@ -279,6 +276,3 @@ TEST(BasicMatrix3x3, Begin) {
 TEST(BasicMatrix3x3, End) {
   EXPECT_EQ(VEC3.end(), VEC3.data + 3);
 }
-
-#endif  // TEST_UTEST_BASIC_HPP
-

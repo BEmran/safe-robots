@@ -1,8 +1,5 @@
 // Copyright (C) 2024 Bara Emran - All Rights Reserved
 
-#ifndef TEST_SIMPLEMATH_UTEST_MATRIX2X2_HPP
-#define TEST_SIMPLEMATH_UTEST_MATRIX2X2_HPP
-
 #include "core/simplemath/matrix2x2.hpp"
 #include "utils.hpp"
 
@@ -180,5 +177,3 @@ TEST(Matrix2x2, ClampedOverValue) {
 TEST(Matrix2x2, ClampedUnderValue) {
   EXPECT_TRUE(expect_near(MAT.clamped(-10, 10), MAT));
 }
-
-#endif  // TEST_SIMPLEMATH_UTEST_MATRIX2X2_HPP

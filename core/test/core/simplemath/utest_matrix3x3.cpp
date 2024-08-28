@@ -1,8 +1,5 @@
 // Copyright (C) 2024 Bara Emran - All Rights Reserved
 
-#ifndef TEST_SIMPLEMATH_UTEST_MATRIX3X3_HPP
-#define TEST_SIMPLEMATH_UTEST_MATRIX3X3_HPP
-
 #include "core/simplemath/matrix3x3.hpp"
 #include "utils.hpp"
 
@@ -264,5 +261,3 @@ TEST(Matrix3x3, ClampedOverValue) {
 TEST(Matrix3x3, ClampedUnderValue) {
   EXPECT_TRUE(expect_near(MAT.clamped(-10, 10), MAT));
 }
-
-#endif  // TEST_SIMPLEMATH_UTEST_MATRIX3X3_HPP

@@ -38,6 +38,12 @@ struct Vector3 : public BasicVector3<T> {
     return Vector3<T>(generate_randoms<T, 3>(vmin, vmax));
   }
 
+  bool is_approx(const Vector3<T>& other) const noexcept {
+    return is_approx(this->x(), other.x()) &&  //
+           is_approx(this->y(), other.y()) &&  //
+           is_approx(this->z(), other.z());
+  }
+
   inline Vector3& operator+=(const Vector3<T>& other) noexcept {
     this->x() += other.x();
     this->y() += other.y();
